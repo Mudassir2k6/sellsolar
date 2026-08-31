@@ -4,6 +4,7 @@ import {
   useState,
 } from 'react';
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
+import AuthPage from './pages/AuthPage';
 import {
   ArrowLeft,
   ArrowRight,
@@ -607,307 +608,11 @@ function hx({
   })
 }function Wu(t){
   const e=t instanceof Error?t.message.toLowerCase():"";
-  return e.includes("weak_password")||e.includes("pwned")||e.includes("password is known")?"This password has been found in known data breaches and cannot be used. Please choose a stronger, unique password.":e.includes("invalid login")||e.includes("invalid credentials")?"Incorrect email or password. Please try again.":e.includes("user already registered")||e.includes("already been registered")?"An account with this email already exists. Try logging in instead.":e.includes("email_rate_limit")||e.includes("rate limit")?"Too many attempts. Please wait a moment and try again.":e.includes("email not confirmed")?"Please check your email and confirm your account before logging in.":t instanceof Error&&t.message?t.message:"Something went wrong. Please try again."
-}function di(t){
-  let e=0;
-  return t.length>=8&&e++,t.length>=12&&e++,/[A-Z]/.test(t)&&/[a-z]/.test(t)&&e++,/[0-9]/.test(t)&&e++,/[^A-Za-z0-9]/.test(t)&&e++,{
-    score:e,...[{
-      label:"Too short",color:"bg-gray-200"
-    },{
-      label:"Weak",color:"bg-error-400"
-    },{
-      label:"Fair",color:"bg-warning-400"
-    },{
-      label:"Good",color:"bg-accent-400"
-    },{
-      label:"Strong",color:"bg-secondary-500"
-    },{
-      label:"Very strong",color:"bg-secondary-600"
-    }][e]
-  }
-}function fx(){
-  const t="ABCDEFGHJKLMNPQRSTUVWXYZ",e="abcdefghjkmnpqrstuvwxyz",r="23456789",n="!@#$%^&*",s=t+e+r+n,a=o=>o[Math.floor(Math.random()*o.length)];
-  let l=[a(t),a(e),a(r),a(n)];
-  for(let o=0;
-  o<12;
-  o++)l.push(a(s));
-  return l.sort(()=>Math.random()-.5).join("")
-}function Bn({
-  onSuccess:t,onBack:e
-}){
-  const{
-    refreshProfile:r
-  }=useAuth(),[n,s]=useState("login"),[a,l]=useState("individual"),[o,c]=useState(!1),[u,d]=useState(!1),[h,p]=useState(null),[y,w]=useState(""),[j,C]=useState(""),[g,f]=useState(""),[m,v]=useState(""),[k,x]=useState(""),[S,L]=useState(""),[z,I]=useState(""),[Y,ke]=useState(""),[ye,Be]=useState(""),le=a==="dealer",We=async()=>{
-    if(p(null),le&&!S.trim()){
-      p("CNIC number is mandatory for dealers");
-      return
-    }if(le&&!z.trim()){
-      p("Business name is mandatory for dealers");
-      return
-    }if(!y.trim()||!j.trim()||!g.trim()){
-      p("Please fill in all required fields");
-      return
-    }if(j.length<8){
-      p("Password must be at least 8 characters.");
-      return
-    }if(di(j).score<3){
-      p('Password is too weak. Use at least 8 characters with a mix of uppercase, lowercase, numbers, and symbols. Or click "Suggest" to generate a strong password.');
-      return
-    }d(!0);
-    try{
-      const{
-        data:D,error:H
-      }=await supabase.auth.signUp({
-        email:y,password:j,options:{
-          data:{
-            account_type:a,full_name:g,phone:m||null,city:k||null,cnic:le?S:null,business_name:le?z:null,business_address:le?Y:null,visiting_card_url:le?ye:null
-          }
-        }
-      });
-      if(H)throw H;
-      if(!D.user)throw new Error("Sign up failed — no user returned");
-      await r(D.user.id),t()
-    }catch(D){
-      p(Wu(D))
-    }finally{
-      d(!1)
-    }
-  },Xe=async()=>{
-    if(p(null),!y.trim()||!j.trim()){
-      p("Please enter your email and password");
-      return
-    }d(!0);
-    try{
-      const{
-        error:A
-      }=await supabase.auth.signInWithPassword({
-        email:y,password:j
-      });
-      if(A)throw A;
-      await r(),t()
-    }catch(A){
-      p(Wu(A))
-    }finally{
-      d(!1)
-    }
-  },_=()=>{
-    n==="login"?Xe():We()
-  };
-  return jsxs("div",{
-    className:"min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50",children:[jsx("div",{
-      className:"border-b border-gray-100 bg-white/80 backdrop-blur-sm",children:jsxs("div",{
-        className:"container-page flex h-16 items-center justify-between",children:[jsxs("button",{
-          onClick:e,className:"flex items-center gap-2",children:[jsx("div",{
-            className:"flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 shadow-lg shadow-primary-500/30",children:jsx(Sun,{
-              className:"h-5 w-5 text-white",strokeWidth:2.5
-            })
-          }),jsxs("span",{
-            className:"text-xl font-extrabold tracking-tight text-gray-900",children:["Sell",jsx("span",{
-              className:"text-primary-500",children:"Solar"
-            })]
-          })]
-        }),jsx("button",{
-          onClick:e,className:"text-sm font-semibold text-gray-600 hover:text-gray-900",children:"Back to Home"
-        })]
-      })
-    }),jsx("div",{
-      className:"container-page flex flex-col items-center justify-center py-12 lg:py-16",children:jsxs("div",{
-        className:"w-full max-w-md",children:[jsxs("div",{
-          className:"mb-6 flex rounded-xl bg-gray-100 p-1",children:[jsx("button",{
-            onClick:()=>s("login"),className:`flex-1 rounded-lg py-2.5 text-sm font-semibold transition-all ${n==="login"?"bg-white text-gray-900 shadow-sm":"text-gray-500"}`,children:"Login"
-          }),jsx("button",{
-            onClick:()=>s("signup"),className:`flex-1 rounded-lg py-2.5 text-sm font-semibold transition-all ${n==="signup"?"bg-white text-gray-900 shadow-sm":"text-gray-500"}`,children:"Sign Up"
-          })]
-        }),jsxs("div",{
-          className:"card p-6 shadow-xl sm:p-8",children:[jsx("h1",{
-            className:"text-2xl font-extrabold tracking-tight text-gray-900",children:n==="login"?"Welcome back":"Create your account"
-          }),jsx("p",{
-            className:"mt-1 text-sm text-gray-500",children:n==="login"?"Sign in to post ads and manage your listings":"Join SellSolar to buy and sell solar equipment"
-          }),n==="signup"&&jsxs("div",{
-            className:"mt-6",children:[jsx("label",{
-              className:"mb-2 block text-sm font-semibold text-gray-700",children:"Account Type"
-            }),jsxs("div",{
-              className:"grid grid-cols-2 gap-3",children:[jsxs("button",{
-                onClick:()=>l("individual"),className:`flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all ${a==="individual"?"border-primary-500 bg-primary-50":"border-gray-200 hover:border-gray-300"}`,children:[jsx(User,{
-                  className:`h-6 w-6 ${a==="individual"?"text-primary-600":"text-gray-400"}`
-                }),jsx("span",{
-                  className:`text-sm font-semibold ${a==="individual"?"text-primary-700":"text-gray-600"}`,children:"Individual"
-                })]
-              }),jsxs("button",{
-                onClick:()=>l("dealer"),className:`flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all ${le?"border-primary-500 bg-primary-50":"border-gray-200 hover:border-gray-300"}`,children:[jsx(Store,{
-                  className:`h-6 w-6 ${le?"text-primary-600":"text-gray-400"}`
-                }),jsx("span",{
-                  className:`text-sm font-semibold ${le?"text-primary-700":"text-gray-600"}`,children:"Dealer"
-                })]
-              })]
-            }),le&&jsxs("div",{
-              className:"mt-2 flex items-start gap-2 rounded-lg bg-warning-50 p-3 text-xs text-warning-700",children:[jsx(CircleAlert,{
-                className:"h-4 w-4 shrink-0 mt-0.5"
-              }),jsx("span",{
-                children:"As a dealer, you must provide your CNIC number, business name, and visiting card. This information is required for verification."
-              })]
-            })]
-          }),jsxs("div",{
-            className:"mt-6 space-y-4",children:[n==="signup"&&jsxs("div",{
-              children:[jsx("label",{
-                className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"Full Name *"
-              }),jsxs("div",{
-                className:"relative",children:[jsx(User,{
-                  className:"absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
-                }),jsx("input",{
-                  type:"text",value:g,onChange:A=>f(A.target.value),placeholder:"Enter your full name",className:"input-field pl-11"
-                })]
-              })]
-            }),jsxs("div",{
-              children:[jsx("label",{
-                className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"Email *"
-              }),jsxs("div",{
-                className:"relative",children:[jsx(Mail,{
-                  className:"absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
-                }),jsx("input",{
-                  type:"email",value:y,onChange:A=>w(A.target.value),placeholder:"you@example.com",className:"input-field pl-11"
-                })]
-              })]
-            }),jsxs("div",{
-              children:[jsx("label",{
-                className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"Password *"
-              }),jsxs("div",{
-                className:"relative",children:[jsx(Lock,{
-                  className:"absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
-                }),jsx("input",{
-                  type:o?"text":"password",value:j,onChange:A=>C(A.target.value),placeholder:"CircleCheckBig least 8 characters, use letters, numbers & symbols",className:"input-field pl-11 pr-11"
-                }),jsx("button",{
-                  onClick:()=>c(!o),className:"absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600",type:"button",children:o?jsx(EyeOff,{
-                    className:"h-5 w-5"
-                  }):jsx(Eye,{
-                    className:"h-5 w-5"
-                  })
-                })]
-              }),n==="signup"&&j.length>0&&jsxs("div",{
-                className:"mt-2",children:[jsxs("div",{
-                  className:"flex items-center gap-2",children:[jsx("div",{
-                    className:"h-1.5 flex-1 overflow-hidden rounded-full bg-gray-100",children:jsx("div",{
-                      className:`h-full rounded-full transition-all duration-300 ${di(j).color}`,style:{
-                        width:`${di(j).score/5*100}%`
-                      }
-                    })
-                  }),jsx("span",{
-                    className:"text-xs font-semibold text-gray-500",children:di(j).label
-                  })]
-                }),jsxs("div",{
-                  className:"mt-1.5 flex items-center justify-between",children:[jsx("p",{
-                    className:"text-xs text-gray-400",children:"Use 8+ characters with letters, numbers & symbols."
-                  }),jsxs("button",{
-                    onClick:()=>{
-                      C(fx()),c(!0)
-                    },className:"flex items-center gap-1 text-xs font-semibold text-primary-600 hover:text-primary-700",type:"button",children:[jsx(RefreshCw,{
-                      className:"h-3 w-3"
-                    }),"Suggest"]
-                  })]
-                })]
-              })]
-            }),n==="signup"&&jsxs(Fragment,{
-              children:[jsxs("div",{
-                children:[jsx("label",{
-                  className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"Phone"
-                }),jsxs("div",{
-                  className:"relative",children:[jsx(Phone,{
-                    className:"absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
-                  }),jsx("input",{
-                    type:"tel",value:m,onChange:A=>v(A.target.value),placeholder:"0300-1234567",className:"input-field pl-11"
-                  })]
-                })]
-              }),jsxs("div",{
-                children:[jsx("label",{
-                  className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"City"
-                }),jsxs("div",{
-                  className:"relative",children:[jsx(MapPin,{
-                    className:"absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 z-10"
-                  }),jsxs("select",{
-                    value:k,onChange:A=>x(A.target.value),className:"select-field pl-11",children:[jsx("option",{
-                      value:"",children:"Select your city"
-                    }),CITIES.map(A=>jsx("option",{
-                      value:A,children:A
-                    },A))]
-                  })]
-                })]
-              }),le&&jsxs("div",{
-                className:"space-y-4 rounded-xl bg-primary-50/50 p-4 ring-1 ring-primary-100",children:[jsxs("div",{
-                  className:"flex items-center gap-2 text-sm font-bold text-primary-700",children:[jsx(Store,{
-                    className:"h-4 w-4"
-                  }),"Dealer Information (Mandatory)"]
-                }),jsxs("div",{
-                  children:[jsx("label",{
-                    className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"CNIC Number *"
-                  }),jsxs("div",{
-                    className:"relative",children:[jsx(CreditCard,{
-                      className:"absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
-                    }),jsx("input",{
-                      type:"text",value:S,onChange:A=>L(A.target.value),placeholder:"12345-1234567-1",className:"input-field pl-11"
-                    })]
-                  })]
-                }),jsxs("div",{
-                  children:[jsx("label",{
-                    className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"Business Name *"
-                  }),jsxs("div",{
-                    className:"relative",children:[jsx(Store,{
-                      className:"absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
-                    }),jsx("input",{
-                      type:"text",value:z,onChange:A=>I(A.target.value),placeholder:"e.g. SolarTech Pakistan",className:"input-field pl-11"
-                    })]
-                  })]
-                }),jsxs("div",{
-                  children:[jsx("label",{
-                    className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"Business Address"
-                  }),jsx("input",{
-                    type:"text",value:Y,onChange:A=>ke(A.target.value),placeholder:"Shop address",className:"input-field"
-                  })]
-                }),jsxs("div",{
-                  children:[jsx("label",{
-                    className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"Visiting Card Image URL"
-                  }),jsxs("div",{
-                    className:"relative",children:[jsx(Image,{
-                      className:"absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
-                    }),jsx("input",{
-                      type:"text",value:ye,onChange:A=>Be(A.target.value),placeholder:"https://...",className:"input-field pl-11"
-                    })]
-                  }),jsx("p",{
-                    className:"mt-1 text-xs text-gray-400",children:"Provide a URL to your visiting card image for verification"
-                  })]
-                })]
-              })]
-            }),h&&jsxs("div",{
-              className:"flex items-start gap-2 rounded-lg bg-error-50 p-3 text-sm text-error-700",children:[jsx(CircleAlert,{
-                className:"h-4 w-4 shrink-0 mt-0.5"
-              }),jsx("span",{
-                children:h
-              })]
-            }),jsx("button",{
-              onClick:_,disabled:u,className:"btn-primary w-full disabled:opacity-60 disabled:cursor-not-allowed",children:u?jsxs(Fragment,{
-                children:[jsx(LoaderCircle,{
-                  className:"h-5 w-5 animate-spin"
-                }),"Please wait..."]
-              }):n==="login"?"Sign In":"Create Account"
-            }),jsx("p",{
-              className:"text-center text-sm text-gray-500",children:n==="login"?jsxs(Fragment,{
-                children:["Don't have an account?"," ",jsx("button",{
-                  onClick:()=>{
-                    s("signup"),p(null)
-                  },className:"font-semibold text-primary-600 hover:text-primary-700",children:"Sign up"
-                })]
-              }):jsxs(Fragment,{
-                children:["Already have an account?"," ",jsx("button",{
-                  onClick:()=>{
-                    s("login"),p(null)
-                  },className:"font-semibold text-primary-600 hover:text-primary-700",children:"Login"
-                })]
-              })
-            })]
-          })]
-        })]
-      })
-    })]
-  })
+  return e.includes("weak_password")||e.includes("pwned")||e.includes("password is known")?"Password must be at least 8 characters.":e.includes("invalid login")||e.includes("invalid credentials")?"Incorrect email or password. Please try again.":e.includes("user already registered")||e.includes("already been registered")?"An account with this email already exists. Try logging in instead.":e.includes("email_rate_limit")||e.includes("rate limit")?"Too many attempts. Please wait a moment and try again.":e.includes("email not confirmed")?"Please check your email and confirm your account before logging in.":e.includes("unable to validate email")||e.includes("invalid email")||e.includes("email address")&&e.includes("invalid")?"Please enter a valid email address.":t instanceof Error&&t.message?t.message:"Something went wrong. Please try again."
+}function isValidEmail(t){
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(t||"").trim())
+}function Bn(props){
+  return jsx(AuthPage,props)
 }function mx({
   onBack:t
 }){
@@ -2969,7 +2674,9 @@ function yx({
               children:[jsx("label",{
                 className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"New Password"
               }),jsx("input",{
-                type:"password",value:X,onChange:T=>St(T.target.value),className:"input-field"
+                type:"password",value:X,onChange:T=>St(T.target.value),placeholder:"At least 8 characters",className:"input-field"
+              }),jsx("p",{
+                className:"mt-1.5 text-xs text-gray-400",children:"Minimum 8 characters."
               })]
             }),jsxs("div",{
               children:[jsx("label",{
@@ -3314,7 +3021,7 @@ function _x({
   })
 }export default function App(){
   const{
-    user:t,profile:e,loading:r
+    user:t,profile:e,loading:r,passwordRecovery:pr
   }=useAuth(),[n,s]=useState("home"),[a,l]=useState(null),o=d=>{
     s(d),window.scrollTo({
       top:0,behavior:"smooth"
@@ -3328,6 +3035,8 @@ function _x({
     className:"flex min-h-screen items-center justify-center bg-white",children:jsx("div",{
       className:"flex h-12 w-12 animate-spin rounded-full border-4 border-primary-200 border-t-primary-500"
     })
+  }):pr?jsx(Bn,{
+    initialView:"reset",onSuccess:()=>o("home"),onBack:()=>o("home")
   }):n==="login"?jsx(Bn,{
     onSuccess:()=>o("home"),onBack:()=>o("home")
   }):n==="dealers"?jsx(mx,{

@@ -3,10 +3,19 @@ import { supabase } from '../lib/supabase';
 
 const AuthContext = createContext(null);
 
+function hasRecoveryParams() {
+  if (typeof window === 'undefined') return false;
+  const hash = window.location.hash?.replace(/^#/, '') || '';
+  const search = window.location.search?.replace(/^\?/, '') || '';
+  const params = new URLSearchParams(hash.includes('type=') ? hash : search);
+  return params.get('type') === 'recovery';
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [passwordRecovery, setPasswordRecovery] = useState(() => hasRecoveryParams());
 
   const loadProfile = useCallback(async (userId) => {
     if (!userId) {
@@ -27,11 +36,22 @@ export function AuthProvider({ children }) {
     await loadProfile(id);
   }, [loadProfile, user?.id]);
 
+  const completePasswordRecovery = useCallback(() => {
+    setPasswordRecovery(false);
+    if (typeof window !== 'undefined') {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
   useEffect(() => {
     let mounted = true;
     const timeout = window.setTimeout(() => {
       if (mounted) setLoading(false);
     }, 4000);
+
+    if (hasRecoveryParams()) {
+      setPasswordRecovery(true);
+    }
 
     supabase.auth
       .getSession()
@@ -51,7 +71,10 @@ export function AuthProvider({ children }) {
 
     let subscription = { unsubscribe() {} };
     try {
-      const result = supabase.auth.onAuthStateChange((_event, session) => {
+      const result = supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'PASSWORD_RECOVERY') {
+          setPasswordRecovery(true);
+        }
         setUser(session?.user ?? null);
         if (session?.user) {
           loadProfile(session.user.id);
@@ -75,11 +98,20 @@ export function AuthProvider({ children }) {
     await supabase.auth.signOut();
     setUser(null);
     setProfile(null);
+    setPasswordRecovery(false);
   }, []);
 
   const value = useMemo(
-    () => ({ user, profile, loading, signOut, refreshProfile }),
-    [user, profile, loading, signOut, refreshProfile]
+    () => ({
+      user,
+      profile,
+      loading,
+      passwordRecovery,
+      signOut,
+      refreshProfile,
+      completePasswordRecovery,
+    }),
+    [user, profile, loading, passwordRecovery, signOut, refreshProfile, completePasswordRecovery]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

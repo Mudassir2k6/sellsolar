@@ -1,12 +1,76 @@
 import { createClient } from '@supabase/supabase-js';
 
-const url = import.meta.env.VITE_SUPABASE_URL || 'https://zgfycrnmivfybbclflwf.supabase.co';
-const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const DEFAULT_SUPABASE_URL = 'https://iinmjmhqnleafhsbrboa.supabase.co';
+const DEFAULT_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dummy_public_key';
 
-if (!anonKey) {
+function getValidSupabaseUrl(rawUrl) {
+  if (!rawUrl || typeof rawUrl !== 'string') {
+    return DEFAULT_SUPABASE_URL;
+  }
+  let trimmed = rawUrl.trim();
+  if (
+    !trimmed ||
+    trimmed === 'undefined' ||
+    trimmed === 'null' ||
+    trimmed.startsWith('MY_') ||
+    trimmed.startsWith('YOUR_')
+  ) {
+    return DEFAULT_SUPABASE_URL;
+  }
+  if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
+    if (trimmed.includes('.')) {
+      trimmed = `https://${trimmed}`;
+    } else {
+      return DEFAULT_SUPABASE_URL;
+    }
+  }
+  try {
+    new URL(trimmed);
+    return trimmed;
+  } catch {
+    return DEFAULT_SUPABASE_URL;
+  }
+}
+
+function getValidAnonKey(rawKey) {
+  if (!rawKey || typeof rawKey !== 'string') {
+    return DEFAULT_ANON_KEY;
+  }
+  const trimmed = rawKey.trim();
+  if (
+    !trimmed ||
+    trimmed === 'undefined' ||
+    trimmed === 'null' ||
+    trimmed.startsWith('MY_') ||
+    trimmed.startsWith('YOUR_')
+  ) {
+    return DEFAULT_ANON_KEY;
+  }
+  return trimmed;
+}
+
+const supabaseUrl = getValidSupabaseUrl(import.meta.env.VITE_SUPABASE_URL);
+const supabaseAnonKey = getValidAnonKey(import.meta.env.VITE_SUPABASE_ANON_KEY);
+
+if (!import.meta.env.VITE_SUPABASE_ANON_KEY) {
   console.warn(
-    '[SellSolar] Missing VITE_SUPABASE_ANON_KEY in .env. The page will render, but listings and login will not load until you add the public anon key.'
+    '[SellSolar] Using default/public Supabase configuration. To connect to your own backend, provide VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.'
   );
 }
 
-export const supabase = createClient(url, anonKey || 'public-anon-key');
+let client;
+try {
+  client = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+    },
+  });
+} catch (err) {
+  console.error('[SellSolar] Failed to initialize Supabase client:', err);
+  client = createClient(DEFAULT_SUPABASE_URL, DEFAULT_ANON_KEY);
+}
+
+export const supabase = client;
+

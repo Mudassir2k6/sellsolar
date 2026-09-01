@@ -5,6 +5,7 @@ import {
 } from 'react';
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
 import AuthPage from './pages/AuthPage';
+import PasswordPage from './pages/PasswordPage';
 import {
   ArrowLeft,
   ArrowRight,
@@ -138,7 +139,11 @@ function Xy({
                 }),jsxs("button",{
                   onClick:()=>h("dashboard"),className:"flex w-full items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50",children:[jsx(LayoutDashboard,{
                     className:"h-4 w-4 text-gray-400"
-                  }),"EyeOff Dashboard"]
+                  }),"My Dashboard"]
+                }),jsxs("button",{
+                  onClick:()=>h("password"),className:"flex w-full items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50",children:[jsx(Lock,{
+                    className:"h-4 w-4 text-gray-400"
+                  }),"Change Password"]
                 }),jsxs("button",{
                   onClick:()=>h("post-ad"),className:"flex w-full items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50",children:[jsx(CirclePlus,{
                     className:"h-4 w-4 text-gray-400"
@@ -183,7 +188,11 @@ function Xy({
           children:[jsxs("button",{
             onClick:()=>h("dashboard"),className:"flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50",children:[jsx(LayoutDashboard,{
               className:"h-4 w-4"
-            }),"EyeOff Dashboard"]
+            }),"My Dashboard"]
+          }),jsxs("button",{
+            onClick:()=>h("password"),className:"flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50",children:[jsx(Lock,{
+              className:"h-4 w-4"
+            }),"Change Password"]
           }),jsxs("button",{
             onClick:()=>h("post-ad"),className:"flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50",children:[jsx(CirclePlus,{
               className:"h-4 w-4"
@@ -2234,7 +2243,7 @@ function yx({
           })]
         }),P(),Q(),jsx("div",{
           className:"grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4",children:[{
-            label:"EyeOff Products",value:l.length,icon:Tag,color:"text-primary-500 bg-primary-50"
+            label:"All Products",value:l.length,icon:Tag,color:"text-primary-500 bg-primary-50"
           },{
             label:"Approved",value:O.length,icon:CircleCheckBig,color:"text-secondary-500 bg-secondary-50"
           },{
@@ -2494,7 +2503,7 @@ function yx({
       case"products":case"drafts":case"pending":case"approved":case"rejected":case"sold":const te=s==="products"?l:s==="drafts"?Fs:s==="pending"?b:s==="approved"?O:s==="rejected"?q:V;
       return jsxs("div",{
         children:[jsx("h1",{
-          className:"mb-1 text-2xl font-extrabold tracking-tight text-gray-900",children:s==="products"?"EyeOff Products":s==="drafts"?"Draft Products":s==="pending"?"Pending Products":s==="approved"?"Approved Products":s==="rejected"?"Rejected Products":"Sold Products"
+          className:"mb-1 text-2xl font-extrabold tracking-tight text-gray-900",children:s==="products"?"All Products":s==="drafts"?"Draft Products":s==="pending"?"Pending Products":s==="approved"?"Approved Products":s==="rejected"?"Rejected Products":"Sold Products"
         }),jsxs("p",{
           className:"mb-6 text-sm text-gray-500",children:[te.length," ",te.length===1?"product":"products"]
         }),P(),te.length===0?jsxs("div",{
@@ -3046,8 +3055,14 @@ function _x({
     className:"flex min-h-screen items-center justify-center bg-white",children:jsx("div",{
       className:"flex h-12 w-12 animate-spin rounded-full border-4 border-primary-200 border-t-primary-500"
     })
-  }):pr?jsx(Bn,{
-    initialView:"reset",onSuccess:()=>o("home"),onBack:()=>o("home")
+  }):pr?jsx(PasswordPage,{
+    initialMode:"reset",onSuccess:()=>o("home"),onBack:()=>o("home")
+  }):n==="password"||n==="change-password"?jsx(PasswordPage,{
+    initialMode:t?"change":"forgot",onSuccess:()=>o(t?"dashboard":"home"),onBack:()=>o("home")
+  }):n==="forgot-password"?jsx(PasswordPage,{
+    initialMode:"forgot",onSuccess:()=>o("home"),onBack:()=>o("home")
+  }):n==="reset-password"?jsx(PasswordPage,{
+    initialMode:"reset",onSuccess:()=>o("home"),onBack:()=>o("home")
   }):n==="login"?jsx(Bn,{
     onSuccess:()=>o("home"),onBack:()=>o("home")
   }):n==="dealers"?jsx(mx,{
@@ -3073,7 +3088,7 @@ function _x({
   }):jsxs("div",{
     className:"min-h-screen bg-white",children:[jsx(Xy,{
       onNavigate:d=>{
-        d==="post-ad"?c():d==="admin"||d==="admin-dashboard"?t&&(e!=null&&e.is_admin)?o("admin-dashboard"):o("login"):o(d==="dashboard"?t?"dashboard":"login":d)
+        d==="post-ad"?c():d==="admin"||d==="admin-dashboard"?t&&(e!=null&&e.is_admin)?o("admin-dashboard"):o("login"):d==="password"||d==="change-password"?o("password"):o(d==="dashboard"?t?"dashboard":"login":d)
       },currentPage:n
     }),jsx("main",{
       children:jsx(_x,{

@@ -7,8 +7,16 @@ function hasRecoveryParams() {
   if (typeof window === 'undefined') return false;
   const hash = window.location.hash?.replace(/^#/, '') || '';
   const search = window.location.search?.replace(/^\?/, '') || '';
-  const params = new URLSearchParams(hash.includes('type=') ? hash : search);
-  return params.get('type') === 'recovery';
+  const hashParams = new URLSearchParams(hash);
+  const searchParams = new URLSearchParams(search);
+  
+  return (
+    hashParams.get('type') === 'recovery' ||
+    searchParams.get('type') === 'recovery' ||
+    hashParams.get('type') === 'invite' ||
+    searchParams.get('type') === 'invite' ||
+    Boolean(hashParams.get('access_token') && hashParams.get('type') === 'recovery')
+  );
 }
 
 export function AuthProvider({ children }) {

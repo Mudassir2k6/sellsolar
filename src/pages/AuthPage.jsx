@@ -36,7 +36,7 @@ function authErrorMessage(error) {
     return 'This email already exists.';
   }
   if (error?.code === 'weak_password' || message.includes('weak_password') || message.includes('pwned') || message.includes('password is known')) {
-    return error instanceof Error && error.message ? error.message : 'Please choose a different password.';
+    return 'Please use any other password of at least 8 characters.';
   }
   if (message.includes('invalid login') || message.includes('invalid credentials')) {
     return 'Incorrect email or password. Please try again.';

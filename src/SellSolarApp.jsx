@@ -64,6 +64,7 @@ import {
   Store,
   Sun,
   Tag,
+  Trash2,
   TrendingUp,
   Twitter,
   User,
@@ -76,6 +77,7 @@ import { useAuth } from './context/AuthContext';
 import { supabase } from './lib/supabase';
 import { BRANDS, CATEGORIES, CITIES, formatPrice } from './lib/constants';
 import { digitsOnlyPhone, isValidPhone } from './lib/auth';
+import { applyPageSeo, pageToPath, parseLocation } from './lib/seo';
 
 function Xy({
   onNavigate:t,currentPage:e
@@ -88,8 +90,17 @@ function Xy({
     const j=()=>n(window.scrollY>20);
     return window.addEventListener("scroll",j),()=>window.removeEventListener("scroll",j)
   },[]);
-  const h=j=>{
-    t(j),a(!1),o(!1)
+  const h=(j,C)=>{
+    t(j,C),a(!1),o(!1);
+    if(C){
+      const g=String(C).replace(/^#/,"");
+      window.setTimeout(()=>{
+        const f=document.getElementById(g);
+        f&&f.scrollIntoView({
+          behavior:"smooth",block:"start"
+        })
+      },140)
+    }
   },p=async()=>{
     await d(),t("home"),o(!1)
   },y=[{
@@ -106,8 +117,10 @@ function Xy({
   return jsxs("header",{
     className:`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${r?"bg-white/95 backdrop-blur-md shadow-md":"bg-white/80 backdrop-blur-sm"}`,children:[jsx("div",{
       className:"container-page",children:jsxs("div",{
-        className:"flex h-16 items-center justify-between lg:h-20",children:[jsxs("button",{
-          onClick:()=>h("home"),className:"flex items-center gap-2 shrink-0",children:[jsx("div",{
+        className:"flex h-16 items-center justify-between lg:h-20",children:[jsxs("a",{
+          href:"/","aria-label":"SellSolar home",onClick:j=>{
+            j.preventDefault(),h("home")
+          },className:"flex items-center gap-2 shrink-0",children:[jsx("div",{
             className:"flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 shadow-lg shadow-primary-500/30",children:jsx(Sun,{
               className:"h-5 w-5 text-white",strokeWidth:2.5
             })
@@ -117,8 +130,10 @@ function Xy({
             })]
           })]
         }),jsx("nav",{
-          className:"hidden items-center gap-1.5 lg:flex",children:y.map(j=>jsx("button",{
-            onClick:()=>h(j.page),className:j.highlight?`flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-sm font-bold transition-all shadow-sm ${e===j.page?"bg-amber-500 text-white shadow-amber-500/25":"bg-amber-50 text-amber-800 border border-amber-200/80 hover:bg-amber-100"}`:j.isCalc?`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-sm font-bold transition-all ${e===j.page?"bg-primary-500 text-white shadow-sm shadow-primary-500/20":"bg-primary-50 text-primary-800 border border-primary-200/70 hover:bg-primary-100"}`:`rounded-lg px-3.5 py-2 text-sm font-semibold transition-colors ${e===j.page?"bg-primary-50 text-primary-600 font-bold":"text-gray-600 hover:bg-gray-100 hover:text-gray-900"}`,children:j.highlight?jsxs(Fragment,{
+          className:"hidden items-center gap-1.5 lg:flex",children:y.map(j=>jsx("a",{
+            href:pageToPath(j.page,null,j.href),onClick:C=>{
+              C.preventDefault(),h(j.page,j.href)
+            },className:j.highlight?`flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-sm font-bold transition-all shadow-sm ${e===j.page?"bg-amber-500 text-white shadow-amber-500/25":"bg-amber-50 text-amber-800 border border-amber-200/80 hover:bg-amber-100"}`:j.isCalc?`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-sm font-bold transition-all ${e===j.page?"bg-primary-500 text-white shadow-sm shadow-primary-500/20":"bg-primary-50 text-primary-800 border border-primary-200/70 hover:bg-primary-100"}`:`rounded-lg px-3.5 py-2 text-sm font-semibold transition-colors ${e===j.page?"bg-primary-50 text-primary-600 font-bold":"text-gray-600 hover:bg-gray-100 hover:text-gray-900"}`,children:j.highlight?jsxs(Fragment,{
               children:[jsxs("span",{
                 className:"relative flex h-2 w-2",children:[jsx("span",{
                   className:"absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75"
@@ -202,8 +217,10 @@ function Xy({
       })
     }),s&&jsx("div",{
       className:"animate-slide-down border-t border-gray-100 bg-white lg:hidden",children:jsxs("nav",{
-        className:"container-page flex flex-col gap-1 py-4",children:[y.map(j=>jsxs("button",{
-          onClick:()=>h(j.page),className:`flex items-center justify-between rounded-lg px-4 py-3 text-sm font-semibold transition-all ${j.highlight?"bg-amber-50 text-amber-900 border border-amber-200/80 font-bold":j.isCalc?"bg-primary-50 text-primary-900 border border-primary-200/80 font-bold":"text-gray-700 hover:bg-gray-50"}`,children:[jsxs("span",{
+        className:"container-page flex flex-col gap-1 py-4",children:[y.map(j=>jsxs("a",{
+          href:pageToPath(j.page,null,j.href),onClick:C=>{
+            C.preventDefault(),h(j.page,j.href)
+          },className:`flex items-center justify-between rounded-lg px-4 py-3 text-sm font-semibold transition-all ${j.highlight?"bg-amber-50 text-amber-900 border border-amber-200/80 font-bold":j.isCalc?"bg-primary-50 text-primary-900 border border-primary-200/80 font-bold":"text-gray-700 hover:bg-gray-50"}`,children:[jsxs("span",{
             className:"flex items-center gap-2",children:[j.highlight&&jsx("span",{
               className:"h-2 w-2 rounded-full bg-amber-500"
             }),j.isCalc&&jsx(Calculator,{
@@ -263,7 +280,7 @@ function nx({
   filters:t,onFilterChange:e,onSearch:r,onReset:n,onNavigatePrices:np,onNavigateCalculator:nc
 }){
   return jsxs("section",{
-    className:"relative overflow-hidden BadgeCheck-16 lg:BadgeCheck-20",children:[jsxs("div",{
+    className:"relative overflow-hidden py-16 lg:py-20",children:[jsxs("div",{
       className:"absolute inset-0 -z-10",children:[jsx("div",{
         className:"absolute inset-0 bg-gradient-to-br from-primary-50 via-white to-secondary-50"
       }),jsx("div",{
@@ -456,10 +473,12 @@ function ix({
   listing:t,onClick:e
 }){
   const r=t.condition==="used";
-  return jsxs("div",{
-    className:"card group cursor-pointer overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl",onClick:e,children:[jsxs("div",{
+  return jsxs("a",{
+    href:`/listing/${t.id}`,onClick:n=>{
+      n.preventDefault(),e&&e()
+    },className:"card group block cursor-pointer overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl",children:[jsxs("div",{
       className:"relative aspect-[4/3] overflow-hidden bg-gray-100",children:[t.image_url?jsx("img",{
-        src:t.image_url,alt:t.title,loading:"lazy",className:"h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+        src:t.image_url,alt:t.title||"Solar equipment listing",loading:"lazy",width:640,height:480,className:"h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
       }):jsx("div",{
         className:"flex h-full items-center justify-center bg-gray-100",children:jsx(Zap,{
           className:"h-12 w-12 text-gray-300"
@@ -598,10 +617,34 @@ function cx(){
     })
   })
 }const ux={
-  Company:["About Us","Careers","Press","Blog"],Marketplace:["Buy Solar","Sell Solar","How It Works","Pricing"],Support:["Help Center","Contact Us","Safety Tips","Report an Issue"],Legal:["Terms of Service","Privacy Policy","Cookie Policy","Disclaimer"]
+  Marketplace:[{
+    label:"Buy Solar",page:"home",hash:"#listings"
+  },{
+    label:"Today's Rates",page:"prices"
+  },{
+    label:"Load Calculator",page:"calculator"
+  },{
+    label:"Dealers",page:"dealers"
+  }],Support:[{
+    label:"Contact Us",href:"mailto:info@sellsolar.pk"
+  },{
+    label:"Help Center"
+  },{
+    label:"Safety Tips"
+  },{
+    label:"Report an Issue"
+  }],Legal:[{
+    label:"Terms of Service"
+  },{
+    label:"Privacy Policy"
+  },{
+    label:"Cookie Policy"
+  },{
+    label:"Disclaimer"
+  }]
 },dx=[Facebook,Twitter,Instagram,Linkedin];
 function hx({
-  onPostAd:t
+  onPostAd:t,onNavigate:e
 }){
   return jsxs("footer",{
     id:"contact",className:"bg-gray-900 text-gray-400",children:[jsx("div",{
@@ -644,33 +687,49 @@ function hx({
               }),"Islamabad, Pakistan"]
             })]
           })]
-        }),Object.entries(ux).map(([e,r])=>jsxs("div",{
+        }),Object.entries(ux).map(([r,n])=>jsxs("div",{
           children:[jsx("h4",{
-            className:"mb-4 text-sm font-bold uppercase tracking-wide text-white",children:e
+            className:"mb-4 text-sm font-bold uppercase tracking-wide text-white",children:r
           }),jsx("ul",{
-            className:"space-y-2.5",children:r.map(n=>jsx("li",{
-              children:jsx("a",{
-                href:"#",className:"text-sm transition-colors hover:text-white",children:n
-              })
-            },n))
+            className:"space-y-2.5",children:n.map(s=>{
+              if(s.href)return jsx("li",{
+                children:jsx("a",{
+                  href:s.href,className:"text-sm transition-colors hover:text-white",children:s.label
+                })
+              },s.label);
+              if(s.page)return jsx("li",{
+                children:jsx("a",{
+                  href:pageToPath(s.page,null,s.hash),onClick:a=>{
+                    a.preventDefault(),e&&e(s.page,s.hash)
+                  },className:"text-sm transition-colors hover:text-white",children:s.label
+                })
+              },s.label);
+              return jsx("li",{
+                children:jsx("span",{
+                  className:"text-sm text-gray-500",children:s.label
+                })
+              },s.label)
+            })
           })]
-        },e))]
+        },r))]
       }),jsxs("div",{
-        className:"mt-12 flex flex-col items-center justify-between gap-4 border-t border-gray-800 BadgeCheck-8 sm:flex-row",children:[jsx("p",{
+        className:"mt-12 flex flex-col items-center justify-between gap-4 border-t border-gray-800 pt-8 sm:flex-row",children:[jsx("p",{
           className:"text-sm",children:"© 2026 SellSolar. All rights reserved."
         }),jsx("div",{
-          className:"flex gap-3",children:dx.map((e,r)=>jsx("a",{
-            href:"#",className:"flex h-9 w-9 items-center justify-center rounded-lg bg-gray-800 transition-colors hover:bg-primary-500",children:jsx(e,{
+          className:"flex gap-3",children:dx.map((r,n)=>jsx("span",{
+            className:"flex h-9 w-9 items-center justify-center rounded-lg bg-gray-800",children:jsx(r,{
               className:"h-4 w-4"
             })
-          },r))
+          },n))
         })]
       })]
     })]
   })
+}function sanitizeSearchTerm(t){
+  return String(t||"").replace(/[%_,.()\\]/g," ").replace(/\s+/g," ").trim()
 }function Wu(t){
-  const e=t instanceof Error?t.message.toLowerCase():"";
-  return e.includes("invalid login")||e.includes("invalid credentials")?"Incorrect email or password. Please try again.":e.includes("user already registered")||e.includes("already been registered")?"An account with this email already exists. Try logging in instead.":e.includes("email_rate_limit")||e.includes("rate limit")?"Too many attempts. Please wait a moment and try again.":e.includes("email not confirmed")?"Please check your email and confirm your account before logging in.":e.includes("unable to validate email")||e.includes("invalid email")||e.includes("email address")&&e.includes("invalid")?"Please enter a valid email address.":t instanceof Error&&t.message?t.message:"Something went wrong. Please try again."
+  const e=(t instanceof Error?t.message:t&&t.message||"").toLowerCase();
+  return e.includes("weak_password")||e.includes("pwned")||e.includes("password is known")?"Please use any other password of at least 8 characters.":e.includes("invalid login")||e.includes("invalid credentials")?"Incorrect email or password. Please try again.":e.includes("user already registered")||e.includes("already been registered")?"An account with this email already exists. Try logging in instead.":e.includes("email_rate_limit")||e.includes("rate limit")?"Too many attempts. Please wait a moment and try again.":e.includes("email not confirmed")?"Please check your email and confirm your account before logging in.":e.includes("unable to validate email")||e.includes("invalid email")||e.includes("email address")&&e.includes("invalid")?"Please enter a valid email address.":t instanceof Error&&t.message?t.message:t&&t.message?t.message:"Something went wrong. Please try again."
 }function isValidEmail(t){
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(t||"").trim())
 }function Bn(props){
@@ -687,7 +746,9 @@ function hx({
       }).order("created_at",{
         ascending:!1
       });
-      o&&(p=p.eq("city",o)),u&&(p=p.eq("is_verified_dealer",!0)),a&&(p=p.or(`full_name.ilike.%${a}%,business_name.ilike.%${a}%`));
+      o&&(p=p.eq("city",o)),u&&(p=p.eq("is_verified_dealer",!0));
+      const dq=sanitizeSearchTerm(a);
+      dq&&(p=p.or(`full_name.ilike.%${dq}%,business_name.ilike.%${dq}%`));
       const{
         data:y,error:w
       }=await p.limit(50);
@@ -790,7 +851,7 @@ function hx({
               })]
             })]
           }),h.cnic&&jsxs("div",{
-            className:"mt-3 border-t border-gray-100 BadgeCheck-3 text-xs text-gray-400",children:["CNIC: ",h.cnic.slice(0,5),"••••••",h.cnic.slice(-1)]
+            className:"mt-3 border-t border-gray-100 pt-3 text-xs text-gray-400",children:["CNIC: ",h.cnic.slice(0,5),"••••••",h.cnic.slice(-1)]
           })]
         },h.id))
       })]
@@ -1004,7 +1065,7 @@ function yx({
                 children:[jsx(LoaderCircle,{
                   className:"h-5 w-5 animate-spin"
                 }),"Posting Ad..."]
-              }):"Post EyeOff Ad"
+              }):"Post Ad"
             })]
           })
         })]
@@ -1215,7 +1276,7 @@ function yx({
           }),jsx("button",{
             onClick:()=>f(x.id),disabled:p===x.id,className:"flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-error-500 transition-colors hover:bg-error-50 disabled:opacity-50",children:p===x.id?jsx(LoaderCircle,{
               className:"h-4 w-4 animate-spin"
-            }):jsx(Cn,{
+            }):jsx(Trash2,{
               className:"h-4 w-4"
             })
           })]
@@ -1279,7 +1340,7 @@ function yx({
               }),!x.is_admin&&jsx("button",{
                 onClick:()=>m(x.id),disabled:p===x.id,className:"flex h-9 w-9 items-center justify-center rounded-lg text-error-500 transition-colors hover:bg-error-50 disabled:opacity-50",children:p===x.id?jsx(LoaderCircle,{
                   className:"h-4 w-4 animate-spin"
-                }):jsx(Cn,{
+                }):jsx(Trash2,{
                   className:"h-4 w-4"
                 })
               })]
@@ -1678,7 +1739,7 @@ function yx({
       }),jsx("button",{
         onClick:()=>H(b.id),disabled:v===b.id,className:"flex h-8 w-8 items-center justify-center rounded-lg text-error-500 transition-colors hover:bg-error-50 disabled:opacity-50",title:"Delete",children:v===b.id?jsx(LoaderCircle,{
           className:"h-3.5 w-3.5 animate-spin"
-        }):jsx(Cn,{
+        }):jsx(Trash2,{
           className:"h-3.5 w-3.5"
         })
       })]
@@ -1731,7 +1792,7 @@ function yx({
         }),!b.is_admin&&jsx("button",{
           onClick:()=>St(b.id),disabled:v===b.id,className:"flex h-9 w-9 items-center justify-center rounded-lg text-error-500 hover:bg-error-50 disabled:opacity-50",children:v===b.id?jsx(LoaderCircle,{
             className:"h-4 w-4 animate-spin"
-          }):jsx(Cn,{
+          }):jsx(Trash2,{
             className:"h-4 w-4"
           })
         })]
@@ -2060,7 +2121,7 @@ function yx({
         data:vt
       }=await supabase.from("solar_listings").select("*").in("id",T);
       j(vt||[])
-    }
+    }else j([])
   },[e]);
   useEffect(()=>{
     if(!e){
@@ -2102,10 +2163,10 @@ function yx({
     const{
       error:Q
     }=await supabase.from("favorites").delete().eq("id",P);
-    Q?m(Q.message):(h(de=>de.filter(te=>te.id!==P)),j(de=>de.filter(te=>{
-      var T;
-      return!((T=d.find(vt=>vt.id===P))!=null&&T.listing_id.includes(te.id))
-    }))),k(null)
+    Q?m(Q.message):(h(de=>de.filter(te=>te.id!==P)),j(de=>{
+      const T=d.find(vt=>vt.id===P);
+      return T?de.filter(te=>te.id!==T.listing_id):de
+    })),k(null)
   },Us=async P=>{
     const{
       error:Q
@@ -2170,13 +2231,13 @@ function yx({
     }=await supabase.auth.updateUser({
       password:X
     });
-    P?m(P.message):(S("Password changed successfully"),St(""),Ve(""),setTimeout(()=>S(null),3e3)),k(null)
+    P?m(Wu(P)):(S("Password changed successfully"),St(""),Ve(""),setTimeout(()=>S(null),3e3)),k(null)
   },Fs=l.filter(P=>P.status==="draft"),b=l.filter(P=>P.status==="pending"),O=l.filter(P=>P.status==="approved"),q=l.filter(P=>P.status==="rejected"),V=l.filter(P=>P.is_sold),_a=l.reduce((P,Q)=>P+(Q.views||0),0),Bs=p.filter(P=>!P.is_read),Mf=[{
     id:"dashboard",label:"Dashboard",icon:LayoutDashboard
   },{
-    id:"profile",label:"EyeOff Profile",icon:User
+    id:"profile",label:"My Profile",icon:User
   },{
-    id:"products",label:"EyeOff Products",icon:Tag,badge:l.length
+    id:"products",label:"My Products",icon:Tag,badge:l.length
   },{
     id:"add-product",label:"Add Product",icon:CirclePlus
   },{
@@ -2267,7 +2328,7 @@ function yx({
         }),jsx("button",{
           onClick:()=>yr(P.id),disabled:v===P.id,className:"flex h-8 w-8 items-center justify-center rounded-lg text-error-500 hover:bg-error-50 disabled:opacity-50",children:v===P.id?jsx(LoaderCircle,{
             className:"h-3.5 w-3.5 animate-spin"
-          }):jsx(Cn,{
+          }):jsx(Trash2,{
             className:"h-3.5 w-3.5"
           })
         })]
@@ -2346,7 +2407,7 @@ function yx({
       });
       case"profile":return jsxs("div",{
         className:"max-w-2xl",children:[jsx("h1",{
-          className:"mb-1 text-2xl font-extrabold tracking-tight text-gray-900",children:"EyeOff Profile"
+          className:"mb-1 text-2xl font-extrabold tracking-tight text-gray-900",children:"My Profile"
         }),jsx("p",{
           className:"mb-6 text-sm text-gray-500",children:"Update your personal information"
         }),P(),Q(),jsxs("div",{
@@ -2545,7 +2606,7 @@ function yx({
                 })]
               })]
             }),jsxs("div",{
-              className:"flex gap-3 BadgeCheck-2",children:[jsxs("button",{
+              className:"flex gap-3 mt-2",children:[jsxs("button",{
                 onClick:()=>{
                   H("pending"),Bt()
                 },disabled:v==="add-product",className:"btn-primary flex-1",children:[v==="add-product"?jsx(LoaderCircle,{
@@ -2558,7 +2619,7 @@ function yx({
                   H("draft"),Bt()
                 },disabled:v==="add-product",className:"btn-ghost flex-1",children:[jsx(FilePen,{
                   className:"h-4 w-4"
-                }),"Save Bell Draft"]
+                }),"Save as Draft"]
               })]
             })]
           })
@@ -2628,7 +2689,7 @@ function yx({
               }),vt&&jsx("button",{
                 onClick:()=>Ms(vt.id),disabled:v===vt.id,className:"flex h-9 w-9 items-center justify-center rounded-lg text-error-500 hover:bg-error-50 disabled:opacity-50",children:v===vt.id?jsx(LoaderCircle,{
                   className:"h-4 w-4 animate-spin"
-                }):jsx(Cn,{
+                }):jsx(Trash2,{
                   className:"h-4 w-4"
                 })
               })]
@@ -2802,7 +2863,11 @@ function yx({
           u("Listing not found");
           return
         }const k=m;
-        if(n(k),await supabase.from("solar_listings").update({
+        n(k);
+        applyPageSeo("listing-detail",{
+          listing:k,listingId:t
+        });
+        if(await supabase.from("solar_listings").update({
           views:(k.views||0)+1
         }).eq("id",t),k.user_id){
           const{
@@ -3075,12 +3140,13 @@ function _x({
       try{
         let f=supabase.from("solar_listings").select("*",{
           count:"exact"
-        }).order("featured",{
+        }).eq("status","approved").eq("is_sold",false).order("featured",{
           ascending:!1
         }).order("created_at",{
           ascending:!1
         });
-        e.category&&(f=f.eq("category",e.category)),e.brand&&(f=f.eq("brand",e.brand)),e.condition&&(f=f.eq("condition",e.condition)),e.city&&(f=f.eq("city",e.city)),e.minPrice&&(f=f.gte("price",parseFloat(e.minPrice))),e.maxPrice&&(f=f.lte("price",parseFloat(e.maxPrice))),e.query&&(f=f.or(`title.ilike.%${e.query}%,brand.ilike.%${e.query}%,description.ilike.%${e.query}%`));
+        const vq=sanitizeSearchTerm(e.query);
+        e.category&&(f=f.eq("category",e.category)),e.brand&&(f=f.eq("brand",e.brand)),e.condition&&(f=f.eq("condition",e.condition)),e.city&&(f=f.eq("city",e.city)),e.minPrice&&(f=f.gte("price",parseFloat(e.minPrice))),e.maxPrice&&(f=f.lte("price",parseFloat(e.maxPrice))),vq&&(f=f.or(`title.ilike.%${vq}%,brand.ilike.%${vq}%,description.ilike.%${vq}%`));
         const{
           data:m,error:v,count:k
         }=await f.limit(50);
@@ -3129,18 +3195,66 @@ function _x({
       
     })]
   })
-}export default function App(){
+}const bootRoute=parseLocation(typeof window==="undefined"?"/":window.location.pathname,typeof window==="undefined"?"":window.location.hash);
+export default function App(){
   const{
     user:t,profile:e,loading:r,passwordRecovery:pr
-  }=useAuth(),[n,s]=useState("home"),[a,l]=useState(null),o=d=>{
-    s(d),window.scrollTo({
+  }=useAuth(),[n,s]=useState(bootRoute.page),[a,l]=useState(bootRoute.listingId);
+  const o=(d,hash)=>{
+    if(d!=="listing-detail")l(null);
+    s(d);
+    const url=pageToPath(d,d==="listing-detail"?a:null,hash);
+    if(`${window.location.pathname}${window.location.hash}`!==url){
+      window.history.pushState({
+        page:d
+      },"",url)
+    }
+    if(hash){
+      window.setTimeout(()=>{
+        const g=String(hash).replace(/^#/,"");
+        const f=document.getElementById(g);
+        f&&f.scrollIntoView({
+          behavior:"smooth",block:"start"
+        })
+      },140)
+    }else window.scrollTo({
       top:0,behavior:"smooth"
     })
   },c=()=>{
     o(t?"post-ad":"login")
   },u=d=>{
-    l(d),o("listing-detail")
+    l(d),s("listing-detail"),window.history.pushState({
+      page:"listing-detail",listingId:d
+    },"",pageToPath("listing-detail",d)),window.scrollTo({
+      top:0,behavior:"smooth"
+    })
+  },handleNav=(d,hash)=>{
+    d==="post-ad"?c():d==="admin"||d==="admin-dashboard"?t&&(e!=null&&e.is_admin)?o("admin-dashboard"):o("login"):d==="password"||d==="change-password"?o("password"):o(d==="dashboard"?t?"dashboard":"login":d,hash)
   };
+  useEffect(()=>{
+    const onPop=()=>{
+      const parsed=parseLocation(window.location.pathname,window.location.hash);
+      s(parsed.page),l(parsed.listingId);
+      if(parsed.hash&&!parsed.hash.includes("access_token")&&!parsed.hash.includes("type=recovery")){
+        const id=parsed.hash.replace(/^#/,"");
+        window.setTimeout(()=>document.getElementById(id)?.scrollIntoView({
+          behavior:"smooth",block:"start"
+        }),80)
+      }
+    };
+    if(bootRoute.hash&&!bootRoute.hash.includes("access_token")&&!bootRoute.hash.includes("type=recovery")){
+      const id=bootRoute.hash.replace(/^#/,"");
+      window.setTimeout(()=>document.getElementById(id)?.scrollIntoView({
+        behavior:"smooth",block:"start"
+      }),400)
+    }
+    return window.addEventListener("popstate",onPop),()=>window.removeEventListener("popstate",onPop)
+  },[]);
+  useEffect(()=>{
+    applyPageSeo(pr?"reset-password":n,{
+      listingId:a
+    })
+  },[n,a,pr]);
   return r?jsx("div",{
     className:"flex min-h-screen items-center justify-center bg-white",children:jsx("div",{
       className:"flex h-12 w-12 animate-spin rounded-full border-4 border-primary-200 border-t-primary-500"
@@ -3159,39 +3273,23 @@ function _x({
     onBack:()=>o("home")
   }):n==="calculator"||n==="load-calculator"?jsxs("div",{
     className:"min-h-screen bg-white",children:[jsx(Xy,{
-      onNavigate:d=>{
-        d==="post-ad"?c():d==="admin"||d==="admin-dashboard"?t&&(e!=null&&e.is_admin)?o("admin-dashboard"):o("login"):d==="password"||d==="change-password"?o("password"):o(d==="dashboard"?t?"dashboard":"login":d)
-      },currentPage:n
+      onNavigate:handleNav,currentPage:n
     }),jsx("main",{
-      children:jsx(LoadCalculatorPage,{
-        onNavigate:o,onSelectCategory:cat=>{
-          o("home");
-          setTimeout(()=>{
-            const el=document.getElementById("listings");
-            if(el)el.scrollIntoView({behavior:"smooth",block:"start"});
-          },100);
-        }
+      id:"main",children:jsx(LoadCalculatorPage,{
+        onNavigate:o,onSelectCategory:()=>o("home","#listings")
       })
     }),jsx(hx,{
-      onPostAd:c
+      onPostAd:c,onNavigate:handleNav
     })]
   }):n==="prices"||n==="today-prices"?jsxs("div",{
     className:"min-h-screen bg-white",children:[jsx(Xy,{
-      onNavigate:d=>{
-        d==="post-ad"?c():d==="admin"||d==="admin-dashboard"?t&&(e!=null&&e.is_admin)?o("admin-dashboard"):o("login"):d==="password"||d==="change-password"?o("password"):o(d==="dashboard"?t?"dashboard":"login":d)
-      },currentPage:n
+      onNavigate:handleNav,currentPage:n
     }),jsx("main",{
-      children:jsx(TodayPricesPage,{
-        onNavigate:o,onSelectCategory:cat=>{
-          o("home");
-          setTimeout(()=>{
-            const el=document.getElementById("listings");
-            if(el)el.scrollIntoView({behavior:"smooth",block:"start"});
-          },100);
-        }
+      id:"main",children:jsx(TodayPricesPage,{
+        onNavigate:o,onSelectCategory:()=>o("home","#listings")
       })
     }),jsx(hx,{
-      onPostAd:c
+      onPostAd:c,onNavigate:handleNav
     })]
   }):n==="post-ad"?t?jsx(yx,{
     onBack:()=>o("home"),onPosted:()=>o("home")
@@ -3213,15 +3311,13 @@ function _x({
     listingId:a,onBack:()=>o("home")
   }):jsxs("div",{
     className:"min-h-screen bg-white",children:[jsx(Xy,{
-      onNavigate:d=>{
-        d==="post-ad"?c():d==="admin"||d==="admin-dashboard"?t&&(e!=null&&e.is_admin)?o("admin-dashboard"):o("login"):d==="password"||d==="change-password"?o("password"):o(d==="dashboard"?t?"dashboard":"login":d)
-      },currentPage:n
+      onNavigate:handleNav,currentPage:n
     }),jsx("main",{
-      children:jsx(_x,{
+      id:"main",children:jsx(_x,{
         onSelectListing:u,onNavigate:o
       })
     }),jsx(hx,{
-      onPostAd:c
+      onPostAd:c,onNavigate:handleNav
     })]
   })
 }

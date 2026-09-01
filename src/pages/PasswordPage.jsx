@@ -19,18 +19,17 @@ import { useAuth } from '../context/AuthContext';
 import { isValidEmail } from '../lib/auth';
 
 function getPasswordStrength(pass) {
-  if (!pass) return { score: 0, text: '', color: 'bg-gray-200' };
-  let score = 0;
-  if (pass.length >= 8) score += 1;
-  if (pass.length >= 12) score += 1;
-  if (/[A-Z]/.test(pass)) score += 1;
-  if (/[0-9]/.test(pass)) score += 1;
-  if (/[^A-Za-z0-9]/.test(pass)) score += 1;
+  if (!pass) return { score: 0, text: '', color: 'bg-gray-200', width: 'w-0' };
+  if (pass.length < 8) return { score: 1, text: 'Too short', color: 'bg-error-500', width: 'w-1/4' };
+  return { score: 2, text: 'Accepted', color: 'bg-secondary-500', width: 'w-full' };
+}
 
-  if (score <= 1) return { score: 1, text: 'Weak', color: 'bg-error-500', width: 'w-1/4' };
-  if (score <= 3) return { score: 2, text: 'Medium', color: 'bg-warning-500', width: 'w-2/4' };
-  if (score <= 4) return { score: 3, text: 'Strong', color: 'bg-secondary-500', width: 'w-3/4' };
-  return { score: 4, text: 'Very Strong', color: 'bg-secondary-600', width: 'w-full' };
+function passwordUpdateError(err) {
+  const message = (err instanceof Error ? err.message : err?.message || '').toLowerCase();
+  if (err?.code === 'weak_password' || message.includes('weak_password') || message.includes('pwned') || message.includes('password is known')) {
+    return 'Please use any other password of at least 8 characters.';
+  }
+  return err instanceof Error && err.message ? err.message : 'Failed to update password. Please try again.';
 }
 
 export default function PasswordPage({
@@ -115,6 +114,10 @@ export default function PasswordPage({
     setError(null);
     setSuccessMessage(null);
 
+    if (mode === 'change' && !currentPassword) {
+      setError('Current password is required.');
+      return;
+    }
     if (newPassword.length < 8) {
       setError('Password must be at least 8 characters long.');
       return;
@@ -126,8 +129,7 @@ export default function PasswordPage({
 
     setBusy(true);
     try {
-      // If user is doing normal change password and provided current password, verify it first
-      if (mode === 'change' && user?.email && currentPassword) {
+      if (mode === 'change' && user?.email) {
         const { error: verifyErr } = await supabase.auth.signInWithPassword({
           email: user.email,
           password: currentPassword,
@@ -156,7 +158,7 @@ export default function PasswordPage({
         }
       }, 1500);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update password. Please try again.');
+      setError(passwordUpdateError(err));
     } finally {
       setBusy(false);
     }
@@ -359,7 +361,7 @@ export default function PasswordPage({
                 {mode === 'change' && user && (
                   <div>
                     <label className="mb-1.5 block text-sm font-semibold text-gray-700">
-                      Current Password (Optional)
+                      Current Password *
                     </label>
                     <div className="relative">
                       <Lock className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
@@ -418,7 +420,7 @@ export default function PasswordPage({
                     </div>
                   )}
                   <p className="mt-1 text-xs text-gray-400">
-                    Must be at least 8 characters. Use letters, numbers & symbols for high security.
+                    Any 8 or more characters.
                   </p>
                 </div>
 

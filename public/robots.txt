@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /login
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /admin-dashboard
+Disallow: /password
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /post-ad
+
+Sitemap: https://sellsolar.pk/sitemap.xml

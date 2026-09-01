@@ -1,0 +1,19 @@
+{
+  "name": "SellSolar",
+  "short_name": "SellSolar",
+  "description": "Buy and sell solar panels, inverters, batteries and complete systems in Pakistan.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#eab308",
+  "lang": "en-PK",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

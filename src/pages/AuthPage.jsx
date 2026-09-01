@@ -86,6 +86,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
   const [error, setError] = useState(null);
   const [info, setInfo] = useState(null);
   const [email, setEmail] = useState('');
+  const [emailTouched, setEmailTouched] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -95,6 +96,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
   const [businessName, setBusinessName] = useState('');
   const [businessAddress, setBusinessAddress] = useState('');
   const [visitingCard, setVisitingCard] = useState('');
+  const [fieldErrors, setFieldErrors] = useState({});
   const isDealer = accountType === 'dealer';
 
   useEffect(() => {
@@ -105,6 +107,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
     setAccountType('individual');
     setShowPassword(false);
     setEmail('');
+    setEmailTouched(false);
     setPassword('');
     setConfirmPassword('');
     setFullName('');
@@ -114,9 +117,17 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
     setBusinessName('');
     setBusinessAddress('');
     setVisitingCard('');
+    setFieldErrors({});
     setError(null);
     setInfo(null);
   };
+
+  const clearFieldError = (key) => {
+    setFieldErrors((prev) => (prev[key] ? { ...prev, [key]: false } : prev));
+  };
+
+  const fieldClass = (key, extra = '') =>
+    `input-field ${extra} ${fieldErrors[key] ? 'border-error-400 ring-1 ring-error-200' : ''}`.trim();
 
   const go = (next) => {
     if (next === 'signup') {
@@ -124,38 +135,25 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
     } else {
       setError(null);
       setInfo(null);
+      setFieldErrors({});
     }
     setView(next);
   };
 
   const handleSignup = async () => {
     setError(null);
-    if (isDealer && !cnic.trim()) {
-      setError('CNIC number is mandatory for dealers');
-      return;
-    }
-    if (isDealer && !businessName.trim()) {
-      setError('Business name is mandatory for dealers');
-      return;
-    }
-    if (!fullName.trim() || !email.trim() || !password.trim() || !phone.trim() || !city.trim()) {
-      setError('Please fill in name, email, phone, city, and password');
-      return;
-    }
-    if (!isValidEmail(email)) {
-      setError('Please enter a valid email address');
-      return;
-    }
-    if (!isValidPhone(phone)) {
-      setError('Phone number must be exactly 11 digits.');
-      return;
-    }
-    if (!city.trim()) {
-      setError('Please select your city');
-      return;
-    }
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters.');
+    const nextErrors = {
+      fullName: !fullName.trim(),
+      email: !email.trim() || !isValidEmail(email),
+      password: !password.trim() || password.length < 8,
+      phone: !isValidPhone(phone),
+      city: !city.trim(),
+      cnic: isDealer && !cnic.trim(),
+      businessName: isDealer && !businessName.trim(),
+      businessAddress: isDealer && !businessAddress.trim(),
+    };
+    setFieldErrors(nextErrors);
+    if (Object.values(nextErrors).some(Boolean)) {
       return;
     }
 
@@ -254,12 +252,12 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
 
   const handleLogin = async () => {
     setError(null);
-    if (!email.trim() || !password.trim()) {
-      setError('Please enter your email and password');
-      return;
-    }
-    if (!isValidEmail(email)) {
-      setError('Please enter a valid email address');
+    const nextErrors = {
+      email: !email.trim() || !isValidEmail(email),
+      password: !password.trim(),
+    };
+    setFieldErrors(nextErrors);
+    if (Object.values(nextErrors).some(Boolean)) {
       return;
     }
     setBusy(true);
@@ -281,8 +279,9 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
   const handleForgot = async () => {
     setError(null);
     setInfo(null);
-    if (!isValidEmail(email)) {
-      setError('Please enter a valid email address');
+    const emailInvalid = !email.trim() || !isValidEmail(email);
+    setFieldErrors({ email: emailInvalid });
+    if (emailInvalid) {
       return;
     }
     setBusy(true);
@@ -409,8 +408,18 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                 <div>
                   <label className="mb-1.5 block text-sm font-semibold text-gray-700">Full Name *</label>
                   <div className="relative">
-                    <User className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
-                    <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Enter your full name" className="input-field pl-11" />
+                    <User className={`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${fieldErrors.fullName ? 'text-error-500' : 'text-gray-400'}`} />
+                    <input
+                      type="text"
+                      value={fullName}
+                      onChange={(e) => {
+                        setFullName(e.target.value);
+                        clearFieldError('fullName');
+                      }}
+                      placeholder="Enter your full name"
+                      className={fieldClass('fullName', 'pl-11 pr-11')}
+                    />
+                    {fieldErrors.fullName ? <CircleAlert className="absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" /> : null}
                   </div>
                 </div>
               )}
@@ -419,17 +428,30 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                 <div>
                   <label className="mb-1.5 block text-sm font-semibold text-gray-700">Email *</label>
                   <div className="relative">
-                    <Mail className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+                    <Mail className={`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${fieldErrors.email || (email.trim() && !isValidEmail(email)) ? 'text-error-500' : 'text-gray-400'}`} />
                     <input
                       type="email"
+                      autoComplete="email"
+                      inputMode="email"
+                      required
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e) => {
+                        setEmail(e.target.value.replace(/\s/g, ''));
+                        clearFieldError('email');
+                        setEmailTouched(true);
+                      }}
+                      onBlur={() => setEmailTouched(true)}
                       placeholder="you@example.com"
-                      className={`input-field pl-11 ${email.trim() && !isValidEmail(email) ? 'border-error-400' : ''}`}
+                      className={fieldClass('email', `pl-11 pr-11 ${email.trim() && !isValidEmail(email) ? 'border-error-400' : ''}`)}
                     />
+                    {fieldErrors.email || (emailTouched && email.trim() && !isValidEmail(email)) ? (
+                      <CircleAlert className="absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" />
+                    ) : null}
                   </div>
-                  {email.trim() && !isValidEmail(email) ? (
-                    <p className="mt-1.5 text-xs font-medium text-error-600">Please enter a valid email address</p>
+                  {fieldErrors.email && !email.trim() ? (
+                    <p className="mt-1.5 text-xs font-medium text-error-600">Email is required.</p>
+                  ) : email.trim() && !isValidEmail(email) ? (
+                    <p className="mt-1.5 text-xs font-medium text-error-600">Please enter a valid email address (e.g. you@example.com).</p>
                   ) : null}
                 </div>
               )}
@@ -440,19 +462,27 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                     {view === 'reset' ? 'New password *' : 'Password *'}
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+                    <Lock className={`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${fieldErrors.password ? 'text-error-500' : 'text-gray-400'}`} />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={(e) => {
+                        setPassword(e.target.value);
+                        clearFieldError('password');
+                      }}
                       placeholder="At least 8 characters"
-                      className="input-field pl-11 pr-11"
+                      className={fieldClass('password', 'pl-11 pr-16')}
                     />
+                    {fieldErrors.password ? <CircleAlert className="absolute right-11 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" /> : null}
                     <button type="button" onClick={() => setShowPassword((v) => !v)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                       {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                     </button>
                   </div>
-                  <p className="mt-1.5 text-xs text-gray-400">Any 8 or more characters.</p>
+                  {fieldErrors.password ? (
+                    <p className="mt-1.5 text-xs font-medium text-error-600">{password.trim() ? 'Password must be at least 8 characters.' : 'Password is required.'}</p>
+                  ) : (
+                    <p className="mt-1.5 text-xs text-gray-400">Any 8 or more characters.</p>
+                  )}
                 </div>
               )}
 
@@ -482,19 +512,25 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                   <div>
                     <label className="mb-1.5 block text-sm font-semibold text-gray-700">Phone *</label>
                     <div className="relative">
-                      <Phone className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+                      <Phone className={`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${fieldErrors.phone ? 'text-error-500' : 'text-gray-400'}`} />
                       <input
                         type="tel"
                         inputMode="numeric"
                         maxLength={11}
                         value={phone}
-                        onChange={(e) => setPhone(digitsOnlyPhone(e.target.value))}
+                        onChange={(e) => {
+                          setPhone(digitsOnlyPhone(e.target.value));
+                          clearFieldError('phone');
+                        }}
                         placeholder="03001234567"
-                        className={`input-field pl-11 ${phone && !isValidPhone(phone) ? 'border-error-400' : ''}`}
+                        className={fieldClass('phone', 'pl-11 pr-11')}
                       />
+                      {fieldErrors.phone ? <CircleAlert className="absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" /> : null}
                     </div>
-                    {phone && !isValidPhone(phone) ? (
-                      <p className="mt-1.5 text-xs font-medium text-error-600">Phone number must be exactly 11 digits.</p>
+                    {fieldErrors.phone ? (
+                      <p className="mt-1.5 text-xs font-medium text-error-600">
+                        {phone ? 'Phone number must be exactly 11 digits.' : 'Phone is required.'}
+                      </p>
                     ) : (
                       <p className="mt-1.5 text-xs text-gray-400">Must be 11 digits, e.g. 03001234567</p>
                     )}
@@ -502,20 +538,24 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                   <div>
                     <label className="mb-1.5 block text-sm font-semibold text-gray-700">City *</label>
                     <div className="relative">
-                      <MapPin className="absolute left-3.5 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-gray-400" />
+                      <MapPin className={`absolute left-3.5 top-1/2 z-10 h-5 w-5 -translate-y-1/2 ${fieldErrors.city ? 'text-error-500' : 'text-gray-400'}`} />
                       <select
                         value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        className={`select-field pl-11 ${!city ? 'border-gray-200' : ''}`}
+                        onChange={(e) => {
+                          setCity(e.target.value);
+                          clearFieldError('city');
+                        }}
+                        className={`select-field pl-11 pr-11 ${fieldErrors.city ? 'border-error-400 ring-1 ring-error-200' : ''}`}
                       >
                         <option value="">Select your city</option>
                         {CITIES.map((item) => (
                           <option key={item} value={item}>{item}</option>
                         ))}
                       </select>
+                      {fieldErrors.city ? <CircleAlert className="pointer-events-none absolute right-8 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" /> : null}
                     </div>
-                    {!city ? (
-                      <p className="mt-1.5 text-xs text-gray-400">City is required.</p>
+                    {fieldErrors.city ? (
+                      <p className="mt-1.5 text-xs font-medium text-error-600">City is required.</p>
                     ) : null}
                   </div>
                   {isDealer && (
@@ -527,17 +567,51 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                       <div>
                         <label className="mb-1.5 block text-sm font-semibold text-gray-700">CNIC Number *</label>
                         <div className="relative">
-                          <CreditCard className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
-                          <input type="text" value={cnic} onChange={(e) => setCnic(e.target.value)} placeholder="12345-1234567-1" className="input-field pl-11" />
+                          <CreditCard className={`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${fieldErrors.cnic ? 'text-error-500' : 'text-gray-400'}`} />
+                          <input
+                            type="text"
+                            value={cnic}
+                            onChange={(e) => {
+                              setCnic(e.target.value);
+                              clearFieldError('cnic');
+                            }}
+                            placeholder="12345-1234567-1"
+                            className={fieldClass('cnic', 'pl-11 pr-11')}
+                          />
+                          {fieldErrors.cnic ? <CircleAlert className="absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" /> : null}
                         </div>
                       </div>
                       <div>
                         <label className="mb-1.5 block text-sm font-semibold text-gray-700">Business Name *</label>
-                        <input type="text" value={businessName} onChange={(e) => setBusinessName(e.target.value)} placeholder="e.g. SolarTech Pakistan" className="input-field" />
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={businessName}
+                            onChange={(e) => {
+                              setBusinessName(e.target.value);
+                              clearFieldError('businessName');
+                            }}
+                            placeholder="e.g. SolarTech Pakistan"
+                            className={fieldClass('businessName', 'pr-11')}
+                          />
+                          {fieldErrors.businessName ? <CircleAlert className="absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" /> : null}
+                        </div>
                       </div>
                       <div>
-                        <label className="mb-1.5 block text-sm font-semibold text-gray-700">Business Address</label>
-                        <input type="text" value={businessAddress} onChange={(e) => setBusinessAddress(e.target.value)} placeholder="Shop address" className="input-field" />
+                        <label className="mb-1.5 block text-sm font-semibold text-gray-700">Business Address *</label>
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={businessAddress}
+                            onChange={(e) => {
+                              setBusinessAddress(e.target.value);
+                              clearFieldError('businessAddress');
+                            }}
+                            placeholder="Shop address"
+                            className={fieldClass('businessAddress', 'pr-11')}
+                          />
+                          {fieldErrors.businessAddress ? <CircleAlert className="absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" /> : null}
+                        </div>
                       </div>
                       <div>
                         <label className="mb-1.5 block text-sm font-semibold text-gray-700">Visiting Card Image URL</label>

@@ -282,7 +282,15 @@ function nx({
                 type:"text",placeholder:"Search by title, brand, or keyword...",value:t.query,onChange:s=>e("query",s.target.value),onKeyDown:s=>s.key==="Enter"&&r(),className:"w-full rounded-xl border border-gray-200 bg-gray-50 py-3.5 pl-12 pr-4 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-primary-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-100"
               })]
             }),jsxs("div",{
-              className:"grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5",children:[jsxs("div",{
+              className:"grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6",children:[jsxs("div",{
+                children:[jsx("label",{
+                  className:"mb-1.5 block text-xs font-semibold text-gray-500",children:"Category"
+                }),jsx("select",{
+                  value:t.category,onChange:s=>e("category",s.target.value),className:"select-field text-xs sm:text-sm",children:Zy.map(s=>jsx("option",{
+                    value:s.value,children:s.value?s.label:"All Categories"
+                  },s.value||"all"))
+                })]
+              }),jsxs("div",{
                 children:[jsx("label",{
                   className:"mb-1.5 block text-xs font-semibold text-gray-500",children:"Brand"
                 }),jsx("select",{
@@ -740,7 +748,7 @@ function yx({
   onBack:t,onPosted:e
 }){
   const{
-    profile:r
+    profile:r,user:seller
   }=useAuth(),[n,s]=useState(!1),[a,l]=useState(null),[o,c]=useState(!1),[u,d]=useState(""),[h,p]=useState(""),[y,w]=useState("panel"),[j,C]=useState("new"),[g,f]=useState(""),[m,v]=useState((r==null?void 0:r.city)||""),[k,x]=useState(""),[S,L]=useState(""),[z,I]=useState(""),[Y,ke]=useState(""),[ye,Be]=useState((r==null?void 0:r.full_name)||""),[le,We]=useState((r==null?void 0:r.phone)||""),Xe=async()=>{
     if(l(null),!u.trim()||!h.trim()||!g.trim()||!m.trim()){
       l("Please fill in all required fields (title, brand, price, city)");
@@ -757,7 +765,7 @@ function yx({
       const{
         error:A
       }=await supabase.from("solar_listings").insert({
-        title:u.trim(),brand:h.trim(),category:y,condition:j,price:_,city:m.trim(),capacity_kw:k?parseFloat(k):null,warranty_years:S?parseInt(S):null,image_url:z.trim()||null,description:Y.trim()||null,featured:!1,seller_name:ye.trim()||(r==null?void 0:r.full_name)||null,seller_phone:le.trim()||(r==null?void 0:r.phone)||null,views:0
+        user_id:seller==null?void 0:seller.id,title:u.trim(),brand:h.trim(),category:y,condition:j,price:_,city:m.trim(),capacity_kw:k?parseFloat(k):null,warranty_years:S?parseInt(S):null,image_url:z.trim()||null,description:Y.trim()||null,featured:!1,seller_name:ye.trim()||(r==null?void 0:r.full_name)||null,seller_phone:le.trim()||(r==null?void 0:r.phone)||null,views:0,status:"approved",is_sold:!1
       });
       if(A)throw A;
       c(!0),setTimeout(()=>{
@@ -2056,6 +2064,18 @@ function yx({
     }:te))
   },ja=async()=>{
     if(!e)return;
+    if(!ke.trim()){
+      m("Please select your city");
+      return
+    }
+    if(oe&&!Be.trim()){
+      m("Business name is required.");
+      return
+    }
+    if(oe&&!We.trim()){
+      m("Business address is required.");
+      return
+    }
     if(I&&!isValidPhone(I)){
       m("Phone number must be exactly 11 digits.");
       return
@@ -2312,7 +2332,7 @@ function yx({
               })]
             }),jsxs("div",{
               children:[jsx("label",{
-                className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"City"
+                className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"City *"
               }),jsxs("select",{
                 value:ke,onChange:T=>ye(T.target.value),className:"input-field",children:[jsx("option",{
                   value:"",children:"Select city"
@@ -2323,13 +2343,13 @@ function yx({
             }),oe&&jsxs(Fragment,{
               children:[jsxs("div",{
                 children:[jsx("label",{
-                  className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"Business Name"
+                  className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"Business Name *"
                 }),jsx("input",{
                   type:"text",value:Be,onChange:T=>le(T.target.value),className:"input-field"
                 })]
               }),jsxs("div",{
                 children:[jsx("label",{
-                  className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"Business Address"
+                  className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"Business Address *"
                 }),jsx("input",{
                   type:"text",value:We,onChange:T=>Xe(T.target.value),className:"input-field"
                 })]

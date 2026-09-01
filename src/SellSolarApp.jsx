@@ -70,6 +70,7 @@ import {
 import { useAuth } from './context/AuthContext';
 import { supabase } from './lib/supabase';
 import { BRANDS, CATEGORIES, CITIES, formatPrice } from './lib/constants';
+import { digitsOnlyPhone, isValidPhone } from './lib/auth';
 
 function Xy({
   onNavigate:t,currentPage:e
@@ -608,7 +609,7 @@ function hx({
   })
 }function Wu(t){
   const e=t instanceof Error?t.message.toLowerCase():"";
-  return e.includes("weak_password")||e.includes("pwned")||e.includes("password is known")?"Password must be at least 8 characters.":e.includes("invalid login")||e.includes("invalid credentials")?"Incorrect email or password. Please try again.":e.includes("user already registered")||e.includes("already been registered")?"An account with this email already exists. Try logging in instead.":e.includes("email_rate_limit")||e.includes("rate limit")?"Too many attempts. Please wait a moment and try again.":e.includes("email not confirmed")?"Please check your email and confirm your account before logging in.":e.includes("unable to validate email")||e.includes("invalid email")||e.includes("email address")&&e.includes("invalid")?"Please enter a valid email address.":t instanceof Error&&t.message?t.message:"Something went wrong. Please try again."
+  return e.includes("invalid login")||e.includes("invalid credentials")?"Incorrect email or password. Please try again.":e.includes("user already registered")||e.includes("already been registered")?"An account with this email already exists. Try logging in instead.":e.includes("email_rate_limit")||e.includes("rate limit")?"Too many attempts. Please wait a moment and try again.":e.includes("email not confirmed")?"Please check your email and confirm your account before logging in.":e.includes("unable to validate email")||e.includes("invalid email")||e.includes("email address")&&e.includes("invalid")?"Please enter a valid email address.":t instanceof Error&&t.message?t.message:"Something went wrong. Please try again."
 }function isValidEmail(t){
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(t||"").trim())
 }function Bn(props){
@@ -743,6 +744,9 @@ function yx({
   }=useAuth(),[n,s]=useState(!1),[a,l]=useState(null),[o,c]=useState(!1),[u,d]=useState(""),[h,p]=useState(""),[y,w]=useState("panel"),[j,C]=useState("new"),[g,f]=useState(""),[m,v]=useState((r==null?void 0:r.city)||""),[k,x]=useState(""),[S,L]=useState(""),[z,I]=useState(""),[Y,ke]=useState(""),[ye,Be]=useState((r==null?void 0:r.full_name)||""),[le,We]=useState((r==null?void 0:r.phone)||""),Xe=async()=>{
     if(l(null),!u.trim()||!h.trim()||!g.trim()||!m.trim()){
       l("Please fill in all required fields (title, brand, price, city)");
+      return
+    }if(le&&!isValidPhone(le)){
+      l("Phone number must be exactly 11 digits.");
       return
     }const _=parseFloat(g);
     if(isNaN(_)||_<0){
@@ -925,7 +929,7 @@ function yx({
                 children:[jsx("label",{
                   className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"Seller Phone"
                 }),jsx("input",{
-                  type:"tel",value:le,onChange:_=>We(_.target.value),placeholder:"0300-1234567",className:"input-field"
+                    type:"tel",inputMode:"numeric",maxLength:11,value:le,onChange:_=>We(digitsOnlyPhone(_.target.value)),placeholder:"03001234567",className:"input-field"
                 })]
               })]
             }),a&&jsxs("div",{
@@ -2052,6 +2056,10 @@ function yx({
     }:te))
   },ja=async()=>{
     if(!e)return;
+    if(I&&!isValidPhone(I)){
+      m("Phone number must be exactly 11 digits.");
+      return
+    }
     k("profile");
     const{
       error:P
@@ -2063,6 +2071,9 @@ function yx({
     if(!e||!r)return;
     if(!_.title.trim()||!_.price.trim()){
       m("Please fill in title and price");
+      return
+    }if(_.seller_phone&&!isValidPhone(_.seller_phone)){
+      m("Phone number must be exactly 11 digits.");
       return
     }k("add-product");
     const{
@@ -2297,7 +2308,7 @@ function yx({
               children:[jsx("label",{
                 className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"Phone"
               }),jsx("input",{
-                type:"text",value:I,onChange:T=>Y(T.target.value),className:"input-field"
+                type:"tel",inputMode:"numeric",maxLength:11,value:I,onChange:T=>Y(digitsOnlyPhone(T.target.value)),placeholder:"03001234567",className:"input-field"
               })]
             }),jsxs("div",{
               children:[jsx("label",{
@@ -2455,9 +2466,9 @@ function yx({
                 children:[jsx("label",{
                   className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"Seller Phone"
                 }),jsx("input",{
-                  type:"text",value:_.seller_phone,onChange:T=>A({
-                    ..._,seller_phone:T.target.value
-                  }),placeholder:(r==null?void 0:r.phone)||"",className:"input-field"
+                  type:"tel",inputMode:"numeric",maxLength:11,value:_.seller_phone,onChange:T=>A({
+                    ..._,seller_phone:digitsOnlyPhone(T.target.value)
+                  }),placeholder:"03001234567",className:"input-field"
                 })]
               })]
             }),jsxs("div",{
@@ -2676,7 +2687,7 @@ function yx({
               }),jsx("input",{
                 type:"password",value:X,onChange:T=>St(T.target.value),placeholder:"At least 8 characters",className:"input-field"
               }),jsx("p",{
-                className:"mt-1.5 text-xs text-gray-400",children:"Minimum 8 characters."
+                className:"mt-1.5 text-xs text-gray-400",children:"Any 8 or more characters."
               })]
             }),jsxs("div",{
               children:[jsx("label",{

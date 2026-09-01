@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   CircleAlert,
+  CircleCheck,
   CreditCard,
   Eye,
   EyeOff,
@@ -17,7 +18,7 @@ import {
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { CITIES } from '../lib/constants';
-import { isValidEmail, normalizePhone } from '../lib/auth';
+import { digitsOnlyPhone, isValidEmail, isValidPhone, normalizePhone } from '../lib/auth';
 
 function authErrorMessage(error) {
   const message = error instanceof Error ? error.message.toLowerCase() : String(error?.message || '').toLowerCase();
@@ -34,8 +35,8 @@ function authErrorMessage(error) {
   if (message.includes('already registered') || message.includes('already been registered') || message.includes('already exists')) {
     return 'This email already exists.';
   }
-  if (message.includes('weak_password') || message.includes('pwned') || message.includes('password is known')) {
-    return 'Password must be at least 8 characters.';
+  if (error?.code === 'weak_password' || message.includes('weak_password') || message.includes('pwned') || message.includes('password is known')) {
+    return error instanceof Error && error.message ? error.message : 'Please choose a different password.';
   }
   if (message.includes('invalid login') || message.includes('invalid credentials')) {
     return 'Incorrect email or password. Please try again.';
@@ -100,10 +101,31 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
     setView(initialView);
   }, [initialView]);
 
-  const go = (next) => {
-    setView(next);
+  const clearSignupFields = () => {
+    setAccountType('individual');
+    setShowPassword(false);
+    setEmail('');
+    setPassword('');
+    setConfirmPassword('');
+    setFullName('');
+    setPhone('');
+    setCity('');
+    setCnic('');
+    setBusinessName('');
+    setBusinessAddress('');
+    setVisitingCard('');
     setError(null);
     setInfo(null);
+  };
+
+  const go = (next) => {
+    if (next === 'signup') {
+      clearSignupFields();
+    } else {
+      setError(null);
+      setInfo(null);
+    }
+    setView(next);
   };
 
   const handleSignup = async () => {
@@ -116,16 +138,20 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
       setError('Business name is mandatory for dealers');
       return;
     }
-    if (!fullName.trim() || !email.trim() || !password.trim() || !phone.trim()) {
-      setError('Please fill in name, email, phone, and password');
+    if (!fullName.trim() || !email.trim() || !password.trim() || !phone.trim() || !city.trim()) {
+      setError('Please fill in name, email, phone, city, and password');
       return;
     }
     if (!isValidEmail(email)) {
       setError('Please enter a valid email address');
       return;
     }
-    if (normalizePhone(phone).length < 10) {
-      setError('Please enter a valid phone number');
+    if (!isValidPhone(phone)) {
+      setError('Phone number must be exactly 11 digits.');
+      return;
+    }
+    if (!city.trim()) {
+      setError('Please select your city');
       return;
     }
     if (password.length < 8) {
@@ -149,6 +175,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
         email: email.trim(),
         password,
         options: {
+          emailRedirectTo: `${window.location.origin}/`,
           data: {
             account_type: accountType,
             full_name: fullName.trim(),
@@ -163,9 +190,23 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
       });
       if (signUpError) throw signUpError;
       if (!data.user) throw new Error('Sign up failed — no user returned');
+      const confirmationEmailQueued = !data.session;
+
+      let session = data.session;
+      if (!session) {
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password,
+        });
+        if (signInError) throw signInError;
+        session = signInData.session;
+      }
+      if (!session?.user) {
+        throw new Error('Account created but sign-in failed. Please log in.');
+      }
 
       await supabase.from('profiles').upsert({
-        id: data.user.id,
+        id: session.user.id,
         email: email.trim().toLowerCase(),
         phone: normalizePhone(phone),
         full_name: fullName.trim(),
@@ -176,8 +217,34 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
         business_address: isDealer ? businessAddress : null,
       });
 
-      await refreshProfile(data.user.id);
-      onSuccess();
+      await refreshProfile(session.user.id);
+
+      let emailed = confirmationEmailQueued;
+      if (!emailed) {
+        const origin = `${window.location.origin}/`;
+        const { error: resendError } = await supabase.auth.resend({
+          type: 'signup',
+          email: email.trim(),
+          options: { emailRedirectTo: origin },
+        });
+        if (!resendError) {
+          emailed = true;
+        } else {
+          const { error: otpError } = await supabase.auth.signInWithOtp({
+            email: email.trim(),
+            options: { shouldCreateUser: false, emailRedirectTo: origin },
+          });
+          emailed = !otpError;
+        }
+      }
+
+      setError(null);
+      setInfo(
+        emailed
+          ? `Account created successfully. A notification email was sent to ${email.trim()}. You are now logged in.`
+          : 'Account created successfully. You are now logged in.'
+      );
+      window.setTimeout(() => onSuccess(), 1600);
     } catch (err) {
       setError(authErrorMessage(err));
     } finally {
@@ -385,7 +452,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                       {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                     </button>
                   </div>
-                  <p className="mt-1.5 text-xs text-gray-400">Minimum 8 characters.</p>
+                  <p className="mt-1.5 text-xs text-gray-400">Any 8 or more characters.</p>
                 </div>
               )}
 
@@ -416,20 +483,40 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                     <label className="mb-1.5 block text-sm font-semibold text-gray-700">Phone *</label>
                     <div className="relative">
                       <Phone className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
-                      <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="03001234567" className="input-field pl-11" />
+                      <input
+                        type="tel"
+                        inputMode="numeric"
+                        maxLength={11}
+                        value={phone}
+                        onChange={(e) => setPhone(digitsOnlyPhone(e.target.value))}
+                        placeholder="03001234567"
+                        className={`input-field pl-11 ${phone && !isValidPhone(phone) ? 'border-error-400' : ''}`}
+                      />
                     </div>
+                    {phone && !isValidPhone(phone) ? (
+                      <p className="mt-1.5 text-xs font-medium text-error-600">Phone number must be exactly 11 digits.</p>
+                    ) : (
+                      <p className="mt-1.5 text-xs text-gray-400">Must be 11 digits, e.g. 03001234567</p>
+                    )}
                   </div>
                   <div>
-                    <label className="mb-1.5 block text-sm font-semibold text-gray-700">City</label>
+                    <label className="mb-1.5 block text-sm font-semibold text-gray-700">City *</label>
                     <div className="relative">
                       <MapPin className="absolute left-3.5 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-gray-400" />
-                      <select value={city} onChange={(e) => setCity(e.target.value)} className="select-field pl-11">
+                      <select
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        className={`select-field pl-11 ${!city ? 'border-gray-200' : ''}`}
+                      >
                         <option value="">Select your city</option>
                         {CITIES.map((item) => (
                           <option key={item} value={item}>{item}</option>
                         ))}
                       </select>
                     </div>
+                    {!city ? (
+                      <p className="mt-1.5 text-xs text-gray-400">City is required.</p>
+                    ) : null}
                   </div>
                   {isDealer && (
                     <div className="space-y-4 rounded-xl bg-primary-50/50 p-4 ring-1 ring-primary-100">
@@ -471,7 +558,10 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                 </div>
               )}
               {info && (
-                <div className="rounded-lg bg-secondary-50 p-3 text-sm font-medium text-secondary-700">{info}</div>
+                <div className="flex items-start gap-2 rounded-lg bg-secondary-50 p-3 text-sm font-medium text-secondary-700">
+                  <CircleCheck className="mt-0.5 h-4 w-4 shrink-0" />
+                  <span>{info}</span>
+                </div>
               )}
 
               <button type="button" onClick={submit} disabled={busy} className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-60">

@@ -1,6 +1,6 @@
 {
   "name": "SellSolar",
-  "description": "Pakistan's #1 marketplace for solar panels, inverters, batteries and complete solar systems. Find the best deals on new and used solar equipment with verified dealers.",
+  "description": "Pakistan's #1 marketplace for solar panels, inverters, batteries and complete systems. Includes live daily market rates and comprehensive solar load calculator.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

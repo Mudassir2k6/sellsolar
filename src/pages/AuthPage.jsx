@@ -268,10 +268,15 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
       });
       if (signInError) throw signInError;
       await refreshProfile();
-      onSuccess();
+      try {
+        sessionStorage.setItem('sellsolar_flash', 'Successfully logged in.');
+      } catch {
+        /* ignore quota / private mode */
+      }
+      setInfo('Successfully logged in.');
+      window.setTimeout(() => onSuccess(), 1400);
     } catch (err) {
       setError(authErrorMessage(err));
-    } finally {
       setBusy(false);
     }
   };
@@ -338,6 +343,15 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50">
+      {info && view === 'login' ? (
+        <div
+          role="status"
+          className="sticky top-0 z-50 flex items-center justify-center gap-2 bg-secondary-500 px-4 py-3 text-sm font-semibold text-white shadow-md"
+        >
+          <CircleCheck className="h-4 w-4 shrink-0" />
+          Successfully logged in.
+        </div>
+      ) : null}
       <div className="border-b border-gray-100 bg-white/80 backdrop-blur-sm">
         <div className="container-page flex h-16 items-center justify-between">
           <button type="button" onClick={onBack} className="flex items-center gap-2">

@@ -1,3 +1,5 @@
+import { listingImages } from './images';
+
 export const SITE_NAME = 'SellSolar';
 export const SITE_URL = 'https://sellsolar.pk';
 export const SITE_EMAIL = 'info@sellsolar.pk';
@@ -33,6 +35,13 @@ export const PAGE_SEO = {
     description:
       'Browse verified solar equipment dealers across Pakistan. Find trusted sellers of Longi, Jinko, Inverex and Homage products in your city.',
     path: '/dealers',
+    robots: INDEXABLE,
+  },
+  install: {
+    title: 'Request Solar Installation in Pakistan | SellSolar',
+    description:
+      'Request professional solar installation. Share your name, address and contact number and SellSolar will arrange a site visit across Pakistan.',
+    path: '/install',
     robots: INDEXABLE,
   },
   login: {
@@ -124,6 +133,7 @@ export function parseLocation(pathname = '/', hash = '') {
     '/calculator': 'calculator',
     '/load-calculator': 'calculator',
     '/dealers': 'dealers',
+    '/install': 'install',
     '/login': 'login',
     '/post-ad': 'post-ad',
     '/dashboard': 'dashboard',
@@ -217,7 +227,7 @@ export function applyPageSeo(page, { listing, listingId } = {}) {
       '@type': 'Product',
       name: listing.title,
       description: listing.description || description,
-      image: listing.image_url || `${origin}/og-image.svg`,
+      image: listingImages(listing)[0] || `${origin}/og-image.svg`,
       brand: listing.brand ? { '@type': 'Brand', name: listing.brand } : undefined,
       category: listing.category,
       offers: {

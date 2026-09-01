@@ -166,7 +166,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
     estimatedBatteryCost;
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 pt-20">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-20 pt-20 text-gray-900 dark:text-gray-100 transition-colors">
       {/* Top Hero Banner */}
       <section className="relative overflow-hidden bg-gradient-to-b from-primary-900 via-gray-900 to-gray-900 py-14 text-white">
         <div className="absolute inset-0 bg-grid opacity-10 pointer-events-none" />

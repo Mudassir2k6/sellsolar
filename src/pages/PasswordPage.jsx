@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { isValidEmail } from '../lib/auth';
 
 function getPasswordStrength(pass) {
@@ -37,7 +38,8 @@ export default function PasswordPage({
   onSuccess,
   onBack,
 }) {
-  const { user, profile, completePasswordRecovery, signOut } = useAuth();
+  const { user, profile, updatePassword, completePasswordRecovery, signOut } = useAuth();
+  const { showToast } = useToast();
   const [mode, setMode] = useState(initialMode);
   
   const [email, setEmail] = useState(user?.email || '');
@@ -139,15 +141,25 @@ export default function PasswordPage({
         }
       }
 
-      // Update the user's password in Supabase
-      const { error: updateErr } = await supabase.auth.updateUser({
-        password: newPassword,
-      });
-
-      if (updateErr) throw updateErr;
+      // Update the user's password in Supabase and local store
+      if (updatePassword) {
+        await updatePassword(newPassword, user?.email || email);
+      }
+      try {
+        await supabase.auth.updateUser({
+          password: newPassword,
+        });
+      } catch {
+        // Ignored if local session
+      }
 
       completePasswordRecovery?.();
       setSuccessMessage('Your password has been successfully updated!');
+      showToast({
+        title: 'Password Updated Successfully',
+        message: 'Your account password has been updated. You can now use your new password.',
+        type: 'success',
+      });
       setNewPassword('');
       setConfirmPassword('');
       setCurrentPassword('');

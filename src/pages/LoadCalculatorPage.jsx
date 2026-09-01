@@ -404,20 +404,20 @@ Generated via SellSolar.pk Load Calculator`;
   }, [activeCategory, customAppliances]);
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 pt-20 lg:pt-24 print:bg-white print:p-0 print:pt-0">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-20 pt-20 lg:pt-24 print:bg-white print:p-0 print:pt-0 text-gray-900 dark:text-gray-100 transition-colors">
       {/* Top Banner / Hero Header */}
-      <section className="border-b border-gray-200 bg-white shadow-xs print:hidden">
+      <section className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xs print:hidden">
         <div className="container-page py-8 lg:py-12">
           <div className="flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
             <div className="max-w-3xl">
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-primary-50 px-3.5 py-1 text-xs font-bold text-primary-700">
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-primary-50 dark:bg-primary-950/50 border border-primary-200/60 dark:border-primary-800/60 px-3.5 py-1 text-xs font-bold text-primary-700 dark:text-primary-300">
                 <Sparkles className="h-3.5 w-3.5 text-primary-500" />
                 Pakistan Solar Sizing & Energy Audit Tool
               </div>
-              <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
+              <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl lg:text-5xl">
                 Solar Load <span className="text-primary-500">Calculator</span>
               </h1>
-              <p className="mt-3 text-base text-gray-600 sm:text-lg">
+              <p className="mt-3 text-base text-gray-600 dark:text-gray-300 sm:text-lg">
                 Enter your fans, lights, Inverter ACs, water motors, and kitchen appliances.
                 Get accurate kW capacity, panel count, battery bank requirements, and budget estimates for Pakistan.
               </p>

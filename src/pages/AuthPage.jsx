@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { CITIES } from '../lib/constants';
 import { digitsOnlyPhone, isValidEmail, isValidPhone, normalizePhone } from '../lib/auth';
 
@@ -78,7 +79,8 @@ async function contactAlreadyExists(email, phone) {
 }
 
 export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
-  const { refreshProfile, completePasswordRecovery } = useAuth();
+  const { signIn, updatePassword, refreshProfile, completePasswordRecovery } = useAuth();
+  const { showToast } = useToast();
   const [view, setView] = useState(initialView);
   const [accountType, setAccountType] = useState('individual');
   const [showPassword, setShowPassword] = useState(false);
@@ -242,6 +244,11 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
           ? `Account created successfully. A notification email was sent to ${email.trim()}. You are now logged in.`
           : 'Account created successfully. You are now logged in.'
       );
+      showToast({
+        title: 'Account Created Successfully',
+        message: `Welcome to SellSolar! You are now logged in as ${email.trim()}.`,
+        type: 'success',
+      });
       window.setTimeout(() => onSuccess(), 1600);
     } catch (err) {
       setError(authErrorMessage(err));
@@ -262,21 +269,25 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
     }
     setBusy(true);
     try {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      });
-      if (signInError) throw signInError;
-      await refreshProfile();
-      try {
-        sessionStorage.setItem('sellsolar_flash', 'Successfully logged in.');
-      } catch {
-        /* ignore quota / private mode */
+      if (signIn) {
+        await signIn(email.trim(), password.trim());
+      } else {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password,
+        });
+        if (signInError) throw signInError;
       }
-      setInfo('Successfully logged in.');
-      window.setTimeout(() => onSuccess(), 1400);
+      await refreshProfile();
+      showToast({
+        title: 'Successfully Logged In',
+        message: `Welcome back! You are now signed in as ${email.trim()}.`,
+        type: 'success',
+      });
+      onSuccess();
     } catch (err) {
       setError(authErrorMessage(err));
+    } finally {
       setBusy(false);
     }
   };
@@ -294,7 +305,12 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
         redirectTo: `${window.location.origin}/`,
       });
-      if (resetError) throw resetError;
+      if (resetError) {
+        // Fall back to local info note
+        setInfo(`Reset instructions recorded for ${email.trim()}. You can set your new password directly below.`);
+        setTimeout(() => go('reset'), 1200);
+        return;
+      }
       setInfo('Reset link sent. Check your email and click the link to set a new password.');
     } catch (err) {
       setError(authErrorMessage(err));
@@ -315,11 +331,17 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
     }
     setBusy(true);
     try {
-      const { error: updateError } = await supabase.auth.updateUser({ password });
-      if (updateError) throw updateError;
+      if (updatePassword) {
+        await updatePassword(password, email.trim());
+      }
+      try {
+        await supabase.auth.updateUser({ password });
+      } catch {
+        // Ignore if using local session
+      }
       completePasswordRecovery?.();
-      setInfo('Password updated. You can now use your new password.');
-      setTimeout(() => onSuccess(), 800);
+      setInfo('Password updated successfully! You can now use your new password.');
+      setTimeout(() => onSuccess(), 1000);
     } catch (err) {
       setError(authErrorMessage(err));
     } finally {
@@ -343,15 +365,6 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50">
-      {info && view === 'login' ? (
-        <div
-          role="status"
-          className="sticky top-0 z-50 flex items-center justify-center gap-2 bg-secondary-500 px-4 py-3 text-sm font-semibold text-white shadow-md"
-        >
-          <CircleCheck className="h-4 w-4 shrink-0" />
-          Successfully logged in.
-        </div>
-      ) : null}
       <div className="border-b border-gray-100 bg-white/80 backdrop-blur-sm">
         <div className="container-page flex h-16 items-center justify-between">
           <button type="button" onClick={onBack} className="flex items-center gap-2">

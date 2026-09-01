@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
 const DEFAULT_SUPABASE_URL = 'https://zgfycrnmivfybbclflwf.supabase.co';
-const DEFAULT_ANON_KEY = '';
+const DEFAULT_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dummy_public_key';
 
 function getValidSupabaseUrl(rawUrl) {
   if (!rawUrl || typeof rawUrl !== 'string') {

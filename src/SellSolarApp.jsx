@@ -289,12 +289,14 @@ function nx({
           className:"mx-auto mt-5 max-w-2xl text-lg text-gray-600",children:"Find the best deals on new and used solar equipment from trusted sellers across Pakistan. Compare prices, brands, and specifications in one place."
         }),(nc||np)&&jsxs("div",{
           className:"mt-6 flex flex-wrap items-center justify-center gap-3.5",children:[nc&&jsxs("button",{
+            key:"btn-calc-load",
             onClick:nc,className:"inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary-600 to-primary-700 px-5 py-3 text-xs sm:text-sm font-extrabold text-white shadow-lg shadow-primary-500/25 hover:from-primary-700 hover:to-primary-800 transition-all hover:scale-105 active:scale-95",children:[jsx(Calculator,{
               className:"h-4 w-4 text-white"
             }),"Solar Load Calculator (Fans, ACs, Motors, kW)",jsx(ArrowRight,{
               className:"h-3.5 w-3.5"
             })]
           }),np&&jsxs("button",{
+            key:"btn-today-prices",
             onClick:np,className:"inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-5 py-3 text-xs sm:text-sm font-bold text-white shadow-lg shadow-amber-500/25 hover:from-amber-600 hover:to-amber-700 transition-all hover:scale-105 active:scale-95",children:[jsx(Zap,{
               className:"h-4 w-4 fill-white"
             }),"Today's Rates (Rs 34-42/W)",jsx(ArrowRight,{
@@ -349,7 +351,7 @@ function nx({
                 }),jsx("select",{
                   value:t.brand,onChange:s=>e("brand",s.target.value),className:"select-field text-xs sm:text-sm",children:tx.map(s=>jsx("option",{
                     value:s,children:s||"All Brands"
-                  },s))
+                  },s||"all-brands"))
                 })]
               }),jsxs("div",{
                 children:[jsx("label",{
@@ -357,7 +359,7 @@ function nx({
                 }),jsx("select",{
                   value:t.condition,onChange:s=>e("condition",s.target.value),className:"select-field text-xs sm:text-sm",children:rx.map(s=>jsx("option",{
                     value:s.value,children:s.label
-                  },s.value))
+                  },s.value||"any-cond"))
                 })]
               }),jsxs("div",{
                 children:[jsx("label",{
@@ -365,7 +367,7 @@ function nx({
                 }),jsx("select",{
                   value:t.city,onChange:s=>e("city",s.target.value),className:"select-field text-xs sm:text-sm",children:ex.map(s=>jsx("option",{
                     value:s,children:s||"All Cities"
-                  },s))
+                  },s||"all-cities"))
                 })]
               }),jsxs("div",{
                 children:[jsx("label",{
@@ -3069,7 +3071,7 @@ function _x({
       behavior:"smooth",block:"start"
     })
   },[]);
-  return useEffect(()=>{
+  useEffect(()=>{
     (async()=>{
       l(!0),c(null);
       try{
@@ -3092,12 +3094,17 @@ function _x({
         l(!1)
       }
     })()
-  },[h,e.category,e.brand,e.condition,e.city,e.minPrice,e.maxPrice,e.query]),jsxs(Fragment,{
+  },[h,e.category,e.brand,e.condition,e.city,e.minPrice,e.maxPrice,e.query]);
+
+  return jsxs(Fragment,{
     children:[jsx(nx,{
+      key:"hero-section",
       filters:e,onFilterChange:y,onSearch:w,onReset:j,onNavigatePrices:nav?()=>nav("prices"):void 0,onNavigateCalculator:nav?()=>nav("calculator"):void 0
     }),jsx(ix,{
+      key:"categories-section",
       onSelectCategory:C
-    }),nav&&jsx("div",{
+    }),nav?jsx("div",{
+      key:"calculator-banner",
       className:"container-page my-6",children:jsxs("div",{
         className:"flex flex-col md:flex-row items-center justify-between gap-6 rounded-3xl bg-gradient-to-r from-primary-900 via-primary-800 to-gray-900 p-6 sm:p-8 text-white shadow-xl shadow-primary-950/10 border border-primary-500/20",children:[jsxs("div",{
           className:"flex items-start gap-4 sm:gap-5",children:[jsx("div",{
@@ -3123,10 +3130,11 @@ function _x({
           })]
         })]
       })
-    }),jsx(lx,{
+    }):null,jsx(lx,{
+      key:"listings-section",
       listings:n,loading:a,error:o,totalCount:u,onSelectListing:t
     }),jsx(cx,{
-      
+      key:"why-sellsolar-section"
     })]
   })
 }export default function App(){

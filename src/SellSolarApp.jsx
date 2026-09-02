@@ -82,9 +82,13 @@ import { getLocalOrSeedListings, getLocalOrSeedListingById } from './data/seedLi
 import { getEquipmentFallbackImage } from './utils/solarImages';
 import ThemeRadioToggle from './components/ThemeRadioToggle';
 import WarrantySelector, { formatWarrantyShort, formatWarrantyLong } from './components/WarrantySelector';
+import InstallationRequestPage from './pages/InstallationRequestPage';
+import ListingPhotoUploader from './components/ListingPhotoUploader';
+import { listingImages, uploadListingPhotos } from './lib/images';
+import GlobalNavbarSearch from './components/GlobalNavbarSearch';
 
 function Xy({
-  onNavigate:t,currentPage:e
+  onNavigate:t,currentPage:e,onSelectListing:selList,onSearchSubmit:searchSub
 }){
   var w;
   const[r,n]=useState(!1),[s,a]=useState(!1),[l,o]=useState(!1),{
@@ -102,25 +106,34 @@ function Xy({
     label:"Today's Rates",page:"prices",highlight:true
   },{
     label:"Load Calculator",page:"calculator",isCalc:true
+  },{
+    label:"Request Complete Installation",page:"install",isInstall:true
   }];
   return jsxs("header",{
     className:`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${r?"bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-md border-b border-gray-100 dark:border-gray-800":"bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm"}`,children:[jsx("div",{
       className:"container-page",children:jsxs("div",{
-        className:"flex h-16 items-center justify-between lg:h-20 gap-2",children:[jsxs("button",{
-          onClick:()=>h("home"),className:"flex items-center gap-2 shrink-0",children:[jsx("div",{
-            className:"flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 shadow-lg shadow-primary-500/30",children:jsx(Sun,{
-              className:"h-5 w-5 text-white",strokeWidth:2.5
-            })
-          }),jsxs("span",{
-            className:"text-xl font-extrabold tracking-tight text-gray-900 dark:text-white",children:["Sell",jsx("span",{
-              className:"text-primary-500",children:"Solar"
+        className:"flex h-16 items-center justify-between lg:h-20 gap-2 sm:gap-4",children:[
+          jsxs("button",{
+            onClick:()=>h("home"),className:"flex items-center gap-2 shrink-0",children:[jsx("div",{
+              className:"flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 shadow-lg shadow-primary-500/30",children:jsx(Sun,{
+                className:"h-5 w-5 text-white",strokeWidth:2.5
+              })
+            }),jsxs("span",{
+              className:"text-xl font-extrabold tracking-tight text-gray-900 dark:text-white",children:["Sell",jsx("span",{
+                className:"text-primary-500",children:"Solar"
+              })]
             })]
-          })]
-        }),jsxs("div",{
-          className:"flex items-center gap-2 sm:gap-3",children:[
+          }),
+          jsx(GlobalNavbarSearch,{
+            onSelectListing:selList,
+            onSearchSubmit:searchSub,
+            className:"flex-1 max-w-[200px] sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg mx-1 sm:mx-2"
+          }),
+          jsxs("div",{
+          className:"flex items-center gap-1.5 sm:gap-2.5",children:[
             jsx("button",{
               onClick:()=>h("prices"),
-              className:`flex items-center gap-1.5 sm:gap-2 rounded-xl px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm font-bold transition-all shadow-sm ${
+              className:`hidden sm:flex items-center gap-1.5 sm:gap-2 rounded-xl px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm font-bold transition-all shadow-sm ${
                 e==="prices"
                   ?"bg-amber-500 text-white shadow-amber-500/25"
                   :"bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/60 hover:bg-amber-100 dark:hover:bg-amber-900/60"
@@ -146,7 +159,7 @@ function Xy({
             }),
             jsx("button",{
               onClick:()=>h("calculator"),
-              className:`flex items-center gap-1.5 sm:gap-2 rounded-xl px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm font-bold transition-all ${
+              className:`hidden md:flex items-center gap-1.5 sm:gap-2 rounded-xl px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm font-bold transition-all ${
                 e==="calculator"
                   ?"bg-primary-500 text-white shadow-sm shadow-primary-500/20"
                   :"bg-primary-50 dark:bg-primary-950/40 text-primary-800 dark:text-primary-300 border border-primary-200/70 dark:border-primary-800/60 hover:bg-primary-100 dark:hover:bg-primary-900/60"
@@ -157,6 +170,22 @@ function Xy({
                     className:`h-4 w-4 shrink-0 ${e==="calculator"?"text-white":"text-primary-600 dark:text-primary-400"}`
                   }),
                   jsx("span",{ className:"whitespace-nowrap", children:"Load Calculator" })
+                ]
+              })
+            }),
+            jsx("button",{
+              onClick:()=>h("install"),
+              className:`hidden lg:flex items-center gap-1.5 sm:gap-2 rounded-xl px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm font-bold transition-all ${
+                e==="install"
+                  ?"bg-secondary-600 text-white shadow-sm shadow-secondary-600/20"
+                  :"bg-secondary-50 dark:bg-secondary-950/40 text-secondary-800 dark:text-secondary-300 border border-secondary-200/70 dark:border-secondary-800/60 hover:bg-secondary-100 dark:hover:bg-secondary-900/60"
+              }`,
+              children:jsxs(Fragment,{
+                children:[
+                  jsx(Wrench,{
+                    className:`h-4 w-4 shrink-0 ${e==="install"?"text-white":"text-secondary-600 dark:text-secondary-400"}`
+                  }),
+                  jsx("span",{ className:"whitespace-nowrap", children:"Request Complete Installation" })
                 ]
               })
             }),
@@ -235,6 +264,8 @@ function Xy({
               className:"h-2 w-2 rounded-full bg-amber-500"
             }),j.isCalc&&jsx(Calculator,{
               className:"h-4 w-4 text-primary-600 dark:text-primary-400"
+            }),j.isInstall&&jsx(Wrench,{
+              className:"h-4 w-4 text-secondary-600 dark:text-secondary-400"
             }),j.label,j.highlight&&jsx("span",{
               className:"rounded bg-amber-200 dark:bg-amber-900 px-1.5 py-0.5 text-[10px] font-extrabold text-amber-900 dark:text-amber-200",children:"LIVE"
             })]
@@ -480,50 +511,97 @@ function ix({
     })
   })
 }function ax({
-  listing:t,onClick:e
+  listing:t,onClick:e,onNavigate:nav
 }){
+  const { user } = useAuth();
+  const toastCtx = useToast ? useToast() : null;
   const r=t.condition==="used";
-  const imgUrl = t.image_url || getEquipmentFallbackImage(t.category, t.title);
+  const allImages = listingImages(t);
+  const imgUrl = allImages[0] || t.image_url || getEquipmentFallbackImage(t.category, t.title);
+
+  const handleWhatsApp = (ev) => {
+    ev.stopPropagation();
+    if (!user) {
+      if (toastCtx && toastCtx.showToast) {
+        toastCtx.showToast({
+          title: "Registration Required",
+          message: "Please login or register on SellSolar before contacting the seller via WhatsApp.",
+          type: "notice"
+        });
+      }
+      if (nav) nav("login");
+      return;
+    }
+    const phone = t.seller_phone || "03001234567";
+    let clean = phone.replace(/[^0-9]/g, '');
+    if (clean.startsWith('0')) {
+      clean = '92' + clean.slice(1);
+    } else if (!clean.startsWith('92')) {
+      clean = '92' + clean;
+    }
+    const msg = `Salam! I am interested in your solar listing on SellSolar: "${t.title}" (PKR ${formatPrice(t.price)}). Is it still available?`;
+    window.open(`https://wa.me/${clean}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
+  };
+
   return jsxs("div",{
-    className:"card group cursor-pointer overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:bg-gray-900 dark:ring-gray-800",onClick:e,children:[jsxs("div",{
-      className:"relative aspect-[4/3] overflow-hidden bg-gray-100 dark:bg-gray-800",children:[jsx("img",{
-        src:imgUrl,alt:t.title,loading:"lazy",className:"h-full w-full object-cover transition-transform duration-500 group-hover:scale-105",onError:s=>{
-          s.currentTarget.src = getEquipmentFallbackImage(t.category, t.title);
-        }
-      }),jsxs("div",{
-        className:"absolute left-3 top-3 flex gap-2",children:[jsx("span",{
-          className:`rounded-full px-2.5 py-1 text-xs font-bold shadow-sm ${r?"bg-warning-500 text-white":"bg-secondary-500 text-white"}`,children:r?"Used":"New"
-        }),t.featured&&jsxs("span",{
-          className:"flex items-center gap-1 rounded-full bg-primary-500 px-2.5 py-1 text-xs font-bold text-white shadow-sm",children:[jsx(Tag,{
+    className:"card group cursor-pointer overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:bg-gray-900 dark:ring-gray-800 flex flex-col justify-between",onClick:e,children:[jsxs("div",{
+      children:[jsxs("div",{
+        className:"relative aspect-[4/3] overflow-hidden bg-gray-100 dark:bg-gray-800",children:[jsx("img",{
+          src:imgUrl,alt:t.title,loading:"lazy",className:"h-full w-full object-cover transition-transform duration-500 group-hover:scale-105",onError:s=>{
+            s.currentTarget.src = getEquipmentFallbackImage(t.category, t.title);
+          }
+        }),jsxs("div",{
+          className:"absolute left-3 top-3 flex gap-2",children:[jsx("span",{
+            className:`rounded-full px-2.5 py-1 text-xs font-bold shadow-sm ${r?"bg-warning-500 text-white":"bg-secondary-500 text-white"}`,children:r?"Used":"New"
+          }),t.featured&&jsxs("span",{
+            className:"flex items-center gap-1 rounded-full bg-primary-500 px-2.5 py-1 text-xs font-bold text-white shadow-sm",children:[jsx(Tag,{
+              className:"h-3 w-3"
+            }),"Featured"]
+          })]
+        }),jsxs("div",{
+          className:"absolute right-3 top-3 flex items-center gap-1 rounded-full bg-black/50 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm",children:[jsx(Eye,{
             className:"h-3 w-3"
-          }),"Featured"]
+          }),t.views||0]
+        }),allImages.length > 1 && jsxs("div",{
+          className:"absolute left-3 bottom-3 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-sm",children:[jsx(Image,{
+            className:"h-3 w-3"
+          }),allImages.length]
+        }),jsx("button",{
+          type:"button",
+          onClick:handleWhatsApp,
+          title:"Contact Seller via WhatsApp",
+          className:"absolute bottom-3 right-3 z-10 flex items-center gap-1.5 rounded-full bg-[#25D366] hover:bg-[#20ba59] text-white px-3 py-1.5 text-xs font-bold shadow-lg shadow-emerald-950/30 transition-all hover:scale-105 active:scale-95",children:jsxs(Fragment,{
+            children:[jsx(MessageCircle,{
+              className:"h-3.5 w-3.5 fill-white"
+            }),jsx("span",{
+              children:"WhatsApp"
+            })]
+          })
         })]
       }),jsxs("div",{
-        className:"absolute right-3 top-3 flex items-center gap-1 rounded-full bg-black/50 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm",children:[jsx(Eye,{
-          className:"h-3 w-3"
-        }),t.views||0]
+        className:"p-4",children:[jsxs("div",{
+          className:"mb-1 flex items-center gap-2 text-xs font-semibold text-primary-600 dark:text-primary-400",children:[jsx("span",{
+            children:CATEGORIES[t.category]||t.category
+          }),t.capacity_kw&&jsx("span",{
+            className:"text-gray-400 dark:text-gray-600",children:"•"
+          }),t.capacity_kw&&jsxs("span",{
+            className:"text-gray-500 dark:text-gray-400",children:[t.capacity_kw,"kW"]
+          })]
+        }),jsx("h3",{
+          className:"line-clamp-2 text-sm font-bold leading-snug text-gray-900 dark:text-gray-100 transition-colors group-hover:text-primary-600 dark:group-hover:text-primary-400",children:t.title
+        }),jsxs("div",{
+          className:"mt-2 flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400",children:[jsx(MapPin,{
+            className:"h-3.5 w-3.5 shrink-0 text-primary-500"
+          }),t.city,jsx("span",{
+            className:"text-gray-300 dark:text-gray-600",children:"•"
+          }),jsx("span",{
+            className:"font-medium text-gray-600 dark:text-gray-300",children:t.brand
+          })]
+        })]
       })]
-    }),jsxs("div",{
-      className:"p-4",children:[jsxs("div",{
-        className:"mb-1 flex items-center gap-2 text-xs font-semibold text-primary-600 dark:text-primary-400",children:[jsx("span",{
-          children:CATEGORIES[t.category]||t.category
-        }),t.capacity_kw&&jsx("span",{
-          className:"text-gray-400 dark:text-gray-600",children:"•"
-        }),t.capacity_kw&&jsxs("span",{
-          className:"text-gray-500 dark:text-gray-400",children:[t.capacity_kw,"kW"]
-        })]
-      }),jsx("h3",{
-        className:"line-clamp-2 text-sm font-bold leading-snug text-gray-900 dark:text-gray-100 transition-colors group-hover:text-primary-600 dark:group-hover:text-primary-400",children:t.title
-      }),jsxs("div",{
-        className:"mt-2 flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400",children:[jsx(MapPin,{
-          className:"h-3.5 w-3.5 shrink-0 text-primary-500"
-        }),t.city,jsx("span",{
-          className:"text-gray-300 dark:text-gray-600",children:"•"
-        }),jsx("span",{
-          className:"font-medium text-gray-600 dark:text-gray-300",children:t.brand
-        })]
-      }),jsx("div",{
-        className:"mt-3 flex items-end justify-between border-t border-gray-100 dark:border-gray-800 pt-3",children:jsxs("div",{
+    }),jsx("div",{
+      className:"px-4 pb-4",children:jsxs("div",{
+        className:"flex items-end justify-between border-t border-gray-100 dark:border-gray-800 pt-3",children:[jsxs("div",{
           children:[jsx("div",{
             className:"text-lg font-extrabold text-primary-900 dark:text-primary-300",children:formatPrice(t.price)
           }),t.warranty_years?jsxs("div",{
@@ -533,12 +611,20 @@ function ix({
           }):jsx("div",{
             className:"text-xs text-gray-400 dark:text-gray-500",children:"No warranty"
           })]
-        })
-      })]
+        }),jsx("button",{
+          type:"button",onClick:handleWhatsApp,className:"inline-flex items-center gap-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-800/60 text-[#128C7E] dark:text-emerald-300 px-2.5 py-1 text-xs font-bold transition-colors",children:jsxs(Fragment,{
+            children:[jsx(MessageCircle,{
+              className:"h-3.5 w-3.5 fill-[#128C7E] dark:fill-emerald-300"
+            }),jsx("span",{
+              children:"Chat"
+            })]
+          })
+        })]
+      })
     })]
   })
 }function lx({
-  listings:t,loading:e,error:r,totalCount:n,onSelectListing:s,onResetFilters:rf
+  listings:t,loading:e,error:r,totalCount:n,onSelectListing:s,onResetFilters:rf,onNavigate:nav
 }){
   return jsx("section",{
     id:"listings",className:"bg-gray-50 dark:bg-gray-950 py-16 lg:py-20 transition-colors",children:jsxs("div",{
@@ -586,7 +672,7 @@ function ix({
         })]
       }):jsx("div",{
         className:"grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",children:t.map(a=>jsx(ax,{
-          listing:a,onClick:()=>s(a.id)
+          listing:a,onClick:()=>s(a.id),onNavigate:nav
         },a.id))
       })]
     })
@@ -838,7 +924,7 @@ function yx({
 }){
   const{
     profile:r,user:seller
-  }=useAuth(),[n,s]=useState(!1),[a,l]=useState(null),[o,c]=useState(!1),[u,d]=useState(""),[h,p]=useState(""),[y,w]=useState("panel"),[j,C]=useState("new"),[g,f]=useState(""),[m,v]=useState((r==null?void 0:r.city)||""),[k,x]=useState(""),[S,L]=useState(""),[z,I]=useState(""),[Y,ke]=useState(""),[ye,Be]=useState((r==null?void 0:r.full_name)||""),[le,We]=useState((r==null?void 0:r.phone)||""),Xe=async()=>{
+  }=useAuth(),[n,s]=useState(!1),[a,l]=useState(null),[o,c]=useState(!1),[u,d]=useState(""),[h,p]=useState(""),[y,w]=useState("panel"),[j,C]=useState("new"),[g,f]=useState(""),[m,v]=useState((r==null?void 0:r.city)||""),[k,x]=useState(""),[S,L]=useState(""),[z,I]=useState(""),[Y,ke]=useState(""),[ye,Be]=useState((r==null?void 0:r.full_name)||""),[le,We]=useState((r==null?void 0:r.phone)||""),[uploadedFiles,setUploadedFiles]=useState([]),[uploadNotice,setUploadNotice]=useState(""),Xe=async()=>{
     if(l(null),!u.trim()||!h.trim()||!g.trim()||!m.trim()){
       l("Please fill in all required fields (title, brand, price, city)");
       return
@@ -853,7 +939,23 @@ function yx({
       l("Capacity must be a positive number in kW");
       return
     }s(!0);
+    setUploadNotice("");
     try{
+      let finalCover = z.trim() || null;
+      let finalImageUrls = [];
+      if (uploadedFiles.length > 0) {
+        setUploadNotice("Compressing & preparing photos...");
+        try {
+          const urls = await uploadListingPhotos(supabase, seller?.id, uploadedFiles);
+          if (urls.length > 0) {
+            finalCover = urls[0];
+            finalImageUrls = urls;
+          }
+        } catch (photoErr) {
+          console.warn("Photo upload notice:", photoErr);
+        }
+      }
+
       const newListing = {
         id: 'cust-' + Date.now(),
         user_id: seller == null ? void 0 : seller.id,
@@ -865,7 +967,8 @@ function yx({
         city: m.trim(),
         capacity_kw: k ? parseFloat(k) : null,
         warranty_years: S !== null && S !== "" && !isNaN(Number(S)) ? parseFloat(Number(S).toFixed(4)) : null,
-        image_url: z.trim() || null,
+        image_url: finalCover,
+        image_urls: finalImageUrls.length > 0 ? finalImageUrls : (finalCover ? [finalCover] : []),
         description: Y.trim() || null,
         featured: false,
         seller_name: ye.trim() || (r == null ? void 0 : r.full_name) || "Solar Seller",
@@ -886,7 +989,7 @@ function yx({
         const{
           error:A
         }=await supabase.from("solar_listings").insert({
-          user_id:seller==null?void 0:seller.id,title:u.trim(),brand:h.trim(),category:y,condition:j,price:_,city:m.trim(),capacity_kw:k?parseFloat(k):null,warranty_years:S !== null && S !== "" && !isNaN(Number(S)) ? parseFloat(Number(S).toFixed(4)) : null,image_url:z.trim()||null,description:Y.trim()||null,featured:!1,seller_name:ye.trim()||(r==null?void 0:r.full_name)||null,seller_phone:le.trim()||(r==null?void 0:r.phone)||null,views:0,status:"approved",is_sold:!1
+          user_id:seller==null?void 0:seller.id,title:u.trim(),brand:h.trim(),category:y,condition:j,price:_,city:m.trim(),capacity_kw:k?parseFloat(k):null,warranty_years:S !== null && S !== "" && !isNaN(Number(S)) ? parseFloat(Number(S).toFixed(4)) : null,image_url:finalCover,image_urls:finalImageUrls.length > 0 ? finalImageUrls : (finalCover ? [finalCover] : []),description:Y.trim()||null,featured:!1,seller_name:ye.trim()||(r==null?void 0:r.full_name)||null,seller_phone:le.trim()||(r==null?void 0:r.phone)||null,views:0,status:"approved",is_sold:!1
         });
         if(A)console.warn("Supabase insert notice:", A);
       } catch(err) {
@@ -1032,14 +1135,18 @@ function yx({
               className:"rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30 p-4",children:jsx(WarrantySelector,{
                 value:S,onChange:val=>L(val)
               })
-            }),jsxs("div",{
-              children:[jsx("label",{
-                className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"Image URL"
+            }),jsx("div",{
+              className:"rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30 p-4",children:jsx(ListingPhotoUploader,{
+                files:uploadedFiles,onChange:setUploadedFiles,disabled:n
+              })
+            }),jsxs("details",{
+              className:"group text-xs text-gray-500",children:[jsx("summary",{
+                className:"cursor-pointer font-semibold hover:text-gray-700 dark:hover:text-gray-300 select-none",children:"Or enter image link manually"
               }),jsxs("div",{
-                className:"relative",children:[jsx(Image,{
-                  className:"absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
+                className:"mt-2 relative",children:[jsx(Image,{
+                  className:"absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
                 }),jsx("input",{
-                  type:"text",value:z,onChange:_=>I(_.target.value),placeholder:"https://...",className:"input-field pl-11"
+                  type:"text",value:z,onChange:_=>I(_.target.value),placeholder:"https://...",className:"input-field pl-10 text-xs"
                 })]
               })]
             }),jsxs("div",{
@@ -1058,7 +1165,7 @@ function yx({
               onClick:Xe,disabled:n,className:"btn-primary w-full disabled:opacity-60 disabled:cursor-not-allowed",children:n?jsxs(Fragment,{
                 children:[jsx(LoaderCircle,{
                   className:"h-5 w-5 animate-spin"
-                }),"Posting Ad..."]
+                }),uploadNotice||"Posting Ad..."]
               }):"Post Ad"
             })]
           })
@@ -2888,7 +2995,9 @@ function yx({
 }function jx({
   listingId:t,onBack:e
 }){
-  const[r,n]=useState(null),[s,a]=useState(null),[l,o]=useState(!0),[c,u]=useState(null),[d,h]=useState(!1);
+  const[r,n]=useState(null),[s,a]=useState(null),[l,o]=useState(!0),[c,u]=useState(null),[d,h]=useState(!1),[activePhotoIdx,setActivePhotoIdx]=useState(0);
+  const { user: currentUser } = useAuth();
+  const toastCtx = useToast ? useToast() : null;
   useEffect(()=>{
     (async()=>{
       o(!0),u(null);
@@ -2963,22 +3072,46 @@ function yx({
   }],g=new Date(r.created_at).toLocaleDateString("en-PK",{
     year:"numeric",month:"long",day:"numeric"
   });
-  const detailImg = r.image_url || getEquipmentFallbackImage(r.category, r.title);
+  const photos = listingImages(r);
+  const detailImg = photos[activePhotoIdx] || r.image_url || getEquipmentFallbackImage(r.category, r.title);
+
+  const handleWhatsApp = () => {
+    if (!currentUser) {
+      if (toastCtx && toastCtx.showToast) {
+        toastCtx.showToast({
+          title: "Registration Required",
+          message: "Please login or register on SellSolar before contacting the seller via WhatsApp.",
+          type: "notice"
+        });
+      }
+      return;
+    }
+    const phone = w || "03001234567";
+    let clean = phone.replace(/[^0-9]/g, '');
+    if (clean.startsWith('0')) {
+      clean = '92' + clean.slice(1);
+    } else if (!clean.startsWith('92')) {
+      clean = '92' + clean;
+    }
+    const msg = `Salam! I am interested in your listing: "${r.title}" (PKR ${formatPrice(r.price)}) on SellSolar.pk. Is it still available?`;
+    window.open(`https://wa.me/${clean}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
+  };
+
   return jsxs("div",{
-    className:"min-h-screen bg-gray-50",children:[jsx("div",{
-      className:"sticky top-0 z-40 border-b border-gray-100 bg-white/90 backdrop-blur-md",children:jsxs("div",{
+    className:"min-h-screen bg-gray-50 dark:bg-gray-950",children:[jsx("div",{
+      className:"sticky top-0 z-40 border-b border-gray-100 dark:border-gray-800 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md",children:jsxs("div",{
         className:"container-page flex h-16 items-center justify-between",children:[jsxs("button",{
           onClick:e,className:"flex items-center gap-2",children:[jsx("div",{
             className:"flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 shadow-lg shadow-primary-500/30",children:jsx(Sun,{
               className:"h-5 w-5 text-white",strokeWidth:2.5
             })
           }),jsxs("span",{
-            className:"text-xl font-extrabold tracking-tight text-gray-900",children:["Sell",jsx("span",{
+            className:"text-xl font-extrabold tracking-tight text-gray-900 dark:text-white",children:["Sell",jsx("span",{
               className:"text-primary-500",children:"Solar"
             })]
           })]
         }),jsxs("button",{
-          onClick:e,className:"flex items-center gap-1 text-sm font-semibold text-gray-600 hover:text-gray-900",children:[jsx(ArrowLeft,{
+          onClick:e,className:"flex items-center gap-1 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white",children:[jsx(ArrowLeft,{
             className:"h-4 w-4"
           }),"Back to Listings"]
         })]
@@ -2986,22 +3119,22 @@ function yx({
     }),jsx("div",{
       className:"container-page py-8 lg:py-12",children:jsxs("div",{
         className:"mx-auto max-w-5xl",children:[jsxs("div",{
-          className:"mb-6 flex items-center gap-2 text-sm text-gray-500",children:[jsx("button",{
-            onClick:e,className:"hover:text-gray-700",children:"Home"
+          className:"mb-6 flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400",children:[jsx("button",{
+            onClick:e,className:"hover:text-gray-700 dark:hover:text-gray-200",children:"Home"
           }),jsx("span",{
             children:"/"
           }),jsx("span",{
-            className:"font-semibold text-primary-600",children:CATEGORIES[r.category]||r.category
+            className:"font-semibold text-primary-600 dark:text-primary-400",children:CATEGORIES[r.category]||r.category
           }),jsx("span",{
             children:"/"
           }),jsx("span",{
-            className:"truncate text-gray-400",children:r.title
+            className:"truncate text-gray-400 dark:text-gray-500",children:r.title
           })]
         }),jsxs("div",{
           className:"grid grid-cols-1 gap-8 lg:grid-cols-5",children:[jsxs("div",{
-            className:"lg:col-span-3",children:[jsx("div",{
-              className:"card overflow-hidden",children:jsxs("div",{
-                className:"relative aspect-[4/3] bg-gray-100",children:[jsx("img",{
+            className:"lg:col-span-3",children:[jsxs("div",{
+              className:"card overflow-hidden",children:[jsxs("div",{
+                className:"relative aspect-[4/3] bg-gray-100 dark:bg-gray-800",children:[jsx("img",{
                   src:detailImg,alt:r.title,className:"h-full w-full object-cover",onError:s=>{
                     s.currentTarget.src = getEquipmentFallbackImage(r.category, r.title);
                   }
@@ -3018,22 +3151,28 @@ function yx({
                     className:"h-3 w-3"
                   }),r.views||0," views"]
                 })]
-              })
+              }),photos.length > 1 && jsx("div",{
+                className:"p-3 flex gap-2 overflow-x-auto bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800",children:photos.map((ph, idx)=>jsx("button",{
+                  key:idx,onClick:()=>setActivePhotoIdx(idx),className:`relative h-16 w-16 shrink-0 rounded-lg overflow-hidden border-2 transition-all ${activePhotoIdx===idx?"border-primary-500 ring-2 ring-primary-500/30 scale-105":"border-transparent opacity-70 hover:opacity-100"}`,children:jsx("img",{
+                    src:ph,alt:"",className:"h-full w-full object-cover"
+                  })
+                }))
+              })]
             }),r.description&&jsxs("div",{
               className:"card mt-6 p-6",children:[jsx("h2",{
-                className:"mb-3 text-lg font-bold text-gray-900",children:"Description"
+                className:"mb-3 text-lg font-bold text-gray-900 dark:text-white",children:"Description"
               }),jsx("p",{
-                className:"text-sm leading-relaxed text-gray-600 whitespace-pre-line",children:r.description
+                className:"text-sm leading-relaxed text-gray-600 dark:text-gray-300 whitespace-pre-line",children:r.description
               })]
             }),jsxs("div",{
               className:"card mt-6 p-6",children:[jsx("h2",{
-                className:"mb-4 text-lg font-bold text-gray-900",children:"Specifications"
+                className:"mb-4 text-lg font-bold text-gray-900 dark:text-white",children:"Specifications"
               }),jsx("div",{
                 className:"grid grid-cols-1 gap-3 sm:grid-cols-2",children:C.map(f=>jsxs("div",{
-                  className:"flex items-center justify-between rounded-xl bg-gray-50 px-4 py-3",children:[jsx("span",{
-                    className:"text-sm font-medium text-gray-500",children:f.label
+                  className:"flex items-center justify-between rounded-xl bg-gray-50 dark:bg-gray-800/60 px-4 py-3",children:[jsx("span",{
+                    className:"text-sm font-medium text-gray-500 dark:text-gray-400",children:f.label
                   }),jsx("span",{
-                    className:"text-sm font-bold text-gray-900",children:f.value||"—"
+                    className:"text-sm font-bold text-gray-900 dark:text-gray-100",children:f.value||"—"
                   })]
                 },f.label))
               })]
@@ -3042,15 +3181,15 @@ function yx({
             className:"lg:col-span-2",children:jsxs("div",{
               className:"sticky top-24 space-y-4",children:[jsxs("div",{
                 className:"card p-6",children:[jsx("h1",{
-                  className:"text-xl font-extrabold leading-tight text-gray-900",children:r.title
+                  className:"text-xl font-extrabold leading-tight text-gray-900 dark:text-white",children:r.title
                 }),jsx("div",{
                   className:"mt-3 flex items-center gap-2",children:jsx("span",{
-                    className:"text-3xl font-extrabold text-primary-600",children:formatPrice(r.price)
+                    className:"text-3xl font-extrabold text-primary-600 dark:text-primary-400",children:formatPrice(r.price)
                   })
                 }),jsxs("div",{
-                  className:"mt-3 flex flex-wrap items-center gap-3 text-sm text-gray-500",children:[jsxs("span",{
+                  className:"mt-3 flex flex-wrap items-center gap-3 text-sm text-gray-500 dark:text-gray-400",children:[jsxs("span",{
                     className:"flex items-center gap-1",children:[jsx(MapPin,{
-                      className:"h-4 w-4"
+                      className:"h-4 w-4 text-primary-500"
                     }),r.city]
                   }),jsxs("span",{
                     className:"flex items-center gap-1",children:[jsx(Calendar,{
@@ -3058,7 +3197,14 @@ function yx({
                     }),g]
                   })]
                 }),jsxs("div",{
-                  className:"mt-5 space-y-3",children:[w?jsxs(Fragment,{
+                  className:"mt-5 space-y-3",children:[
+                    jsxs("button",{
+                      onClick:handleWhatsApp,
+                      className:"flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] hover:bg-[#20ba59] px-4 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-emerald-500/25 transition-all hover:scale-[1.02] active:scale-98 cursor-pointer",children:[jsx(MessageCircle,{
+                        className:"h-5 w-5 fill-white"
+                      }),"Contact Seller via WhatsApp"]
+                    }),
+                    w?jsxs(Fragment,{
                     children:[jsxs("a",{
                       href:`tel:${w}`,className:"btn-primary w-full",children:[jsx(Phone,{
                         className:"h-5 w-5"
@@ -3068,20 +3214,29 @@ function yx({
                         className:"h-4 w-4"
                       }),"Show Phone Number"]
                     }),d&&jsxs("div",{
-                      className:"rounded-xl bg-primary-50 p-4 text-center",children:[jsx("div",{
-                        className:"text-xs font-semibold text-gray-500",children:"Phone Number"
+                      className:"rounded-xl bg-primary-50 dark:bg-primary-950/50 p-4 text-center border border-primary-100 dark:border-primary-800",children:[jsx("div",{
+                        className:"text-xs font-semibold text-gray-500 dark:text-gray-400",children:"Phone Number"
                       }),jsx("div",{
-                        className:"mt-1 text-lg font-extrabold text-primary-700",children:w
+                        className:"mt-1 text-lg font-extrabold text-primary-700 dark:text-primary-300",children:w
                       })]
                     })]
                   }):jsx("div",{
-                    className:"rounded-xl bg-gray-50 p-4 text-center text-sm text-gray-500",children:"No contact number provided"
+                    className:"rounded-xl bg-gray-50 dark:bg-gray-800 p-4 text-center text-sm text-gray-500 dark:text-gray-400",children:"No phone number provided"
                   }),jsxs("button",{
-                    className:"btn-ghost w-full",children:[jsx(MessageCircle,{
-                      className:"h-4 w-4"
-                    }),"Send Message"]
+                    onClick:handleWhatsApp,className:"btn-ghost w-full",children:[jsx(MessageCircle,{
+                      className:"h-4 w-4 text-emerald-600"
+                    }),"Send WhatsApp Inquiry"]
                   }),jsxs("button",{
-                    className:"btn-ghost w-full",children:[jsx(Share2,{
+                    onClick:()=>{
+                      if(navigator.share){
+                        navigator.share({title:r.title,url:window.location.href}).catch(()=>{});
+                      }else if(navigator.clipboard){
+                        navigator.clipboard.writeText(window.location.href);
+                        if(toastCtx && toastCtx.showToast){
+                          toastCtx.showToast({title:"Link Copied",message:"Listing link copied to clipboard",type:"success"});
+                        }
+                      }
+                    },className:"btn-ghost w-full",children:[jsx(Share2,{
                       className:"h-4 w-4"
                     }),"Share Listing"]
                   })]
@@ -3155,9 +3310,9 @@ function yx({
   category:"",brand:"",condition:"",city:"",minPrice:"",maxPrice:"",query:""
 };
 function _x({
-  onSelectListing:t,onNavigate:nav
+  onSelectListing:t,onNavigate:nav,initialFilters
 }){
-  const[e,r]=useState(Vu),[n,s]=useState([]),[a,l]=useState(!0),[o,c]=useState(null),[u,d]=useState(0),[h,p]=useState(0),y=useCallback((g,m)=>{
+  const[e,r]=useState(()=>initialFilters?{...Vu,...initialFilters}:Vu),[n,s]=useState([]),[a,l]=useState(!0),[o,c]=useState(null),[u,d]=useState(0),[h,p]=useState(0),y=useCallback((g,m)=>{
     r(v=>({
       ...v,[g]:m
     }))
@@ -3178,6 +3333,23 @@ function _x({
       behavior:"smooth",block:"start"
     })
   },[]);
+
+  useEffect(()=>{
+    if(initialFilters){
+      r(prev=>({
+        ...prev,
+        ...initialFilters
+      }));
+      p(cnt=>cnt+1);
+      setTimeout(()=>{
+        const g=document.getElementById("listings");
+        g&&g.scrollIntoView({
+          behavior:"smooth",block:"start"
+        });
+      }, 100);
+    }
+  },[initialFilters]);
+
   useEffect(()=>{
     let active = true;
     (async()=>{
@@ -3247,7 +3419,7 @@ function _x({
         })]
       })
     }):null,jsx(lx,{
-      listings:n,loading:a,error:o,totalCount:u,onSelectListing:t,onResetFilters:j
+      listings:n,loading:a,error:o,totalCount:u,onSelectListing:t,onResetFilters:j,onNavigate:nav
     }),jsx(cx,{})]
   })
 }export default function App(){
@@ -3258,6 +3430,7 @@ function _x({
   const initialLoc = typeof window !== 'undefined' ? parseLocation(window.location.pathname, window.location.hash) : { page: 'home', listingId: null };
   const [n, s] = useState(initialLoc.page || "home");
   const [a, l] = useState(initialLoc.listingId || null);
+  const [searchFilters, setSearchFilters] = useState(null);
 
   useEffect(() => {
     applyPageSeo(n, { listingId: a });
@@ -3304,6 +3477,18 @@ function _x({
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const handleGlobalSearchSubmit = filterObj => {
+    const formatted = typeof filterObj === 'string' ? { query: filterObj } : (filterObj || {});
+    setSearchFilters(formatted);
+    if (n !== "home") {
+      o("home");
+    }
+    setTimeout(() => {
+      const el = document.getElementById("listings");
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 150);
+  };
+
   return r ? jsx("div", {
     className: "flex min-h-screen items-center justify-center bg-white dark:bg-gray-950", children: jsx("div", {
       className: "flex h-12 w-12 animate-spin rounded-full border-4 border-primary-200 dark:border-primary-800 border-t-primary-500"
@@ -3320,11 +3505,13 @@ function _x({
     onSuccess: () => o("home"), onBack: () => o("home")
   }) : n === "dealers" ? jsx(mx, {
     onBack: () => o("home")
+  }) : n === "install" || n === "installation" || n === "request-installation" ? jsx(InstallationRequestPage, {
+    onBack: () => o("home")
   }) : n === "calculator" || n === "load-calculator" ? jsxs("div", {
     className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
       onNavigate: d => {
         d === "post-ad" ? c() : d === "admin" || d === "admin-dashboard" ? t && (e != null && e.is_admin) ? o("admin-dashboard") : o("login") : d === "password" || d === "change-password" ? o("password") : o(d === "dashboard" ? t ? "dashboard" : "login" : d)
-      }, currentPage: n
+      }, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
     }), jsx("main", {
       id: "main",
       children: jsx(LoadCalculatorPage, {
@@ -3343,7 +3530,7 @@ function _x({
     className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
       onNavigate: d => {
         d === "post-ad" ? c() : d === "admin" || d === "admin-dashboard" ? t && (e != null && e.is_admin) ? o("admin-dashboard") : o("login") : d === "password" || d === "change-password" ? o("password") : o(d === "dashboard" ? t ? "dashboard" : "login" : d)
-      }, currentPage: n
+      }, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
     }), jsx("main", {
       id: "main",
       children: jsx(TodayPricesPage, {
@@ -3380,11 +3567,11 @@ function _x({
     className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
       onNavigate: d => {
         d === "post-ad" ? c() : d === "admin" || d === "admin-dashboard" ? t && (e != null && e.is_admin) ? o("admin-dashboard") : o("login") : d === "password" || d === "change-password" ? o("password") : o(d === "dashboard" ? t ? "dashboard" : "login" : d)
-      }, currentPage: n
+      }, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
     }), jsx("main", {
       id: "main",
       children: jsx(_x, {
-        onSelectListing: u, onNavigate: o
+        onSelectListing: u, onNavigate: o, initialFilters: searchFilters
       })
     }), jsx(hx, {
       onPostAd: c

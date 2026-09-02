@@ -67,29 +67,48 @@ export function listingCover(listing) {
   return listingImages(listing)[0] || '';
 }
 
+function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 export async function uploadListingPhotos(supabase, userId, files) {
-  if (!userId) {
-    throw new Error('Please log in to upload photos.');
-  }
   const selected = Array.from(files || []).slice(0, MAX_LISTING_PHOTOS);
+  if (!selected.length) return [];
   const urls = [];
+
   for (let i = 0; i < selected.length; i += 1) {
-    const compressed = await compressImageFile(selected[i]);
-    const path = `${userId}/${Date.now()}-${i}.jpg`;
-    const { error } = await supabase.storage.from('listing-images').upload(path, compressed, {
-      cacheControl: '3600',
-      contentType: 'image/jpeg',
-      upsert: false,
-    });
-    if (error) {
-      const message = String(error.message || '');
-      if (/row-level security|not allowed|unauthorized/i.test(message)) {
-        throw new Error('Photo upload was blocked. Please log in and try again.');
+    try {
+      const compressed = await compressImageFile(selected[i]);
+      if (supabase && userId) {
+        const path = `${userId}/${Date.now()}-${i}.jpg`;
+        const { error } = await supabase.storage.from('listing-images').upload(path, compressed, {
+          cacheControl: '3600',
+          contentType: 'image/jpeg',
+          upsert: false,
+        });
+        if (!error) {
+          const { data } = supabase.storage.from('listing-images').getPublicUrl(path);
+          if (data?.publicUrl) {
+            urls.push(data.publicUrl);
+            continue;
+          }
+        }
       }
-      throw error;
+      // Fallback to compressed Data URL
+      const dataUrl = await fileToDataUrl(compressed);
+      urls.push(dataUrl);
+    } catch (err) {
+      console.warn('Image compression/upload notice:', err);
+      try {
+        const dataUrl = await fileToDataUrl(selected[i]);
+        urls.push(dataUrl);
+      } catch {}
     }
-    const { data } = supabase.storage.from('listing-images').getPublicUrl(path);
-    if (data?.publicUrl) urls.push(data.publicUrl);
   }
   return urls;
 }

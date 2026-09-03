@@ -5,8 +5,8 @@ const DEFAULT_ANON_KEY =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpnZnljcm5taXZmeWJiY2xmbHdmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxNjMzNDQsImV4cCI6MjEwMzczOTM0NH0.30oiwuVIdIjaMMZGyobVqZk8HA18vVIhq2jN6jFgyao';
 
 export function isSupabaseConfigured() {
-  const url = import.meta.env.VITE_SUPABASE_URL;
-  const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  const url = getValidSupabaseUrl(import.meta.env.VITE_SUPABASE_URL);
+  const key = getValidAnonKey(import.meta.env.VITE_SUPABASE_ANON_KEY);
   if (!key || typeof key !== 'string' || !url || typeof url !== 'string') return false;
   const trimmedKey = key.trim();
   const trimmedUrl = url.trim();
@@ -21,7 +21,7 @@ export function isSupabaseConfigured() {
   ) {
     return false;
   }
-  return trimmedKey.split('.').length === 3;
+  return trimmedKey.split('.').length === 3 || trimmedKey.startsWith('sb_publishable_');
 }
 
 function getValidSupabaseUrl(rawUrl) {

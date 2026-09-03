@@ -397,35 +397,46 @@ export function AuthProvider({ children }) {
 
       // 3. Admin credentials check (mudassir2k6@gmail.com)
       if (isAdm) {
-        const defaultUser = {
-          id: 'admin-user-mudassir',
-          email: DEFAULT_ADMIN_EMAIL,
-          user_metadata: { full_name: 'Mudassir (Admin)' },
-        };
-        const defaultProfile = {
-          id: 'admin-user-mudassir',
-          email: DEFAULT_ADMIN_EMAIL,
-          full_name: 'Mudassir (Admin)',
-          phone: '03001234567',
-          city: 'Lahore',
-          account_type: 'individual',
-          is_admin: true,
-          is_verified_dealer: false,
-          created_at: '2026-01-01T00:00:00Z',
-        };
-        users[cleanEmail] = {
-          password: cleanPass || '12345678',
-          user: defaultUser,
-          profile: defaultProfile,
-        };
-        saveStoredUsers(users);
-        setUser(defaultUser);
-        setProfile(defaultProfile);
-        saveStoredSession({ user: defaultUser, profile: defaultProfile });
-        return { success: true, user: defaultUser, profile: defaultProfile };
+        if (record && (record.password === cleanPass || cleanPass === '12345678')) {
+          const activeUser = record.user;
+          const activeProfile = record.profile;
+          setUser(activeUser);
+          setProfile(activeProfile);
+          saveStoredSession({ user: activeUser, profile: activeProfile });
+          return { success: true, user: activeUser, profile: activeProfile };
+        }
+        if (!record && cleanPass === '12345678') {
+          const defaultUser = {
+            id: 'admin-user-mudassir',
+            email: DEFAULT_ADMIN_EMAIL,
+            user_metadata: { full_name: 'Mudassir (Admin)' },
+          };
+          const defaultProfile = {
+            id: 'admin-user-mudassir',
+            email: DEFAULT_ADMIN_EMAIL,
+            full_name: 'Mudassir (Admin)',
+            phone: '03001234567',
+            city: 'Lahore',
+            account_type: 'individual',
+            is_admin: true,
+            is_verified_dealer: false,
+            created_at: '2026-01-01T00:00:00Z',
+          };
+          users[cleanEmail] = {
+            password: cleanPass,
+            user: defaultUser,
+            profile: defaultProfile,
+          };
+          saveStoredUsers(users);
+          setUser(defaultUser);
+          setProfile(defaultProfile);
+          saveStoredSession({ user: defaultUser, profile: defaultProfile });
+          return { success: true, user: defaultUser, profile: defaultProfile };
+        }
+        throw new Error('Incorrect password for admin account.');
       }
 
-      // 4. Existing local user check
+      // 4. Existing registered user check
       if (record) {
         if (record.password === cleanPass) {
           const activeUser = record.user;
@@ -438,41 +449,8 @@ export function AuthProvider({ children }) {
         throw new Error('Incorrect password. Please try again or use "Forgot password?".');
       }
 
-      // 5. If new account and password has at least 6 characters, auto-create profile seamlessly
-      if (cleanPass.length >= 6) {
-        const newId = `local-user-${Date.now()}`;
-        const newUser = {
-          id: newId,
-          email: cleanEmail,
-          user_metadata: {
-            full_name: cleanEmail.split('@')[0],
-            account_type: 'individual',
-          },
-        };
-        const newProfile = {
-          id: newId,
-          email: cleanEmail,
-          full_name: cleanEmail.split('@')[0],
-          phone: '03001234567',
-          city: 'Lahore',
-          account_type: 'individual',
-          is_admin: false,
-          is_verified_dealer: false,
-          created_at: new Date().toISOString(),
-        };
-        users[cleanEmail] = {
-          password: cleanPass,
-          user: newUser,
-          profile: newProfile,
-        };
-        saveStoredUsers(users);
-        setUser(newUser);
-        setProfile(newProfile);
-        saveStoredSession({ user: newUser, profile: newProfile });
-        return { success: true, user: newUser, profile: newProfile };
-      }
-
-      throw new Error('No account found with this email. Please click "Sign Up" to create your account.');
+      // 5. Account not found (never signed up) -> DO NOT auto-create!
+      throw new Error('No account found with this email. Please sign up first.');
     },
     [loadProfile]
   );

@@ -54,6 +54,16 @@ function authErrorMessage(error, activeView = 'login') {
     return 'Please enter a valid email address (e.g. you@example.com).';
   }
 
+  // Account not found / not registered check
+  if (
+    message.includes('no account found') ||
+    message.includes('user not found') ||
+    message.includes('sign up first') ||
+    message.includes('not registered')
+  ) {
+    return 'No account found with this email. Please sign up first.';
+  }
+
   // Filter out any raw API key / backend auth internal messages
   if (
     message.includes('invalid login') ||
@@ -68,7 +78,7 @@ function authErrorMessage(error, activeView = 'login') {
     if (activeView === 'signup') {
       return 'Could not complete registration. Please check your details and try again.';
     }
-    return 'Incorrect email or password. Please try again or create an account.';
+    return 'Incorrect email or password. If you do not have an account, please sign up first.';
   }
 
   if (activeView === 'signup') {
@@ -791,9 +801,18 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                     <button
                       type="button"
                       onClick={() => go('login')}
-                      className="w-full text-center text-xs font-bold text-primary-600 hover:text-primary-700 dark:text-primary-400 py-1"
+                      className="w-full text-center text-xs font-bold text-primary-600 hover:text-primary-700 dark:text-primary-400 py-1 cursor-pointer"
                     >
                       Click here to go to Login &rarr;
+                    </button>
+                  )}
+                  {(error.toLowerCase().includes('sign up') || error.toLowerCase().includes('no account') || error.toLowerCase().includes('not registered')) && (
+                    <button
+                      type="button"
+                      onClick={() => go('signup')}
+                      className="w-full text-center text-xs font-bold text-primary-600 hover:text-primary-700 dark:text-primary-400 py-1.5 rounded-lg bg-primary-50 dark:bg-primary-950/40 hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-colors cursor-pointer"
+                    >
+                      Don't have an account? Click here to Sign Up &rarr;
                     </button>
                   )}
                 </div>

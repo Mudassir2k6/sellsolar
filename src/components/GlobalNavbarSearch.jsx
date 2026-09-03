@@ -260,27 +260,18 @@ export default function GlobalNavbarSearch({
                 setQuery('');
                 inputRef.current?.focus();
               }}
-              className="p-1.5 mr-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-md transition-colors"
+              className="p-1.5 mr-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-md transition-colors cursor-pointer"
               title="Clear search"
             >
               <X className="h-3.5 w-3.5" />
             </button>
           ) : (
-            <div className="mr-2 flex items-center pointer-events-none">
-              <kbd className="hidden xl:inline-flex items-center rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800/80 px-1.5 py-0.5 text-[10px] font-semibold text-gray-400 dark:text-gray-500 shadow-2xs">
+            <div className="mr-2.5 flex items-center pointer-events-none">
+              <kbd className="hidden sm:inline-flex items-center rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800/80 px-1.5 py-0.5 text-[10px] font-semibold text-gray-400 dark:text-gray-500 shadow-2xs">
                 ⌘K
               </kbd>
             </div>
           )}
-
-          <button
-            type="button"
-            onClick={() => handleSubmitSearch()}
-            className="mr-1 rounded-lg bg-primary-500 hover:bg-primary-600 text-white p-1.5 transition-colors"
-            title="Search"
-          >
-            <Search className="h-3.5 w-3.5" />
-          </button>
         </div>
       </div>
 

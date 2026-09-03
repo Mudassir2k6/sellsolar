@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Search,
   X,
@@ -47,7 +48,7 @@ export default function GlobalNavbarSearch({
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
-  const [allListings, setAllListings] = useState([]);
+  const [allListings, setAllListings] = useState(() => getLocalOrSeedListings({}));
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [isMobileModalOpen, setIsMobileModalOpen] = useState(false);
 
@@ -55,6 +56,18 @@ export default function GlobalNavbarSearch({
   const inputRef = useRef(null);
   const mobileInputRef = useRef(null);
   const resultsContainerRef = useRef(null);
+
+  // Prevent body scroll when mobile modal is open
+  useEffect(() => {
+    if (isMobileModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileModalOpen]);
 
   // Load listings cache for super-fast instant search
   useEffect(() => {
@@ -272,18 +285,26 @@ export default function GlobalNavbarSearch({
       </div>
 
       {/* Mobile / Tablet Search Trigger Icon Button */}
-      <div className="flex lg:hidden items-center">
+      <div className="flex lg:hidden items-center w-full">
         <button
+          id="navbar-mobile-search-btn"
           type="button"
           onClick={() => {
             setIsMobileModalOpen(true);
             setTimeout(() => mobileInputRef.current?.focus(), 150);
           }}
-          className="flex items-center gap-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80 px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+          className="w-full flex items-center justify-between gap-2 rounded-xl border border-gray-200/90 dark:border-gray-700/80 bg-gray-50/90 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-800 hover:border-primary-400 dark:hover:border-primary-500/60 px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 shadow-2xs hover:shadow-sm transition-all active:scale-[0.98] cursor-pointer group"
           aria-label="Open solar search"
         >
-          <Search className="h-4 w-4 text-primary-500 shrink-0" />
-          <span className="hidden sm:inline text-xs text-gray-500 dark:text-gray-400">Search Solar...</span>
+          <div className="flex items-center gap-2 min-w-0">
+            <Search className="h-4 w-4 text-primary-500 shrink-0 group-hover:scale-105 transition-transform" />
+            <span className="truncate text-xs text-gray-600 dark:text-gray-300 font-medium">
+              Search Solar...
+            </span>
+          </div>
+          <span className="hidden sm:inline-flex items-center rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800/90 px-1.5 py-0.5 text-[10px] font-semibold text-gray-400 dark:text-gray-500">
+            ⌘K
+          </span>
         </button>
       </div>
 
@@ -495,9 +516,17 @@ export default function GlobalNavbarSearch({
       )}
 
       {/* Mobile Full Screen Search Modal */}
-      {isMobileModalOpen && (
-        <div className="lg:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex flex-col justify-start">
-          <div className="bg-white dark:bg-gray-900 w-full rounded-b-2xl shadow-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in slide-in-from-top duration-200">
+      {isMobileModalOpen && typeof document !== 'undefined' && createPortal(
+        <div
+          className="lg:hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex flex-col justify-start"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsMobileModalOpen(false);
+          }}
+        >
+          <div
+            className="bg-white dark:bg-gray-900 w-full rounded-b-2xl shadow-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in slide-in-from-top duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Header Search Input */}
             <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center gap-2">
               <div className="flex-1 flex items-center rounded-xl border border-primary-500 bg-gray-50 dark:bg-gray-800 px-3 py-2">
@@ -528,7 +557,8 @@ export default function GlobalNavbarSearch({
               <button
                 type="button"
                 onClick={() => setIsMobileModalOpen(false)}
-                className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white rounded-lg"
+                className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white rounded-lg transition-colors cursor-pointer"
+                aria-label="Close search"
               >
                 <X className="h-6 w-6" />
               </button>
@@ -568,7 +598,7 @@ export default function GlobalNavbarSearch({
                     <div
                       key={item.id}
                       onClick={() => handleSelect(item.id)}
-                      className="flex items-center gap-3 p-2.5 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-850 hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-98 transition-all"
+                      className="flex items-center gap-3 p-2.5 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-850 hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-98 transition-all cursor-pointer"
                     >
                       <div className="h-12 w-12 shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
                         <img
@@ -613,7 +643,7 @@ export default function GlobalNavbarSearch({
                   <button
                     type="button"
                     onClick={() => handleSubmitSearch()}
-                    className="mt-3 rounded-lg bg-primary-500 text-white px-4 py-2 text-xs font-bold"
+                    className="mt-3 rounded-lg bg-primary-500 text-white px-4 py-2 text-xs font-bold cursor-pointer"
                   >
                     Search all listings
                   </button>
@@ -633,7 +663,7 @@ export default function GlobalNavbarSearch({
                             setQuery(item.brand || item.label);
                             handleSubmitSearch(item.brand || item.label, item.category);
                           }}
-                          className="w-full text-left p-2 rounded-lg bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 flex items-center justify-between"
+                          className="w-full text-left p-2 rounded-lg bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 flex items-center justify-between cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                         >
                           <span>{item.label}</span>
                           <ChevronRight className="h-3.5 w-3.5 text-gray-400" />
@@ -650,14 +680,15 @@ export default function GlobalNavbarSearch({
               <button
                 type="button"
                 onClick={() => handleSubmitSearch()}
-                className="w-full btn-primary py-2.5 text-sm flex items-center justify-center gap-2"
+                className="w-full btn-primary py-2.5 text-sm flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Search className="h-4 w-4" />
                 <span>Search for "{query || 'all solar items'}"</span>
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

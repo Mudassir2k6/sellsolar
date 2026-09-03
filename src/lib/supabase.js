@@ -43,8 +43,15 @@ function getValidAnonKey(rawKey) {
     trimmed === 'undefined' ||
     trimmed === 'null' ||
     trimmed.startsWith('MY_') ||
-    trimmed.startsWith('YOUR_')
+    trimmed.startsWith('YOUR_') ||
+    trimmed.includes('dummy') ||
+    trimmed.includes('placeholder')
   ) {
+    return DEFAULT_ANON_KEY;
+  }
+  if (trimmed.startsWith('sb_publishable_')) return trimmed;
+  const parts = trimmed.split('.');
+  if (parts.length !== 3 || parts.some((part) => part.length < 8)) {
     return DEFAULT_ANON_KEY;
   }
   return trimmed;

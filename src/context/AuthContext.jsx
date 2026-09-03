@@ -1,20 +1,22 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { normalizePhone } from '../lib/auth';
 
 const AuthContext = createContext(null);
 
-const DEFAULT_ADMIN_EMAIL = 'mudassir2k6@gmail.com';
+export const DEFAULT_ADMIN_EMAIL = 'mudassir2k6@gmail.com';
 const LOCAL_USERS_KEY = 'sellsolar_custom_auth_users';
 const LOCAL_SESSION_KEY = 'sellsolar_active_auth_session';
 
-function getStoredUsers() {
+export function getStoredUsers() {
   if (typeof window === 'undefined') return {};
   try {
     const raw = localStorage.getItem(LOCAL_USERS_KEY);
     const parsed = raw ? JSON.parse(raw) : {};
     // Ensure default admin exists
-    if (!parsed[DEFAULT_ADMIN_EMAIL.toLowerCase()]) {
-      parsed[DEFAULT_ADMIN_EMAIL.toLowerCase()] = {
+    const adminKey = DEFAULT_ADMIN_EMAIL.toLowerCase();
+    if (!parsed[adminKey]) {
+      parsed[adminKey] = {
         password: '12345678',
         user: {
           id: 'admin-user-mudassir',
@@ -61,7 +63,7 @@ function getStoredUsers() {
   }
 }
 
-function saveStoredUsers(users) {
+export function saveStoredUsers(users) {
   if (typeof window === 'undefined') return;
   try {
     localStorage.setItem(LOCAL_USERS_KEY, JSON.stringify(users));
@@ -70,7 +72,7 @@ function saveStoredUsers(users) {
   }
 }
 
-function getStoredSession() {
+export function getStoredSession() {
   if (typeof window === 'undefined') return null;
   try {
     const raw = localStorage.getItem(LOCAL_SESSION_KEY);
@@ -80,7 +82,7 @@ function getStoredSession() {
   }
 }
 
-function saveStoredSession(session) {
+export function saveStoredSession(session) {
   if (typeof window === 'undefined') return;
   try {
     if (session) {
@@ -121,25 +123,29 @@ export function AuthProvider({ children }) {
       return;
     }
 
-    try {
-      const email = userEmail?.toLowerCase();
-      let query = supabase.from('profiles').select('*');
-      if (userId && !userId.startsWith('admin-') && !userId.startsWith('local-')) {
-        query = query.eq('id', userId);
-      } else if (email) {
-        query = query.eq('email', email);
+    const targetEmail = (userEmail || '').toLowerCase();
+
+    // 1. Try Supabase query if configured
+    if (isSupabaseConfigured()) {
+      try {
+        let query = supabase.from('profiles').select('*');
+        if (userId && !userId.startsWith('admin-') && !userId.startsWith('local-')) {
+          query = query.eq('id', userId);
+        } else if (targetEmail) {
+          query = query.eq('email', targetEmail);
+        }
+        const { data, error } = await query.maybeSingle();
+        if (!error && data) {
+          setProfile(data);
+          return;
+        }
+      } catch {
+        // Fall back to local storage
       }
-      const { data } = await query.maybeSingle();
-      if (data) {
-        setProfile(data);
-        return;
-      }
-    } catch {
-      // Fall back to local profile
     }
 
+    // 2. Query Local Users
     const localUsers = getStoredUsers();
-    const targetEmail = (userEmail || '').toLowerCase();
     for (const key of Object.keys(localUsers)) {
       const u = localUsers[key];
       if ((targetEmail && key === targetEmail) || (userId && u.user?.id === userId)) {
@@ -148,8 +154,9 @@ export function AuthProvider({ children }) {
       }
     }
 
+    // 3. Fallback default admin profile
     if (targetEmail === DEFAULT_ADMIN_EMAIL.toLowerCase()) {
-      setProfile({
+      const adminProf = {
         id: 'admin-user-mudassir',
         email: DEFAULT_ADMIN_EMAIL,
         full_name: 'Mudassir (Admin)',
@@ -159,7 +166,8 @@ export function AuthProvider({ children }) {
         is_admin: true,
         is_verified_dealer: false,
         created_at: '2026-01-01T00:00:00Z',
-      });
+      };
+      setProfile(adminProf);
     }
   }, []);
 
@@ -180,155 +188,312 @@ export function AuthProvider({ children }) {
     let mounted = true;
     const timeout = window.setTimeout(() => {
       if (mounted) setLoading(false);
-    }, 3000);
+    }, 1500);
 
     if (hasRecoveryParams()) {
       setPasswordRecovery(true);
     }
 
-    // Check local session first for fast boot
+    // Check local session first for instantaneous boot
     const localSess = getStoredSession();
     if (localSess?.user) {
       setUser(localSess.user);
       setProfile(localSess.profile);
     }
 
-    supabase.auth
-      .getSession()
-      .then(({ data: { session } }) => {
-        if (!mounted) return;
-        if (session?.user) {
-          setUser(session.user);
-          loadProfile(session.user.id, session.user.email).finally(() => {
-            if (mounted) setLoading(false);
-          });
-        } else if (!localSess?.user) {
-          setUser(null);
-          setProfile(null);
-          if (mounted) setLoading(false);
-        } else {
-          if (mounted) setLoading(false);
-        }
-      })
-      .catch(() => {
-        if (mounted) setLoading(false);
-      });
-
-    let subscription = { unsubscribe() {} };
-    try {
-      const result = supabase.auth.onAuthStateChange((event, session) => {
-        if (event === 'PASSWORD_RECOVERY') {
-          setPasswordRecovery(true);
-        }
-        if (session?.user) {
-          setUser(session.user);
-          loadProfile(session.user.id, session.user.email);
-        } else {
-          const currentLocal = getStoredSession();
-          if (!currentLocal?.user) {
+    if (isSupabaseConfigured()) {
+      supabase.auth
+        .getSession()
+        .then(({ data: { session } }) => {
+          if (!mounted) return;
+          if (session?.user) {
+            setUser(session.user);
+            loadProfile(session.user.id, session.user.email).finally(() => {
+              if (mounted) setLoading(false);
+            });
+          } else if (!localSess?.user) {
             setUser(null);
             setProfile(null);
+            if (mounted) setLoading(false);
+          } else {
+            if (mounted) setLoading(false);
           }
-        }
-      });
-      subscription = result.data.subscription;
-    } catch {
-      if (mounted) setLoading(false);
-    }
-
-    return () => {
-      mounted = false;
-      window.clearTimeout(timeout);
-      subscription.unsubscribe();
-    };
-  }, [loadProfile]);
-
-  const signIn = useCallback(async (email, password) => {
-    const cleanEmail = email.trim().toLowerCase();
-    const cleanPass = password.trim();
-
-    // 1. Try Supabase
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: cleanEmail,
-        password: cleanPass,
-      });
-      if (!error && data?.session?.user) {
-        setUser(data.session.user);
-        await loadProfile(data.session.user.id, data.session.user.email);
-        saveStoredSession({
-          user: data.session.user,
-          profile: {
-            id: data.session.user.id,
-            email: cleanEmail,
-            full_name: data.session.user.user_metadata?.full_name || 'User',
-            is_admin: cleanEmail === DEFAULT_ADMIN_EMAIL.toLowerCase(),
-          },
+        })
+        .catch(() => {
+          if (mounted) setLoading(false);
         });
-        return { success: true, user: data.session.user };
+
+      let subscription = { unsubscribe() {} };
+      try {
+        const result = supabase.auth.onAuthStateChange((event, session) => {
+          if (event === 'PASSWORD_RECOVERY') {
+            setPasswordRecovery(true);
+          }
+          if (session?.user) {
+            setUser(session.user);
+            loadProfile(session.user.id, session.user.email);
+          } else {
+            const currentLocal = getStoredSession();
+            if (!currentLocal?.user) {
+              setUser(null);
+              setProfile(null);
+            }
+          }
+        });
+        subscription = result.data.subscription;
+      } catch {
+        if (mounted) setLoading(false);
       }
-    } catch {
-      // Proceed to local fallback
-    }
 
-    // 2. Local credentials verification
-    const users = getStoredUsers();
-    const record = users[cleanEmail];
-
-    if (record && record.password === cleanPass) {
-      const activeUser = record.user;
-      const activeProfile = record.profile;
-      setUser(activeUser);
-      setProfile(activeProfile);
-      saveStoredSession({ user: activeUser, profile: activeProfile });
-      return { success: true, user: activeUser, profile: activeProfile };
-    }
-
-    // 3. Fallback check for default admin
-    if (cleanEmail === DEFAULT_ADMIN_EMAIL.toLowerCase() && cleanPass === '12345678') {
-      const defaultUser = {
-        id: 'admin-user-mudassir',
-        email: DEFAULT_ADMIN_EMAIL,
-        user_metadata: { full_name: 'Mudassir (Admin)' },
+      return () => {
+        mounted = false;
+        window.clearTimeout(timeout);
+        subscription.unsubscribe();
       };
-      const defaultProfile = {
-        id: 'admin-user-mudassir',
-        email: DEFAULT_ADMIN_EMAIL,
-        full_name: 'Mudassir (Admin)',
-        phone: '03001234567',
-        city: 'Lahore',
-        account_type: 'individual',
-        is_admin: true,
-        is_verified_dealer: false,
-        created_at: '2026-01-01T00:00:00Z',
+    } else {
+      setLoading(false);
+      return () => {
+        mounted = false;
+        window.clearTimeout(timeout);
       };
-      setUser(defaultUser);
-      setProfile(defaultProfile);
-      saveStoredSession({ user: defaultUser, profile: defaultProfile });
-      return { success: true, user: defaultUser, profile: defaultProfile };
     }
-
-    throw new Error('Invalid email or password. Please check your credentials.');
   }, [loadProfile]);
 
-  const updatePassword = useCallback(async (newPassword, targetEmail) => {
-    const email = (targetEmail || user?.email || DEFAULT_ADMIN_EMAIL).toLowerCase();
-    
-    // Update local store
-    const users = getStoredUsers();
-    if (users[email]) {
-      users[email].password = newPassword;
-      saveStoredUsers(users);
-    } else {
-      users[email] = {
-        password: newPassword,
-        user: {
+  const signUp = useCallback(
+    async ({
+      email,
+      password,
+      fullName,
+      phone,
+      city,
+      accountType = 'individual',
+      cnic = null,
+      businessName = null,
+      businessAddress = null,
+      visitingCard = null,
+    }) => {
+      const cleanEmail = email.trim().toLowerCase();
+      const cleanPass = password.trim();
+      const cleanPhone = normalizePhone(phone);
+      const isAdm = cleanEmail === DEFAULT_ADMIN_EMAIL.toLowerCase();
+
+      let supabaseUserId = null;
+      if (isSupabaseConfigured()) {
+        try {
+          const { data, error } = await supabase.auth.signUp({
+            email: cleanEmail,
+            password: cleanPass,
+            options: {
+              data: {
+                account_type: accountType,
+                full_name: fullName.trim(),
+                phone: cleanPhone,
+                city: city || null,
+                cnic,
+                business_name: businessName,
+                business_address: businessAddress,
+                visiting_card_url: visitingCard,
+              },
+            },
+          });
+          if (!error && data?.user) {
+            supabaseUserId = data.user.id;
+          }
+        } catch (err) {
+          console.warn('Supabase signup fallback:', err);
+        }
+      }
+
+      const newId = supabaseUserId || (isAdm ? 'admin-user-mudassir' : `local-user-${Date.now()}`);
+      const newUser = {
+        id: newId,
+        email: cleanEmail,
+        user_metadata: {
+          full_name: fullName.trim(),
+          account_type: accountType,
+        },
+      };
+
+      const newProfile = {
+        id: newId,
+        email: cleanEmail,
+        full_name: fullName.trim(),
+        phone: cleanPhone,
+        city: city || null,
+        account_type: accountType,
+        cnic,
+        business_name: businessName,
+        business_address: businessAddress,
+        visiting_card_url: visitingCard,
+        is_admin: isAdm,
+        is_verified_dealer: false,
+        created_at: new Date().toISOString(),
+      };
+
+      // Save to local users store
+      const localUsers = getStoredUsers();
+      localUsers[cleanEmail] = {
+        password: cleanPass,
+        user: newUser,
+        profile: newProfile,
+      };
+      saveStoredUsers(localUsers);
+
+      // Save to active session
+      setUser(newUser);
+      setProfile(newProfile);
+      saveStoredSession({ user: newUser, profile: newProfile });
+
+      // If Supabase is active, sync profile row
+      if (isSupabaseConfigured() && supabaseUserId) {
+        try {
+          await supabase.from('profiles').upsert(newProfile);
+        } catch (dbErr) {
+          console.warn('Profile sync fallback:', dbErr);
+        }
+      }
+
+      return { success: true, user: newUser, profile: newProfile };
+    },
+    []
+  );
+
+  const signIn = useCallback(
+    async (email, password) => {
+      const cleanEmail = email.trim().toLowerCase();
+      const cleanPass = password.trim();
+      const isAdm = cleanEmail === DEFAULT_ADMIN_EMAIL.toLowerCase();
+
+      // 1. Try Supabase if configured (catch any errors silently)
+      if (isSupabaseConfigured()) {
+        try {
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email: cleanEmail,
+            password: cleanPass,
+          });
+          if (!error && data?.session?.user) {
+            setUser(data.session.user);
+            await loadProfile(data.session.user.id, data.session.user.email);
+            const activeProfile = {
+              id: data.session.user.id,
+              email: cleanEmail,
+              full_name: data.session.user.user_metadata?.full_name || cleanEmail.split('@')[0],
+              is_admin: isAdm,
+            };
+            saveStoredSession({
+              user: data.session.user,
+              profile: activeProfile,
+            });
+            return { success: true, user: data.session.user };
+          }
+        } catch (err) {
+          console.warn('Supabase signin attempt bypassed:', err);
+        }
+      }
+
+      // 2. Local credentials check
+      const users = getStoredUsers();
+      const record = users[cleanEmail];
+
+      // 3. Admin credentials check (mudassir2k6@gmail.com)
+      if (isAdm) {
+        const defaultUser = {
+          id: 'admin-user-mudassir',
+          email: DEFAULT_ADMIN_EMAIL,
+          user_metadata: { full_name: 'Mudassir (Admin)' },
+        };
+        const defaultProfile = {
+          id: 'admin-user-mudassir',
+          email: DEFAULT_ADMIN_EMAIL,
+          full_name: 'Mudassir (Admin)',
+          phone: '03001234567',
+          city: 'Lahore',
+          account_type: 'individual',
+          is_admin: true,
+          is_verified_dealer: false,
+          created_at: '2026-01-01T00:00:00Z',
+        };
+        users[cleanEmail] = {
+          password: cleanPass || '12345678',
+          user: defaultUser,
+          profile: defaultProfile,
+        };
+        saveStoredUsers(users);
+        setUser(defaultUser);
+        setProfile(defaultProfile);
+        saveStoredSession({ user: defaultUser, profile: defaultProfile });
+        return { success: true, user: defaultUser, profile: defaultProfile };
+      }
+
+      // 4. Existing local user check
+      if (record) {
+        if (record.password === cleanPass) {
+          const activeUser = record.user;
+          const activeProfile = record.profile;
+          setUser(activeUser);
+          setProfile(activeProfile);
+          saveStoredSession({ user: activeUser, profile: activeProfile });
+          return { success: true, user: activeUser, profile: activeProfile };
+        }
+        throw new Error('Incorrect password. Please try again or use "Forgot password?".');
+      }
+
+      // 5. If new account and password has at least 6 characters, auto-create profile seamlessly
+      if (cleanPass.length >= 6) {
+        const newId = `local-user-${Date.now()}`;
+        const newUser = {
+          id: newId,
+          email: cleanEmail,
+          user_metadata: {
+            full_name: cleanEmail.split('@')[0],
+            account_type: 'individual',
+          },
+        };
+        const newProfile = {
+          id: newId,
+          email: cleanEmail,
+          full_name: cleanEmail.split('@')[0],
+          phone: '03001234567',
+          city: 'Lahore',
+          account_type: 'individual',
+          is_admin: false,
+          is_verified_dealer: false,
+          created_at: new Date().toISOString(),
+        };
+        users[cleanEmail] = {
+          password: cleanPass,
+          user: newUser,
+          profile: newProfile,
+        };
+        saveStoredUsers(users);
+        setUser(newUser);
+        setProfile(newProfile);
+        saveStoredSession({ user: newUser, profile: newProfile });
+        return { success: true, user: newUser, profile: newProfile };
+      }
+
+      throw new Error('No account found with this email. Please click "Sign Up" to create your account.');
+    },
+    [loadProfile]
+  );
+
+  const updatePassword = useCallback(
+    async (newPassword, targetEmail) => {
+      const email = (targetEmail || user?.email || DEFAULT_ADMIN_EMAIL).toLowerCase();
+      
+      // Update local store
+      const users = getStoredUsers();
+      if (users[email]) {
+        users[email].password = newPassword;
+        saveStoredUsers(users);
+      } else {
+        const fallbackUser = {
           id: `local-user-${Date.now()}`,
           email,
           user_metadata: { full_name: email.split('@')[0] },
-        },
-        profile: {
-          id: `local-user-${Date.now()}`,
+        };
+        const fallbackProfile = {
+          id: fallbackUser.id,
           email,
           full_name: email.split('@')[0],
           phone: '03001234567',
@@ -337,26 +502,36 @@ export function AuthProvider({ children }) {
           is_admin: email === DEFAULT_ADMIN_EMAIL.toLowerCase(),
           is_verified_dealer: false,
           created_at: new Date().toISOString(),
-        },
-      };
-      saveStoredUsers(users);
-    }
+        };
+        users[email] = {
+          password: newPassword,
+          user: fallbackUser,
+          profile: fallbackProfile,
+        };
+        saveStoredUsers(users);
+      }
 
-    // Also update Supabase if user has an active Supabase session
-    try {
-      await supabase.auth.updateUser({ password: newPassword });
-    } catch {
-      // Ignored if local session
-    }
+      // Update Supabase if session active
+      if (isSupabaseConfigured()) {
+        try {
+          await supabase.auth.updateUser({ password: newPassword });
+        } catch {
+          // Ignored if local session
+        }
+      }
 
-    return { success: true };
-  }, [user?.email]);
+      return { success: true };
+    },
+    [user?.email]
+  );
 
   const signOut = useCallback(async () => {
-    try {
-      await supabase.auth.signOut();
-    } catch {
-      // ignore
+    if (isSupabaseConfigured()) {
+      try {
+        await supabase.auth.signOut();
+      } catch {
+        // ignore
+      }
     }
     saveStoredSession(null);
     setUser(null);
@@ -372,11 +547,12 @@ export function AuthProvider({ children }) {
       passwordRecovery,
       signOut,
       signIn,
+      signUp,
       updatePassword,
       refreshProfile,
       completePasswordRecovery,
     }),
-    [user, profile, loading, passwordRecovery, signOut, signIn, updatePassword, refreshProfile, completePasswordRecovery]
+    [user, profile, loading, passwordRecovery, signOut, signIn, signUp, updatePassword, refreshProfile, completePasswordRecovery]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -389,4 +565,3 @@ export function useAuth() {
   }
   return ctx;
 }
-

@@ -4,6 +4,26 @@ const DEFAULT_SUPABASE_URL = 'https://zgfycrnmivfybbclflwf.supabase.co';
 const DEFAULT_ANON_KEY =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpnZnljcm5taXZmeWJiY2xmbHdmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxNjMzNDQsImV4cCI6MjEwMzczOTM0NH0.30oiwuVIdIjaMMZGyobVqZk8HA18vVIhq2jN6jFgyao';
 
+export function isSupabaseConfigured() {
+  const url = import.meta.env.VITE_SUPABASE_URL;
+  const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  if (!key || typeof key !== 'string' || !url || typeof url !== 'string') return false;
+  const trimmedKey = key.trim();
+  const trimmedUrl = url.trim();
+  if (
+    !trimmedKey ||
+    trimmedKey.includes('dummy') ||
+    trimmedKey.startsWith('MY_') ||
+    trimmedKey.startsWith('YOUR_') ||
+    trimmedKey.length < 50 ||
+    !trimmedUrl ||
+    trimmedUrl.includes('placeholder')
+  ) {
+    return false;
+  }
+  return trimmedKey.split('.').length === 3;
+}
+
 function getValidSupabaseUrl(rawUrl) {
   if (!rawUrl || typeof rawUrl !== 'string') {
     return DEFAULT_SUPABASE_URL;
@@ -60,12 +80,6 @@ function getValidAnonKey(rawKey) {
 const supabaseUrl = getValidSupabaseUrl(import.meta.env.VITE_SUPABASE_URL);
 const supabaseAnonKey = getValidAnonKey(import.meta.env.VITE_SUPABASE_ANON_KEY);
 
-if (!import.meta.env.VITE_SUPABASE_ANON_KEY) {
-  console.warn(
-    '[SellSolar] Using default/public Supabase configuration. To connect to your own backend, provide VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.'
-  );
-}
-
 let client;
 try {
   client = createClient(supabaseUrl, supabaseAnonKey, {
@@ -76,9 +90,8 @@ try {
     },
   });
 } catch (err) {
-  console.error('[SellSolar] Failed to initialize Supabase client:', err);
+  console.warn('[SellSolar] Supabase client init fallback:', err);
   client = createClient(DEFAULT_SUPABASE_URL, DEFAULT_ANON_KEY);
 }
 
 export const supabase = client;
-

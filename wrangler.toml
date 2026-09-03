@@ -1,8 +1,0 @@
-# Cloudflare Pages: SPA routes (/login, /listing/...) without Netlify-style _redirects.
-# The old `/* /index.html 200` rule is rejected as an infinite loop.
-name = "sellsolar"
-compatibility_date = "2026-09-02"
-pages_build_output_dir = "dist"
-
-[assets]
-not_found_handling = "single-page-application"

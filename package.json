@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "update-prices": "node scripts/update-today-prices.js",
+    "schedule-prices": "node scripts/daily-price-scheduler.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",

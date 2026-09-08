@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { createPortal } from 'react-dom';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Search,
   X,
@@ -11,13 +10,9 @@ import {
   Sparkles,
   ArrowRight,
   TrendingUp,
-  SlidersHorizontal,
   ChevronRight,
-  Tag,
-  ShieldCheck,
-  Store,
 } from 'lucide-react';
-import { CATEGORIES, BRANDS, formatPrice } from '../lib/constants';
+import { CATEGORIES, formatPrice } from '../lib/constants';
 import { getLocalOrSeedListings } from '../data/seedListings';
 import { getEquipmentFallbackImage } from '../utils/solarImages';
 import { supabase } from '../lib/supabase';
@@ -50,26 +45,12 @@ export default function GlobalNavbarSearch({
   const [activeCategory, setActiveCategory] = useState('all');
   const [allListings, setAllListings] = useState(() => getLocalOrSeedListings({}));
   const [selectedIndex, setSelectedIndex] = useState(-1);
-  const [isMobileModalOpen, setIsMobileModalOpen] = useState(false);
 
   const containerRef = useRef(null);
   const inputRef = useRef(null);
-  const mobileInputRef = useRef(null);
   const resultsContainerRef = useRef(null);
 
-  // Prevent body scroll when mobile modal is open
-  useEffect(() => {
-    if (isMobileModalOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isMobileModalOpen]);
-
-  // Load listings cache for super-fast instant search
+  // Load listings cache for fast instant search
   useEffect(() => {
     let isMounted = true;
     async function loadData() {
@@ -106,13 +87,8 @@ export default function GlobalNavbarSearch({
         ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k')
       ) {
         e.preventDefault();
-        if (window.innerWidth < 1024) {
-          setIsMobileModalOpen(true);
-          setTimeout(() => mobileInputRef.current?.focus(), 150);
-        } else {
-          setIsOpen(true);
-          inputRef.current?.focus();
-        }
+        setIsOpen(true);
+        inputRef.current?.focus();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -161,7 +137,6 @@ export default function GlobalNavbarSearch({
 
   const handleSelect = (listingId) => {
     setIsOpen(false);
-    setIsMobileModalOpen(false);
     if (onSelectListing) {
       onSelectListing(listingId);
     }
@@ -169,7 +144,6 @@ export default function GlobalNavbarSearch({
 
   const handleSubmitSearch = (searchQuery = query, categoryId = activeCategory, brandName = '') => {
     setIsOpen(false);
-    setIsMobileModalOpen(false);
     if (onSearchSubmit) {
       onSearchSubmit({
         query: searchQuery,
@@ -195,7 +169,6 @@ export default function GlobalNavbarSearch({
       }
     } else if (e.key === 'Escape') {
       setIsOpen(false);
-      setIsMobileModalOpen(false);
     }
   };
 
@@ -226,87 +199,88 @@ export default function GlobalNavbarSearch({
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
-      {/* Desktop Search Bar */}
-      <div className="hidden lg:flex items-center relative">
-        <div
-          className={`flex items-center w-full max-w-sm xl:max-w-md 2xl:max-w-lg transition-all duration-200 rounded-xl border bg-gray-50/90 dark:bg-gray-800/90 ${
-            isOpen
-              ? 'border-primary-500 ring-2 ring-primary-500/20 shadow-md bg-white dark:bg-gray-800'
-              : 'border-gray-200/80 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-          }`}
-        >
-          <div className="pl-3 pr-2 flex items-center pointer-events-none text-gray-400 dark:text-gray-500">
-            <Search className="h-4 w-4 shrink-0 text-primary-500" />
-          </div>
-          <input
-            ref={inputRef}
-            type="text"
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setSelectedIndex(-1);
-              if (!isOpen) setIsOpen(true);
-            }}
-            onFocus={() => setIsOpen(true)}
-            onKeyDown={handleKeyDownInInput}
-            placeholder="Search panels, inverters, batteries, brands..."
-            className="w-full bg-transparent py-2 text-xs sm:text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none"
-          />
-
-          {query ? (
-            <button
-              type="button"
-              onClick={() => {
-                setQuery('');
-                inputRef.current?.focus();
-              }}
-              className="p-1.5 mr-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-md transition-colors cursor-pointer"
-              title="Clear search"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
-          ) : (
-            <div className="mr-2.5 flex items-center pointer-events-none">
-              <kbd className="hidden sm:inline-flex items-center rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800/80 px-1.5 py-0.5 text-[10px] font-semibold text-gray-400 dark:text-gray-500 shadow-2xs">
-                ⌘K
-              </kbd>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Mobile / Tablet Search Trigger Icon Button */}
-      <div className="flex lg:hidden items-center w-full">
+      {/* Clickable Search Input for Mobile, Tablet, and Desktop */}
+      <div
+        id="navbar-search-bar-container"
+        role="search"
+        onClick={() => {
+          inputRef.current?.focus();
+          setIsOpen(true);
+        }}
+        className={`flex items-center w-full transition-all duration-200 rounded-xl border cursor-text bg-gray-50/90 dark:bg-gray-800/90 ${
+          isOpen
+            ? 'border-primary-500 ring-2 ring-primary-500/20 shadow-md bg-white dark:bg-gray-800'
+            : 'border-gray-200/90 dark:border-gray-700 hover:border-primary-400 dark:hover:border-primary-500/60 shadow-2xs'
+        }`}
+      >
         <button
-          id="navbar-mobile-search-btn"
           type="button"
-          onClick={() => {
-            setIsMobileModalOpen(true);
-            setTimeout(() => mobileInputRef.current?.focus(), 150);
+          onClick={(e) => {
+            e.stopPropagation();
+            if (query.trim()) {
+              handleSubmitSearch();
+            } else {
+              inputRef.current?.focus();
+              setIsOpen(true);
+            }
           }}
-          className="w-full flex items-center justify-between gap-2 rounded-xl border border-gray-200/90 dark:border-gray-700/80 bg-gray-50/90 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-800 hover:border-primary-400 dark:hover:border-primary-500/60 px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 shadow-2xs hover:shadow-sm transition-all active:scale-[0.98] cursor-pointer group"
-          aria-label="Open solar search"
+          className="pl-2.5 sm:pl-3 pr-1.5 py-2 flex items-center text-gray-400 dark:text-gray-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors cursor-pointer shrink-0"
+          title="Search"
+          aria-label="Submit search"
         >
-          <div className="flex items-center gap-2 min-w-0">
-            <Search className="h-4 w-4 text-primary-500 shrink-0 group-hover:scale-105 transition-transform" />
-            <span className="truncate text-xs text-gray-600 dark:text-gray-300 font-medium">
-              Search Solar...
-            </span>
-          </div>
-          <span className="hidden sm:inline-flex items-center rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800/90 px-1.5 py-0.5 text-[10px] font-semibold text-gray-400 dark:text-gray-500">
-            ⌘K
-          </span>
+          <Search className="h-4 w-4 shrink-0 text-primary-500" />
         </button>
+
+        <input
+          id="navbar-search-input"
+          ref={inputRef}
+          type="text"
+          value={query}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setSelectedIndex(-1);
+            if (!isOpen) setIsOpen(true);
+          }}
+          onFocus={() => setIsOpen(true)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsOpen(true);
+          }}
+          onKeyDown={handleKeyDownInInput}
+          placeholder="Search solar panels, inverters..."
+          className="w-full min-w-0 bg-transparent py-2 text-xs sm:text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none cursor-text truncate"
+        />
+
+        {query ? (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setQuery('');
+              inputRef.current?.focus();
+            }}
+            className="p-1.5 mr-1.5 sm:mr-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-md transition-colors cursor-pointer shrink-0"
+            title="Clear search"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        ) : (
+          <div className="mr-2 sm:mr-2.5 flex items-center pointer-events-none shrink-0">
+            <kbd className="hidden md:inline-flex items-center rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800/80 px-1.5 py-0.5 text-[10px] font-semibold text-gray-400 dark:text-gray-500 shadow-2xs">
+              ⌘K
+            </kbd>
+          </div>
+        )}
       </div>
 
-      {/* Desktop Dropdown Panel */}
+      {/* Responsive Dropdown Panel (Mobile, Tablet, Desktop) */}
       {isOpen && (
         <div
           ref={resultsContainerRef}
-          className="hidden lg:block absolute left-0 right-0 top-full mt-2 w-[480px] xl:w-[540px] rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150"
+          className="fixed inset-x-2 top-16 sm:absolute sm:inset-x-auto sm:top-full sm:left-0 sm:mt-2 w-auto sm:w-[460px] md:w-[500px] lg:w-[540px] max-w-[calc(100vw-1rem)] sm:max-w-[92vw] rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150"
         >
           {/* Category Filter Chips */}
-          <div className="flex items-center gap-1.5 overflow-x-auto p-2.5 bg-gray-50 dark:bg-gray-900/90 border-b border-gray-100 dark:border-gray-800 no-scrollbar">
+          <div className="flex items-center gap-1.5 overflow-x-auto p-2 sm:p-2.5 bg-gray-50 dark:bg-gray-900/90 border-b border-gray-100 dark:border-gray-800 no-scrollbar">
             {CATEGORY_TABS.map((tab) => {
               const TabIcon = tab.icon;
               const count = categoryCounts[tab.id] ?? 0;
@@ -318,14 +292,15 @@ export default function GlobalNavbarSearch({
                   onClick={() => {
                     setActiveCategory(tab.id);
                     setSelectedIndex(-1);
+                    inputRef.current?.focus();
                   }}
-                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
                     isActive
                       ? 'bg-primary-500 text-white shadow-xs'
                       : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200/80 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-750'
                   }`}
                 >
-                  <TabIcon className="h-3 w-3" />
+                  <TabIcon className="h-3 w-3 shrink-0" />
                   <span>{tab.label}</span>
                   {count > 0 && (
                     <span
@@ -344,7 +319,7 @@ export default function GlobalNavbarSearch({
           </div>
 
           {/* Results List or Popular/Trending */}
-          <div className="max-h-[380px] overflow-y-auto p-2 divide-y divide-gray-100 dark:divide-gray-800/60">
+          <div className="max-h-[50vh] sm:max-h-[380px] overflow-y-auto p-2 divide-y divide-gray-100 dark:divide-gray-800/60">
             {displayedResults.length > 0 ? (
               <div className="space-y-1">
                 {displayedResults.map((item, idx) => {
@@ -426,7 +401,7 @@ export default function GlobalNavbarSearch({
                 <button
                   type="button"
                   onClick={() => handleSubmitSearch()}
-                  className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-primary-50 dark:bg-primary-950 text-primary-600 dark:text-primary-400 border border-primary-200 dark:border-primary-800 px-3 py-1.5 text-xs font-bold hover:bg-primary-100 transition-colors"
+                  className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-primary-50 dark:bg-primary-950 text-primary-600 dark:text-primary-400 border border-primary-200 dark:border-primary-800 px-3 py-1.5 text-xs font-bold hover:bg-primary-100 transition-colors cursor-pointer"
                 >
                   <Search className="h-3 w-3" />
                   Search all listings with "{query}"
@@ -449,7 +424,7 @@ export default function GlobalNavbarSearch({
                           setQuery(item.brand || item.label);
                           handleSubmitSearch(item.brand || item.label, item.category);
                         }}
-                        className="flex items-center justify-between p-2 rounded-lg text-left hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors group"
+                        className="flex items-center justify-between p-2 rounded-lg text-left hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors group cursor-pointer"
                       >
                         <span className="text-xs font-semibold text-gray-700 dark:text-gray-200 group-hover:text-primary-600 dark:group-hover:text-primary-400">
                           {item.label}
@@ -477,7 +452,7 @@ export default function GlobalNavbarSearch({
                             setQuery(brand);
                             handleSubmitSearch(brand);
                           }}
-                          className="rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-primary-50 dark:hover:bg-primary-950/60 hover:text-primary-600 dark:hover:text-primary-400 px-2.5 py-1 text-xs font-semibold text-gray-700 dark:text-gray-300 transition-colors"
+                          className="rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-primary-50 dark:hover:bg-primary-950/60 hover:text-primary-600 dark:hover:text-primary-400 px-2.5 py-1 text-xs font-semibold text-gray-700 dark:text-gray-300 transition-colors cursor-pointer"
                         >
                           {brand}
                         </button>
@@ -490,196 +465,20 @@ export default function GlobalNavbarSearch({
           </div>
 
           {/* Bottom Footer Actions */}
-          <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 text-xs">
-            <span className="text-gray-400 dark:text-gray-500 font-medium">
+          <div className="flex items-center justify-between p-2.5 sm:p-3 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 text-xs">
+            <span className="text-gray-400 dark:text-gray-500 font-medium text-[11px] sm:text-xs">
               Found {filteredResults.length} matching items
             </span>
             <button
               type="button"
               onClick={() => handleSubmitSearch()}
-              className="flex items-center gap-1 font-bold text-primary-600 dark:text-primary-400 hover:text-primary-700 transition-colors"
+              className="flex items-center gap-1 font-bold text-primary-600 dark:text-primary-400 hover:text-primary-700 transition-colors cursor-pointer"
             >
-              <span>View all results</span>
+              <span>View all</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </div>
         </div>
-      )}
-
-      {/* Mobile Full Screen Search Modal */}
-      {isMobileModalOpen && typeof document !== 'undefined' && createPortal(
-        <div
-          className="lg:hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex flex-col justify-start"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setIsMobileModalOpen(false);
-          }}
-        >
-          <div
-            className="bg-white dark:bg-gray-900 w-full rounded-b-2xl shadow-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in slide-in-from-top duration-200"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header Search Input */}
-            <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center gap-2">
-              <div className="flex-1 flex items-center rounded-xl border border-primary-500 bg-gray-50 dark:bg-gray-800 px-3 py-2">
-                <Search className="h-4 w-4 text-primary-500 shrink-0 mr-2" />
-                <input
-                  ref={mobileInputRef}
-                  type="text"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  onKeyDown={handleKeyDownInInput}
-                  placeholder="Search brand, model, kW, battery..."
-                  className="w-full bg-transparent text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none"
-                />
-                {query && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setQuery('');
-                      mobileInputRef.current?.focus();
-                    }}
-                    className="p-1 text-gray-400 hover:text-gray-600"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                )}
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setIsMobileModalOpen(false)}
-                className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white rounded-lg transition-colors cursor-pointer"
-                aria-label="Close search"
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-
-            {/* Category Tabs */}
-            <div className="flex items-center gap-1.5 overflow-x-auto p-2.5 bg-gray-50 dark:bg-gray-800/40 border-b border-gray-100 dark:border-gray-800 no-scrollbar">
-              {CATEGORY_TABS.map((tab) => {
-                const TabIcon = tab.icon;
-                const count = categoryCounts[tab.id] ?? 0;
-                const isActive = activeCategory === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => setActiveCategory(tab.id)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
-                      isActive
-                        ? 'bg-primary-500 text-white'
-                        : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
-                    }`}
-                  >
-                    <TabIcon className="h-3.5 w-3.5" />
-                    <span>{tab.label}</span>
-                    {count > 0 && <span className="opacity-75">({count})</span>}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Results or Trending */}
-            <div className="flex-1 overflow-y-auto p-3 space-y-2 max-h-[60vh]">
-              {displayedResults.length > 0 ? (
-                displayedResults.map((item) => {
-                  const itemImg = item.image_url || getEquipmentFallbackImage(item.category, item.title);
-                  return (
-                    <div
-                      key={item.id}
-                      onClick={() => handleSelect(item.id)}
-                      className="flex items-center gap-3 p-2.5 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-850 hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-98 transition-all cursor-pointer"
-                    >
-                      <div className="h-12 w-12 shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                        <img
-                          src={itemImg}
-                          alt={item.title}
-                          className="h-full w-full object-cover"
-                          onError={(e) => {
-                            e.currentTarget.src = getEquipmentFallbackImage(item.category, item.title);
-                          }}
-                        />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 mb-0.5">
-                          <span className="text-[10px] font-extrabold text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.2 rounded">
-                            {item.brand}
-                          </span>
-                          <span className="text-[11px] text-gray-400">
-                            {CATEGORIES[item.category]}
-                          </span>
-                        </div>
-                        <h4 className="text-xs font-bold text-gray-900 dark:text-white truncate">
-                          {item.title}
-                        </h4>
-                        <div className="flex items-center justify-between mt-1 text-xs font-bold">
-                          <span className="text-gray-500 dark:text-gray-400 font-normal text-[11px]">
-                            {item.city}
-                          </span>
-                          <span className="text-primary-600 dark:text-primary-400 font-extrabold">
-                            {formatPrice(item.price)}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })
-              ) : query.trim() ? (
-                <div className="py-8 text-center">
-                  <Search className="h-8 w-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-                  <p className="text-sm font-bold text-gray-700 dark:text-gray-300">
-                    No results for "{query}"
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => handleSubmitSearch()}
-                    className="mt-3 rounded-lg bg-primary-500 text-white px-4 py-2 text-xs font-bold cursor-pointer"
-                  >
-                    Search all listings
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div>
-                    <div className="text-xs font-bold uppercase text-gray-400 px-1 mb-2">
-                      Popular Searches
-                    </div>
-                    <div className="space-y-1">
-                      {POPULAR_SEARCHES.map((item) => (
-                        <button
-                          key={item.label}
-                          type="button"
-                          onClick={() => {
-                            setQuery(item.brand || item.label);
-                            handleSubmitSearch(item.brand || item.label, item.category);
-                          }}
-                          className="w-full text-left p-2 rounded-lg bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-800 dark:text-gray-200 flex items-center justify-between cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                        >
-                          <span>{item.label}</span>
-                          <ChevronRight className="h-3.5 w-3.5 text-gray-400" />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Footer Button */}
-            <div className="p-3 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800">
-              <button
-                type="button"
-                onClick={() => handleSubmitSearch()}
-                className="w-full btn-primary py-2.5 text-sm flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <Search className="h-4 w-4" />
-                <span>Search for "{query || 'all solar items'}"</span>
-              </button>
-            </div>
-          </div>
-        </div>,
-        document.body
       )}
     </div>
   );

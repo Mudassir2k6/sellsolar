@@ -1,6 +1,7 @@
 import {
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
@@ -34,7 +35,9 @@ import {
   Facebook,
   FilePen,
   FileText,
+  Filter,
   Flame,
+  Grid,
   Headphones,
   Heart,
   Image,
@@ -64,6 +67,7 @@ import {
   Star,
   Store,
   Sun,
+  Table,
   Tag,
   TrendingUp,
   Twitter,
@@ -94,10 +98,55 @@ function Xy({
   const[r,n]=useState(!1),[s,a]=useState(!1),[l,o]=useState(!1),{
     user:c,profile:u,signOut:d
   }=useAuth();
+  const mobileMenuRef = useRef(null);
+  const mobileToggleBtnRef = useRef(null);
+  const userDropdownRef = useRef(null);
+
   useEffect(()=>{
     const j=()=>n(window.scrollY>20);
     return window.addEventListener("scroll",j),()=>window.removeEventListener("scroll",j)
   },[]);
+
+  useEffect(()=>{
+    if(!s) return;
+    const handleOutsideClick=(event)=>{
+      if(
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(event.target) &&
+        mobileToggleBtnRef.current &&
+        !mobileToggleBtnRef.current.contains(event.target)
+      ){
+        a(!1);
+      }
+    };
+    const handleKeyDown=(event)=>{
+      if(event.key==="Escape") a(!1);
+    };
+    document.addEventListener("mousedown",handleOutsideClick);
+    document.addEventListener("touchstart",handleOutsideClick);
+    document.addEventListener("keydown",handleKeyDown);
+    return ()=>{
+      document.removeEventListener("mousedown",handleOutsideClick);
+      document.removeEventListener("touchstart",handleOutsideClick);
+      document.removeEventListener("keydown",handleKeyDown);
+    };
+  },[s]);
+
+  useEffect(()=>{
+    if(!l) return;
+    const handleUserOutside=(event)=>{
+      if(userDropdownRef.current && !userDropdownRef.current.contains(event.target)){
+        o(!1);
+      }
+    };
+    document.addEventListener("mousedown",handleUserOutside);
+    document.addEventListener("touchstart",handleUserOutside);
+    return ()=>{
+      document.removeEventListener("mousedown",handleUserOutside);
+      document.removeEventListener("touchstart",handleUserOutside);
+    };
+  },[l]);
+
   const h=j=>{
     t(j),a(!1),o(!1)
   },p=async()=>{
@@ -110,9 +159,41 @@ function Xy({
     label:"Request Complete Installation",page:"install",isInstall:true
   }];
   return jsxs("header",{
-    className:`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${r?"bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-md border-b border-gray-100 dark:border-gray-800":"bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm"}`,children:[jsx("div",{
+    className:`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${r?"bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-md border-b border-gray-200/80 dark:border-gray-800":"bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-200/50 dark:border-gray-800/50"}`,children:[
+      jsx("div",{
+        className:"hidden lg:block bg-gray-950 text-gray-300 text-xs py-1.5 border-b border-gray-800",children:jsxs("div",{
+          className:"container-page flex items-center justify-between",children:[
+            jsxs("div",{
+              className:"flex items-center gap-4 text-xs",children:[
+                jsxs("span",{
+                  className:"flex items-center gap-1.5 text-gray-300 font-medium",children:[
+                    jsx(TrendingUp,{ className:"h-3.5 w-3.5 text-primary-400" }),
+                    "Pakistan's #1 Solar Marketplace"
+                  ]
+                }),
+                jsx("span",{ className:"text-gray-700", children:"|" }),
+                jsxs("span",{
+                  className:"text-amber-400 font-semibold flex items-center gap-1",children:[
+                    jsx(Zap,{ className:"h-3 w-3 fill-amber-400" }),
+                    "Daily Rates: Longi 585W Rs 38/W • Inverex 6kW Rs 210,000"
+                  ]
+                })
+              ]
+            }),
+            jsxs("div",{
+              className:"flex items-center gap-5 text-gray-400 font-medium",children:[
+                jsx("button",{ onClick:()=>h("prices"), className:"hover:text-amber-400 transition-colors font-semibold", children:"Today's Rates" }),
+                jsx("button",{ onClick:()=>h("calculator"), className:"hover:text-white transition-colors", children:"Load Calculator" }),
+                jsx("button",{ onClick:()=>h("install"), className:"hover:text-white transition-colors", children:"Turnkey Installation" }),
+                jsx("button",{ onClick:()=>h("dealers"), className:"hover:text-white transition-colors", children:"Verified Dealers" })
+              ]
+            })
+          ]
+        })
+      }),
+      jsx("div",{
       className:"container-page",children:jsxs("div",{
-        className:"flex h-16 items-center justify-between lg:h-20 gap-2 sm:gap-4",children:[
+        className:"flex h-16 items-center justify-between lg:h-18 gap-2 sm:gap-4",children:[
           jsxs("button",{
             onClick:()=>h("home"),className:"flex items-center gap-2 shrink-0",children:[jsx("div",{
               className:"flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 shadow-lg shadow-primary-500/30",children:jsx(Sun,{
@@ -127,13 +208,13 @@ function Xy({
           jsx(GlobalNavbarSearch,{
             onSelectListing:selList,
             onSearchSubmit:searchSub,
-            className:"flex-1 max-w-[200px] sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg mx-1 sm:mx-2"
+            className:"flex-1 min-w-[120px] sm:min-w-[180px] md:min-w-[220px] max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl mx-1 sm:mx-2"
           }),
           jsxs("div",{
           className:"flex items-center gap-1.5 sm:gap-2.5",children:[
             jsx("button",{
               onClick:()=>h("prices"),
-              className:`hidden sm:flex items-center gap-1.5 sm:gap-2 rounded-xl px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm font-bold transition-all shadow-sm ${
+              className:`hidden sm:flex items-center gap-1.5 sm:gap-2 rounded-lg px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all shadow-xs ${
                 e==="prices"
                   ?"bg-amber-500 text-white shadow-amber-500/25"
                   :"bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/60 hover:bg-amber-100 dark:hover:bg-amber-900/60"
@@ -159,9 +240,9 @@ function Xy({
             }),
             jsx("button",{
               onClick:()=>h("calculator"),
-              className:`hidden md:flex items-center gap-1.5 sm:gap-2 rounded-xl px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm font-bold transition-all ${
+              className:`hidden md:flex items-center gap-1.5 sm:gap-2 rounded-lg px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all ${
                 e==="calculator"
-                  ?"bg-primary-500 text-white shadow-sm shadow-primary-500/20"
+                  ?"bg-primary-500 text-white shadow-xs shadow-primary-500/20"
                   :"bg-primary-50 dark:bg-primary-950/40 text-primary-800 dark:text-primary-300 border border-primary-200/70 dark:border-primary-800/60 hover:bg-primary-100 dark:hover:bg-primary-900/60"
               }`,
               children:jsxs(Fragment,{
@@ -169,15 +250,15 @@ function Xy({
                   jsx(Calculator,{
                     className:`h-4 w-4 shrink-0 ${e==="calculator"?"text-white":"text-primary-600 dark:text-primary-400"}`
                   }),
-                  jsx("span",{ className:"whitespace-nowrap", children:"Load Calculator" })
+                  jsx("span",{ className:"whitespace-nowrap", children:"Calculator" })
                 ]
               })
             }),
             jsx("button",{
               onClick:()=>h("install"),
-              className:`hidden lg:flex items-center gap-1.5 sm:gap-2 rounded-xl px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm font-bold transition-all ${
+              className:`hidden xl:flex items-center gap-1.5 sm:gap-2 rounded-lg px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all ${
                 e==="install"
-                  ?"bg-secondary-600 text-white shadow-sm shadow-secondary-600/20"
+                  ?"bg-secondary-600 text-white shadow-xs shadow-secondary-600/20"
                   :"bg-secondary-50 dark:bg-secondary-950/40 text-secondary-800 dark:text-secondary-300 border border-secondary-200/70 dark:border-secondary-800/60 hover:bg-secondary-100 dark:hover:bg-secondary-900/60"
               }`,
               children:jsxs(Fragment,{
@@ -185,7 +266,7 @@ function Xy({
                   jsx(Wrench,{
                     className:`h-4 w-4 shrink-0 ${e==="install"?"text-white":"text-secondary-600 dark:text-secondary-400"}`
                   }),
-                  jsx("span",{ className:"whitespace-nowrap", children:"Request Complete Installation" })
+                  jsx("span",{ className:"whitespace-nowrap", children:"Installation" })
                 ]
               })
             }),
@@ -193,12 +274,12 @@ function Xy({
               className:"shrink-0"
             }),c?jsxs(Fragment,{
             children:[jsxs("button",{
-              onClick:()=>h("post-ad"),className:"btn-primary hidden text-sm sm:inline-flex",children:[jsx(CirclePlus,{
+              onClick:()=>h("post-ad"),className:"btn-primary hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm shadow-xs",children:[jsx(CirclePlus,{
                 className:"h-4 w-4"
-              }),"Post Ad"]
+              }),"Post an Ad"]
             }),jsxs("div",{
               className:"relative",children:[jsxs("button",{
-                onClick:()=>o(!l),className:"flex items-center gap-2 rounded-xl border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx("div",{
+                onClick:()=>o(!l),className:"flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx("div",{
                   className:"flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-primary-400 to-primary-600 text-xs font-bold text-white",children:((u==null?void 0:u.full_name)||c.email||"U").charAt(0).toUpperCase()
                 }),jsx("span",{
                   className:"hidden sm:inline",children:((w=u==null?void 0:u.full_name)==null?void 0:w.split(" ")[0])||"User"
@@ -206,6 +287,7 @@ function Xy({
                   className:"h-4 w-4 text-gray-400"
                 })]
               }),l&&jsxs("div",{
+                ref:userDropdownRef,
                 className:"absolute right-0 mt-2 w-56 animate-slide-down rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 py-2 shadow-xl",children:[jsxs("div",{
                   className:"border-b border-gray-100 dark:border-gray-800 px-4 py-2",children:[jsx("p",{
                     className:"text-sm font-bold text-gray-900 dark:text-white",children:(u==null?void 0:u.full_name)||"User"
@@ -243,11 +325,14 @@ function Xy({
             })]
           }):jsxs(Fragment,{
             children:[jsx("button",{
-              onClick:()=>h("login"),className:"hidden text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white sm:inline-flex",children:"Login"
-            }),jsx("button",{
-              onClick:()=>h("login"),className:"btn-primary hidden text-sm sm:inline-flex",children:"Post Ad"
+              onClick:()=>h("login"),className:"hidden text-sm font-bold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white sm:inline-flex px-2 py-1",children:"Sign In"
+            }),jsxs("button",{
+              onClick:()=>h("login"),className:"btn-primary hidden text-xs sm:text-sm sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:py-2 shadow-xs",children:[jsx(CirclePlus,{
+                className:"h-4 w-4"
+              }),"Post an Ad"]
             })]
           }),jsx("button",{
+            ref:mobileToggleBtnRef,
             onClick:()=>a(!s),className:"rounded-lg p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 lg:hidden","aria-label":"Toggle menu",children:s?jsx(X,{
               className:"h-6 w-6"
             }):jsx(Menu,{
@@ -256,48 +341,58 @@ function Xy({
           })]
         })]
       })
-    }),s&&jsx("div",{
-      className:"animate-slide-down border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 lg:hidden",children:jsxs("nav",{
-        className:"container-page flex flex-col gap-1 py-4",children:[y.map(j=>jsxs("button",{
-          onClick:()=>h(j.page),className:`flex items-center justify-between rounded-lg px-4 py-3 text-sm font-semibold transition-all ${j.highlight?"bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 border border-amber-200/80 dark:border-amber-800/60 font-bold":j.isCalc?"bg-primary-50 dark:bg-primary-950/40 text-primary-900 dark:text-primary-200 border border-primary-200/80 dark:border-primary-800/60 font-bold":"text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800"}`,children:[jsxs("span",{
-            className:"flex items-center gap-2",children:[j.highlight&&jsx("span",{
-              className:"h-2 w-2 rounded-full bg-amber-500"
-            }),j.isCalc&&jsx(Calculator,{
-              className:"h-4 w-4 text-primary-600 dark:text-primary-400"
-            }),j.isInstall&&jsx(Wrench,{
-              className:"h-4 w-4 text-secondary-600 dark:text-secondary-400"
-            }),j.label,j.highlight&&jsx("span",{
-              className:"rounded bg-amber-200 dark:bg-amber-900 px-1.5 py-0.5 text-[10px] font-extrabold text-amber-900 dark:text-amber-200",children:"LIVE"
+    }),s&&jsxs(Fragment,{
+      children:[
+        jsx("div",{
+          className:"fixed inset-0 top-16 bg-black/40 backdrop-blur-[1px] lg:hidden z-40 transition-opacity",
+          onClick:()=>a(!1),
+          "aria-hidden":"true"
+        }),
+        jsx("div",{
+          ref:mobileMenuRef,
+          className:"relative z-50 animate-slide-down border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 lg:hidden shadow-2xl max-h-[calc(100vh-4.5rem)] overflow-y-auto",children:jsxs("nav",{
+            className:"container-page flex flex-col gap-1 py-4",children:[...y.map(j=>jsxs("button",{
+              onClick:()=>h(j.page),className:`flex items-center justify-between rounded-lg px-4 py-3 text-sm font-semibold transition-all ${j.highlight?"bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 border border-amber-200/80 dark:border-amber-800/60 font-bold":j.isCalc?"bg-primary-50 dark:bg-primary-950/40 text-primary-900 dark:text-primary-200 border border-primary-200/80 dark:border-primary-800/60 font-bold":"text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800"}`,children:[jsxs("span",{
+                className:"flex items-center gap-2",children:[j.highlight&&jsx("span",{
+                  className:"h-2 w-2 rounded-full bg-amber-500"
+                }),j.isCalc&&jsx(Calculator,{
+                  className:"h-4 w-4 text-primary-600 dark:text-primary-400"
+                }),j.isInstall&&jsx(Wrench,{
+                  className:"h-4 w-4 text-secondary-600 dark:text-secondary-400"
+                }),j.label,j.highlight&&jsx("span",{
+                  className:"rounded bg-amber-200 dark:bg-amber-900 px-1.5 py-0.5 text-[10px] font-extrabold text-amber-900 dark:text-amber-200",children:"LIVE"
+                })]
+              }),jsx(ChevronDown,{
+                className:"h-4 w-4 -rotate-90 text-gray-400"
+              })]
+            },j.label)),c?jsxs(Fragment,{
+              children:[jsxs("button",{
+                onClick:()=>h("dashboard"),className:"flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx(LayoutDashboard,{
+                  className:"h-4 w-4"
+                }),"My Dashboard"]
+              }),jsxs("button",{
+                onClick:()=>h("password"),className:"flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx(Lock,{
+                  className:"h-4 w-4"
+                }),"Change Password"]
+              }),jsxs("button",{
+                onClick:()=>h("post-ad"),className:"flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx(CirclePlus,{
+                  className:"h-4 w-4"
+                }),"Post Ad"]
+              }),(u==null?void 0:u.is_admin)&&jsxs("button",{
+                onClick:()=>h("admin-dashboard"),className:"flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-error-600 dark:text-error-400 hover:bg-error-50 dark:hover:bg-error-950/40",children:[jsx(ShieldCheck,{
+                  className:"h-4 w-4"
+                }),"Admin Dashboard"]
+              }),jsxs("button",{
+                onClick:p,className:"flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-error-600 dark:text-error-400 hover:bg-error-50 dark:hover:bg-error-950/40",children:[jsx(LogOut,{
+                  className:"h-4 w-4"
+                }),"Sign Out"]
+              })]
+            }):jsx("button",{
+              onClick:()=>h("login"),className:"btn-primary mt-2 w-full",children:"Login / Sign Up"
             })]
-          }),jsx(ChevronDown,{
-            className:"h-4 w-4 -rotate-90 text-gray-400"
-          })]
-        },j.label)),c?jsxs(Fragment,{
-          children:[jsxs("button",{
-            onClick:()=>h("dashboard"),className:"flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx(LayoutDashboard,{
-              className:"h-4 w-4"
-            }),"My Dashboard"]
-          }),jsxs("button",{
-            onClick:()=>h("password"),className:"flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx(Lock,{
-              className:"h-4 w-4"
-            }),"Change Password"]
-          }),jsxs("button",{
-            onClick:()=>h("post-ad"),className:"flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx(CirclePlus,{
-              className:"h-4 w-4"
-            }),"Post Ad"]
-          }),(u==null?void 0:u.is_admin)&&jsxs("button",{
-            onClick:()=>h("admin-dashboard"),className:"flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-error-600 dark:text-error-400 hover:bg-error-50 dark:hover:bg-error-950/40",children:[jsx(ShieldCheck,{
-              className:"h-4 w-4"
-            }),"Admin Dashboard"]
-          }),jsxs("button",{
-            onClick:p,className:"flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-error-600 dark:text-error-400 hover:bg-error-50 dark:hover:bg-error-950/40",children:[jsx(LogOut,{
-              className:"h-4 w-4"
-            }),"Sign Out"]
-          })]
-        }):jsx("button",{
-          onClick:()=>h("login"),className:"btn-primary mt-2 w-full",children:"Login / Sign Up"
-        })]
-      })
+          })
+        })
+      ]
     })]
   })
 }const Zy=[{
@@ -320,197 +415,655 @@ function Xy({
 function nx({
   filters:t,onFilterChange:e,onSearch:r,onReset:n,onNavigatePrices:np,onNavigateCalculator:nc
 }){
+  const popularSearches = [
+    "Longi 585W",
+    "Inverex 6kW",
+    "Canadian Solar TopCon",
+    "Crown 3.2kW",
+    "Narada 48V",
+    "10kW On-Grid",
+    "Jinko 580W"
+  ];
+
+  const handlePopularClick = (term) => {
+    e("query", term);
+    setTimeout(() => {
+      r();
+      const el = document.getElementById("listings");
+      el && el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
+  };
+
   return jsxs("section",{
-    className:"relative overflow-hidden BadgeCheck-16 lg:BadgeCheck-20",children:[jsxs("div",{
-      className:"absolute inset-0 -z-10",children:[jsx("div",{
-        className:"absolute inset-0 bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 transition-colors"
-      }),jsx("div",{
-        className:"absolute inset-0 bg-grid opacity-40 dark:opacity-20"
-      }),jsx("div",{
-        className:"absolute -right-32 -top-32 h-96 w-96 rounded-full bg-primary-300/30 dark:bg-primary-500/10 blur-3xl"
-      }),jsx("div",{
-        className:"absolute -left-32 top-64 h-96 w-96 rounded-full bg-secondary-300/20 dark:bg-secondary-500/10 blur-3xl"
-      })]
-    }),jsxs("div",{
-      className:"container-page py-12 lg:py-20",children:[jsxs("div",{
-        className:"mx-auto max-w-3xl text-center",children:[jsxs("div",{
-          className:"mb-4 inline-flex items-center gap-2 rounded-full bg-primary-100 dark:bg-primary-950/60 border border-primary-200/60 dark:border-primary-800/60 px-4 py-1.5 text-sm font-semibold text-primary-700 dark:text-primary-300",children:[jsx(TrendingUp,{
-            className:"h-4 w-4"
-          }),"Pakistan's #1 Solar Marketplace"]
-        }),jsxs("h1",{
-          className:"text-balance text-4xl font-extrabold leading-tight tracking-tight text-gray-900 dark:text-white sm:text-5xl lg:text-6xl",children:["Buy & Sell Solar Panels,",jsx("br",{
-            
-          }),jsx("span",{
-            className:"bg-gradient-to-r from-primary-500 to-secondary-500 bg-clip-text text-transparent",children:"Inverters & Systems"
-          })]
-        }),jsx("p",{
-          className:"mx-auto mt-5 max-w-2xl text-lg text-gray-600 dark:text-gray-300",children:"Find the best deals on new and used solar equipment from trusted sellers across Pakistan. Compare prices, brands, and specifications in one place."
-        }),(nc||np)&&jsxs("div",{
-          className:"mt-6 flex flex-wrap items-center justify-center gap-3.5",children:[nc?jsxs("button",{
-            onClick:nc,className:"inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary-600 to-primary-700 px-5 py-3 text-xs sm:text-sm font-extrabold text-white shadow-lg shadow-primary-500/25 hover:from-primary-700 hover:to-primary-800 transition-all hover:scale-105 active:scale-95",children:[jsx(Calculator,{
-              className:"h-4 w-4 text-white"
-            }),"Solar Load Calculator (Fans, ACs, Motors, kW)",jsx(ArrowRight,{
-              className:"h-3.5 w-3.5"
-            })]
-          }):null,np?jsxs("button",{
-            onClick:np,className:"inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-5 py-3 text-xs sm:text-sm font-bold text-white shadow-lg shadow-amber-500/25 hover:from-amber-600 hover:to-amber-700 transition-all hover:scale-105 active:scale-95",children:[jsx(Zap,{
-              className:"h-4 w-4 fill-white"
-            }),"Today's Rates (Rs 34-42/W)",jsx(ArrowRight,{
-              className:"h-3.5 w-3.5"
-            })]
-          }):null]
-        }),jsxs("div",{
-          className:"mt-6 flex flex-wrap items-center justify-center gap-6 text-sm text-gray-500 dark:text-gray-400",children:[jsxs("span",{
-            className:"flex items-center gap-1.5",children:[jsx(ShieldCheck,{
-              className:"h-4 w-4 text-secondary-500"
-            }),"Verified Sellers"]
-          }),jsxs("span",{
-            className:"flex items-center gap-1.5",children:[jsx(Clock,{
-              className:"h-4 w-4 text-primary-500"
-            }),"Updated Daily"]
-          }),jsxs("span",{
-            className:"flex items-center gap-1.5",children:[jsx(TrendingUp,{
-              className:"h-4 w-4 text-accent-500"
-            }),"500+ Listings"]
-          })]
-        })]
-      }),jsx("div",{
-        className:"mx-auto mt-10 max-w-5xl",children:jsxs("div",{
-          className:"card overflow-hidden p-0 shadow-xl dark:bg-gray-900 dark:ring-gray-800",children:[jsx("div",{
-            className:"flex gap-1 overflow-x-auto border-b border-gray-100 dark:border-gray-800 p-2 scrollbar-hide bg-gray-50/50 dark:bg-gray-850/50",children:Zy.map(s=>{
-              const a=s.icon,l=t.category===s.value;
-              return jsxs("button",{
-                onClick:()=>e("category",s.value),className:`flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${l?"bg-primary-500 text-white shadow-md shadow-primary-500/30":"text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"}` ,children:[jsx(a,{
-                  className:"h-4 w-4"
-                }),s.label]
-              },s.value||"all")
-            })
-          }),jsxs("div",{
-            className:"p-4 sm:p-6",children:[jsxs("div",{
-              className:"relative mb-4",children:[jsx(Search,{
-                className:"absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
-              }),jsx("input",{
-                type:"text",placeholder:"Search by title, brand, or keyword...",value:t.query,onChange:s=>e("query",s.target.value),onKeyDown:s=>s.key==="Enter"&&r(),className:"w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 py-3.5 pl-12 pr-4 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-all focus:border-primary-400 focus:bg-white dark:focus:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-100 dark:focus:ring-primary-900"
-              })]
-            }),jsxs("div",{
-              className:"grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6",children:[jsxs("div",{
-                children:[jsx("label",{
-                  className:"mb-1.5 block text-xs font-semibold text-gray-500 dark:text-gray-400",children:"Category"
-                }),jsx("select",{
-                  value:t.category,onChange:s=>e("category",s.target.value),className:"select-field text-xs sm:text-sm",children:Zy.map(s=>jsx("option",{
-                    value:s.value,children:s.value?s.label:"All Categories"
-                  },s.value||"all"))
-                })]
-              }),jsxs("div",{
-                children:[jsx("label",{
-                  className:"mb-1.5 block text-xs font-semibold text-gray-500 dark:text-gray-400",children:"Brand"
-                }),jsx("select",{
-                  value:t.brand,onChange:s=>e("brand",s.target.value),className:"select-field text-xs sm:text-sm",children:tx.map(s=>jsx("option",{
-                    value:s,children:s||"All Brands"
-                  },s||"all-brands"))
-                })]
-              }),jsxs("div",{
-                children:[jsx("label",{
-                  className:"mb-1.5 block text-xs font-semibold text-gray-500 dark:text-gray-400",children:"Condition"
-                }),jsx("select",{
-                  value:t.condition,onChange:s=>e("condition",s.target.value),className:"select-field text-xs sm:text-sm",children:rx.map(s=>jsx("option",{
-                    value:s.value,children:s.label
-                  },s.value||"any-cond"))
-                })]
-              }),jsxs("div",{
-                children:[jsx("label",{
-                  className:"mb-1.5 block text-xs font-semibold text-gray-500 dark:text-gray-400",children:"City"
-                }),jsx("select",{
-                  value:t.city,onChange:s=>e("city",s.target.value),className:"select-field text-xs sm:text-sm",children:ex.map(s=>jsx("option",{
-                    value:s,children:s||"All Cities"
-                  },s||"all-cities"))
-                })]
-              }),jsxs("div",{
-                children:[jsx("label",{
-                  className:"mb-1.5 block text-xs font-semibold text-gray-500 dark:text-gray-400",children:"Min Price"
-                }),jsx("input",{
-                  type:"number",placeholder:"0",value:t.minPrice,onChange:s=>e("minPrice",s.target.value),className:"input-field text-xs sm:text-sm"
-                })]
-              }),jsxs("div",{
-                children:[jsx("label",{
-                  className:"mb-1.5 block text-xs font-semibold text-gray-500 dark:text-gray-400",children:"Max Price"
-                }),jsx("input",{
-                  type:"number",placeholder:"Any",value:t.maxPrice,onChange:s=>e("maxPrice",s.target.value),className:"input-field text-xs sm:text-sm"
-                })]
-              })]
-            }),jsxs("div",{
-              className:"mt-4 flex flex-col gap-3 sm:flex-row",children:[jsxs("button",{
-                onClick:r,className:"btn-primary flex-1",children:[jsx(Search,{
-                  className:"h-5 w-5"
-                }),"Search Solar Listings"]
-              }),jsx("button",{
-                onClick:n,className:"btn-ghost sm:w-auto",children:"Reset Filters"
-              })]
-            })]
-          })]
-        })
-      }),jsx("div",{
-        className:"mx-auto mt-12 grid max-w-4xl grid-cols-2 gap-4 sm:grid-cols-4",children:[{
-          value:"500+",label:"Active Listings"
-        },{
-          value:"120+",label:"Verified Sellers"
-        },{
-          value:"15+",label:"Cities Covered"
-        },{
-          value:"10K+",label:"Monthly Visitors"
-        }].map(s=>jsxs("div",{
-          className:"card p-4 text-center dark:bg-gray-900 dark:ring-gray-800",children:[jsx("div",{
-            className:"text-2xl font-extrabold text-gray-900 dark:text-white",children:s.value
-          }),jsx("div",{
-            className:"mt-1 text-xs font-medium text-gray-500 dark:text-gray-400",children:s.label
-          })]
-        },s.label))
-      })]
-    })]
-  })
-}const sx=[{
-  value:"panel",icon:Sun,desc:"Monocrystalline & polycrystalline panels",gradient:"from-primary-400 to-primary-600"
-},{
-  value:"inverter",icon:Zap,desc:"Hybrid, off-grid & grid-tie inverters",gradient:"from-accent-400 to-accent-600"
-},{
-  value:"battery",icon:BatteryCharging,desc:"Deep cycle & tubular solar batteries",gradient:"from-secondary-400 to-secondary-600"
-},{
-  value:"complete_system",icon:Boxes,desc:"Full solar kits with installation",gradient:"from-warning-400 to-warning-600"
-}];
-function ix({
-  onSelectCategory:t
-}){
-  return jsx("section",{
-    id:"categories",className:"py-16 lg:py-20 bg-white dark:bg-gray-950 transition-colors",children:jsxs("div",{
-      className:"container-page",children:[jsxs("div",{
-        className:"mx-auto mb-10 max-w-2xl text-center",children:[jsx("h2",{
-          className:"text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white",children:"Browse by Category"
-        }),jsx("p",{
-          className:"mt-2 text-gray-500 dark:text-gray-400",children:"Find exactly what you need across our solar equipment categories"
-        })]
-      }),jsx("div",{
-        className:"grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4",children:sx.map(e=>{
-          const r=e.icon;
-          return jsxs("button",{
-            onClick:()=>t(e.value),className:"card group p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:bg-gray-900 dark:ring-gray-800",children:[jsx("div",{
-              className:`mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${e.gradient} shadow-lg transition-transform group-hover:scale-110`,children:jsx(r,{
-                className:"h-7 w-7 text-white",strokeWidth:2
+    className:"relative overflow-hidden pt-24 sm:pt-28 lg:pt-32 pb-8 sm:pb-12 border-b border-gray-200/60 dark:border-gray-800 transition-colors",children:[
+      jsxs("div",{
+        className:"absolute inset-0 -z-10",children:[
+          jsx("div",{
+            className:"absolute inset-0 bg-gradient-to-b from-gray-50 via-white to-white dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 transition-colors"
+          }),
+          jsx("div",{
+            className:"absolute inset-0 bg-grid opacity-30 dark:opacity-15"
+          }),
+          jsx("div",{
+            className:"absolute -right-32 -top-32 h-96 w-96 rounded-full bg-primary-300/20 dark:bg-primary-500/10 blur-3xl"
+          }),
+          jsx("div",{
+            className:"absolute -left-32 top-64 h-96 w-96 rounded-full bg-secondary-300/15 dark:bg-secondary-500/10 blur-3xl"
+          })
+        ]
+      }),
+      jsxs("div",{
+        className:"container-page",children:[
+          jsxs("div",{
+            className:"mx-auto max-w-3xl text-center",children:[
+              jsxs("div",{
+                className:"mb-3 inline-flex items-center gap-2 rounded-full bg-primary-50 dark:bg-primary-950/60 border border-primary-200/80 dark:border-primary-800/60 px-3.5 py-1 text-xs font-bold text-primary-700 dark:text-primary-300 shadow-2xs",children:[
+                  jsx(TrendingUp,{ className:"h-3.5 w-3.5 text-primary-600 dark:text-primary-400" }),
+                  "Pakistan's #1 Solar Marketplace"
+                ]
+              }),
+              jsx("h1",{
+                className:"text-balance text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white leading-tight",
+                children:"Find Solar Panels, Inverters & Systems in Pakistan"
+              }),
+              jsx("p",{
+                className:"mx-auto mt-3 max-w-2xl text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed",
+                children:"Search from 500+ verified new and used solar equipment listings across Pakistan at live market rates."
+              }),
+              (nc||np)&&jsxs("div",{
+                className:"mt-4 flex flex-wrap items-center justify-center gap-2.5",children:[
+                  np?jsxs("button",{
+                    onClick:np,className:"inline-flex items-center gap-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/60 px-3.5 py-1.5 text-xs font-bold text-amber-800 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/60 transition-all shadow-2xs",children:[
+                      jsx(Zap,{ className:"h-3.5 w-3.5 fill-amber-500 text-amber-500" }),
+                      "Today's Rates (Rs 34-42/W)",
+                      jsx(ArrowRight,{ className:"h-3 w-3" })
+                    ]
+                  }):null,
+                  nc?jsxs("button",{
+                    onClick:nc,className:"inline-flex items-center gap-1.5 rounded-lg bg-primary-50 dark:bg-primary-950/40 border border-primary-200/80 dark:border-primary-800/60 px-3.5 py-1.5 text-xs font-bold text-primary-800 dark:text-primary-300 hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-all shadow-2xs",children:[
+                      jsx(Calculator,{ className:"h-3.5 w-3.5 text-primary-600 dark:text-primary-400" }),
+                      "Load Calculator (kW Sizing)",
+                      jsx(ArrowRight,{ className:"h-3 w-3" })
+                    ]
+                  }):null
+                ]
               })
-            }),jsx("h3",{
-              className:"text-lg font-bold text-gray-900 dark:text-white",children:CATEGORIES[e.value]
-            }),jsx("p",{
-              className:"mt-1 text-sm text-gray-500 dark:text-gray-400",children:e.desc
-            }),jsxs("div",{
-              className:"mt-4 flex items-center gap-1 text-sm font-semibold text-primary-600 dark:text-primary-400 transition-all group-hover:gap-2",children:["Browse now",jsx(ArrowRight,{
-                className:"h-4 w-4"
-              })]
-            })]
-          },e.value)
+            ]
+          }),
+          jsx("div",{
+            className:"mx-auto mt-6 sm:mt-8 max-w-4xl",children:jsxs("div",{
+              className:"card overflow-hidden border border-gray-200/90 dark:border-gray-800 shadow-xl dark:bg-gray-900",children:[
+                jsx("div",{
+                  className:"flex gap-1 overflow-x-auto border-b border-gray-200 dark:border-gray-800 p-1.5 sm:p-2 scrollbar-hide bg-gray-50/70 dark:bg-gray-850/60",children:Zy.map(s=>{
+                    const a=s.icon,l=t.category===s.value;
+                    return jsxs("button",{
+                      onClick:()=>e("category",s.value),className:`flex shrink-0 items-center gap-1.5 sm:gap-2 rounded-lg px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-bold transition-all ${
+                        l?"bg-primary-500 text-white shadow-xs":"text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800 border border-transparent"
+                      }`,children:[
+                        jsx(a,{ className:"h-4 w-4" }),
+                        s.label
+                      ]
+                    },s.value||"all")
+                  })
+                }),
+                jsxs("div",{
+                  className:"p-4 sm:p-6",children:[
+                    jsxs("div",{
+                      className:"relative mb-3.5",children:[
+                        jsx(Search,{ className:"absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" }),
+                        jsx("input",{
+                          type:"text",
+                          placeholder:"Search by title, brand, or model (e.g. Longi Hi-MO 6, Inverex Nitrox 6kW, Narada 48V)...",
+                          value:t.query,
+                          onChange:s=>e("query",s.target.value),
+                          onKeyDown:s=>s.key==="Enter"&&r(),
+                          className:"w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 py-2.5 pl-10 pr-4 text-xs sm:text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-all focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100 dark:focus:ring-primary-950"
+                        })
+                      ]
+                    }),
+                    jsxs("div",{
+                      className:"grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-4 mb-3.5",children:[
+                        jsxs("div",{
+                          children:[
+                            jsx("label",{ className:"mb-1 block text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400", children:"Category" }),
+                            jsx("select",{
+                              value:t.category,onChange:s=>e("category",s.target.value),className:"select-field text-xs",children:Zy.map(s=>jsx("option",{
+                                value:s.value,children:s.value?s.label:"All Categories"
+                              },s.value||"all"))
+                            })
+                          ]
+                        }),
+                        jsxs("div",{
+                          children:[
+                            jsx("label",{ className:"mb-1 block text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400", children:"City" }),
+                            jsx("select",{
+                              value:t.city,onChange:s=>e("city",s.target.value),className:"select-field text-xs",children:ex.map(s=>jsx("option",{
+                                value:s,children:s||"All Cities"
+                              },s||"all-cities"))
+                            })
+                          ]
+                        }),
+                        jsxs("div",{
+                          children:[
+                            jsx("label",{ className:"mb-1 block text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400", children:"Brand" }),
+                            jsx("select",{
+                              value:t.brand,onChange:s=>e("brand",s.target.value),className:"select-field text-xs",children:tx.map(s=>jsx("option",{
+                                value:s,children:s||"All Brands"
+                              },s||"all-brands"))
+                            })
+                          ]
+                        }),
+                        jsxs("div",{
+                          children:[
+                            jsx("label",{ className:"mb-1 block text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400", children:"Condition" }),
+                            jsx("select",{
+                              value:t.condition,onChange:s=>e("condition",s.target.value),className:"select-field text-xs",children:rx.map(s=>jsx("option",{
+                                value:s.value,children:s.label
+                              },s.value||"any-cond"))
+                            })
+                          ]
+                        })
+                      ]
+                    }),
+                    jsxs("div",{
+                      className:"flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3 pt-1 border-t border-gray-100 dark:border-gray-800",children:[
+                        jsxs("div",{
+                          className:"flex items-center gap-2 w-full sm:w-auto",children:[
+                            jsx("input",{
+                              type:"number",placeholder:"Min PKR",value:t.minPrice,onChange:s=>e("minPrice",s.target.value),className:"input-field text-xs w-1/2 sm:w-28"
+                            }),
+                            jsx("span",{ className:"text-gray-400 text-xs", children:"to" }),
+                            jsx("input",{
+                              type:"number",placeholder:"Max PKR",value:t.maxPrice,onChange:s=>e("maxPrice",s.target.value),className:"input-field text-xs w-1/2 sm:w-28"
+                            })
+                          ]
+                        }),
+                        jsxs("div",{
+                          className:"flex items-center gap-2 flex-1 justify-end",children:[
+                            jsx("button",{
+                              onClick:n,className:"btn-ghost text-xs px-3.5 py-2.5",children:"Reset"
+                            }),
+                            jsxs("button",{
+                              onClick:r,className:"btn-primary flex-1 sm:flex-none px-6 py-2.5 text-xs sm:text-sm font-bold shadow-xs",children:[
+                                jsx(Search,{ className:"h-4 w-4" }),
+                                "Search Solar Listings"
+                              ]
+                            })
+                          ]
+                        })
+                      ]
+                    })
+                  ]
+                }),
+                jsxs("div",{
+                  className:"border-t border-gray-200/70 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-850/50 px-4 py-2.5 text-xs flex flex-wrap items-center gap-1.5",children:[
+                    jsx("span",{ className:"font-bold text-gray-500 dark:text-gray-400 text-[11px] mr-1", children:"Popular:" }),
+                    popularSearches.map(term=>jsx("button",{
+                      type:"button",onClick:()=>handlePopularClick(term),className:"rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2 py-0.5 text-[11px] font-medium text-gray-700 dark:text-gray-300 hover:border-primary-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors shadow-2xs",children:term
+                    },term))
+                  ]
+                })
+              ]
+            })
+          }),
+          jsx("div",{
+            className:"mx-auto mt-8 sm:mt-10 grid max-w-4xl grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-4",children:[{
+              value:"500+",label:"Active Listings"
+            },{
+              value:"120+",label:"Verified Sellers"
+            },{
+              value:"15+",label:"Cities Covered"
+            },{
+              value:"10K+",label:"Monthly Buyers"
+            }].map(s=>jsxs("div",{
+              className:"card p-3.5 sm:p-4 text-center border border-gray-200/80 dark:border-gray-800 dark:bg-gray-900 shadow-2xs",children:[
+                jsx("div",{ className:"text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white", children:s.value }),
+                jsx("div",{ className:"mt-0.5 text-xs font-semibold text-gray-500 dark:text-gray-400", children:s.label })
+              ]
+            },s.label))
+          })
+        ]
+      })
+    ]
+  });
+}function PakWheelsSellCards({ onPostAd, onInstall }) {
+  return jsx("section", {
+    className: "bg-white dark:bg-gray-950 py-7 sm:py-8 border-b border-gray-200/70 dark:border-gray-800 transition-colors",
+    children: jsx("div", {
+      className: "container-page",
+      children: jsxs("div", {
+        className: "grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5",
+        children: [
+          jsxs("div", {
+            className: "card p-5 sm:p-6 border border-gray-200/90 dark:border-gray-800 hover:border-primary-400 dark:hover:border-primary-600 transition-all flex flex-col justify-between group dark:bg-gray-900 shadow-2xs",
+            children: [
+              jsxs("div", {
+                children: [
+                  jsxs("div", {
+                    className: "flex items-center justify-between mb-2.5",
+                    children: [
+                      jsx("span", {
+                        className: "rounded bg-primary-50 dark:bg-primary-950/60 text-primary-700 dark:text-primary-300 px-2 py-0.5 text-xs font-bold border border-primary-200/60 dark:border-primary-800/60",
+                        children: "Post Solar Ad"
+                      }),
+                      jsx(Sun, { className: "h-4 w-4 text-primary-500" })
+                    ]
+                  }),
+                  jsx("h3", {
+                    className: "text-base sm:text-lg font-bold text-gray-900 dark:text-white",
+                    children: "Sell Your Solar Equipment on SellSolar"
+                  }),
+                  jsx("p", {
+                    className: "mt-1 text-xs text-gray-500 dark:text-gray-400 leading-relaxed",
+                    children: "Post your solar panels, inverters, batteries or complete setups and connect directly with genuine buyers across Pakistan."
+                  }),
+                  jsxs("ul", {
+                    className: "mt-3 space-y-1.5 text-xs text-gray-600 dark:text-gray-300",
+                    children: [
+                      jsxs("li", {
+                        className: "flex items-center gap-2",
+                        children: [
+                          jsx(ShieldCheck, { className: "h-3.5 w-3.5 text-emerald-500 shrink-0" }),
+                          "Post your ad in 30 seconds for FREE"
+                        ]
+                      }),
+                      jsxs("li", {
+                        className: "flex items-center gap-2",
+                        children: [
+                          jsx(MessageCircle, { className: "h-3.5 w-3.5 text-emerald-500 shrink-0" }),
+                          "Direct inquiries via WhatsApp and phone calls"
+                        ]
+                      }),
+                      jsxs("li", {
+                        className: "flex items-center gap-2",
+                        children: [
+                          jsx(TrendingUp, { className: "h-3.5 w-3.5 text-emerald-500 shrink-0" }),
+                          "10,000+ monthly active solar buyers"
+                        ]
+                      })
+                    ]
+                  })
+                ]
+              }),
+              jsx("div", {
+                className: "mt-5 pt-3.5 border-t border-gray-100 dark:border-gray-800",
+                children: jsxs("button", {
+                  onClick: onPostAd,
+                  className: "btn-primary w-full sm:w-auto px-5 py-2 text-xs font-bold shadow-xs",
+                  children: [
+                    jsx(CirclePlus, { className: "h-3.5 w-3.5" }),
+                    "Post an Ad — Free"
+                  ]
+                })
+              })
+            ]
+          }),
+          jsxs("div", {
+            className: "card p-5 sm:p-6 border border-gray-200/90 dark:border-gray-800 hover:border-secondary-400 dark:hover:border-secondary-600 transition-all flex flex-col justify-between group dark:bg-gray-900 shadow-2xs",
+            children: [
+              jsxs("div", {
+                children: [
+                  jsxs("div", {
+                    className: "flex items-center justify-between mb-2.5",
+                    children: [
+                      jsx("span", {
+                        className: "rounded bg-secondary-50 dark:bg-secondary-950/60 text-secondary-700 dark:text-secondary-300 px-2 py-0.5 text-xs font-bold border border-secondary-200/60 dark:border-secondary-800/60",
+                        children: "EPC & Net-Metering"
+                      }),
+                      jsx(Wrench, { className: "h-4 w-4 text-secondary-500" })
+                    ]
+                  }),
+                  jsx("h3", {
+                    className: "text-base sm:text-lg font-bold text-gray-900 dark:text-white",
+                    children: "SellSolar Turnkey Installation Service"
+                  }),
+                  jsx("p", {
+                    className: "mt-1 text-xs text-gray-500 dark:text-gray-400 leading-relaxed",
+                    children: "Get complete on-grid, hybrid or off-grid solar systems engineered, installed and net-metered with Tier-1 warranty equipment."
+                  }),
+                  jsxs("ul", {
+                    className: "mt-3 space-y-1.5 text-xs text-gray-600 dark:text-gray-300",
+                    children: [
+                      jsxs("li", {
+                        className: "flex items-center gap-2",
+                        children: [
+                          jsx(ShieldCheck, { className: "h-3.5 w-3.5 text-emerald-500 shrink-0" }),
+                          "Tier-1 25-yr warranty panels & hybrid inverters"
+                        ]
+                      }),
+                      jsxs("li", {
+                        className: "flex items-center gap-2",
+                        children: [
+                          jsx(Zap, { className: "h-3.5 w-3.5 text-amber-500 shrink-0" }),
+                          "WAPDA / K-Electric Net-Metering license processing"
+                        ]
+                      }),
+                      jsxs("li", {
+                        className: "flex items-center gap-2",
+                        children: [
+                          jsx(Calculator, { className: "h-3.5 w-3.5 text-primary-500 shrink-0" }),
+                          "Free rooftop engineering survey & kW sizing"
+                        ]
+                      })
+                    ]
+                  })
+                ]
+              }),
+              jsx("div", {
+                className: "mt-5 pt-3.5 border-t border-gray-100 dark:border-gray-800",
+                children: jsxs("button", {
+                  onClick: onInstall,
+                  className: "btn bg-secondary-600 hover:bg-secondary-700 text-white w-full sm:w-auto px-5 py-2 text-xs font-bold shadow-xs",
+                  children: [
+                    jsx(Wrench, { className: "h-3.5 w-3.5" }),
+                    "Request Installation"
+                  ]
+                })
+              })
+            ]
+          })
+        ]
+      })
+    })
+  });
+}
+
+const sx=[{
+  value:"panel",icon:Sun,desc:"Monocrystalline & TopCon panels",gradient:"from-primary-500 to-primary-600",count:"240+ Ads"
+},{
+  value:"inverter",icon:Zap,desc:"Hybrid, off-grid & on-grid inverters",gradient:"from-accent-500 to-accent-600",count:"150+ Ads"
+},{
+  value:"battery",icon:BatteryCharging,desc:"Lithium LiFePO4 & tubular batteries",gradient:"from-secondary-500 to-secondary-600",count:"95+ Ads"
+},{
+  value:"complete_system",icon:Boxes,desc:"Full solar packages with net-metering",gradient:"from-amber-500 to-amber-600",count:"60+ Ads"
+}];
+
+function ix({
+  onSelectCategory:t,
+  onSelectCity:onCity,
+  onSelectBrand:onBrand
+}){
+  const [activeBrowseTab, setActiveBrowseTab] = useState("category");
+  const [categoryViewMode, setCategoryViewMode] = useState("grid"); // "grid" (4-group) or "table"
+
+  const browseCities = [
+    { name: "Lahore", count: "140+ Listings" },
+    { name: "Karachi", count: "110+ Listings" },
+    { name: "Islamabad", count: "85+ Listings" },
+    { name: "Rawalpindi", count: "70+ Listings" },
+    { name: "Faisalabad", count: "55+ Listings" },
+    { name: "Multan", count: "40+ Listings" },
+    { name: "Peshawar", count: "35+ Listings" },
+    { name: "Gujranwala", count: "30+ Listings" },
+    { name: "Sialkot", count: "25+ Listings" },
+    { name: "Quetta", count: "20+ Listings" }
+  ];
+
+  const browseBrands = [
+    { name: "Longi", desc: "Hi-MO 6 & 7 Panels" },
+    { name: "Canadian Solar", desc: "TopCon & Bifacial" },
+    { name: "Jinko", desc: "Tiger Neo N-Type" },
+    { name: "Trina", desc: "Vertex High-Power" },
+    { name: "Inverex", desc: "Nitrox & Veyron Hybrid" },
+    { name: "Crown", desc: "Solar Hybrid Inverters" },
+    { name: "Huawei", desc: "Commercial & Home On-Grid" },
+    { name: "Growatt", desc: "SPF & SPH Inverters" },
+    { name: "Narada", desc: "Lithium LiFePO4 48V" },
+    { name: "Phoenix", desc: "Tubular Deep Cycle" }
+  ];
+
+  return jsx("section",{
+    id:"categories",className:"py-7 sm:py-8 bg-gray-50/70 dark:bg-gray-900/60 border-b border-gray-200/60 dark:border-gray-800 transition-colors",children:jsxs("div",{
+      className:"container-page",children:[
+        jsxs("div",{
+          className:"flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 border-b border-gray-200 dark:border-gray-800 pb-2.5 mb-4",children:[
+            jsxs("div",{
+              children:[
+                jsx("h2",{
+                  className:"text-lg sm:text-xl font-bold tracking-tight text-gray-900 dark:text-white",children:"Browse Solar Equipment"
+                }),
+                jsx("p",{
+                  className:"mt-0.5 text-xs text-gray-500 dark:text-gray-400",children:"Find verified equipment by category, city or popular brand"
+                })
+              ]
+            }),
+            jsxs("div",{
+              className:"flex items-center gap-1 bg-white dark:bg-gray-800 p-1 rounded-lg border border-gray-200 dark:border-gray-700 text-xs font-bold shrink-0 shadow-2xs",children:[
+                jsx("button",{
+                  onClick:()=>setActiveBrowseTab("category"),
+                  className:`px-3 py-1 rounded-md transition-all ${
+                    activeBrowseTab==="category"?"bg-primary-500 text-white shadow-xs":"text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                  }`,children:"By Category"
+                }),
+                jsx("button",{
+                  onClick:()=>setActiveBrowseTab("city"),
+                  className:`px-3 py-1 rounded-md transition-all ${
+                    activeBrowseTab==="city"?"bg-primary-500 text-white shadow-xs":"text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                  }`,children:"By City"
+                }),
+                jsx("button",{
+                  onClick:()=>setActiveBrowseTab("brand"),
+                  className:`px-3 py-1 rounded-md transition-all ${
+                    activeBrowseTab==="brand"?"bg-primary-500 text-white shadow-xs":"text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                  }`,children:"By Brand"
+                })
+              ]
+            })
+          ]
+        }),
+        activeBrowseTab === "category" && jsxs("div",{
+          className:"space-y-3",
+          children:[
+            jsxs("div",{
+              className:"flex items-center justify-between gap-2",
+              children:[
+                jsxs("span",{
+                  className:"text-xs font-bold text-gray-500 dark:text-gray-400 flex items-center gap-1.5",
+                  children:[
+                    jsx(Layers,{ className:"h-3.5 w-3.5 text-primary-500" }),
+                    "Equipment Categories (4 Groups)"
+                  ]
+                }),
+                jsxs("div",{
+                  className:"inline-flex items-center p-0.5 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-2xs text-[11px] font-bold",
+                  children:[
+                    jsxs("button",{
+                      type:"button",
+                      onClick:()=>setCategoryViewMode("grid"),
+                      className:`px-2.5 py-1 rounded-md transition-all flex items-center gap-1 ${
+                        categoryViewMode==="grid"
+                          ?"bg-primary-500 text-white shadow-xs"
+                          :"text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                      }`,
+                      children:[
+                        jsx(Grid,{ className:"h-3 w-3" }),
+                        jsx("span",{ children:"4-Grid" })
+                      ]
+                    }),
+                    jsxs("button",{
+                      type:"button",
+                      onClick:()=>setCategoryViewMode("table"),
+                      className:`px-2.5 py-1 rounded-md transition-all flex items-center gap-1 ${
+                        categoryViewMode==="table"
+                          ?"bg-primary-500 text-white shadow-xs"
+                          :"text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                      }`,
+                      children:[
+                        jsx(Table,{ className:"h-3 w-3" }),
+                        jsx("span",{ children:"Table" })
+                      ]
+                    })
+                  ]
+                })
+              ]
+            }),
+            categoryViewMode === "grid" ? jsx("div",{
+              className:"grid grid-cols-2 gap-2.5 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4",
+              children:sx.map(e=>{
+                const r=e.icon;
+                return jsxs("button",{
+                  onClick:()=>t(e.value),
+                  className:"card group p-3 sm:p-5 text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:bg-gray-900 border border-gray-200/90 dark:border-gray-800 flex flex-col justify-between shadow-2xs rounded-xl",
+                  children:[
+                    jsxs("div",{
+                      className:"flex items-center justify-between mb-2 sm:mb-3",
+                      children:[
+                        jsx("div",{
+                          className:`flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-lg bg-gradient-to-br ${e.gradient} shadow-xs transition-transform group-hover:scale-105 shrink-0`,
+                          children:jsx(r,{ className:"h-4.5 w-4.5 sm:h-5 sm:w-5 text-white", strokeWidth:2 })
+                        }),
+                        jsx("span",{
+                          className:"text-[10px] sm:text-xs font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded border border-gray-200/60 dark:border-gray-700",
+                          children:e.count
+                        })
+                      ]
+                    }),
+                    jsxs("div",{
+                      className:"flex-1",
+                      children:[
+                        jsx("h3",{
+                          className:"text-xs sm:text-base font-bold text-gray-900 dark:text-white leading-tight",
+                          children:CATEGORIES[e.value]
+                        }),
+                        jsx("p",{
+                          className:"mt-1 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 line-clamp-2 leading-tight",
+                          children:e.desc
+                        })
+                      ]
+                    }),
+                    jsxs("div",{
+                      className:"mt-2.5 sm:mt-3.5 flex items-center gap-1 text-[11px] sm:text-xs font-bold text-primary-600 dark:text-primary-400 group-hover:gap-1.5 transition-all",
+                      children:[
+                        "Explore listings",
+                        jsx(ArrowRight,{ className:"h-3 w-3 shrink-0" })
+                      ]
+                    })
+                  ]
+                },e.value)
+              })
+            }) : jsx("div",{
+              className:"overflow-hidden rounded-xl border border-gray-200/90 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xs",
+              children:jsx("div",{
+                className:"overflow-x-auto",
+                children:jsxs("table",{
+                  className:"w-full text-left border-collapse text-xs sm:text-sm",
+                  children:[
+                    jsx("thead",{
+                      children:jsxs("tr",{
+                        className:"border-b border-gray-200/80 dark:border-gray-800 bg-gray-50 dark:bg-gray-850/80 text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider",
+                        children:[
+                          jsx("th",{ className:"py-2.5 px-3 sm:px-4", children:"Category" }),
+                          jsx("th",{ className:"py-2.5 px-2 sm:px-4 hidden sm:table-cell", children:"Equipment Details" }),
+                          jsx("th",{ className:"py-2.5 px-3 sm:px-4 text-center", children:"Verified Ads" }),
+                          jsx("th",{ className:"py-2.5 px-3 sm:px-4 text-right", children:"Action" })
+                        ]
+                      })
+                    }),
+                    jsx("tbody",{
+                      className:"divide-y divide-gray-100 dark:divide-gray-800/80",
+                      children:sx.map(e=>{
+                        const r=e.icon;
+                        return jsxs("tr",{
+                          onClick:()=>t(e.value),
+                          className:"hover:bg-primary-50/40 dark:hover:bg-primary-950/20 cursor-pointer transition-colors group",
+                          children:[
+                            jsx("td",{
+                              className:"py-2.5 sm:py-3 px-3 sm:px-4",
+                              children:jsxs("div",{
+                                className:"flex items-center gap-2 sm:gap-3",
+                                children:[
+                                  jsx("div",{
+                                    className:`flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg bg-gradient-to-br ${e.gradient} shadow-xs text-white shrink-0`,
+                                    children:jsx(r,{ className:"h-4 w-4", strokeWidth:2 })
+                                  }),
+                                  jsxs("div",{
+                                    children:[
+                                      jsx("div",{
+                                        className:"font-bold text-xs sm:text-sm text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors",
+                                        children:CATEGORIES[e.value]
+                                      }),
+                                      jsx("div",{
+                                        className:"text-[10px] text-gray-500 dark:text-gray-400 sm:hidden line-clamp-1",
+                                        children:e.desc
+                                      })
+                                    ]
+                                  })
+                                ]
+                              })
+                            }),
+                            jsx("td",{
+                              className:"py-2.5 sm:py-3 px-2 sm:px-4 hidden sm:table-cell text-xs text-gray-600 dark:text-gray-300",
+                              children:e.desc
+                            }),
+                            jsx("td",{
+                              className:"py-2.5 sm:py-3 px-3 sm:px-4 text-center",
+                              children:jsx("span",{
+                                className:"inline-flex items-center px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold bg-primary-50 dark:bg-primary-950/60 text-primary-700 dark:text-primary-300 border border-primary-200/50 dark:border-primary-800/50",
+                                children:e.count
+                              })
+                            }),
+                            jsx("td",{
+                              className:"py-2.5 sm:py-3 px-3 sm:px-4 text-right",
+                              children:jsxs("span",{
+                                className:"inline-flex items-center gap-1 text-[11px] sm:text-xs font-bold text-primary-600 dark:text-primary-400 group-hover:text-primary-700 dark:group-hover:text-primary-300",
+                                children:[
+                                  jsx("span",{ children:"Explore" }),
+                                  jsx(ArrowRight,{ className:"h-3 w-3 transition-transform group-hover:translate-x-0.5" })
+                                ]
+                              })
+                            })
+                          ]
+                        },e.value);
+                      })
+                    })
+                  ]
+                })
+              })
+            })
+          ]
+        }),
+        activeBrowseTab === "city" && jsx("div",{
+          className:"grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 sm:gap-3",children:browseCities.map(c=>jsxs("button",{
+            onClick:()=>onCity&&onCity(c.name),
+            className:"card p-3 text-left border border-gray-200/90 dark:border-gray-800 hover:border-primary-400 dark:hover:border-primary-500 hover:shadow-xs transition-all group dark:bg-gray-900 flex items-center justify-between shadow-2xs",children:[
+              jsxs("div",{
+                children:[
+                  jsx("div",{
+                    className:"font-bold text-xs sm:text-sm text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors",children:c.name
+                  }),
+                  jsx("div",{
+                    className:"text-[11px] text-gray-500 dark:text-gray-400 mt-0.5",children:c.count
+                  })
+                ]
+              }),
+              jsx(MapPin,{ className:"h-3.5 w-3.5 text-gray-400 group-hover:text-primary-500 transition-colors shrink-0" })
+            ]
+          },c.name))
+        }),
+        activeBrowseTab === "brand" && jsx("div",{
+          className:"grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 sm:gap-3",children:browseBrands.map(b=>jsxs("button",{
+            onClick:()=>onBrand&&onBrand(b.name),
+            className:"card p-3 text-left border border-gray-200/90 dark:border-gray-800 hover:border-primary-400 dark:hover:border-primary-500 hover:shadow-xs transition-all group dark:bg-gray-900 flex items-center justify-between shadow-2xs",children:[
+              jsxs("div",{
+                children:[
+                  jsx("div",{
+                    className:"font-bold text-xs sm:text-sm text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors",children:b.name
+                  }),
+                  jsx("div",{
+                    className:"text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 truncate max-w-[120px]",children:b.desc
+                  })
+                ]
+              }),
+              jsx(Award,{ className:"h-3.5 w-3.5 text-gray-400 group-hover:text-primary-500 transition-colors shrink-0" })
+            ]
+          },b.name))
         })
-      })]
+      ]
     })
   })
-}function ax({
+}
+
+function ax({
   listing:t,onClick:e,onNavigate:nav
 }){
   const { user } = useAuth();
@@ -544,33 +1097,33 @@ function ix({
   };
 
   return jsxs("div",{
-    className:"card group cursor-pointer overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:bg-gray-900 dark:ring-gray-800 flex flex-col justify-between",onClick:e,children:[jsxs("div",{
+    className:"card group cursor-pointer overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:bg-gray-900 border border-gray-200/90 dark:border-gray-800 flex flex-col justify-between shadow-2xs",onClick:e,children:[jsxs("div",{
       children:[jsxs("div",{
         className:"relative aspect-[4/3] overflow-hidden bg-gray-100 dark:bg-gray-800",children:[jsx("img",{
-          src:imgUrl,alt:t.title,loading:"lazy",className:"h-full w-full object-cover transition-transform duration-500 group-hover:scale-105",onError:s=>{
+          src:imgUrl,alt:t.title,loading:"lazy",className:"h-full w-full object-cover transition-transform duration-300 group-hover:scale-105",onError:s=>{
             s.currentTarget.src = getEquipmentFallbackImage(t.category, t.title);
           }
         }),jsxs("div",{
-          className:"absolute left-3 top-3 flex gap-2",children:[jsx("span",{
-            className:`rounded-full px-2.5 py-1 text-xs font-bold shadow-sm ${r?"bg-warning-500 text-white":"bg-secondary-500 text-white"}`,children:r?"Used":"New"
+          className:"absolute left-2.5 top-2.5 flex gap-1.5",children:[jsx("span",{
+            className:`rounded px-2 py-0.5 text-[11px] font-bold shadow-2xs ${r?"bg-warning-500 text-white":"bg-secondary-500 text-white"}`,children:r?"Used":"New"
           }),t.featured&&jsxs("span",{
-            className:"flex items-center gap-1 rounded-full bg-primary-500 px-2.5 py-1 text-xs font-bold text-white shadow-sm",children:[jsx(Tag,{
+            className:"flex items-center gap-1 rounded bg-primary-500 px-2 py-0.5 text-[11px] font-bold text-white shadow-2xs",children:[jsx(Tag,{
               className:"h-3 w-3"
             }),"Featured"]
           })]
         }),jsxs("div",{
-          className:"absolute right-3 top-3 flex items-center gap-1 rounded-full bg-black/50 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm",children:[jsx(Eye,{
+          className:"absolute right-2.5 top-2.5 flex items-center gap-1 rounded bg-black/50 px-2 py-0.5 text-[11px] font-medium text-white backdrop-blur-sm",children:[jsx(Eye,{
             className:"h-3 w-3"
           }),t.views||0]
         }),allImages.length > 1 && jsxs("div",{
-          className:"absolute left-3 bottom-3 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-sm",children:[jsx(Image,{
+          className:"absolute left-2.5 bottom-2.5 flex items-center gap-1 rounded bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-sm",children:[jsx(Image,{
             className:"h-3 w-3"
           }),allImages.length]
         }),jsx("button",{
           type:"button",
           onClick:handleWhatsApp,
           title:"Contact Seller via WhatsApp",
-          className:"absolute bottom-3 right-3 z-10 flex items-center gap-1.5 rounded-full bg-[#25D366] hover:bg-[#20ba59] text-white px-3 py-1.5 text-xs font-bold shadow-lg shadow-emerald-950/30 transition-all hover:scale-105 active:scale-95",children:jsxs(Fragment,{
+          className:"absolute bottom-2.5 right-2.5 z-10 flex items-center gap-1 rounded bg-[#25D366] hover:bg-[#20ba59] text-white px-2.5 py-1 text-xs font-bold shadow-md transition-all hover:scale-105 active:scale-95",children:jsxs(Fragment,{
             children:[jsx(MessageCircle,{
               className:"h-3.5 w-3.5 fill-white"
             }),jsx("span",{
@@ -579,8 +1132,8 @@ function ix({
           })
         })]
       }),jsxs("div",{
-        className:"p-4",children:[jsxs("div",{
-          className:"mb-1 flex items-center gap-2 text-xs font-semibold text-primary-600 dark:text-primary-400",children:[jsx("span",{
+        className:"p-3.5",children:[jsxs("div",{
+          className:"mb-1 flex items-center gap-1.5 text-xs font-semibold text-primary-600 dark:text-primary-400",children:[jsx("span",{
             children:CATEGORIES[t.category]||t.category
           }),t.capacity_kw&&jsx("span",{
             className:"text-gray-400 dark:text-gray-600",children:"•"
@@ -588,10 +1141,10 @@ function ix({
             className:"text-gray-500 dark:text-gray-400",children:[t.capacity_kw,"kW"]
           })]
         }),jsx("h3",{
-          className:"line-clamp-2 text-sm font-bold leading-snug text-gray-900 dark:text-gray-100 transition-colors group-hover:text-primary-600 dark:group-hover:text-primary-400",children:t.title
+          className:"line-clamp-2 text-xs sm:text-sm font-bold leading-snug text-gray-900 dark:text-gray-100 transition-colors group-hover:text-primary-600 dark:group-hover:text-primary-400",children:t.title
         }),jsxs("div",{
-          className:"mt-2 flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400",children:[jsx(MapPin,{
-            className:"h-3.5 w-3.5 shrink-0 text-primary-500"
+          className:"mt-2 flex items-center gap-1.5 text-[11px] sm:text-xs text-gray-500 dark:text-gray-400",children:[jsx(MapPin,{
+            className:"h-3 w-3 shrink-0 text-primary-500"
           }),t.city,jsx("span",{
             className:"text-gray-300 dark:text-gray-600",children:"•"
           }),jsx("span",{
@@ -600,21 +1153,21 @@ function ix({
         })]
       })]
     }),jsx("div",{
-      className:"px-4 pb-4",children:jsxs("div",{
-        className:"flex items-end justify-between border-t border-gray-100 dark:border-gray-800 pt-3",children:[jsxs("div",{
+      className:"px-3.5 pb-3.5",children:jsxs("div",{
+        className:"flex items-end justify-between border-t border-gray-100 dark:border-gray-800 pt-2.5",children:[jsxs("div",{
           children:[jsx("div",{
-            className:"text-lg font-extrabold text-primary-900 dark:text-primary-300",children:formatPrice(t.price)
+            className:"text-sm sm:text-base font-extrabold text-primary-600 dark:text-primary-400",children:formatPrice(t.price)
           }),t.warranty_years?jsxs("div",{
-            className:"flex items-center gap-1 text-xs font-medium text-secondary-600 dark:text-secondary-400",children:[jsx(ShieldCheck,{
+            className:"flex items-center gap-1 text-[11px] font-medium text-secondary-600 dark:text-secondary-400",children:[jsx(ShieldCheck,{
               className:"h-3 w-3"
             }),formatWarrantyShort(t.warranty_years)]
           }):jsx("div",{
-            className:"text-xs text-gray-400 dark:text-gray-500",children:"No warranty"
+            className:"text-[11px] text-gray-400 dark:text-gray-500",children:"No warranty"
           })]
         }),jsx("button",{
-          type:"button",onClick:handleWhatsApp,className:"inline-flex items-center gap-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-800/60 text-[#128C7E] dark:text-emerald-300 px-2.5 py-1 text-xs font-bold transition-colors",children:jsxs(Fragment,{
+          type:"button",onClick:handleWhatsApp,className:"inline-flex items-center gap-1 rounded bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-800/60 text-[#128C7E] dark:text-emerald-300 px-2 py-0.5 text-xs font-bold transition-colors",children:jsxs(Fragment,{
             children:[jsx(MessageCircle,{
-              className:"h-3.5 w-3.5 fill-[#128C7E] dark:fill-emerald-300"
+              className:"h-3 w-3 fill-[#128C7E] dark:fill-emerald-300"
             }),jsx("span",{
               children:"Chat"
             })]
@@ -623,100 +1176,184 @@ function ix({
       })
     })]
   })
-}function lx({
-  listings:t,loading:e,error:r,totalCount:n,onSelectListing:s,onResetFilters:rf,onNavigate:nav
+}
+
+function lx({
+  listings:t,loading:e,error:r,totalCount:n,onSelectListing:s,onResetFilters:rf,onNavigate:nav,currentCondition,onConditionChange
 }){
   return jsx("section",{
-    id:"listings",className:"bg-gray-50 dark:bg-gray-950 py-16 lg:py-20 transition-colors",children:jsxs("div",{
-      className:"container-page",children:[jsx("div",{
-        className:"mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between",children:jsxs("div",{
-          children:[jsxs("div",{
-            className:"mb-2 flex items-center gap-2 text-sm font-semibold text-primary-600 dark:text-primary-400",children:[jsx(SlidersHorizontal,{
-              className:"h-4 w-4"
-            }),"Browse Listings"]
-          }),jsx("h2",{
-            className:"text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white",children:"Available Solar Equipment"
-          }),jsx("p",{
-            className:"mt-1 text-sm text-gray-500 dark:text-gray-400",children:e?"Loading equipment...":`${n} ${n===1?"listing":"listings"} available across Pakistan`
-          })]
-        })
-      }),e?jsx("div",{
-        className:"grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",children:[1,2,3,4,5,6,7,8].map(sk=>jsxs("div",{
-          className:"card overflow-hidden animate-pulse dark:bg-gray-900 dark:ring-gray-800",children:[jsx("div",{
-            className:"aspect-[4/3] bg-gray-200 dark:bg-gray-800"
-          }),jsxs("div",{
-            className:"p-4 space-y-3",children:[jsx("div",{
-              className:"h-4 bg-gray-200 dark:bg-gray-800 rounded w-1/3"
-            }),jsx("div",{
-              className:"h-5 bg-gray-200 dark:bg-gray-800 rounded w-4/5"
-            }),jsx("div",{
-              className:"h-4 bg-gray-200 dark:bg-gray-800 rounded w-1/2"
-            }),jsx("div",{
-              className:"h-6 bg-gray-200 dark:bg-gray-800 rounded w-2/5 pt-2"
+    id:"listings",className:"bg-white dark:bg-gray-950 py-8 sm:py-10 border-b border-gray-200/60 dark:border-gray-800 transition-colors",children:jsxs("div",{
+      className:"container-page",children:[
+        jsxs("div",{
+          className:"flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3.5 border-b border-gray-200 dark:border-gray-800 pb-3.5 mb-5",children:[
+            jsxs("div",{
+              children:[
+                jsx("h2",{
+                  className:"text-lg sm:text-xl font-bold tracking-tight text-gray-900 dark:text-white",children:"Featured Solar Products"
+                }),
+                jsx("p",{
+                  className:"mt-0.5 text-xs text-gray-500 dark:text-gray-400",children:e?"Loading equipment...":`${n} ${n===1?"listing":"listings"} available across Pakistan`
+                })
+              ]
+            }),
+            jsxs("div",{
+              className:"flex flex-wrap items-center gap-2 sm:gap-3",children:[
+                jsxs("div",{
+                  className:"inline-flex items-center p-1 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-bold shadow-2xs",
+                  children:[
+                    jsx("span",{
+                      className:"px-2 py-0.5 text-[11px] font-semibold text-gray-500 dark:text-gray-400 hidden xs:inline",
+                      children:"Condition:"
+                    }),
+                    jsx("button",{
+                      type:"button",
+                      onClick:()=>onConditionChange&&onConditionChange(""),
+                      className:`px-2.5 sm:px-3 py-1 rounded-md transition-all ${
+                        !currentCondition || currentCondition===""
+                          ?"bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-300 font-bold shadow-xs"
+                          :"text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                      }`,
+                      children:"Both (All)"
+                    }),
+                    jsxs("button",{
+                      type:"button",
+                      onClick:()=>onConditionChange&&onConditionChange("new"),
+                      className:`px-2.5 sm:px-3 py-1 rounded-md transition-all flex items-center gap-1.5 ${
+                        currentCondition==="new"
+                          ?"bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 font-bold shadow-xs"
+                          :"text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                      }`,
+                      children:[
+                        jsx("span",{ className:"h-2 w-2 rounded-full bg-emerald-500 shrink-0" }),
+                        "Brand New"
+                      ]
+                    }),
+                    jsxs("button",{
+                      type:"button",
+                      onClick:()=>onConditionChange&&onConditionChange("used"),
+                      className:`px-2.5 sm:px-3 py-1 rounded-md transition-all flex items-center gap-1.5 ${
+                        currentCondition==="used"
+                          ?"bg-white dark:bg-gray-700 text-amber-600 dark:text-amber-400 font-bold shadow-xs"
+                          :"text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                      }`,
+                      children:[
+                        jsx("span",{ className:"h-2 w-2 rounded-full bg-amber-500 shrink-0" }),
+                        "Used"
+                      ]
+                    })
+                  ]
+                }),
+                rf&&jsxs("button",{
+                  onClick:rf,className:"btn-ghost text-xs px-2.5 py-1.5 flex items-center gap-1.5",children:[
+                    jsx(RefreshCw,{ className:"h-3.5 w-3.5" }),
+                    "Clear"
+                  ]
+                }),
+                jsx("span",{
+                  className:"rounded-md bg-gray-100 dark:bg-gray-800 px-2.5 py-1 text-xs font-bold text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 shrink-0",
+                  children:`${n} Listed`
+                })
+              ]
+            })
+          ]
+        }),
+        e?jsx("div",{
+          className:"grid grid-cols-1 gap-3.5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4",children:[1,2,3,4,5,6,7,8].map(sk=>jsxs("div",{
+            className:"card overflow-hidden animate-pulse dark:bg-gray-900 border border-gray-200 dark:border-gray-800",children:[jsx("div",{
+              className:"aspect-[4/3] bg-gray-200 dark:bg-gray-800"
+            }),jsxs("div",{
+              className:"p-3.5 space-y-2.5",children:[jsx("div",{
+                className:"h-3.5 bg-gray-200 dark:bg-gray-800 rounded w-1/3"
+              }),jsx("div",{
+                className:"h-4 bg-gray-200 dark:bg-gray-800 rounded w-4/5"
+              }),jsx("div",{
+                className:"h-3.5 bg-gray-200 dark:bg-gray-800 rounded w-1/2"
+              }),jsx("div",{
+                className:"h-5 bg-gray-200 dark:bg-gray-800 rounded w-2/5 pt-2"
+              })]
             })]
+          },sk))
+        }):r?jsxs("div",{
+          className:"card p-8 text-center text-error-600 dark:text-error-400 dark:bg-gray-900 border border-error-200 dark:border-error-900",children:[jsx(CircleAlert,{
+            className:"mx-auto h-7 w-7 mb-2"
+          }),jsx("p",{
+            className:"font-semibold text-xs sm:text-sm",children:r
           })]
-        },sk))
-      }):t.length===0?jsxs("div",{
-        className:"flex flex-col items-center justify-center rounded-3xl bg-white dark:bg-gray-900 p-12 text-center shadow-sm border border-gray-200 dark:border-gray-800",children:[jsx("div",{
-          className:"flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-50 dark:bg-amber-950/50 text-amber-500 mb-4",children:jsx(PackageOpen,{
-            className:"h-8 w-8"
-          })
-        }),jsx("h3",{
-          className:"text-xl font-bold text-gray-900 dark:text-white",children:"No solar listings found"
-        }),jsx("p",{
-          className:"mt-1.5 max-w-md text-sm text-gray-500 dark:text-gray-400",children:"We couldn't find any equipment matching your active filters. Try broadening your criteria or search keywords."
-        }),rf&&jsx("button",{
-          onClick:rf,className:"mt-5 inline-flex items-center gap-2 rounded-full bg-primary-600 px-5 py-2.5 text-sm font-bold text-white shadow-md hover:bg-primary-700 transition-colors",children:[jsx(RefreshCw,{
-            className:"h-4 w-4"
-          }),"Clear All Filters"]
-        })]
-      }):jsx("div",{
-        className:"grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",children:t.map(a=>jsx(ax,{
-          listing:a,onClick:()=>s(a.id),onNavigate:nav
-        },a.id))
-      })]
+        }):t.length===0?jsxs("div",{
+          className:"card p-10 text-center dark:bg-gray-900 border border-gray-200 dark:border-gray-800",children:[jsx(PackageOpen,{
+            className:"mx-auto h-10 w-10 text-gray-400 mb-2.5"
+          }),jsx("h3",{
+            className:"text-base font-bold text-gray-900 dark:text-white",children:"No solar listings found"
+          }),jsx("p",{
+            className:"mt-1 max-w-md mx-auto text-xs text-gray-500 dark:text-gray-400",children:"We couldn't find any equipment matching your active filters. Try broadening your criteria or search keywords."
+          }),rf&&jsxs("button",{
+            onClick:rf,className:"btn-primary mt-4 text-xs inline-flex items-center gap-1.5 px-4 py-2",children:[jsx(RefreshCw,{
+              className:"h-3.5 w-3.5"
+            }),"Clear All Filters"]
+          })]
+        }):jsx("div",{
+          className:"grid grid-cols-1 gap-3.5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4",children:t.map(a=>jsx(ax,{
+            listing:a,onClick:()=>s(a.id),onNavigate:nav
+          },a.id))
+        })
+      ]
     })
   })
-}const ox=[{
-  icon:ShieldCheck,title:"Verified Sellers",desc:"Every seller is identity-verified so you can buy with confidence and avoid scams.",color:"text-secondary-500",bg:"bg-secondary-50"
+}
+
+const ox=[{
+  icon:ShieldCheck,title:"Verified Sellers",desc:"Every seller is identity-verified so you can buy with confidence and avoid fraudulent trade listings.",color:"text-secondary-600 dark:text-secondary-400",bg:"bg-secondary-50 dark:bg-secondary-950/50"
 },{
-  icon:TrendingUp,title:"Best Market Prices",desc:"Compare prices across brands and cities to get the best deal on solar equipment.",color:"text-primary-500",bg:"bg-primary-50"
+  icon:TrendingUp,title:"Best Market Prices",desc:"Compare daily per-watt and per-kW rates across Lahore, Karachi & Rawalpindi in real-time.",color:"text-primary-600 dark:text-primary-400",bg:"bg-primary-50 dark:bg-primary-950/50"
 },{
-  icon:Headphones,title:"Expert Support",desc:"Our solar experts help you choose the right system size and configuration for free.",color:"text-accent-500",bg:"bg-accent-50"
+  icon:Headphones,title:"Engineering Sizing",desc:"Use our automated sizing calculator or speak with verified EPC solar engineers.",color:"text-accent-600 dark:text-accent-400",bg:"bg-accent-50 dark:bg-accent-950/50"
 },{
-  icon:CreditCard,title:"Secure Payments",desc:"Safe payment options with buyer protection on every transaction through SellSolar.",color:"text-warning-500",bg:"bg-warning-50"
+  icon:CreditCard,title:"Transparent Quotes",desc:"Transparent pricing breakdowns for panels, inverters, structure, wiring and net-metering.",color:"text-amber-600 dark:text-amber-400",bg:"bg-amber-50 dark:bg-amber-950/50"
 },{
-  icon:Wrench,title:"Installation Services",desc:"Connect with certified installers in your city for professional solar system setup.",color:"text-error-500",bg:"bg-error-50"
+  icon:Wrench,title:"Installation & Net-Metering",desc:"Request complete EPC installation with WAPDA green meter licensing processing included.",color:"text-emerald-600 dark:text-emerald-400",bg:"bg-emerald-50 dark:bg-emerald-950/50"
 },{
-  icon:Users,title:"Trusted Community",desc:"Join thousands of buyers and sellers making Pakistan solar-powered, one home at a time.",color:"text-secondary-600",bg:"bg-secondary-50"
+  icon:Users,title:"Pakistan's Largest Community",desc:"Join thousands of homeowners and businesses cutting electricity bills with solar.",color:"text-primary-600 dark:text-primary-400",bg:"bg-primary-50 dark:bg-primary-950/50"
 }];
+
 function cx(){
   return jsx("section",{
-    id:"how-it-works",className:"bg-white py-16 lg:py-20",children:jsxs("div",{
-      className:"container-page",children:[jsxs("div",{
-        className:"mx-auto mb-12 max-w-2xl text-center",children:[jsx("div",{
-          className:"mb-2 text-sm font-semibold uppercase tracking-wide text-primary-600",children:"Why SellSolar"
-        }),jsx("h2",{
-          className:"text-3xl font-extrabold tracking-tight text-gray-900",children:"Pakistan's Trusted Solar Marketplace"
-        }),jsx("p",{
-          className:"mt-2 text-gray-500",children:"We make buying and selling solar equipment safe, simple, and affordable."
-        })]
-      }),jsx("div",{
-        className:"grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3",children:ox.map(t=>{
-          const e=t.icon;
-          return jsxs("div",{
-            className:"card p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg",children:[jsx("div",{
-              className:`mb-4 flex h-12 w-12 items-center justify-center rounded-xl ${t.bg}`,children:jsx(e,{
-                className:`h-6 w-6 ${t.color}`,strokeWidth:2
-              })
-            }),jsx("h3",{
-              className:"text-lg font-bold text-gray-900",children:t.title
-            }),jsx("p",{
-              className:"mt-2 text-sm leading-relaxed text-gray-500",children:t.desc
-            })]
-          },t.title)
+    id:"how-it-works",className:"bg-gray-50/70 dark:bg-gray-900/60 py-8 sm:py-10 border-b border-gray-200/60 dark:border-gray-800 transition-colors",children:jsxs("div",{
+      className:"container-page",children:[
+        jsxs("div",{
+          className:"flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 border-b border-gray-200 dark:border-gray-800 pb-2.5 mb-5",children:[
+            jsxs("div",{
+              children:[
+                jsx("h2",{
+                  className:"text-lg sm:text-xl font-bold tracking-tight text-gray-900 dark:text-white",children:"Why SellSolar Pakistan"
+                }),
+                jsx("p",{
+                  className:"mt-0.5 text-xs text-gray-500 dark:text-gray-400",children:"Pakistan's trusted marketplace for solar panels, inverters & turnkey installation"
+                })
+              ]
+            })
+          ]
+        }),
+        jsx("div",{
+          className:"grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3",children:ox.map(t=>{
+            const e=t.icon;
+            return jsxs("div",{
+              className:"card p-4 sm:p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:bg-gray-900 border border-gray-200/90 dark:border-gray-800 shadow-2xs",children:[
+                jsx("div",{
+                  className:`mb-3 flex h-10 w-10 items-center justify-center rounded-lg ${t.bg}`,children:jsx(e,{
+                    className:`h-5 w-5 ${t.color}`,strokeWidth:2
+                  })
+                }),
+                jsx("h3",{
+                  className:"text-sm sm:text-base font-bold text-gray-900 dark:text-white",children:t.title
+                }),
+                jsx("p",{
+                  className:"mt-1 text-xs leading-relaxed text-gray-500 dark:text-gray-400",children:t.desc
+                })
+              ]
+            },t.title)
+          })
         })
-      })]
+      ]
     })
   })
 }const ux={
@@ -778,7 +1415,7 @@ function hx({
           })]
         },e))]
       }),jsxs("div",{
-        className:"mt-12 flex flex-col items-center justify-between gap-4 border-t border-gray-800 BadgeCheck-8 sm:flex-row",children:[jsx("p",{
+        className:"mt-12 flex flex-col items-center justify-between gap-4 border-t border-gray-800 pt-8 sm:flex-row",children:[jsx("p",{
           className:"text-sm",children:"© 2026 SellSolar. All rights reserved."
         }),jsx("div",{
           className:"flex gap-3",children:dx.map((e,r)=>jsx("a",{
@@ -912,7 +1549,7 @@ function hx({
               })]
             })]
           }),h.cnic&&jsxs("div",{
-            className:"mt-3 border-t border-gray-100 BadgeCheck-3 text-xs text-gray-400",children:["CNIC: ",h.cnic.slice(0,5),"••••••",h.cnic.slice(-1)]
+            className:"mt-3 border-t border-gray-100 pt-3 text-xs text-gray-400",children:["CNIC: ",h.cnic.slice(0,5),"••••••",h.cnic.slice(-1)]
           })]
         },h.id))
       })]
@@ -2751,7 +3388,7 @@ function yx({
                 }),placeholder:"Describe your product...",className:"input-field min-h-[80px]"
               })]
             }),jsxs("div",{
-              className:"flex gap-3 BadgeCheck-2",children:[jsxs("button",{
+              className:"flex gap-3 pt-2",children:[jsxs("button",{
                 onClick:()=>{
                   H("pending"),Bt()
                 },disabled:v==="add-product",className:"btn-primary flex-1",children:[v==="add-product"?jsx(LoaderCircle,{
@@ -3153,10 +3790,10 @@ function yx({
                 })]
               }),photos.length > 1 && jsx("div",{
                 className:"p-3 flex gap-2 overflow-x-auto bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800",children:photos.map((ph, idx)=>jsx("button",{
-                  key:idx,onClick:()=>setActivePhotoIdx(idx),className:`relative h-16 w-16 shrink-0 rounded-lg overflow-hidden border-2 transition-all ${activePhotoIdx===idx?"border-primary-500 ring-2 ring-primary-500/30 scale-105":"border-transparent opacity-70 hover:opacity-100"}`,children:jsx("img",{
+                  onClick:()=>setActivePhotoIdx(idx),className:`relative h-16 w-16 shrink-0 rounded-lg overflow-hidden border-2 transition-all ${activePhotoIdx===idx?"border-primary-500 ring-2 ring-primary-500/30 scale-105":"border-transparent opacity-70 hover:opacity-100"}`,children:jsx("img",{
                     src:ph,alt:"",className:"h-full w-full object-cover"
                   })
-                }))
+                },idx))
               })]
             }),r.description&&jsxs("div",{
               className:"card mt-6 p-6",children:[jsx("h2",{
@@ -3390,36 +4027,50 @@ function _x({
   return jsxs(Fragment,{
     children:[jsx(nx,{
       filters:e,onFilterChange:y,onSearch:w,onReset:j,onNavigatePrices:nav?()=>nav("prices"):void 0,onNavigateCalculator:nav?()=>nav("calculator"):void 0
+    }),jsx(PakWheelsSellCards,{
+      onPostAd:()=>nav?nav("post-ad"):void 0,
+      onInstall:()=>nav?nav("installation"):void 0
     }),jsx(ix,{
-      onSelectCategory:C
+      onSelectCategory:C,
+      onSelectCity:(cityName)=>{
+        y("city", cityName);
+        setTimeout(w, 50);
+      },
+      onSelectBrand:(brandName)=>{
+        y("brand", brandName);
+        setTimeout(w, 50);
+      }
     }),nav?jsx("div",{
-      className:"container-page my-6",children:jsxs("div",{
-        className:"flex flex-col md:flex-row items-center justify-between gap-6 rounded-3xl bg-gradient-to-r from-primary-900 via-primary-800 to-gray-900 p-6 sm:p-8 text-white shadow-xl shadow-primary-950/10 border border-primary-500/20",children:[jsxs("div",{
-          className:"flex items-start gap-4 sm:gap-5",children:[jsx("div",{
-            className:"flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary-500/20 border border-primary-400/30 text-primary-400 shadow-inner",children:jsx(Calculator,{
-              className:"h-7 w-7"
+      className:"container-page my-5",children:jsxs("div",{
+        className:"flex flex-col md:flex-row items-center justify-between gap-4 rounded-xl bg-gradient-to-r from-gray-900 via-gray-850 to-primary-950 p-5 sm:p-6 text-white shadow-md border border-gray-800",children:[jsxs("div",{
+          className:"flex items-center gap-4",children:[jsx("div",{
+            className:"flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary-500/20 border border-primary-400/30 text-primary-400 shadow-inner",children:jsx(Calculator,{
+              className:"h-6 w-6"
             })
           }),jsxs("div",{
             children:[jsxs("div",{
-              className:"inline-flex items-center gap-2 rounded-full bg-primary-500/20 border border-primary-400/30 px-3 py-0.5 text-xs font-bold text-primary-300 mb-1.5",children:[jsx(Zap,{
-                className:"h-3.5 w-3.5 fill-primary-400 text-primary-400"
+              className:"inline-flex items-center gap-1.5 rounded-full bg-primary-500/20 border border-primary-400/30 px-2.5 py-0.5 text-xs font-bold text-primary-300 mb-1",children:[jsx(Zap,{
+                className:"h-3 w-3 fill-primary-400 text-primary-400"
               }),"Instant System Sizing Tool"]
             }),jsx("h3",{
-              className:"text-xl sm:text-2xl font-extrabold text-white tracking-tight",children:"Calculate Your Solar Load in 30 Seconds"
+              className:"text-base sm:text-lg font-bold text-white tracking-tight",children:"Calculate Your Solar Load in 30 Seconds"
             }),jsx("p",{
-              className:"mt-1.5 text-xs sm:text-sm text-gray-300 max-w-xl",children:"Enter your Fans, LED Bulbs, Inverter ACs, Water Pumps (0.5 - 2 HP), Iron & Fridge. Find your required kW system size, panel count, inverter, and battery backup."
+              className:"mt-0.5 text-xs text-gray-300 max-w-xl",children:"Enter your Fans, LED Bulbs, Inverter ACs, Water Pumps, Iron & Fridge. Find your required kW system size, panel count, and battery backup."
             })]
           })]
         }),jsxs("button",{
-          onClick:()=>nav("calculator"),className:"shrink-0 inline-flex items-center gap-2.5 rounded-2xl bg-primary-500 px-6 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-primary-500/30 hover:bg-primary-400 transition-all hover:scale-105 active:scale-95",children:[jsx(Calculator,{
+          onClick:()=>nav("calculator"),className:"shrink-0 inline-flex items-center gap-2 rounded-lg bg-primary-500 px-5 py-2.5 text-xs sm:text-sm font-bold text-white shadow-xs hover:bg-primary-600 transition-all",children:[jsx(Calculator,{
             className:"h-4 w-4 text-white"
           }),"Open Load Calculator",jsx(ArrowRight,{
-            className:"h-4 w-4"
+            className:"h-3.5 w-3.5"
           })]
         })]
       })
     }):null,jsx(lx,{
-      listings:n,loading:a,error:o,totalCount:u,onSelectListing:t,onResetFilters:j,onNavigate:nav
+      listings:n,loading:a,error:o,totalCount:u,onSelectListing:t,onResetFilters:j,onNavigate:nav,currentCondition:e.condition,onConditionChange:(newCond)=>{
+        y("condition", newCond);
+        p(cnt => cnt + 1);
+      }
     }),jsx(cx,{})]
   })
 }export default function App(){

@@ -28,6 +28,7 @@ import {
   SOLAR_PRICES_DATA,
   MARKET_SUMMARY,
   TODAY_DATE_STR,
+  LAST_MIDNIGHT_UPDATE,
 } from '../data/todayPricesData';
 import { formatPrice } from '../lib/constants';
 
@@ -176,9 +177,15 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         <div className="container-page relative z-10">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
             <div className="max-w-3xl">
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-primary-500/20 border border-primary-400/30 px-3.5 py-1 text-xs font-semibold text-primary-300">
-                <Clock className="h-3.5 w-3.5 text-primary-400" />
-                Live Market Rates • Updated {TODAY_DATE_STR}
+              <div className="mb-3 flex flex-wrap items-center gap-2">
+                <div className="inline-flex items-center gap-2 rounded-full bg-primary-500/20 border border-primary-400/30 px-3.5 py-1 text-xs font-semibold text-primary-300">
+                  <Clock className="h-3.5 w-3.5 text-primary-400" />
+                  Live Market Rates • Updated Daily at 12:00 AM ({TODAY_DATE_STR})
+                </div>
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 px-3 py-1 text-xs font-semibold text-emerald-300">
+                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+                  Customer & Dealer Ad Prices Protected
+                </div>
               </div>
               <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
                 Today's Solar Prices in{' '}
@@ -247,7 +254,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
       {/* Main Content Area */}
       <div className="container-page -mt-6">
         {/* Top Category Filter Tabs Bar */}
-        <div className="rounded-2xl bg-white p-2 shadow-lg ring-1 ring-gray-200/80 mb-6">
+        <div className="rounded-2xl bg-white dark:bg-gray-900 p-2 shadow-lg ring-1 ring-gray-200/80 dark:ring-gray-800 mb-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             {categoryTabs.map((tab) => {
               const Icon = tab.icon;
@@ -260,29 +267,29 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                     setSelectedCategory(tab.id);
                     setSelectedBrand('');
                   }}
-                  className={`group relative flex items-center gap-3 rounded-xl px-4 py-3.5 text-left transition-all ${
+                  className={`group relative flex items-center gap-2.5 sm:gap-3 rounded-xl p-2.5 sm:px-4 sm:py-3.5 text-left transition-all cursor-pointer ${
                     isSelected
                       ? tab.activeBg + ' shadow-md'
-                      : 'bg-gray-50 hover:bg-gray-100 text-gray-700'
+                      : 'bg-gray-50 dark:bg-gray-800/60 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
                   }`}
                 >
                   <div
-                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-transform group-hover:scale-105 ${
+                    className={`flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-lg transition-transform group-hover:scale-105 ${
                       isSelected
                         ? 'bg-white/20 text-white'
-                        : 'bg-white text-gray-600 shadow-sm'
+                        : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 shadow-sm'
                     }`}
                   >
-                    <Icon className="h-5 w-5" strokeWidth={2.2} />
+                    <Icon className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={2.2} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-sm truncate">{tab.label}</span>
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="font-bold text-xs sm:text-sm truncate">{tab.label}</span>
                       <span
-                        className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                        className={`text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full font-bold shrink-0 ${
                           isSelected
                             ? 'bg-white/25 text-white'
-                            : 'bg-gray-200 text-gray-600'
+                            : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
                         }`}
                       >
                         {tab.count}
@@ -290,8 +297,8 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                     </div>
                     {tab.sublabel && (
                       <p
-                        className={`text-[11px] truncate mt-0.5 ${
-                          isSelected ? 'text-white/80' : 'text-gray-400'
+                        className={`text-[10px] sm:text-[11px] truncate mt-0.5 ${
+                          isSelected ? 'text-white/80' : 'text-gray-400 dark:text-gray-500'
                         }`}
                       >
                         {tab.sublabel}
@@ -305,7 +312,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         </div>
 
         {/* Filter controls & Search */}
-        <div className="rounded-2xl bg-white p-4 sm:p-5 shadow-sm ring-1 ring-gray-200/70 mb-8">
+        <div className="rounded-2xl bg-white dark:bg-gray-900 p-4 sm:p-5 shadow-sm ring-1 ring-gray-200/70 dark:ring-gray-800 mb-8">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             {/* Search Input */}
             <div className="relative flex-1">
@@ -315,12 +322,12 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search brand, model (e.g. Longi Hi-MO 7, 6kW Hybrid, Narada 100Ah, 585W)..."
-                className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-100"
+                className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 py-2.5 pl-10 pr-4 text-xs sm:text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-colors focus:border-primary-500 focus:bg-white dark:focus:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                 >
                   Clear
                 </button>
@@ -330,11 +337,11 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
             {/* Sort & Controls */}
             <div className="flex flex-wrap items-center gap-3">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-gray-500">Sort:</span>
+                <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">Sort:</span>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 focus:border-primary-500 focus:outline-none"
+                  className="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 focus:border-primary-500 focus:outline-none"
                 >
                   <option value="popular">Most Popular</option>
                   <option value="price_asc">Price: Low to High</option>
@@ -344,23 +351,23 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
               </div>
 
               {/* View Toggle */}
-              <div className="hidden sm:flex items-center rounded-xl bg-gray-100 p-1">
+              <div className="hidden sm:flex items-center rounded-xl bg-gray-100 dark:bg-gray-800 p-1">
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
+                  className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
                     viewMode === 'grid'
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-500 hover:text-gray-700'
+                      ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
                   }`}
                 >
                   Cards
                 </button>
                 <button
                   onClick={() => setViewMode('table')}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
+                  className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
                     viewMode === 'table'
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-500 hover:text-gray-700'
+                      ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
                   }`}
                 >
                   Compare Table
@@ -370,16 +377,16 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
           </div>
 
           {/* Brand Pills Filter */}
-          <div className="mt-4 pt-3 border-t border-gray-100 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
-            <span className="text-xs font-bold text-gray-400 shrink-0 uppercase tracking-wider flex items-center gap-1">
+          <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            <span className="text-xs font-bold text-gray-400 dark:text-gray-500 shrink-0 uppercase tracking-wider flex items-center gap-1">
               <Filter className="h-3 w-3" /> Brands:
             </span>
             <button
               onClick={() => setSelectedBrand('')}
-              className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
+              className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold transition-colors cursor-pointer ${
                 selectedBrand === ''
-                  ? 'bg-gray-900 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  ? 'bg-primary-500 text-white shadow-xs'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
               }`}
             >
               All Brands ({availableBrands.length})

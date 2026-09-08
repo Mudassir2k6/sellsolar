@@ -9,6 +9,9 @@ import AuthPage from './pages/AuthPage';
 import PasswordPage from './pages/PasswordPage';
 import TodayPricesPage from './pages/TodayPricesPage';
 import LoadCalculatorPage from './pages/LoadCalculatorPage';
+import SolarLoadCalculator from './components/SolarLoadCalculator';
+import FloatingPostAdButton from './components/FloatingPostAdButton';
+import CompanyMarketplacePage from './pages/CompanyMarketplacePage';
 import { applyPageSeo, parseLocation, pageToPath } from './lib/seo';
 import {
   ArrowLeft,
@@ -1356,11 +1359,42 @@ function cx(){
       ]
     })
   })
-}const ux={
-  Company:["About Us","Careers","Press","Blog"],Marketplace:["Buy Solar","Sell Solar","How It Works","Pricing"],Support:["Help Center","Contact Us","Safety Tips","Report an Issue"],Legal:["Terms of Service","Privacy Policy","Cookie Policy","Disclaimer"]
+}const FOOTER_PAGES_KEYS = [
+  "about", "careers", "press", "blog",
+  "buy-solar", "sell-solar", "how-it-works", "pricing",
+  "help", "contact", "safety", "report-issue",
+  "terms", "privacy", "cookies", "disclaimer"
+];
+
+const ux={
+  Company:[
+    { label: "About Us", page: "about" },
+    { label: "Careers", page: "careers" },
+    { label: "Press", page: "press" },
+    { label: "Blog", page: "blog" }
+  ],
+  Marketplace:[
+    { label: "Buy Solar", page: "buy-solar" },
+    { label: "Sell Solar", page: "sell-solar" },
+    { label: "How It Works", page: "how-it-works" },
+    { label: "Pricing", page: "pricing" }
+  ],
+  Support:[
+    { label: "Help Center", page: "help" },
+    { label: "Contact Us", page: "contact" },
+    { label: "Safety Tips", page: "safety" },
+    { label: "Report an Issue", page: "report-issue" }
+  ],
+  Legal:[
+    { label: "Terms of Service", page: "terms" },
+    { label: "Privacy Policy", page: "privacy" },
+    { label: "Cookie Policy", page: "cookies" },
+    { label: "Disclaimer", page: "disclaimer" }
+  ]
 },dx=[Facebook,Twitter,Instagram,Linkedin];
 function hx({
-  onPostAd:t
+  onPostAd:t,
+  onNavigate:navigate
 }){
   return jsxs("footer",{
     id:"contact",className:"bg-gray-900 text-gray-400",children:[jsx("div",{
@@ -1407,11 +1441,20 @@ function hx({
           children:[jsx("h4",{
             className:"mb-4 text-sm font-bold uppercase tracking-wide text-white",children:e
           }),jsx("ul",{
-            className:"space-y-2.5",children:r.map(n=>jsx("li",{
+            className:"space-y-2.5",children:r.map(item=>jsx("li",{
               children:jsx("a",{
-                href:"#",className:"text-sm transition-colors hover:text-white",children:n
+                href:`/${item.page}`,
+                onClick:(ev)=>{
+                  ev.preventDefault();
+                  if(navigate){
+                    navigate(item.page);
+                    window.scrollTo({top:0,behavior:"smooth"});
+                  }
+                },
+                className:"text-sm transition-colors hover:text-white cursor-pointer",
+                children:item.label
               })
-            },n))
+            },item.page))
           })]
         },e))]
       }),jsxs("div",{
@@ -3949,6 +3992,7 @@ function yx({
 function _x({
   onSelectListing:t,onNavigate:nav,initialFilters
 }){
+  const[calcOpen, setCalcOpen]=useState(false);
   const[e,r]=useState(()=>initialFilters?{...Vu,...initialFilters}:Vu),[n,s]=useState([]),[a,l]=useState(!0),[o,c]=useState(null),[u,d]=useState(0),[h,p]=useState(0),y=useCallback((g,m)=>{
     r(v=>({
       ...v,[g]:m
@@ -4042,29 +4086,64 @@ function _x({
       }
     }),nav?jsx("div",{
       className:"container-page my-5",children:jsxs("div",{
-        className:"flex flex-col md:flex-row items-center justify-between gap-4 rounded-xl bg-gradient-to-r from-gray-900 via-gray-850 to-primary-950 p-5 sm:p-6 text-white shadow-md border border-gray-800",children:[jsxs("div",{
-          className:"flex items-center gap-4",children:[jsx("div",{
-            className:"flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary-500/20 border border-primary-400/30 text-primary-400 shadow-inner",children:jsx(Calculator,{
-              className:"h-6 w-6"
+        className:"rounded-2xl bg-gradient-to-r from-gray-900 via-gray-850 to-primary-950 p-5 sm:p-6 text-white shadow-md border border-gray-800 transition-all",children:[
+          jsxs("div",{
+            className:"flex flex-col md:flex-row items-center justify-between gap-4",children:[
+              jsxs("div",{
+                className:"flex items-center gap-4",children:[jsx("div",{
+                  className:"flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary-500/20 border border-primary-400/30 text-primary-400 shadow-inner",children:jsx(Calculator,{
+                    className:"h-6 w-6"
+                  })
+                }),jsxs("div",{
+                  children:[jsxs("div",{
+                    className:"inline-flex items-center gap-1.5 rounded-full bg-primary-500/20 border border-primary-400/30 px-2.5 py-0.5 text-xs font-bold text-primary-300 mb-1",children:[jsx(Zap,{
+                      className:"h-3 w-3 fill-primary-400 text-primary-400"
+                    }),"Instant System Sizing Tool"]
+                  }),jsx("h3",{
+                    className:"text-base sm:text-lg font-bold text-white tracking-tight",children:"Calculate Your Solar Load in 30 Seconds"
+                  }),jsx("p",{
+                    className:"mt-0.5 text-xs text-gray-300 max-w-xl",children:"Enter your Fans, LED Bulbs, Inverter ACs, Water Pumps, Iron & Fridge. Find your required kW system size, panel count, and battery backup."
+                  })]
+                })]
+              }),
+              jsxs("div",{
+                className:"flex items-center gap-2.5 shrink-0 flex-wrap",children:[
+                  jsxs("button",{
+                    type:"button",
+                    onClick:()=>setCalcOpen(prev=>!prev),
+                    className:`inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-xs sm:text-sm font-bold transition-all border ${
+                      calcOpen
+                        ? "bg-gray-800 border-primary-400 text-primary-300"
+                        : "bg-primary-500 hover:bg-primary-600 border-primary-400 text-white shadow-xs"
+                    }`,
+                    children:[
+                      jsx(Calculator,{ className:"h-4 w-4" }),
+                      calcOpen ? "Hide Calculator" : "Calculate Here (Instant kW)"
+                    ]
+                  }),
+                  jsxs("button",{
+                    type:"button",
+                    onClick:()=>nav("calculator"),
+                    className:"inline-flex items-center gap-1.5 rounded-lg border border-gray-700 bg-gray-800/80 hover:bg-gray-800 px-4 py-2.5 text-xs sm:text-sm font-bold text-gray-200 transition-all",
+                    children:[
+                      "Full Page",
+                      jsx(ArrowRight,{ className:"h-3.5 w-3.5" })
+                    ]
+                  })
+                ]
+              })
+            ]
+          }),
+          calcOpen ? jsx("div",{
+            className:"mt-6 pt-6 border-t border-gray-800",
+            children: jsx(SolarLoadCalculator,{
+              compact:true,
+              showHeroBanner:false,
+              onNavigate:nav,
+              onSelectCategory:C
             })
-          }),jsxs("div",{
-            children:[jsxs("div",{
-              className:"inline-flex items-center gap-1.5 rounded-full bg-primary-500/20 border border-primary-400/30 px-2.5 py-0.5 text-xs font-bold text-primary-300 mb-1",children:[jsx(Zap,{
-                className:"h-3 w-3 fill-primary-400 text-primary-400"
-              }),"Instant System Sizing Tool"]
-            }),jsx("h3",{
-              className:"text-base sm:text-lg font-bold text-white tracking-tight",children:"Calculate Your Solar Load in 30 Seconds"
-            }),jsx("p",{
-              className:"mt-0.5 text-xs text-gray-300 max-w-xl",children:"Enter your Fans, LED Bulbs, Inverter ACs, Water Pumps, Iron & Fridge. Find your required kW system size, panel count, and battery backup."
-            })]
-          })]
-        }),jsxs("button",{
-          onClick:()=>nav("calculator"),className:"shrink-0 inline-flex items-center gap-2 rounded-lg bg-primary-500 px-5 py-2.5 text-xs sm:text-sm font-bold text-white shadow-xs hover:bg-primary-600 transition-all",children:[jsx(Calculator,{
-            className:"h-4 w-4 text-white"
-          }),"Open Load Calculator",jsx(ArrowRight,{
-            className:"h-3.5 w-3.5"
-          })]
-        })]
+          }) : null
+        ]
       })
     }):null,jsx(lx,{
       listings:n,loading:a,error:o,totalCount:u,onSelectListing:t,onResetFilters:j,onNavigate:nav,currentCondition:e.condition,onConditionChange:(newCond)=>{
@@ -4140,7 +4219,7 @@ function _x({
     }, 150);
   };
 
-  return r ? jsx("div", {
+  const pageContent = r ? jsx("div", {
     className: "flex min-h-screen items-center justify-center bg-white dark:bg-gray-950", children: jsx("div", {
       className: "flex h-12 w-12 animate-spin rounded-full border-4 border-primary-200 dark:border-primary-800 border-t-primary-500"
     })
@@ -4175,7 +4254,7 @@ function _x({
         }
       })
     }), jsx(hx, {
-      onPostAd: c
+      onPostAd: c, onNavigate: o
     })]
   }) : n === "prices" || n === "today-prices" ? jsxs("div", {
     className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
@@ -4194,7 +4273,20 @@ function _x({
         }
       })
     }), jsx(hx, {
-      onPostAd: c
+      onPostAd: c, onNavigate: o
+    })]
+  }) : FOOTER_PAGES_KEYS.includes(n) ? jsxs("div", {
+    className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
+      onNavigate: d => {
+        d === "post-ad" ? c() : d === "admin" || d === "admin-dashboard" ? t && (e != null && e.is_admin) ? o("admin-dashboard") : o("login") : d === "password" || d === "change-password" ? o("password") : o(d === "dashboard" ? t ? "dashboard" : "login" : d)
+      }, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
+    }), jsx("main", {
+      id: "main",
+      children: jsx(CompanyMarketplacePage, {
+        page: n, onNavigate: o, onPostAd: c
+      })
+    }), jsx(hx, {
+      onPostAd: c, onNavigate: o
     })]
   }) : n === "post-ad" ? t ? jsx(yx, {
     onBack: () => o("home"), onPosted: () => o("home")
@@ -4225,8 +4317,17 @@ function _x({
         onSelectListing: u, onNavigate: o, initialFilters: searchFilters
       })
     }), jsx(hx, {
-      onPostAd: c
+      onPostAd: c, onNavigate: o
     })]
-  })
+  });
+
+  const showFloatingPostBtn = !r && !pr && n !== "post-ad" && n !== "login" && n !== "password" && n !== "forgot-password" && n !== "reset-password";
+
+  return jsxs(Fragment, {
+    children: [
+      pageContent,
+      showFloatingPostBtn ? jsx(FloatingPostAdButton, { onPostAd: c }) : null
+    ]
+  });
 }
 

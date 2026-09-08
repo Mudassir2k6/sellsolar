@@ -23,25 +23,34 @@ import {
   Flame,
   ArrowUpDown,
   Filter,
+  Boxes,
+  Wrench,
+  Calendar,
+  ArrowDownRight,
+  Equal,
+  FileText,
 } from 'lucide-react';
 import {
   SOLAR_PRICES_DATA,
   MARKET_SUMMARY,
   TODAY_DATE_STR,
   LAST_MIDNIGHT_UPDATE,
+  ISLAMABAD_DAILY_SHEETS,
 } from '../data/todayPricesData';
 import { formatPrice } from '../lib/constants';
 
 export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
-  const [selectedCategory, setSelectedCategory] = useState('all'); // 'all', 'panel', 'inverter', 'battery'
+  const [selectedCategory, setSelectedCategory] = useState('all'); // 'all', 'panel', 'inverter', 'battery', 'complete_system', 'structure_accessories'
   const [selectedBrand, setSelectedBrand] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('popular'); // 'popular', 'price_asc', 'price_desc', 'name'
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'table'
+  const [dailySheetDate, setDailySheetDate] = useState('compare'); // '08-Sep-2026' | '07-Sep-2026' | 'compare'
+  const [showDailySheetDetail, setShowDailySheetDetail] = useState(true);
 
   // Calculator State
   const [calcWatts, setCalcWatts] = useState(585);
-  const [calcPanelBrandRate, setCalcPanelBrandRate] = useState(36.5);
+  const [calcPanelBrandRate, setCalcPanelBrandRate] = useState(41.6);
   const [calcSystemSizeKw, setCalcSystemSizeKw] = useState(10);
   const [calcIncludeInverter, setCalcIncludeInverter] = useState(true);
   const [calcIncludeBattery, setCalcIncludeBattery] = useState('lithium'); // 'none', 'tubular', 'lithium'
@@ -82,6 +91,24 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
       count: SOLAR_PRICES_DATA.filter((i) => i.category === 'battery').length,
       color: 'text-emerald-600',
       activeBg: 'bg-emerald-600 text-white',
+    },
+    {
+      id: 'complete_system',
+      label: 'Complete Systems',
+      sublabel: '3kW to 20kW Packages',
+      icon: Boxes,
+      count: SOLAR_PRICES_DATA.filter((i) => i.category === 'complete_system').length,
+      color: 'text-indigo-600',
+      activeBg: 'bg-indigo-600 text-white',
+    },
+    {
+      id: 'structure_accessories',
+      label: 'Structures & Wire',
+      sublabel: 'GI Frames & Cables',
+      icon: Wrench,
+      count: SOLAR_PRICES_DATA.filter((i) => i.category === 'structure_accessories').length,
+      color: 'text-slate-600',
+      activeBg: 'bg-slate-700 text-white',
     },
   ];
 
@@ -180,11 +207,11 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
               <div className="mb-3 flex flex-wrap items-center gap-2">
                 <div className="inline-flex items-center gap-2 rounded-full bg-primary-500/20 border border-primary-400/30 px-3.5 py-1 text-xs font-semibold text-primary-300">
                   <Clock className="h-3.5 w-3.5 text-primary-400" />
-                  Live Market Rates • Updated Daily at 12:00 AM ({TODAY_DATE_STR})
+                  Live Market Rates • Islamabad Ready Stock ({TODAY_DATE_STR})
                 </div>
                 <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 px-3 py-1 text-xs font-semibold text-emerald-300">
                   <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-                  Customer & Dealer Ad Prices Protected
+                  Wholesale Trade Stock Benchmark
                 </div>
               </div>
               <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
@@ -194,9 +221,8 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                 </span>
               </h1>
               <p className="mt-3 text-base text-gray-300 sm:text-lg max-w-2xl leading-relaxed">
-                Daily verified trade benchmark prices for Tier-1 Solar Panels,
-                Hybrid & On-Grid Inverters, and Lithium/Tubular Batteries across Hall
-                Road Lahore, Saddar Karachi, and Rawalpindi.
+                Daily verified trade benchmark prices for Tier-1 Solar Panels (Canadian, Aiko, Jinko, LONGi, JA Solar, Astronergy, Risen, Korean),
+                Hybrid & On-Grid Inverters, and Lithium/Tubular Batteries across Islamabad, Rawalpindi, Lahore, and Karachi.
               </p>
 
               {/* Quick Key Benchmarks */}
@@ -208,9 +234,9 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                   </span>
                 </div>
                 <div className="rounded-xl bg-white/10 backdrop-blur-md px-3.5 py-2 border border-white/10">
-                  <span className="text-gray-400 block text-[11px]">Popular Panels</span>
+                  <span className="text-gray-400 block text-[11px]">Popular Ready Stock</span>
                   <span className="text-sm font-bold text-white">
-                    Longi Hi-MO 7 / Jinko 585W
+                    Canadian 585W / Aiko / Jinko Neo / LONGi X10
                   </span>
                 </div>
                 <div className="rounded-xl bg-white/10 backdrop-blur-md px-3.5 py-2 border border-white/10">
@@ -255,7 +281,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
       <div className="container-page -mt-6">
         {/* Top Category Filter Tabs Bar */}
         <div className="rounded-2xl bg-white dark:bg-gray-900 p-2 shadow-lg ring-1 ring-gray-200/80 dark:ring-gray-800 mb-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
             {categoryTabs.map((tab) => {
               const Icon = tab.icon;
               const isSelected = selectedCategory === tab.id;
@@ -267,14 +293,14 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                     setSelectedCategory(tab.id);
                     setSelectedBrand('');
                   }}
-                  className={`group relative flex items-center gap-2.5 sm:gap-3 rounded-xl p-2.5 sm:px-4 sm:py-3.5 text-left transition-all cursor-pointer ${
+                  className={`group relative flex items-center gap-2.5 sm:gap-3 rounded-xl p-2.5 sm:px-3.5 sm:py-3 text-left transition-all cursor-pointer ${
                     isSelected
                       ? tab.activeBg + ' shadow-md'
                       : 'bg-gray-50 dark:bg-gray-800/60 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
                   }`}
                 >
                   <div
-                    className={`flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-lg transition-transform group-hover:scale-105 ${
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-transform group-hover:scale-105 ${
                       isSelected
                         ? 'bg-white/20 text-white'
                         : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 shadow-sm'
@@ -286,7 +312,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                     <div className="flex items-center justify-between gap-1">
                       <span className="font-bold text-xs sm:text-sm truncate">{tab.label}</span>
                       <span
-                        className={`text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full font-bold shrink-0 ${
+                        className={`text-[10px] sm:text-xs px-1.5 py-0.5 rounded-full font-bold shrink-0 ${
                           isSelected
                             ? 'bg-white/25 text-white'
                             : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
@@ -297,7 +323,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                     </div>
                     {tab.sublabel && (
                       <p
-                        className={`text-[10px] sm:text-[11px] truncate mt-0.5 ${
+                        className={`text-[10px] truncate mt-0.5 ${
                           isSelected ? 'text-white/80' : 'text-gray-400 dark:text-gray-500'
                         }`}
                       >
@@ -311,8 +337,222 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
           </div>
         </div>
 
+        {/* Islamabad Ready Stock Daily Sheet Verification & Date Comparison */}
+        <div className="rounded-2xl bg-gradient-to-br from-slate-900 via-primary-950 to-slate-900 text-white p-5 sm:p-6 shadow-xl ring-1 ring-white/10 mb-8">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-4">
+            <div>
+              <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/20 px-3 py-1 text-xs font-bold text-amber-300 border border-amber-500/30">
+                  <MapPin className="h-3.5 w-3.5 text-amber-400" />
+                  Islamabad Ready Stock Sheets
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-xs font-semibold text-emerald-300 border border-emerald-500/30">
+                  <CheckCircle2 className="h-3 w-3" />
+                  Verified Physical Stock
+                </span>
+                <span className="text-xs text-gray-400">
+                  College Rd, I-9 Industrial & Blue Area
+                </span>
+              </div>
+              <h2 className="text-lg sm:text-xl font-black text-white">
+                Daily Ready Stock Rates: 07-Sep vs 08-Sep Comparison
+              </h2>
+              <p className="text-xs text-gray-300 mt-0.5">
+                Compare yesterday's price sheet (07-Sep) directly with today's live trade rates (08-Sep). Click any row to inspect catalog listings.
+              </p>
+            </div>
+
+            {/* Date Selection Toggle */}
+            <div className="flex items-center gap-1.5 bg-white/10 p-1.5 rounded-xl border border-white/15 self-start md:self-auto">
+              <button
+                onClick={() => setDailySheetDate('compare')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  dailySheetDate === 'compare'
+                    ? 'bg-primary-500 text-white shadow-sm'
+                    : 'text-gray-300 hover:text-white'
+                }`}
+              >
+                07 vs 08 Difference
+              </button>
+              <button
+                onClick={() => setDailySheetDate('08-Sep-2026')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  dailySheetDate === '08-Sep-2026'
+                    ? 'bg-primary-500 text-white shadow-sm'
+                    : 'text-gray-300 hover:text-white'
+                }`}
+              >
+                08-Sep (Today)
+              </button>
+              <button
+                onClick={() => setDailySheetDate('07-Sep-2026')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  dailySheetDate === '07-Sep-2026'
+                    ? 'bg-primary-500 text-white shadow-sm'
+                    : 'text-gray-300 hover:text-white'
+                }`}
+              >
+                07-Sep (Yesterday)
+              </button>
+            </div>
+          </div>
+
+          {/* Quick Summary Highlights */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 my-4">
+            <div className="rounded-xl bg-white/5 border border-white/10 p-3">
+              <span className="text-[11px] text-gray-400 block">Canadian Solar 625W</span>
+              <div className="flex items-baseline gap-2 mt-0.5">
+                <span className="text-base font-extrabold text-white">Rs. 41.75/W</span>
+                <span className="inline-flex items-center text-xs font-bold text-emerald-400 bg-emerald-500/20 px-1.5 py-0.5 rounded">
+                  <ArrowDownRight className="h-3 w-3" /> -0.15/W
+                </span>
+              </div>
+              <span className="text-[10px] text-gray-400">Dropped from Rs. 41.90 on 07-Sep</span>
+            </div>
+
+            <div className="rounded-xl bg-white/5 border border-white/10 p-3">
+              <span className="text-[11px] text-gray-400 block">Astronergy 580W</span>
+              <div className="flex items-baseline gap-2 mt-0.5">
+                <span className="text-base font-extrabold text-white">Rs. 38.25/W</span>
+                <span className="inline-flex items-center text-xs font-bold text-emerald-400 bg-emerald-500/20 px-1.5 py-0.5 rounded">
+                  <ArrowDownRight className="h-3 w-3" /> -0.25/W
+                </span>
+              </div>
+              <span className="text-[10px] text-gray-400">Dropped from Rs. 38.50 on 07-Sep</span>
+            </div>
+
+            <div className="rounded-xl bg-white/5 border border-white/10 p-3">
+              <span className="text-[11px] text-gray-400 block">Astronergy 625W Stock</span>
+              <div className="flex items-baseline gap-2 mt-0.5">
+                <span className="text-base font-extrabold text-amber-300">Rs. 39.00/W</span>
+                <span className="inline-flex items-center text-xs font-bold text-amber-400 bg-amber-500/20 px-1.5 py-0.5 rounded">
+                  Ready Stock
+                </span>
+              </div>
+              <span className="text-[10px] text-gray-400">Dual-Glass N-Type (Rs. 24,375/plate)</span>
+            </div>
+
+            <div className="rounded-xl bg-white/5 border border-white/10 p-3">
+              <span className="text-[11px] text-gray-400 block">Aiko / Jinko / LONGi / JA</span>
+              <div className="flex items-baseline gap-2 mt-0.5">
+                <span className="text-base font-extrabold text-white">Stable Rates</span>
+                <span className="inline-flex items-center text-xs font-bold text-blue-300 bg-blue-500/20 px-1.5 py-0.5 rounded">
+                  <Equal className="h-3 w-3" /> 16 Items
+                </span>
+              </div>
+              <span className="text-[10px] text-gray-400">No change between 07-Sep & 08-Sep</span>
+            </div>
+          </div>
+
+          {/* Collapsible Sheet Table */}
+          {showDailySheetDetail && (
+            <div className="overflow-x-auto rounded-xl border border-white/10 bg-black/30">
+              <table className="w-full text-left text-xs text-gray-300">
+                <thead className="bg-white/10 text-[11px] uppercase tracking-wider text-gray-300 font-bold border-b border-white/10">
+                  <tr>
+                    <th className="px-3.5 py-2.5">Brand & Module</th>
+                    <th className="px-3 py-2.5">Wattage</th>
+                    <th className="px-3 py-2.5">07-Sep-2026</th>
+                    <th className="px-3 py-2.5">08-Sep-2026</th>
+                    <th className="px-3 py-2.5">Difference</th>
+                    <th className="px-3 py-2.5">Plate Price (Est.)</th>
+                    <th className="px-3 py-2.5 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5 font-medium">
+                  {ISLAMABAD_DAILY_SHEETS["08-Sep-2026"].rates.map((item, idx) => {
+                    const wattsNum = parseInt(item.model.replace(/\D/g, '')) || 585;
+                    const platePrice = Math.round(item.rate * wattsNum);
+                    const isAstro625 = item.brand === 'Astronergy' && item.model.includes('625');
+                    const isCanadian625 = item.brand === 'Canadian Solar' && item.model.includes('625');
+                    const isAstro580 = item.brand === 'Astronergy' && item.model.includes('580');
+
+                    return (
+                      <tr
+                        key={idx}
+                        className={`hover:bg-white/5 transition-colors ${
+                          isCanadian625 || isAstro580 ? 'bg-emerald-500/5' : isAstro625 ? 'bg-amber-500/5' : ''
+                        }`}
+                      >
+                        <td className="px-3.5 py-2.5 font-bold text-white flex items-center gap-1.5">
+                          {item.brand}
+                          {(isCanadian625 || isAstro580) && (
+                            <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1 rounded">
+                              Rate Changed
+                            </span>
+                          )}
+                          {isAstro625 && (
+                            <span className="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1 rounded">
+                              625W Stock
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-3 py-2.5 text-gray-200 font-semibold">{item.model}</td>
+                        <td className="px-3 py-2.5 text-gray-300">
+                          Rs. {item.prevRate.toFixed(2)}/W
+                        </td>
+                        <td className="px-3 py-2.5 font-bold text-amber-300">
+                          Rs. {item.rate.toFixed(2)}/W
+                        </td>
+                        <td className="px-3 py-2.5">
+                          {item.change < 0 ? (
+                            <span className="inline-flex items-center gap-0.5 text-emerald-400 font-bold">
+                              <ArrowDownRight className="h-3.5 w-3.5" />
+                              Rs. {Math.abs(item.change).toFixed(2)}/W Drop
+                            </span>
+                          ) : item.change > 0 ? (
+                            <span className="inline-flex items-center gap-0.5 text-red-400 font-bold">
+                              <TrendingUp className="h-3.5 w-3.5" />
+                              +Rs. {item.change.toFixed(2)}/W
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 text-gray-400">
+                              <Equal className="h-3 w-3" /> Stable
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-3 py-2.5 font-bold text-white">
+                          Rs. {platePrice.toLocaleString()}
+                        </td>
+                        <td className="px-3 py-2.5 text-right">
+                          <button
+                            onClick={() => {
+                              setSelectedCategory('panel');
+                              setSelectedBrand(item.brand.replace(' Solar', ''));
+                              setSearchQuery(item.model.split(' ')[0]);
+                              const target = document.getElementById('catalog-results');
+                              if (target) target.scrollIntoView({ behavior: 'smooth' });
+                            }}
+                            className="inline-flex items-center gap-1 rounded-lg bg-white/10 hover:bg-white/20 px-2.5 py-1 text-[11px] font-semibold text-white transition-colors cursor-pointer"
+                          >
+                            View Stock
+                            <ChevronRight className="h-3 w-3" />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          <div className="mt-3 flex items-center justify-between text-xs text-gray-400 pt-2 border-t border-white/10">
+            <span className="flex items-center gap-1">
+              <Clock className="h-3.5 w-3.5 text-gray-400" />
+              Verified daily at 12:00 Midnight PKT from wholesale suppliers in Islamabad.
+            </span>
+            <button
+              onClick={() => setShowDailySheetDetail(!showDailySheetDetail)}
+              className="text-primary-300 hover:text-white font-semibold cursor-pointer"
+            >
+              {showDailySheetDetail ? 'Collapse Sheet' : 'Expand 19 Models Sheet'}
+            </button>
+          </div>
+        </div>
+
         {/* Filter controls & Search */}
-        <div className="rounded-2xl bg-white dark:bg-gray-900 p-4 sm:p-5 shadow-sm ring-1 ring-gray-200/70 dark:ring-gray-800 mb-8">
+        <div id="catalog-results" className="rounded-2xl bg-white dark:bg-gray-900 p-4 sm:p-5 shadow-sm ring-1 ring-gray-200/70 dark:ring-gray-800 mb-8">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             {/* Search Input */}
             <div className="relative flex-1">
@@ -833,6 +1073,8 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
 function PriceCard({ item, onExploreMarket }) {
   const isPanel = item.category === 'panel';
   const isBattery = item.category === 'battery';
+  const isSystem = item.category === 'complete_system';
+  const isStructure = item.category === 'structure_accessories';
   const isHot = item.trend === 'hot';
   const isDrop = item.trend === 'drop';
 
@@ -889,6 +1131,30 @@ function PriceCard({ item, onExploreMarket }) {
                 </span>
               </div>
             </div>
+          ) : isSystem ? (
+            <div>
+              <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
+                Complete Turnkey Package Cost
+              </div>
+              <div className="text-xl font-extrabold text-indigo-600">
+                {formatPrice(item.unitPriceMin)} – {formatPrice(item.unitPriceMax)}
+              </div>
+              <div className="mt-1 text-[11px] text-gray-600 font-semibold">
+                Daily Generation: <span className="text-emerald-600">{item.capacity}</span>
+              </div>
+            </div>
+          ) : isStructure ? (
+            <div>
+              <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
+                Mounting & BOS Trade Rate
+              </div>
+              <div className="text-xl font-extrabold text-slate-800">
+                {formatPrice(item.unitPriceMin)} – {formatPrice(item.unitPriceMax)}
+              </div>
+              <div className="mt-1 text-[11px] text-gray-500">
+                Rating / Size: <span className="font-semibold text-gray-800">{item.capacity}</span>
+              </div>
+            </div>
           ) : (
             <div>
               <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
@@ -909,7 +1175,7 @@ function PriceCard({ item, onExploreMarket }) {
           {item.efficiency && (
             <div className="flex items-center justify-between">
               <span className="text-gray-400">
-                {isBattery ? 'Life Cycle / DoD:' : 'Efficiency:'}
+                {isBattery ? 'Life Cycle / DoD:' : isSystem ? 'Efficiency:' : isStructure ? 'Specification:' : 'Efficiency:'}
               </span>
               <span className="font-semibold text-gray-800">{item.efficiency}</span>
             </div>

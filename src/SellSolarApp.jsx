@@ -86,7 +86,7 @@ import { useAuth, DEFAULT_ADMIN_ID, DEFAULT_ADMIN_EMAIL, getStoredUsers, saveSto
 import { useToast } from './context/ToastContext';
 import { supabase } from './lib/supabase';
 import { BRANDS, CATEGORIES, CITIES, formatPrice } from './lib/constants';
-import { digitsOnlyPhone, isValidPhone, isValidUuid } from './lib/auth';
+import { digitsOnlyPhone, isValidPhone, normalizePhone, isValidUuid } from './lib/auth';
 import { getLocalOrSeedListings, getLocalOrSeedListingById } from './data/seedListings';
 import { getEquipmentFallbackImage } from './utils/solarImages';
 import ThemeRadioToggle from './components/ThemeRadioToggle';
@@ -3088,9 +3088,30 @@ function yx({
 }function wx({
   onBack:t
 }){
-  const{
-    user:e,profile:r,refreshProfile:n
-  }=useAuth(),[s,a]=useState("dashboard"),[l,o]=useState([]),[c,u]=useState([]),[d,h]=useState([]),[p,y]=useState([]),[w,j]=useState([]),[C,g]=useState(!0),[f,m]=useState(null),[v,k]=useState(null),[x,S]=useState(null),[L,z]=useState(""),[I,Y]=useState(""),[ke,ye]=useState(""),[Be,le]=useState(""),[We,Xe]=useState(""),[_,A]=useState({
+  const {
+    user: e,
+    profile: r,
+    refreshProfile: n,
+    updateProfile,
+  } = useAuth(),
+  [s, a] = useState("dashboard"),
+  [l, o] = useState([]),
+  [c, u] = useState([]),
+  [d, h] = useState([]),
+  [p, y] = useState([]),
+  [w, j] = useState([]),
+  [C, g] = useState(!0),
+  [f, m] = useState(null),
+  [v, k] = useState(null),
+  [x, S] = useState(null),
+  [L, z] = useState(""),
+  [I, Y] = useState(""),
+  [profileEmail, setProfileEmail] = useState(""),
+  [fieldErrors, setFieldErrors] = useState({ phone: "", email: "" }),
+  [ke, ye] = useState(""),
+  [Be, le] = useState(""),
+  [We, Xe] = useState(""),
+  [_, A] = useState({
     title:"",brand:BRANDS[0],category:"panel",condition:"new",price:"",city:CITIES[0],capacity_kw:"",warranty_years:"",image_url:"",description:"",seller_name:"",seller_phone:""
   }),[D,H]=useState("pending"),[X,St]=useState(""),[we,Ve]=useState(""),oe=(r==null?void 0:r.account_type)==="dealer";
   const xt = useCallback(async () => {
@@ -3182,8 +3203,19 @@ function yx({
       return
     }g(!0),m(null),xt().finally(()=>g(!1))
   },[e,xt]),useEffect(()=>{
-    r&&(z(r.full_name||""),Y(r.phone||""),ye(r.city||""),le(r.business_name||""),Xe(r.business_address||""))
-  },[r]);
+    if (r) {
+      z(r.full_name || "");
+      Y(r.phone || "");
+      ye(r.city || "");
+      le(r.business_name || "");
+      Xe(r.business_address || "");
+      const cleanInitEmail = r.email || e?.email || "";
+      setProfileEmail(cleanInitEmail.endsWith("@sellsolar.local") ? "" : cleanInitEmail);
+    } else if (e) {
+      const cleanInitEmail = e.email || "";
+      setProfileEmail(cleanInitEmail.endsWith("@sellsolar.local") ? "" : cleanInitEmail);
+    }
+  },[r,e]);
   const yr=async P=>{
     if(!confirm("Delete this listing?"))return;
     k(P);
@@ -3230,54 +3262,82 @@ function yx({
       ...te,is_read:!0
     }:te))
   },ja=async()=>{
-    if(!e)return;
+    if(!e&&!r)return;
+    m(null);
+    S(null);
+    setFieldErrors({ phone: "", email: "" });
+
+    if(!L.trim()){
+      m("Full Name is required.");
+      return;
+    }
     if(!ke.trim()){
-      m("Please select your city");
-      return
+      m("Please select your city.");
+      return;
     }
     if(oe&&!Be.trim()){
       m("Business name is required.");
-      return
+      return;
     }
     if(oe&&!We.trim()){
       m("Business address is required.");
-      return
+      return;
     }
-    if(I&&!isValidPhone(I)){
-      m("Phone number must be exactly 11 digits.");
-      return
+
+    const cleanP = normalizePhone(I);
+    if(I&&!isValidPhone(cleanP)){
+      const errMsg = "Phone number must be exactly 11 digits (e.g. 03001234567).";
+      m(errMsg);
+      setFieldErrors(prev => ({ ...prev, phone: errMsg }));
+      return;
     }
+
+    const cleanEm = profileEmail.trim().toLowerCase();
+    if(cleanEm&&!isValidEmail(cleanEm)){
+      const errMsg = "Please enter a valid email address (e.g. name@example.com).";
+      m(errMsg);
+      setFieldErrors(prev => ({ ...prev, email: errMsg }));
+      return;
+    }
+
     k("profile");
-    let targetProfileId = e.id;
-    if (!isValidUuid(targetProfileId) && e.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase()) {
-      targetProfileId = DEFAULT_ADMIN_ID;
-    }
-    if (isValidUuid(targetProfileId)) {
-      try {
-        await supabase.from("profiles").update({
-          full_name:L,phone:I||null,city:ke||null,business_name:oe?Be:null,business_address:oe?We:null
-        }).eq("id",targetProfileId);
-      } catch(err) {}
-    }
     try {
-      const users = getStoredUsers();
-      const userKey = (e.email || '').toLowerCase();
-      if (users[userKey]) {
-        users[userKey].profile = {
-          ...users[userKey].profile,
-          full_name: L,
-          phone: I || null,
-          city: ke || null,
-          business_name: oe ? Be : null,
-          business_address: oe ? We : null
-        };
-        saveStoredUsers(users);
+      if (updateProfile) {
+        await updateProfile({
+          fullName: L,
+          phone: I,
+          email: cleanEm,
+          city: ke,
+          businessName: oe ? Be : null,
+          businessAddress: oe ? We : null,
+        });
+      } else {
+        let targetProfileId = e?.id || r?.id;
+        if (!isValidUuid(targetProfileId) && (e?.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() || r?.is_admin)) {
+          targetProfileId = DEFAULT_ADMIN_ID;
+        }
+        if (isValidUuid(targetProfileId) && isSupabaseConfigured()) {
+          const upd = { full_name: L, phone: cleanP || null, city: ke || null, business_name: oe ? Be : null, business_address: oe ? We : null };
+          if (cleanEm) upd.email = cleanEm;
+          await supabase.from("profiles").update(upd).eq("id", targetProfileId);
+        }
       }
-    } catch (err) {}
-    S("Profile updated successfully");
-    await n();
-    setTimeout(()=>S(null),3e3);
-    k(null);
+      S("Profile and contact details updated successfully!");
+      if (n) await n();
+      setTimeout(() => S(null), 4000);
+    } catch (err) {
+      console.warn("Profile update error:", err);
+      const msg = err.message || "Failed to update profile. Please try again.";
+      m(msg);
+      if (msg.toLowerCase().includes("phone") || msg.toLowerCase().includes("number")) {
+        setFieldErrors(prev => ({ ...prev, phone: msg }));
+      }
+      if (msg.toLowerCase().includes("email")) {
+        setFieldErrors(prev => ({ ...prev, email: msg }));
+      }
+    } finally {
+      k(null);
+    }
   },Bt=async()=>{
     if(!e||!r)return;
     if(!_.title.trim()||!_.price.trim()){
@@ -3552,44 +3612,80 @@ function yx({
         className:"max-w-2xl",children:[jsx("h1",{
           className:"mb-1 text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white",children:"My Profile"
         }),jsx("p",{
-          className:"mb-6 text-sm text-gray-500",children:"Update your personal information"
+          className:"mb-6 text-sm text-gray-500 dark:text-gray-400",children:"Update your personal information, phone number, and email address."
         }),P(),Q(),jsxs("div",{
-          className:"card p-6",children:[jsxs("div",{
-            className:"mb-6 flex items-center gap-4",children:[jsx("div",{
-              className:"flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600",children:oe?jsx(Store,{
+          className:"card p-6 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm rounded-2xl",children:[jsxs("div",{
+            className:"mb-6 flex items-center gap-4 pb-6 border-b border-gray-100 dark:border-gray-800",children:[jsx("div",{
+              className:"flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 shadow-md",children:oe?jsx(Store,{
                 className:"h-8 w-8 text-white"
               }):jsx("span",{
-                className:"text-2xl font-bold text-white",children:L.charAt(0).toUpperCase()
+                className:"text-2xl font-bold text-white",children:(L.trim().charAt(0) || "U").toUpperCase()
               })
             }),jsxs("div",{
-              children:[jsx("h2",{
-                className:"text-lg font-bold text-gray-900",children:r==null?void 0:r.full_name
+              className:"min-w-0 flex-1",children:[jsx("h2",{
+                className:"text-lg font-bold text-gray-900 dark:text-white truncate",children:r?.full_name || L || "User Profile"
               }),jsx("p",{
-                className:"text-sm text-gray-500 font-medium",children:(r?.username||(e?.email?.endsWith('@sellsolar.local')?e.email.replace('@sellsolar.local',''):e?.email))||""
+                className:"text-sm text-gray-500 dark:text-gray-400 font-medium truncate",children:profileEmail || r?.username || (e?.email?.endsWith('@sellsolar.local')?e.email.replace('@sellsolar.local',''):e?.email) || ""
               }),oe&&jsx("span",{
-                className:`mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${r!=null&&r.is_verified_dealer?"bg-secondary-100 text-secondary-700":"bg-warning-100 text-warning-700"}`,children:r!=null&&r.is_verified_dealer?jsxs(Fragment,{
+                className:`mt-1.5 inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ${r!=null&&r.is_verified_dealer?"bg-secondary-100 text-secondary-700 dark:bg-secondary-950/60 dark:text-secondary-400":"bg-warning-100 text-warning-700 dark:bg-warning-950/60 dark:text-warning-400"}`,children:r!=null&&r.is_verified_dealer?jsxs(Fragment,{
                   children:[jsx(BadgeCheck,{
-                    className:"h-3 w-3"
+                    className:"h-3.5 w-3.5"
                   })," Verified Dealer"]
-                }):"Pending Verification"
+                }):"Pending Dealer Verification"
               })]
             })]
           }),jsxs("div",{
             className:"space-y-4",children:[jsxs("div",{
               children:[jsx("label",{
-                className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"Full Name"
+                className:"mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-200",children:"Full Name *"
               }),jsx("input",{
-                type:"text",value:L,onChange:T=>z(T.target.value),className:"input-field"
+                type:"text",value:L,onChange:T=>z(T.target.value),placeholder:"Enter your full name",className:"input-field"
+              })]
+            }),jsxs("div",{
+              children:[jsxs("div",{
+                className:"flex items-center justify-between mb-1.5",children:[jsx("label",{
+                  className:"block text-sm font-semibold text-gray-700 dark:text-gray-200",children:"Email Address"
+                }),jsx("span",{
+                  className:"text-xs text-gray-400 dark:text-gray-500",children:"Account & Login Email"
+                })]
+              }),jsxs("div",{
+                className:"relative",children:[jsx(Mail,{
+                  className:"pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"
+                }),jsx("input",{
+                  type:"email",value:profileEmail,onChange:T=>{
+                    setProfileEmail(T.target.value);
+                    if(fieldErrors.email)setFieldErrors(prev=>({...prev,email:""}));
+                  },placeholder:"yourname@example.com",className:`input-field pl-10 ${fieldErrors.email?"border-error-500 focus:ring-error-500":""}`
+                })]
+              }),fieldErrors.email?jsxs("p",{
+                className:"mt-1.5 text-xs text-error-600 dark:text-error-400 font-medium flex items-center gap-1",children:[jsx(CircleAlert,{className:"h-3.5 w-3.5 shrink-0"}),fieldErrors.email]
+              }):jsx("p",{
+                className:"mt-1 text-xs text-gray-500 dark:text-gray-400",children:"System checks if email is already registered with another account before updating."
+              })]
+            }),jsxs("div",{
+              children:[jsxs("div",{
+                className:"flex items-center justify-between mb-1.5",children:[jsx("label",{
+                  className:"block text-sm font-semibold text-gray-700 dark:text-gray-200",children:"Phone Number (11 Digits) *"
+                }),jsx("span",{
+                  className:"text-xs font-mono text-gray-400 dark:text-gray-500",children:`${normalizePhone(I).length}/11`
+                })]
+              }),jsxs("div",{
+                className:"relative",children:[jsx(Phone,{
+                  className:"pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"
+                }),jsx("input",{
+                  type:"tel",inputMode:"numeric",maxLength:11,value:I,onChange:T=>{
+                    Y(digitsOnlyPhone(T.target.value));
+                    if(fieldErrors.phone)setFieldErrors(prev=>({...prev,phone:""}));
+                  },placeholder:"03001234567",className:`input-field pl-10 font-mono tracking-wide ${fieldErrors.phone?"border-error-500 focus:ring-error-500":""}`
+                })]
+              }),fieldErrors.phone?jsxs("p",{
+                className:"mt-1.5 text-xs text-error-600 dark:text-error-400 font-medium flex items-center gap-1",children:[jsx(CircleAlert,{className:"h-3.5 w-3.5 shrink-0"}),fieldErrors.phone]
+              }):jsx("p",{
+                className:"mt-1 text-xs text-gray-500 dark:text-gray-400",children:"Pakistani phone number (03xxxxxxxxx). Verified for duplicate prevention."
               })]
             }),jsxs("div",{
               children:[jsx("label",{
-                className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"Phone"
-              }),jsx("input",{
-                type:"tel",inputMode:"numeric",maxLength:11,value:I,onChange:T=>Y(digitsOnlyPhone(T.target.value)),placeholder:"03001234567",className:"input-field"
-              })]
-            }),jsxs("div",{
-              children:[jsx("label",{
-                className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"City *"
+                className:"mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-200",children:"City *"
               }),jsxs("select",{
                 value:ke,onChange:T=>ye(T.target.value),className:"input-field",children:[jsx("option",{
                   value:"",children:"Select city"
@@ -3600,23 +3696,27 @@ function yx({
             }),oe&&jsxs(Fragment,{
               children:[jsxs("div",{
                 children:[jsx("label",{
-                  className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"Business Name *"
+                  className:"mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-200",children:"Business Name *"
                 }),jsx("input",{
-                  type:"text",value:Be,onChange:T=>le(T.target.value),className:"input-field"
+                  type:"text",value:Be,onChange:T=>le(T.target.value),placeholder:"Your company or shop name",className:"input-field"
                 })]
               }),jsxs("div",{
                 children:[jsx("label",{
-                  className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"Business Address *"
+                  className:"mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-200",children:"Business Address *"
                 }),jsx("input",{
-                  type:"text",value:We,onChange:T=>Xe(T.target.value),className:"input-field"
+                  type:"text",value:We,onChange:T=>Xe(T.target.value),placeholder:"Shop / Office address",className:"input-field"
                 })]
               })]
-            }),jsxs("button",{
-              onClick:ja,disabled:v==="profile",className:"btn-primary",children:[v==="profile"?jsx(LoaderCircle,{
-                className:"h-4 w-4 animate-spin"
-              }):jsx(CircleCheckBig,{
-                className:"h-4 w-4"
-              }),"Save Changes"]
+            }),jsxs("div",{
+              className:"pt-2 flex flex-col sm:flex-row sm:items-center gap-3",children:[jsxs("button",{
+                onClick:ja,disabled:v==="profile",className:"btn-primary inline-flex items-center justify-center gap-2 min-w-[160px]",children:[v==="profile"?jsx(LoaderCircle,{
+                  className:"h-4 w-4 animate-spin"
+                }):jsx(CircleCheckBig,{
+                  className:"h-4 w-4"
+                }),v==="profile"?"Saving Changes...":"Save Changes"]
+              }),jsx("span",{
+                className:"text-xs text-gray-500 dark:text-gray-400",children:"All checks will run automatically before saving."
+              })]
             })]
           })]
         })]

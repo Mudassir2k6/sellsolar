@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { normalizePhone, isValidUuid, generateUuid } from '../lib/auth';
+import { normalizePhone, isValidPhone, isValidEmail, isValidUuid, generateUuid } from '../lib/auth';
 
 const AuthContext = createContext(null);
 
@@ -628,6 +628,303 @@ export function AuthProvider({ children }) {
     [user?.email]
   );
 
+  const updateProfile = useCallback(
+    async ({
+      fullName,
+      phone,
+      email,
+      city,
+      businessName = null,
+      businessAddress = null,
+    }) => {
+      const currentUserId = user?.id || profile?.id;
+      if (!currentUserId) {
+        throw new Error('You must be logged in to update your profile.');
+      }
+
+      const cleanFullName = (fullName || '').trim();
+      if (!cleanFullName) {
+        throw new Error('Full Name is required.');
+      }
+
+      const cleanCity = (city || '').trim();
+      if (!cleanCity) {
+        throw new Error('Please select your city.');
+      }
+
+      const isDealer = (profile?.account_type || user?.user_metadata?.account_type) === 'dealer';
+      if (isDealer) {
+        if (!businessName || !businessName.trim()) {
+          throw new Error('Business Name is required for dealer accounts.');
+        }
+        if (!businessAddress || !businessAddress.trim()) {
+          throw new Error('Business Address is required for dealer accounts.');
+        }
+      }
+
+      const currentEmail = (profile?.email || user?.email || '').toLowerCase();
+      const currentPhone = normalizePhone(profile?.phone || user?.user_metadata?.phone || '');
+
+      // Clean and validate phone
+      const rawPhone = (phone || '').trim();
+      const cleanPhone = normalizePhone(rawPhone);
+      if (rawPhone && !isValidPhone(cleanPhone)) {
+        throw new Error('Phone number must be exactly 11 digits (e.g. 03001234567).');
+      }
+
+      // Clean and validate email
+      const rawEmail = (email || '').trim().toLowerCase();
+      const isLocalPlaceholder = currentEmail.endsWith('@sellsolar.local');
+      const cleanEmail = rawEmail || (!isLocalPlaceholder ? currentEmail : '');
+
+      if (cleanEmail && !cleanEmail.endsWith('@sellsolar.local')) {
+        if (!isValidEmail(cleanEmail)) {
+          throw new Error('Please enter a valid email address (e.g. name@example.com).');
+        }
+      }
+
+      // 1. CHECK IF PHONE ALREADY EXISTS IN SYSTEM
+      if (cleanPhone && cleanPhone !== currentPhone) {
+        // Live Supabase check
+        if (isSupabaseConfigured()) {
+          try {
+            const { data: existingPhones, error: phoneErr } = await supabase
+              .from('profiles')
+              .select('id, email, phone, full_name')
+              .eq('phone', cleanPhone);
+
+            if (!phoneErr && existingPhones && existingPhones.length > 0) {
+              const conflict = existingPhones.find(
+                (p) => p.id !== currentUserId && p.email?.toLowerCase() !== currentEmail
+              );
+              if (conflict) {
+                throw new Error(
+                  `Yeh Phone Number (${cleanPhone}) pehle se registered hai (${conflict.full_name || 'User'}). Baraye meherbani doosra number darj karein.`
+                );
+              }
+            }
+          } catch (err) {
+            if (err.message && err.message.includes('pehle se registered')) throw err;
+          }
+        }
+
+        // Local storage check
+        const localUsers = getStoredUsers();
+        for (const [key, val] of Object.entries(localUsers)) {
+          const prof = val?.profile;
+          if (!prof) continue;
+          const profPhone = normalizePhone(prof.phone || '');
+          const profId = prof.id || val.user?.id;
+          const isOwnAccount =
+            profId === currentUserId ||
+            (currentEmail && key.toLowerCase() === currentEmail) ||
+            (currentEmail && prof.email?.toLowerCase() === currentEmail);
+
+          if (!isOwnAccount && profPhone && profPhone === cleanPhone) {
+            throw new Error(
+              `Yeh Phone Number (${cleanPhone}) pehle se kisi doosray account ke sath registered hai. Baraye meherbani doosra phone number use karein.`
+            );
+          }
+        }
+      }
+
+      // 2. CHECK IF EMAIL ALREADY EXISTS IN SYSTEM
+      if (cleanEmail && cleanEmail !== currentEmail && !cleanEmail.endsWith('@sellsolar.local')) {
+        // Live Supabase check
+        if (isSupabaseConfigured()) {
+          try {
+            const { data: existingEmails, error: emailErr } = await supabase
+              .from('profiles')
+              .select('id, email, full_name')
+              .ilike('email', cleanEmail);
+
+            if (!emailErr && existingEmails && existingEmails.length > 0) {
+              const conflict = existingEmails.find(
+                (p) => p.id !== currentUserId
+              );
+              if (conflict) {
+                throw new Error(
+                  `Yeh Email (${cleanEmail}) pehle se kisi doosray account ke sath registered hai. Baraye meherbani doosri email darj karein.`
+                );
+              }
+            }
+          } catch (err) {
+            if (err.message && err.message.includes('pehle se')) throw err;
+          }
+        }
+
+        // Local storage check
+        const localUsers = getStoredUsers();
+        for (const [key, val] of Object.entries(localUsers)) {
+          const prof = val?.profile;
+          const profId = prof?.id || val.user?.id;
+          const isOwnAccount =
+            profId === currentUserId ||
+            (currentEmail && key.toLowerCase() === currentEmail) ||
+            (currentEmail && prof?.email?.toLowerCase() === currentEmail);
+
+          const storedEmail = (prof?.email || val.user?.email || key).toLowerCase();
+          if (!isOwnAccount && storedEmail === cleanEmail) {
+            throw new Error(
+              `Yeh Email (${cleanEmail}) pehle se kisi doosray account ke sath registered hai. Baraye meherbani doosri email darj karein.`
+            );
+          }
+        }
+      }
+
+      // 3. PERSIST CHANGES
+      let targetProfileId = currentUserId;
+      const isAdminAccount =
+        currentEmail === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
+        user?.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
+        profile?.is_admin;
+
+      if (!isValidUuid(targetProfileId) && isAdminAccount) {
+        targetProfileId = DEFAULT_ADMIN_ID;
+      }
+
+      const finalEmail = cleanEmail || currentEmail;
+
+      // Update Supabase
+      if (isSupabaseConfigured()) {
+        if (cleanEmail && cleanEmail !== currentEmail && !cleanEmail.endsWith('@sellsolar.local')) {
+          try {
+            await supabase.auth.updateUser({ email: cleanEmail });
+          } catch (authErr) {
+            console.warn('Supabase auth email update notice:', authErr);
+          }
+        }
+
+        if (isValidUuid(targetProfileId)) {
+          try {
+            const profilePayload = {
+              full_name: cleanFullName,
+              phone: cleanPhone || null,
+              city: cleanCity || null,
+              business_name: isDealer ? (businessName?.trim() || null) : null,
+              business_address: isDealer ? (businessAddress?.trim() || null) : null,
+            };
+            if (finalEmail && !finalEmail.endsWith('@sellsolar.local')) {
+              profilePayload.email = finalEmail;
+            }
+
+            const { error: dbUpdateErr } = await supabase
+              .from('profiles')
+              .update(profilePayload)
+              .eq('id', targetProfileId);
+
+            if (dbUpdateErr) {
+              console.warn('Supabase profile update warning:', dbUpdateErr);
+              if (
+                dbUpdateErr.code === '23505' ||
+                dbUpdateErr.message?.includes('unique') ||
+                dbUpdateErr.message?.includes('profiles_phone_unique') ||
+                dbUpdateErr.message?.includes('profiles_email_unique')
+              ) {
+                if (dbUpdateErr.message?.includes('phone') || dbUpdateErr.message?.includes('profiles_phone_unique')) {
+                  throw new Error(`Yeh Phone Number (${cleanPhone}) pehle se system mein kisi account ke sath registered hai.`);
+                }
+                throw new Error(`Yeh Email (${finalEmail}) pehle se system mein kisi account ke sath registered hai.`);
+              }
+            }
+          } catch (dbErr) {
+            if (dbErr.message && dbErr.message.includes('pehle se')) {
+              throw dbErr;
+            }
+          }
+        }
+      }
+
+      // Update listings seller_name/seller_phone in local cache if present
+      try {
+        const raw = localStorage.getItem('sellsolar_custom_listings');
+        if (raw) {
+          const listings = JSON.parse(raw);
+          if (Array.isArray(listings)) {
+            let updatedListings = false;
+            const modifiedList = listings.map(item => {
+              if (item.user_id === targetProfileId || (item.seller_phone && item.seller_phone === currentPhone)) {
+                updatedListings = true;
+                return {
+                  ...item,
+                  seller_name: cleanFullName,
+                  seller_phone: cleanPhone || item.seller_phone,
+                };
+              }
+              return item;
+            });
+            if (updatedListings) {
+              localStorage.setItem('sellsolar_custom_listings', JSON.stringify(modifiedList));
+            }
+          }
+        }
+      } catch {}
+
+      // Build updated models
+      const updatedProfile = {
+        ...(profile || {}),
+        id: targetProfileId,
+        full_name: cleanFullName,
+        phone: cleanPhone || null,
+        email: finalEmail,
+        city: cleanCity || null,
+        business_name: isDealer ? (businessName?.trim() || null) : null,
+        business_address: isDealer ? (businessAddress?.trim() || null) : null,
+      };
+
+      const updatedUser = user ? {
+        ...user,
+        id: targetProfileId,
+        email: finalEmail,
+        user_metadata: {
+          ...(user.user_metadata || {}),
+          full_name: cleanFullName,
+          phone: cleanPhone || null,
+        },
+      } : {
+        id: targetProfileId,
+        email: finalEmail,
+        user_metadata: { full_name: cleanFullName, phone: cleanPhone || null },
+      };
+
+      // Update in Local Storage
+      const localUsers = getStoredUsers();
+      const oldKey = currentEmail.toLowerCase();
+      const newKey = finalEmail.toLowerCase();
+      const currentEntry = localUsers[oldKey] || localUsers[targetProfileId] || {};
+      const updatedEntry = {
+        ...currentEntry,
+        user: updatedUser,
+        profile: updatedProfile,
+      };
+
+      localUsers[newKey] = updatedEntry;
+      if (oldKey && oldKey !== newKey) {
+        delete localUsers[oldKey];
+      }
+      if (updatedProfile.username) {
+        localUsers[updatedProfile.username.toLowerCase()] = updatedEntry;
+      }
+      if (cleanPhone) {
+        localUsers[cleanPhone] = updatedEntry;
+      }
+      if (currentPhone && currentPhone !== cleanPhone && localUsers[currentPhone]) {
+        delete localUsers[currentPhone];
+      }
+      saveStoredUsers(localUsers);
+
+      // Save to active session
+      saveStoredSession({ user: updatedUser, profile: updatedProfile });
+
+      // Update React state
+      setUser(updatedUser);
+      setProfile(updatedProfile);
+
+      return { success: true, user: updatedUser, profile: updatedProfile };
+    },
+    [user, profile]
+  );
+
   const signOut = useCallback(async () => {
     if (isSupabaseConfigured()) {
       try {
@@ -652,10 +949,11 @@ export function AuthProvider({ children }) {
       signIn,
       signUp,
       updatePassword,
+      updateProfile,
       refreshProfile,
       completePasswordRecovery,
     }),
-    [user, profile, loading, passwordRecovery, signOut, signIn, signUp, updatePassword, refreshProfile, completePasswordRecovery]
+    [user, profile, loading, passwordRecovery, signOut, signIn, signUp, updatePassword, updateProfile, refreshProfile, completePasswordRecovery]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

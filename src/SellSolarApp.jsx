@@ -2237,11 +2237,23 @@ function yx({
               className:"absolute right-0 mt-2 w-64 animate-slide-down rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 py-2 shadow-2xl z-50",
               children:[
                 jsxs("div",{
-                  className:"border-b border-gray-100 dark:border-gray-800 px-4 py-3",
+                  onClick:()=>{ y("profile"); },
+                  role:"button",
+                  tabIndex:0,
+                  title:"View Profile",
+                  className:"border-b border-gray-100 dark:border-gray-800 px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors group",
                   children:[
-                    jsx("p",{
-                      className:"text-sm font-bold text-gray-900 dark:text-white truncate",
-                      children:(h==null?void 0:h.full_name)||"User"
+                    jsxs("div",{
+                      className:"flex items-center justify-between",
+                      children:[
+                        jsx("p",{
+                          className:"text-sm font-bold text-gray-900 dark:text-white truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors",
+                          children:(h==null?void 0:h.full_name)||"User"
+                        }),
+                        jsx(ChevronRight,{
+                          className:"h-4 w-4 text-gray-400 group-hover:text-primary-500 group-hover:translate-x-0.5 transition-all"
+                        })
+                      ]
                     }),
                     jsx("p",{
                       className:"truncate text-xs text-gray-500 dark:text-gray-400",
@@ -2336,15 +2348,27 @@ function yx({
     }),jsxs("div",{
       className:"flex",children:[jsxs("aside",{
         className:`fixed left-0 top-16 z-30 h-[calc(100vh-4rem)] w-64 overflow-y-auto border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 transition-transform duration-300 lg:sticky lg:translate-x-0 ${c?"translate-x-0":"-translate-x-full"}`,children:[jsxs("nav",{
-          className:"flex flex-col gap-0.5 p-3",children:[jsx("div",{
-            className:"mb-3 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-850 p-3 border border-gray-100 dark:border-gray-700/60",children:jsxs("div",{
+          className:"flex flex-col gap-0.5 p-3",children:[jsxs("button",{
+            type:"button",
+            onClick:()=>y("profile"),
+            title:"Edit Profile",
+            className:"w-full text-left mb-3 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-850 p-3 border border-gray-200 dark:border-gray-700/60 hover:border-primary-300 dark:hover:border-primary-600 hover:shadow-sm transition-all cursor-pointer group",
+            children:[jsxs("div",{
               className:"flex items-center gap-3",children:[jsx("div",{
-                className:"flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 shadow-md",children:jsx("span",{
+                className:"flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 shadow-md group-hover:scale-105 transition-transform",children:jsx("span",{
                   className:"text-lg font-bold text-white",children:((h==null?void 0:h.full_name)||(d==null?void 0:d.email)||"U").charAt(0).toUpperCase()
                 })
               }),jsxs("div",{
-                className:"min-w-0 flex-1",children:[jsx("p",{
-                  className:"truncate text-sm font-bold text-gray-900 dark:text-white",children:(h==null?void 0:h.full_name)||"User"
+                className:"min-w-0 flex-1",children:[jsxs("div",{
+                  className:"flex items-center justify-between",
+                  children:[
+                    jsx("p",{
+                      className:"truncate text-sm font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors",children:(h==null?void 0:h.full_name)||"User"
+                    }),
+                    jsx(ChevronRight,{
+                      className:"h-3.5 w-3.5 text-gray-400 group-hover:text-primary-500 group-hover:translate-x-0.5 transition-all shrink-0"
+                    })
+                  ]
                 }),jsx("p",{
                   className:"truncate text-xs text-gray-500 dark:text-gray-400",children:(h?.username||(d?.email?.endsWith('@sellsolar.local')?d.email.replace('@sellsolar.local',''):d?.email))||""
                 }),jsxs("div",{
@@ -2359,7 +2383,7 @@ function yx({
                   })]
                 })]
               })]
-            })
+            })]
           }),jsxs("div",{
             className:"mb-2 flex items-center gap-2 px-3 py-2 text-xs font-bold uppercase tracking-wider text-gray-400",children:[jsx(l,{
               className:"h-3.5 w-3.5"
@@ -3318,9 +3342,9 @@ function yx({
   },Fs=l.filter(P=>P.status==="draft"),b=l.filter(P=>P.status==="pending"),O=l.filter(P=>P.status==="approved"),q=l.filter(P=>P.status==="rejected"),V=l.filter(P=>P.is_sold),_a=l.reduce((P,Q)=>P+(Q.views||0),0),Bs=p.filter(P=>!P.is_read),Mf=[{
     id:"dashboard",label:"Dashboard",icon:LayoutDashboard
   },{
-    id:"profile",label:"EyeOff Profile",icon:User
+    id:"profile",label:"My Profile",icon:User
   },{
-    id:"products",label:"EyeOff Products",icon:Tag,badge:l.length
+    id:"products",label:"My Products",icon:Tag,badge:l.length
   },{
     id:"add-product",label:"Add Product",icon:CirclePlus
   },{
@@ -3444,45 +3468,81 @@ function yx({
     switch(s){
       case"dashboard":return jsxs("div",{
         children:[jsxs("div",{
-          className:"mb-6",children:[jsxs("h1",{
-            className:"text-2xl font-extrabold tracking-tight text-gray-900",children:["Welcome, ",((de=r==null?void 0:r.full_name)==null?void 0:de.split(" ")[0])||"User","!"]
-          }),jsxs("p",{
-            className:"mt-1 text-sm text-gray-500",children:[oe?"Dealer Dashboard":"Seller Dashboard"," — manage your products and enquiries."]
+          className:"mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between",children:[jsxs("div",{
+            children:[jsxs("h1",{
+              className:"text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white",children:["Welcome, ",((de=r==null?void 0:r.full_name)==null?void 0:de.split(" ")[0])||"User","!"]
+            }),jsxs("p",{
+              className:"mt-1 text-sm text-gray-500 dark:text-gray-400",children:[oe?"Dealer Dashboard":"Seller Dashboard"," — manage your products and enquiries."]
+            })]
+          }),jsxs("div",{
+            className:"flex items-center gap-2",children:[jsxs("button",{
+              type:"button",
+              onClick:()=>a("add-product"),
+              className:"btn-primary text-sm py-2 px-3.5 shadow-sm inline-flex items-center gap-1.5",
+              children:[jsx(CirclePlus,{ className:"h-4 w-4" }),"Add Product"]
+            }),jsxs("button",{
+              type:"button",
+              onClick:()=>a("products"),
+              className:"btn-ghost text-sm py-2 px-3.5 border border-gray-200 dark:border-gray-700 inline-flex items-center gap-1.5",
+              children:[jsx(Tag,{ className:"h-4 w-4" }),"My Products"]
+            })]
           })]
         }),P(),Q(),jsx("div",{
           className:"grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4",children:[{
-            label:"All Products",value:l.length,icon:Tag,color:"text-primary-500 bg-primary-50"
+            label:"All Products",value:l.length,icon:Tag,color:"text-primary-500 bg-primary-50 dark:bg-primary-950/50",tab:"products",hint:"Click to view listings"
           },{
-            label:"Approved",value:O.length,icon:CircleCheckBig,color:"text-secondary-500 bg-secondary-50"
+            label:"Approved",value:O.length,icon:CircleCheckBig,color:"text-secondary-500 bg-secondary-50 dark:bg-secondary-950/50",tab:"approved",hint:"Live on site"
           },{
-            label:"Pending",value:b.length,icon:Clock,color:"text-warning-500 bg-warning-50"
+            label:"Pending",value:b.length,icon:Clock,color:"text-warning-500 bg-warning-50 dark:bg-warning-950/50",tab:"pending",hint:"Awaiting approval"
           },{
-            label:"Rejected",value:q.length,icon:CircleX,color:"text-error-500 bg-error-50"
+            label:"Rejected",value:q.length,icon:CircleX,color:"text-error-500 bg-error-50 dark:bg-error-950/50",tab:"rejected",hint:"Needs review"
           },{
-            label:"Sold",value:V.length,icon:DollarSign,color:"text-gray-600 bg-gray-100"
+            label:"Sold",value:V.length,icon:DollarSign,color:"text-gray-600 bg-gray-100 dark:bg-gray-800",tab:"sold",hint:"Completed sales"
           },{
-            label:"Favorites",value:d.length,icon:Heart,color:"text-error-500 bg-error-50"
+            label:"Favorites",value:d.length,icon:Heart,color:"text-error-500 bg-error-50 dark:bg-error-950/50",tab:"favorites",hint:"Saved items"
           },{
-            label:"Enquiries",value:c.length,icon:MessageSquare,color:"text-accent-500 bg-accent-50"
+            label:"Enquiries",value:c.length,icon:MessageSquare,color:"text-accent-500 bg-accent-50 dark:bg-accent-950/50",tab:"enquiries",hint:"Buyer messages"
           },{
-            label:"Total Views",value:_a,icon:TrendingUp,color:"text-primary-500 bg-primary-50"
+            label:"Total Views",value:_a,icon:TrendingUp,color:"text-primary-500 bg-primary-50 dark:bg-primary-950/50",tab:"products",hint:"Listing impressions"
           }].map(T=>{
             const vt=T.icon;
-            return jsxs("div",{
-              className:"card p-4",children:[jsx("div",{
-                className:`mb-2 flex h-10 w-10 items-center justify-center rounded-xl ${T.color}`,children:jsx(vt,{
-                  className:"h-5 w-5"
+            return jsxs("button",{
+              key:T.label,
+              type:"button",
+              onClick:()=>a(T.tab),
+              title:`View ${T.label}`,
+              className:"card p-4 text-left transition-all duration-200 hover:shadow-lg hover:border-primary-300 dark:hover:border-primary-600 hover:-translate-y-0.5 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-primary-500/30",
+              children:[
+                jsxs("div",{
+                  className:"flex items-center justify-between mb-2",
+                  children:[
+                    jsx("div",{
+                      className:`flex h-10 w-10 items-center justify-center rounded-xl ${T.color} transition-transform group-hover:scale-110`,
+                      children:jsx(vt,{ className:"h-5 w-5" })
+                    }),
+                    jsx(ChevronRight,{
+                      className:"h-4 w-4 text-gray-300 dark:text-gray-600 group-hover:text-primary-500 group-hover:translate-x-0.5 transition-all"
+                    })
+                  ]
+                }),
+                jsx("div",{
+                  className:"text-2xl font-extrabold text-gray-900 dark:text-white",
+                  children:T.value
+                }),
+                jsx("div",{
+                  className:"text-xs font-bold text-gray-700 dark:text-gray-200 mt-0.5",
+                  children:T.label
+                }),
+                jsx("div",{
+                  className:"text-[11px] text-gray-400 dark:text-gray-500 mt-0.5 group-hover:text-primary-500 dark:group-hover:text-primary-400 transition-colors",
+                  children:T.hint
                 })
-              }),jsx("div",{
-                className:"text-2xl font-extrabold text-gray-900",children:T.value
-              }),jsx("div",{
-                className:"text-xs font-medium text-gray-500",children:T.label
-              })]
-            },T.label)
+              ]
+            })
           })
         }),b.length>0&&jsxs("div",{
           className:"mt-8",children:[jsx("h2",{
-            className:"mb-4 text-lg font-bold text-gray-900",children:"Awaiting Approval"
+            className:"mb-4 text-lg font-bold text-gray-900 dark:text-white",children:"Awaiting Approval"
           }),jsx("div",{
             className:"space-y-3",children:b.map(fc)
           })]
@@ -3490,7 +3550,7 @@ function yx({
       });
       case"profile":return jsxs("div",{
         className:"max-w-2xl",children:[jsx("h1",{
-          className:"mb-1 text-2xl font-extrabold tracking-tight text-gray-900",children:"EyeOff Profile"
+          className:"mb-1 text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white",children:"My Profile"
         }),jsx("p",{
           className:"mb-6 text-sm text-gray-500",children:"Update your personal information"
         }),P(),Q(),jsxs("div",{
@@ -3696,7 +3756,7 @@ function yx({
                   H("draft"),Bt()
                 },disabled:v==="add-product",className:"btn-ghost flex-1",children:[jsx(FilePen,{
                   className:"h-4 w-4"
-                }),"Save Bell Draft"]
+                }),"Save as Draft"]
               })]
             })]
           })

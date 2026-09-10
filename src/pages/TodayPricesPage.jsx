@@ -45,8 +45,10 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('popular'); // 'popular', 'price_asc', 'price_desc', 'name'
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'table'
-  const [dailySheetDate, setDailySheetDate] = useState('compare'); // '08-Sep-2026' | '07-Sep-2026' | 'compare'
+  const [dailySheetDate, setDailySheetDate] = useState('07-Sep-2026'); // '07-Sep-2026' | '08-Sep-2026' | 'compare'
   const [showDailySheetDetail, setShowDailySheetDetail] = useState(true);
+  const [sheetSearchQuery, setSheetSearchQuery] = useState('');
+  const [sheetFilterStatus, setSheetFilterStatus] = useState('all'); // 'all' | 'changed' | 'canadian' | 'astronergy' | 'aiko'
 
   // Calculator State
   const [calcWatts, setCalcWatts] = useState(585);
@@ -169,6 +171,28 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
 
     return result;
   }, [selectedCategory, selectedBrand, searchQuery, sortBy]);
+
+  // Filtered Islamabad Daily Sheet Rates
+  const displayedSheetRates = useMemo(() => {
+    const isYesterday = dailySheetDate === '07-Sep-2026';
+    const activeData = isYesterday
+      ? ISLAMABAD_DAILY_SHEETS['07-Sep-2026']?.rates || []
+      : ISLAMABAD_DAILY_SHEETS['08-Sep-2026']?.rates || [];
+
+    return activeData.filter((item) => {
+      if (sheetFilterStatus === 'changed' && item.change === 0) return false;
+      if (sheetFilterStatus === 'canadian' && !item.brand.toLowerCase().includes('canadian')) return false;
+      if (sheetFilterStatus === 'astronergy' && !item.brand.toLowerCase().includes('astronergy')) return false;
+      if (sheetFilterStatus === 'aiko' && !item.brand.toLowerCase().includes('aiko')) return false;
+
+      if (!sheetSearchQuery) return true;
+      const q = sheetSearchQuery.toLowerCase().trim();
+      return (
+        item.brand.toLowerCase().includes(q) ||
+        item.model.toLowerCase().includes(q)
+      );
+    });
+  }, [dailySheetDate, sheetFilterStatus, sheetSearchQuery]);
 
   // Quick Calculator logic
   const calculatedPanelCost = calcWatts * calcPanelBrandRate;
@@ -338,213 +362,263 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         </div>
 
         {/* Islamabad Ready Stock Daily Sheet Verification & Date Comparison */}
-        <div className="rounded-2xl bg-gradient-to-br from-slate-900 via-primary-950 to-slate-900 text-white p-5 sm:p-6 shadow-xl ring-1 ring-white/10 mb-8">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-4">
+        <div className="rounded-2xl bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-5 sm:p-6 shadow-sm border border-gray-200/90 dark:border-gray-800 mb-8 transition-colors">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 dark:bg-amber-400/10 px-3.5 py-1 text-xs font-bold text-amber-800 dark:text-amber-300 border border-amber-500/30 mb-3 shadow-2xs">
+            <MapPin className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+            Islamabad Ready Stock Sheet • Verified Available Stock (07-Sep-2026)
+          </span>
+
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200 dark:border-gray-800 pb-4">
             <div>
               <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/20 px-3 py-1 text-xs font-bold text-amber-300 border border-amber-500/30">
-                  <MapPin className="h-3.5 w-3.5 text-amber-400" />
-                  Islamabad Ready Stock Sheets
-                </span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-xs font-semibold text-emerald-300 border border-emerald-500/30">
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
                   <CheckCircle2 className="h-3 w-3" />
                   Verified Physical Stock
                 </span>
-                <span className="text-xs text-gray-400">
+                <span className="text-xs text-gray-500 dark:text-gray-400">
                   College Rd, I-9 Industrial & Blue Area
                 </span>
               </div>
-              <h2 className="text-lg sm:text-xl font-black text-white">
-                Daily Ready Stock Rates: 07-Sep vs 08-Sep Comparison
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+                Solar Panels — Ready Stock Available Islamabad
               </h2>
-              <p className="text-xs text-gray-300 mt-0.5">
-                Compare yesterday's price sheet (07-Sep) directly with today's live trade rates (08-Sep). Click any row to inspect catalog listings.
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
+                Wholesale ready stock trade sheet (07-Sep-2026) for Tier-1 N-Type TOPCon & Bifacial modules.
               </p>
             </div>
 
             {/* Date Selection Toggle */}
-            <div className="flex items-center gap-1.5 bg-white/10 p-1.5 rounded-xl border border-white/15 self-start md:self-auto">
+            <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl border border-gray-200 dark:border-gray-700 self-start md:self-auto">
               <button
-                onClick={() => setDailySheetDate('compare')}
+                onClick={() => setDailySheetDate('07-Sep-2026')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  dailySheetDate === 'compare'
-                    ? 'bg-primary-500 text-white shadow-sm'
-                    : 'text-gray-300 hover:text-white'
+                  dailySheetDate === '07-Sep-2026'
+                    ? 'bg-primary-600 text-white shadow-sm'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
-                07 vs 08 Difference
+                07-Sep Sheet
               </button>
               <button
                 onClick={() => setDailySheetDate('08-Sep-2026')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   dailySheetDate === '08-Sep-2026'
-                    ? 'bg-primary-500 text-white shadow-sm'
-                    : 'text-gray-300 hover:text-white'
+                    ? 'bg-primary-600 text-white shadow-sm'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
-                08-Sep (Today)
+                08-Sep Live
               </button>
               <button
-                onClick={() => setDailySheetDate('07-Sep-2026')}
+                onClick={() => setDailySheetDate('compare')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  dailySheetDate === '07-Sep-2026'
-                    ? 'bg-primary-500 text-white shadow-sm'
-                    : 'text-gray-300 hover:text-white'
+                  dailySheetDate === 'compare'
+                    ? 'bg-primary-600 text-white shadow-sm'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
-                07-Sep (Yesterday)
+                Compare Jump
               </button>
             </div>
           </div>
 
           {/* Quick Summary Highlights */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 my-4">
-            <div className="rounded-xl bg-white/5 border border-white/10 p-3">
-              <span className="text-[11px] text-gray-400 block">Canadian Solar 625W</span>
+            <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
+              <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Canadian Solar Stock</span>
               <div className="flex items-baseline gap-2 mt-0.5">
-                <span className="text-base font-extrabold text-white">Rs. 41.75/W</span>
-                <span className="inline-flex items-center text-xs font-bold text-emerald-400 bg-emerald-500/20 px-1.5 py-0.5 rounded">
-                  <ArrowDownRight className="h-3 w-3" /> -0.15/W
-                </span>
+                <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 41.60 – 41.90/W</span>
               </div>
-              <span className="text-[10px] text-gray-400">Dropped from Rs. 41.90 on 07-Sep</span>
+              <span className="text-[10px] text-gray-500 dark:text-gray-400">585W (Rs. 41.60) • 625W (Rs. 41.90)</span>
             </div>
 
-            <div className="rounded-xl bg-white/5 border border-white/10 p-3">
-              <span className="text-[11px] text-gray-400 block">Astronergy 580W</span>
+            <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
+              <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Astronergy / Astro Range</span>
               <div className="flex items-baseline gap-2 mt-0.5">
-                <span className="text-base font-extrabold text-white">Rs. 38.25/W</span>
-                <span className="inline-flex items-center text-xs font-bold text-emerald-400 bg-emerald-500/20 px-1.5 py-0.5 rounded">
-                  <ArrowDownRight className="h-3 w-3" /> -0.25/W
-                </span>
+                <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 38.50 – 39.00/W</span>
               </div>
-              <span className="text-[10px] text-gray-400">Dropped from Rs. 38.50 on 07-Sep</span>
+              <span className="text-[10px] text-gray-500 dark:text-gray-400">580W (38.50) • 620W (38.75) • 625W (39.00)</span>
             </div>
 
-            <div className="rounded-xl bg-white/5 border border-white/10 p-3">
-              <span className="text-[11px] text-gray-400 block">Astronergy 625W Stock</span>
+            <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
+              <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Aiko High-Efficiency</span>
               <div className="flex items-baseline gap-2 mt-0.5">
-                <span className="text-base font-extrabold text-amber-300">Rs. 39.00/W</span>
-                <span className="inline-flex items-center text-xs font-bold text-amber-400 bg-amber-500/20 px-1.5 py-0.5 rounded">
-                  Ready Stock
-                </span>
+                <span className="text-base font-extrabold text-amber-600 dark:text-amber-400">Rs. 42.50 – 44.50/W</span>
               </div>
-              <span className="text-[10px] text-gray-400">Dual-Glass N-Type (Rs. 24,375/plate)</span>
+              <span className="text-[10px] text-gray-500 dark:text-gray-400">645W (42.50) • 665W (43.50) • 770W (44.50)</span>
             </div>
 
-            <div className="rounded-xl bg-white/5 border border-white/10 p-3">
-              <span className="text-[11px] text-gray-400 block">Aiko / Jinko / LONGi / JA</span>
+            <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
+              <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Jinko, LONGi, JA & More</span>
               <div className="flex items-baseline gap-2 mt-0.5">
-                <span className="text-base font-extrabold text-white">Stable Rates</span>
-                <span className="inline-flex items-center text-xs font-bold text-blue-300 bg-blue-500/20 px-1.5 py-0.5 rounded">
-                  <Equal className="h-3 w-3" /> 16 Items
+                <span className="text-base font-extrabold text-gray-900 dark:text-white">19 Ready Models</span>
+                <span className="inline-flex items-center text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 px-1.5 py-0.5 rounded">
+                  Stock On Hand
                 </span>
               </div>
-              <span className="text-[10px] text-gray-400">No change between 07-Sep & 08-Sep</span>
+              <span className="text-[10px] text-gray-500 dark:text-gray-400">Risen (41.00) • Korean (37.00) • OSDA (36.75)</span>
             </div>
           </div>
 
           {/* Collapsible Sheet Table */}
           {showDailySheetDetail && (
-            <div className="overflow-x-auto rounded-xl border border-white/10 bg-black/30">
-              <table className="w-full text-left text-xs text-gray-300">
-                <thead className="bg-white/10 text-[11px] uppercase tracking-wider text-gray-300 font-bold border-b border-white/10">
-                  <tr>
-                    <th className="px-3.5 py-2.5">Brand & Module</th>
-                    <th className="px-3 py-2.5">Wattage</th>
-                    <th className="px-3 py-2.5">07-Sep-2026</th>
-                    <th className="px-3 py-2.5">08-Sep-2026</th>
-                    <th className="px-3 py-2.5">Difference</th>
-                    <th className="px-3 py-2.5">Plate Price (Est.)</th>
-                    <th className="px-3 py-2.5 text-right">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/5 font-medium">
-                  {ISLAMABAD_DAILY_SHEETS["08-Sep-2026"].rates.map((item, idx) => {
-                    const wattsNum = parseInt(item.model.replace(/\D/g, '')) || 585;
-                    const platePrice = Math.round(item.rate * wattsNum);
-                    const isAstro625 = item.brand === 'Astronergy' && item.model.includes('625');
-                    const isCanadian625 = item.brand === 'Canadian Solar' && item.model.includes('625');
-                    const isAstro580 = item.brand === 'Astronergy' && item.model.includes('580');
+            <div>
+              {/* Sheet Quick Filter and Search Bar */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 mb-3">
+                <div className="relative flex-1 max-w-sm">
+                  <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    value={sheetSearchQuery}
+                    onChange={(e) => setSheetSearchQuery(e.target.value)}
+                    placeholder="Filter sheet (e.g. Canadian, 625W, Astro...)"
+                    className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80 pl-8 pr-3 py-1.5 text-xs text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  />
+                </div>
 
-                    return (
-                      <tr
-                        key={idx}
-                        className={`hover:bg-white/5 transition-colors ${
-                          isCanadian625 || isAstro580 ? 'bg-emerald-500/5' : isAstro625 ? 'bg-amber-500/5' : ''
-                        }`}
-                      >
-                        <td className="px-3.5 py-2.5 font-bold text-white flex items-center gap-1.5">
-                          {item.brand}
-                          {(isCanadian625 || isAstro580) && (
-                            <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1 rounded">
-                              Rate Changed
-                            </span>
-                          )}
-                          {isAstro625 && (
-                            <span className="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1 rounded">
-                              625W Stock
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-3 py-2.5 text-gray-200 font-semibold">{item.model}</td>
-                        <td className="px-3 py-2.5 text-gray-300">
-                          Rs. {item.prevRate.toFixed(2)}/W
-                        </td>
-                        <td className="px-3 py-2.5 font-bold text-amber-300">
-                          Rs. {item.rate.toFixed(2)}/W
-                        </td>
-                        <td className="px-3 py-2.5">
-                          {item.change < 0 ? (
-                            <span className="inline-flex items-center gap-0.5 text-emerald-400 font-bold">
-                              <ArrowDownRight className="h-3.5 w-3.5" />
-                              Rs. {Math.abs(item.change).toFixed(2)}/W Drop
-                            </span>
-                          ) : item.change > 0 ? (
-                            <span className="inline-flex items-center gap-0.5 text-red-400 font-bold">
-                              <TrendingUp className="h-3.5 w-3.5" />
-                              +Rs. {item.change.toFixed(2)}/W
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1 text-gray-400">
-                              <Equal className="h-3 w-3" /> Stable
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-3 py-2.5 font-bold text-white">
-                          Rs. {platePrice.toLocaleString()}
-                        </td>
-                        <td className="px-3 py-2.5 text-right">
-                          <button
-                            onClick={() => {
-                              setSelectedCategory('panel');
-                              setSelectedBrand(item.brand.replace(' Solar', ''));
-                              setSearchQuery(item.model.split(' ')[0]);
-                              const target = document.getElementById('catalog-results');
-                              if (target) target.scrollIntoView({ behavior: 'smooth' });
-                            }}
-                            className="inline-flex items-center gap-1 rounded-lg bg-white/10 hover:bg-white/20 px-2.5 py-1 text-[11px] font-semibold text-white transition-colors cursor-pointer"
-                          >
-                            View Stock
-                            <ChevronRight className="h-3 w-3" />
-                          </button>
+                <div className="flex items-center gap-1.5 overflow-x-auto text-[11px] pb-1 sm:pb-0">
+                  {[
+                    { id: 'all', label: 'All Models' },
+                    { id: 'changed', label: 'Rate Changed' },
+                    { id: 'canadian', label: 'Canadian' },
+                    { id: 'astronergy', label: 'Astronergy' },
+                    { id: 'aiko', label: 'Aiko' },
+                  ].map((f) => (
+                    <button
+                      key={f.id}
+                      onClick={() => setSheetFilterStatus(f.id)}
+                      className={`px-2.5 py-1 rounded-md whitespace-nowrap font-medium transition-colors cursor-pointer ${
+                        sheetFilterStatus === f.id
+                          ? 'bg-primary-100 dark:bg-primary-950/60 text-primary-700 dark:text-primary-300 font-bold'
+                          : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                      }`}
+                    >
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800">
+                <table className="w-full text-left text-xs text-gray-700 dark:text-gray-300">
+                  <thead className="bg-gray-50 dark:bg-gray-800/90 text-[11px] uppercase tracking-wider text-gray-600 dark:text-gray-400 font-bold border-b border-gray-200 dark:border-gray-800">
+                    <tr>
+                      <th className="px-3.5 py-2.5">Brand & Module</th>
+                      <th className="px-3 py-2.5">Wattage</th>
+                      <th className="px-3 py-2.5">
+                        {dailySheetDate === '07-Sep-2026' ? '07-Sep Ready Rate' : '07-Sep (Sheet)'}
+                      </th>
+                      <th className="px-3 py-2.5">
+                        {dailySheetDate === '07-Sep-2026' ? 'Benchmark Ref' : '08-Sep (Today)'}
+                      </th>
+                      <th className="px-3 py-2.5">
+                        {dailySheetDate === '07-Sep-2026' ? 'Stock Trend' : 'Difference'}
+                      </th>
+                      <th className="px-3 py-2.5">Plate Price (Est.)</th>
+                      <th className="px-3 py-2.5 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 dark:divide-gray-800 font-medium">
+                    {displayedSheetRates.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                          No matching solar panel models found in daily rate sheet.
                         </td>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                    ) : (
+                      displayedSheetRates.map((item, idx) => {
+                        const wattsNum = parseInt(item.model.replace(/\D/g, '')) || 585;
+                        const platePrice = Math.round(item.rate * wattsNum);
+                        const isAstro625 = item.brand === 'Astronergy' && item.model.includes('625');
+                        const isCanadian625 = item.brand === 'Canadian Solar' && item.model.includes('625');
+                        const isAstro580 = item.brand === 'Astronergy' && item.model.includes('580');
+
+                        return (
+                          <tr
+                            key={idx}
+                            className={`hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors ${
+                              isCanadian625 || isAstro580
+                                ? 'bg-emerald-50/50 dark:bg-emerald-950/20'
+                                : isAstro625
+                                ? 'bg-amber-50/50 dark:bg-amber-950/20'
+                                : ''
+                            }`}
+                          >
+                            <td className="px-3.5 py-2.5 font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
+                              {item.brand}
+                              {(isCanadian625 || isAstro580) && (
+                                <span className="text-[10px] bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 px-1 rounded">
+                                  Rate Changed
+                                </span>
+                              )}
+                              {isAstro625 && (
+                                <span className="text-[10px] bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/30 px-1 rounded">
+                                  625W Stock
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-3 py-2.5 text-gray-800 dark:text-gray-200 font-semibold">
+                              {item.model}
+                            </td>
+                            <td className="px-3 py-2.5 text-gray-600 dark:text-gray-300">
+                              Rs. {dailySheetDate === '07-Sep-2026' ? item.rate.toFixed(2) : item.prevRate.toFixed(2)}/W
+                            </td>
+                            <td className="px-3 py-2.5 font-bold text-primary-700 dark:text-amber-300">
+                              Rs. {dailySheetDate === '07-Sep-2026' ? item.prevRate.toFixed(2) : item.rate.toFixed(2)}/W
+                            </td>
+                            <td className="px-3 py-2.5">
+                              {item.change < 0 ? (
+                                <span className="inline-flex items-center gap-0.5 text-emerald-600 dark:text-emerald-400 font-bold">
+                                  <ArrowDownRight className="h-3.5 w-3.5" />
+                                  Rs. {Math.abs(item.change).toFixed(2)}/W Drop
+                                </span>
+                              ) : item.change > 0 ? (
+                                <span className="inline-flex items-center gap-0.5 text-red-600 dark:text-red-400 font-bold">
+                                  <TrendingUp className="h-3.5 w-3.5" />
+                                  +Rs. {item.change.toFixed(2)}/W
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 text-gray-400">
+                                  <Equal className="h-3 w-3" /> Stable
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-3 py-2.5 font-bold text-gray-900 dark:text-white">
+                              Rs. {platePrice.toLocaleString()}
+                            </td>
+                            <td className="px-3 py-2.5 text-right">
+                              <button
+                                onClick={() => {
+                                  setSelectedCategory('panel');
+                                  setSelectedBrand(item.brand.replace(' Solar', ''));
+                                  setSearchQuery(item.model.split(' ')[0]);
+                                  const target = document.getElementById('catalog-results');
+                                  if (target) target.scrollIntoView({ behavior: 'smooth' });
+                                }}
+                                className="inline-flex items-center gap-1 rounded-lg bg-primary-50 dark:bg-primary-950/50 hover:bg-primary-100 dark:hover:bg-primary-900/60 px-2.5 py-1 text-[11px] font-semibold text-primary-700 dark:text-primary-300 transition-colors cursor-pointer"
+                              >
+                                View Stock
+                                <ChevronRight className="h-3 w-3" />
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
 
-          <div className="mt-3 flex items-center justify-between text-xs text-gray-400 pt-2 border-t border-white/10">
+          <div className="mt-3 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-200 dark:border-gray-800">
             <span className="flex items-center gap-1">
               <Clock className="h-3.5 w-3.5 text-gray-400" />
               Verified daily at 12:00 Midnight PKT from wholesale suppliers in Islamabad.
             </span>
             <button
               onClick={() => setShowDailySheetDetail(!showDailySheetDetail)}
-              className="text-primary-300 hover:text-white font-semibold cursor-pointer"
+              className="text-primary-600 dark:text-primary-400 hover:underline font-semibold cursor-pointer"
             >
               {showDailySheetDetail ? 'Collapse Sheet' : 'Expand 19 Models Sheet'}
             </button>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   CircleAlert,
   CircleCheck,
@@ -27,19 +27,26 @@ function authErrorMessage(error, activeView = 'login') {
   const message = rawMsg.toLowerCase();
 
   if (
-    error?.code === '23505' ||
     message.includes('profiles_email_unique') ||
     ((message.includes('already registered') || message.includes('already been registered') || message.includes('already exists')) && message.includes('email'))
   ) {
-    return 'This email address is already registered. Please login instead.';
+    return 'This Email Address is already registered. Please log in or use a different email.';
+  }
+  if (
+    error?.code === '23505' ||
+    message.includes('unique_username') ||
+    message.includes('profiles_username_unique') ||
+    ((message.includes('already registered') || message.includes('already been registered') || message.includes('already exists')) && message.includes('username'))
+  ) {
+    return 'This Username is already taken. Please choose a different username.';
   }
   if (message.includes('profiles_phone_unique') || (message.includes('already exists') && message.includes('phone'))) {
-    return 'This phone number is already registered with another account.';
+    return 'This Phone Number is already registered. Please use another number or log in.';
   }
   if (message.includes('already registered') || message.includes('already been registered') || message.includes('already exists')) {
     return activeView === 'signup'
-      ? 'An account with this email already exists. Please log in.'
-      : 'This account already exists. Please login.';
+      ? 'This account or identifier is already taken. Please choose another or log in.'
+      : 'This account already exists. Please log in.';
   }
   if (error?.code === 'weak_password' || message.includes('weak_password') || message.includes('pwned') || message.includes('password is known')) {
     return 'Please use a password of at least 8 characters.';
@@ -51,7 +58,7 @@ function authErrorMessage(error, activeView = 'login') {
     return 'Please check your email to confirm your account, or sign in directly.';
   }
   if (message.includes('invalid email') || message.includes('unable to validate email') || (message.includes('email address') && message.includes('invalid'))) {
-    return 'Please enter a valid email address (e.g. you@example.com).';
+    return 'Please enter a valid username, mobile, or email address.';
   }
 
   // Account not found / not registered check
@@ -61,7 +68,7 @@ function authErrorMessage(error, activeView = 'login') {
     message.includes('sign up first') ||
     message.includes('not registered')
   ) {
-    return 'No account found with this email. Please sign up first.';
+    return 'No account found with this username or ID. Please sign up first.';
   }
 
   // Filter out any raw API key / backend auth internal messages
@@ -78,7 +85,7 @@ function authErrorMessage(error, activeView = 'login') {
     if (activeView === 'signup') {
       return 'Could not complete registration. Please check your details and try again.';
     }
-    return 'Incorrect email or password. If you do not have an account, please sign up first.';
+    return 'Incorrect username or password. If you do not have an account, please sign up first.';
   }
 
   if (activeView === 'signup') {
@@ -89,46 +96,149 @@ function authErrorMessage(error, activeView = 'login') {
 
   return rawMsg && !message.includes('api') && !message.includes('key')
     ? rawMsg
-    : 'Incorrect email or password. Please try again or create an account.';
+    : 'Incorrect username or password. Please try again or create an account.';
 }
 
-async function contactAlreadyExists(email, phone) {
-  const cleanEmail = email.trim().toLowerCase();
-  const cleanPhone = normalizePhone(phone);
+async function contactAlreadyExists({ username, email, phone, cnic }) {
+  const cleanUsername = (username || '').trim().toLowerCase();
+  const cleanEmail = (email || '').trim().toLowerCase();
+  const cleanPhone = normalizePhone(phone || '');
+  const cleanCnic = (cnic || '').trim().toLowerCase();
 
-  // 1. Check local storage users
-  const localUsers = getStoredUsers();
-  if (localUsers[cleanEmail]) {
-    return { emailExists: true, phoneExists: false };
+  // 0. Check default admin username / email
+  if (cleanUsername === 'mudassir2k6' || cleanUsername === DEFAULT_ADMIN_EMAIL.toLowerCase()) {
+    return {
+      field: 'username',
+      message: 'This Username is already taken. Please choose a different username.',
+    };
   }
-  
-  // Note: Only check duplicate phone against non-admin accounts to avoid blocking demo testers
-  for (const k of Object.keys(localUsers)) {
-    if (k === DEFAULT_ADMIN_EMAIL.toLowerCase()) continue;
-    const p = localUsers[k].profile;
-    if (p && normalizePhone(p.phone) === cleanPhone) {
-      return { emailExists: false, phoneExists: true };
-    }
+  if (cleanEmail === DEFAULT_ADMIN_EMAIL.toLowerCase()) {
+    return {
+      field: 'signupEmail',
+      message: 'This Email Address is already registered. Please log in or use a different email.',
+    };
   }
 
-  // 2. If Supabase is configured and reachable, check remote DB
+  // 1. If Supabase is configured and reachable, check live DB first
   if (isSupabaseConfigured()) {
     try {
-      const [{ data: emailRow }, { data: phoneRow }] = await Promise.all([
-        supabase.from('profiles').select('id').ilike('email', cleanEmail).maybeSingle(),
-        supabase.from('profiles').select('id').eq('phone', cleanPhone).maybeSingle(),
-      ]);
+      if (cleanUsername) {
+        const { data: idRow } = await supabase
+          .from('profiles')
+          .select('id')
+          .ilike('username', cleanUsername)
+          .maybeSingle();
+        if (idRow?.id) {
+          return {
+            field: 'username',
+            message: 'This Username is already taken. Please choose a different username.',
+          };
+        }
+      }
 
-      return {
-        emailExists: Boolean(emailRow?.id),
-        phoneExists: Boolean(phoneRow?.id),
-      };
+      if (cleanEmail) {
+        const { data: emailRow } = await supabase
+          .from('profiles')
+          .select('id')
+          .ilike('email', cleanEmail)
+          .maybeSingle();
+        if (emailRow?.id) {
+          return {
+            field: 'signupEmail',
+            message: 'This Email Address is already registered. Please log in or use a different email.',
+          };
+        }
+      }
+
+      if (cleanPhone) {
+        const { data: phoneRow } = await supabase
+          .from('profiles')
+          .select('id, email, username')
+          .eq('phone', cleanPhone)
+          .maybeSingle();
+        if (
+          phoneRow?.id &&
+          phoneRow.id !== DEFAULT_ADMIN_ID &&
+          phoneRow.email?.toLowerCase() !== DEFAULT_ADMIN_EMAIL.toLowerCase() &&
+          phoneRow.username?.toLowerCase() !== 'mudassir2k6'
+        ) {
+          return {
+            field: 'phone',
+            message: 'This Phone Number is already registered. Please use another number or log in.',
+          };
+        }
+      }
+
+      if (cleanCnic) {
+        const { data: cnicRow } = await supabase
+          .from('profiles')
+          .select('id, email')
+          .eq('cnic', cleanCnic)
+          .maybeSingle();
+        if (
+          cnicRow?.id &&
+          cnicRow.id !== DEFAULT_ADMIN_ID &&
+          cnicRow.email?.toLowerCase() !== DEFAULT_ADMIN_EMAIL.toLowerCase()
+        ) {
+          return {
+            field: 'cnic',
+            message: 'This CNIC is already registered with another account.',
+          };
+        }
+      }
+
+      // Live Supabase check passed with no duplicate found.
+      // Do not allow stale browser localStorage cache to block valid registrations.
+      return null;
     } catch {
-      // Ignore network / key errors
+      // Network/service error, fall back to offline local check below
     }
   }
 
-  return { emailExists: false, phoneExists: false };
+  // 2. Fallback offline local storage check (when Supabase not configured or offline)
+  const localUsers = getStoredUsers();
+  for (const k of Object.keys(localUsers)) {
+    const p = localUsers[k]?.profile;
+    if (
+      !p ||
+      p.is_admin ||
+      k.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
+      p.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
+      p.username?.toLowerCase() === 'mudassir2k6'
+    ) {
+      continue;
+    }
+
+    if (cleanUsername && p.username && p.username.toLowerCase() === cleanUsername) {
+      return {
+        field: 'username',
+        message: 'This Username is already taken. Please choose a different username.',
+      };
+    }
+
+    if (cleanEmail && p.email && p.email.toLowerCase() === cleanEmail) {
+      return {
+        field: 'signupEmail',
+        message: 'This Email Address is already registered. Please log in or use a different email.',
+      };
+    }
+
+    if (cleanPhone && p.phone && normalizePhone(p.phone) === cleanPhone) {
+      return {
+        field: 'phone',
+        message: 'This Phone Number is already registered. Please use another number or log in.',
+      };
+    }
+
+    if (cleanCnic && p.cnic && p.cnic.trim().toLowerCase() === cleanCnic) {
+      return {
+        field: 'cnic',
+        message: 'This CNIC is already registered with another account.',
+      };
+    }
+  }
+
+  return null;
 }
 
 export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
@@ -142,6 +252,9 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
   const [info, setInfo] = useState(null);
   const [email, setEmail] = useState('');
   const [emailTouched, setEmailTouched] = useState(false);
+  const [signupUsername, setSignupUsername] = useState('');
+  const [signupEmail, setSignupEmail] = useState('');
+  const [signupEmailTouched, setSignupEmailTouched] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -152,7 +265,52 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
   const [businessAddress, setBusinessAddress] = useState('');
   const [visitingCard, setVisitingCard] = useState('');
   const [fieldErrors, setFieldErrors] = useState({});
+  const [fieldErrorMessages, setFieldErrorMessages] = useState({});
   const isDealer = accountType === 'dealer';
+
+  // Input element refs for moving cursor/focus into the exact field
+  const fullNameRef = useRef(null);
+  const signupUsernameRef = useRef(null);
+  const signupEmailRef = useRef(null);
+  const emailRef = useRef(null);
+  const passwordRef = useRef(null);
+  const confirmPasswordRef = useRef(null);
+  const phoneRef = useRef(null);
+  const cityRef = useRef(null);
+  const cnicRef = useRef(null);
+  const businessNameRef = useRef(null);
+  const businessAddressRef = useRef(null);
+
+  const focusField = (fieldKey) => {
+    setTimeout(() => {
+      const refMap = {
+        fullName: fullNameRef.current,
+        username: signupUsernameRef.current,
+        signupUsername: signupUsernameRef.current,
+        email: view === 'signup' ? signupEmailRef.current : emailRef.current,
+        signupEmail: signupEmailRef.current,
+        password: passwordRef.current,
+        confirmPassword: confirmPasswordRef.current,
+        phone: phoneRef.current,
+        city: cityRef.current,
+        cnic: cnicRef.current,
+        businessName: businessNameRef.current,
+        businessAddress: businessAddressRef.current,
+      };
+      const target = refMap[fieldKey];
+      if (target) {
+        try {
+          target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } catch {
+          // ignore
+        }
+        target.focus();
+        if (typeof target.select === 'function') {
+          target.select();
+        }
+      }
+    }, 50);
+  };
 
   useEffect(() => {
     setView(initialView);
@@ -161,8 +319,9 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
   const clearSignupFields = () => {
     setAccountType('individual');
     setShowPassword(false);
-    setEmail('');
-    setEmailTouched(false);
+    setSignupUsername('');
+    setSignupEmail('');
+    setSignupEmailTouched(false);
     setPassword('');
     setConfirmPassword('');
     setFullName('');
@@ -173,12 +332,15 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
     setBusinessAddress('');
     setVisitingCard('');
     setFieldErrors({});
+    setFieldErrorMessages({});
     setError(null);
     setInfo(null);
   };
 
   const clearFieldError = (key) => {
     setFieldErrors((prev) => (prev[key] ? { ...prev, [key]: false } : prev));
+    setFieldErrorMessages((prev) => (prev[key] ? { ...prev, [key]: null } : prev));
+    setError(null);
   };
 
   const fieldClass = (key, extra = '') =>
@@ -193,15 +355,22 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
       setError(null);
       setInfo(null);
       setFieldErrors({});
+      setFieldErrorMessages({});
     }
     setView(next);
   };
 
   const handleSignup = async () => {
     setError(null);
+    setFieldErrorMessages({});
+    const cleanUName = signupUsername.trim();
+    const cleanMail = signupEmail.trim().toLowerCase();
+    const isMailValid = isValidEmail(cleanMail);
+
     const nextErrors = {
       fullName: !fullName.trim(),
-      email: !email.trim() || !isValidEmail(email),
+      username: !cleanUName || cleanUName.length < 3,
+      signupEmail: !cleanMail || !isMailValid,
       password: !password.trim() || password.length < 8,
       phone: !isValidPhone(phone),
       city: !city.trim(),
@@ -210,24 +379,72 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
       businessAddress: isDealer && !businessAddress.trim(),
     };
     setFieldErrors(nextErrors);
-    if (Object.values(nextErrors).some(Boolean)) {
+
+    // If validation fails, focus the first erroneous field immediately
+    if (nextErrors.fullName) {
+      focusField('fullName');
+      return;
+    }
+    if (nextErrors.username) {
+      focusField('username');
+      return;
+    }
+    if (nextErrors.signupEmail) {
+      if (!cleanMail) {
+        setFieldErrorMessages((prev) => ({ ...prev, signupEmail: 'Email address is required.' }));
+      } else if (!isMailValid) {
+        setFieldErrorMessages((prev) => ({
+          ...prev,
+          signupEmail: 'Please enter a valid email address (e.g. you@example.com).',
+        }));
+      }
+      focusField('signupEmail');
+      return;
+    }
+    if (nextErrors.password) {
+      focusField('password');
+      return;
+    }
+    if (nextErrors.phone) {
+      focusField('phone');
+      return;
+    }
+    if (nextErrors.city) {
+      focusField('city');
+      return;
+    }
+    if (nextErrors.cnic) {
+      focusField('cnic');
+      return;
+    }
+    if (nextErrors.businessName) {
+      focusField('businessName');
+      return;
+    }
+    if (nextErrors.businessAddress) {
+      focusField('businessAddress');
       return;
     }
 
     setBusy(true);
     try {
-      const taken = await contactAlreadyExists(email, phone);
-      if (taken.emailExists) {
-        setError('This email is already registered. Please log in or use another email.');
-        return;
-      }
-      if (taken.phoneExists) {
-        setError('This phone number is already registered with another account.');
+      const duplicate = await contactAlreadyExists({
+        username: cleanUName,
+        email: cleanMail,
+        phone,
+        cnic: isDealer ? cnic : null,
+      });
+      if (duplicate) {
+        setError(duplicate.message);
+        setFieldErrors((prev) => ({ ...prev, [duplicate.field]: true }));
+        setFieldErrorMessages((prev) => ({ ...prev, [duplicate.field]: duplicate.message }));
+        focusField(duplicate.field);
         return;
       }
 
       const res = await signUp({
-        email: email.trim(),
+        username: cleanUName,
+        email: cleanMail,
         password,
         fullName: fullName.trim(),
         phone: normalizePhone(phone),
@@ -245,12 +462,43 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
 
       showToast({
         title: 'Account Created Successfully',
-        message: `Welcome to SellSolar! You are now logged in as ${email.trim()}.`,
+        message: `Welcome to SellSolar! You are now logged in as ${cleanUName || cleanMail}.`,
         type: 'success',
       });
       window.setTimeout(() => onSuccess(), 800);
     } catch (err) {
-      setError(authErrorMessage(err, 'signup'));
+      const errMsg = authErrorMessage(err, 'signup');
+      const lower = (err?.message || '').toLowerCase();
+      if (
+        lower.includes('email') ||
+        lower.includes('user already')
+      ) {
+        const msg = 'This Email Address is already registered. Please log in or use a different email.';
+        setError(msg);
+        setFieldErrors((prev) => ({ ...prev, signupEmail: true }));
+        setFieldErrorMessages((prev) => ({ ...prev, signupEmail: msg }));
+        focusField('signupEmail');
+      } else if (lower.includes('username') || lower.includes('23505')) {
+        const msg = 'This Username is already taken. Please choose a different username.';
+        setError(msg);
+        setFieldErrors((prev) => ({ ...prev, username: true }));
+        setFieldErrorMessages((prev) => ({ ...prev, username: msg }));
+        focusField('username');
+      } else if (lower.includes('phone')) {
+        const msg = 'This Phone Number is already registered. Please use another number or log in.';
+        setError(msg);
+        setFieldErrors((prev) => ({ ...prev, phone: true }));
+        setFieldErrorMessages((prev) => ({ ...prev, phone: msg }));
+        focusField('phone');
+      } else if (lower.includes('cnic')) {
+        const msg = 'This CNIC is already registered with another account.';
+        setError(msg);
+        setFieldErrors((prev) => ({ ...prev, cnic: true }));
+        setFieldErrorMessages((prev) => ({ ...prev, cnic: msg }));
+        focusField('cnic');
+      } else {
+        setError(errMsg);
+      }
     } finally {
       setBusy(false);
     }
@@ -258,12 +506,18 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
 
   const handleLogin = async () => {
     setError(null);
+    setFieldErrorMessages({});
     const nextErrors = {
-      email: !email.trim() || !isValidEmail(email),
+      email: !email.trim(),
       password: !password.trim(),
     };
     setFieldErrors(nextErrors);
-    if (Object.values(nextErrors).some(Boolean)) {
+    if (nextErrors.email) {
+      focusField('email');
+      return;
+    }
+    if (nextErrors.password) {
+      focusField('password');
       return;
     }
     setBusy(true);
@@ -277,6 +531,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
       onSuccess();
     } catch (err) {
       setError(authErrorMessage(err, 'login'));
+      focusField('password');
     } finally {
       setBusy(false);
     }
@@ -288,6 +543,8 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
     const emailInvalid = !email.trim() || !isValidEmail(email);
     setFieldErrors({ email: emailInvalid });
     if (emailInvalid) {
+      setError('Please enter a valid email address (e.g. you@example.com) to receive the password reset link.');
+      focusField('email');
       return;
     }
     setBusy(true);
@@ -297,15 +554,15 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
           redirectTo: `${window.location.origin}/`,
         });
         if (resetError) {
-          setInfo(`Reset instructions recorded for ${email.trim()}. You can set your new password directly below.`);
-          setTimeout(() => go('reset'), 1000);
-          return;
+          console.warn('Supabase reset link notice:', resetError);
         }
-        setInfo('Reset link sent. Check your email inbox to set a new password.');
-      } else {
-        setInfo(`Password reset initiated for ${email.trim()}. Please enter your new password below.`);
-        setTimeout(() => go('reset'), 1000);
       }
+      showToast({
+        title: 'Reset Link Sent',
+        message: `A password reset link has been sent to ${email.trim()}. Please check your email inbox.`,
+        type: 'success',
+      });
+      setInfo(`Password reset link sent to ${email.trim()}! Please check your email inbox to reset your password.`);
     } catch (err) {
       setError(authErrorMessage(err, 'forgot'));
     } finally {
@@ -351,9 +608,9 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
   };
 
   const titles = {
-    login: ['Welcome back', 'Sign in to post ads and manage your listings'],
-    signup: ['Create your account', 'Join SellSolar to buy and sell solar equipment'],
-    forgot: ['Reset your password', 'We will help you securely recover your account'],
+    login: ['Welcome back', 'Sign in using your username, mobile, or CNIC'],
+    signup: ['Create your account', 'Join SellSolar with any unique username or identifier'],
+    forgot: ['Reset your password', 'Enter your registered email and we will send you a password reset link'],
     reset: ['Set a new password', 'Enter a new password for your account'],
   };
 
@@ -422,7 +679,10 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     type="button"
-                    onClick={() => setAccountType('individual')}
+                    onClick={() => {
+                      setAccountType('individual');
+                      setError(null);
+                    }}
                     className={`flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all ${
                       accountType === 'individual'
                         ? 'border-primary-500 bg-primary-50 dark:bg-primary-950/40'
@@ -448,7 +708,10 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setAccountType('dealer')}
+                    onClick={() => {
+                      setAccountType('dealer');
+                      setError(null);
+                    }}
                     className={`flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all ${
                       isDealer
                         ? 'border-primary-500 bg-primary-50 dark:bg-primary-950/40'
@@ -476,40 +739,148 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
 
             <div className="mt-6 space-y-4">
               {view === 'signup' && (
-                <div>
-                  <label className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    Full Name *
-                  </label>
-                  <div className="relative">
-                    <User
-                      className={`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${
-                        fieldErrors.fullName ? 'text-error-500' : 'text-gray-400'
-                      }`}
-                    />
-                    <input
-                      type="text"
-                      value={fullName}
-                      onChange={(e) => {
-                        setFullName(e.target.value);
-                        clearFieldError('fullName');
-                      }}
-                      placeholder="Enter your full name"
-                      className={fieldClass('fullName', 'pl-11 pr-11')}
-                    />
-                    {fieldErrors.fullName ? (
-                      <CircleAlert className="absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" />
-                    ) : null}
+                <>
+                  <div>
+                    <label className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      Full Name *
+                    </label>
+                    <div className="relative">
+                      <User
+                        className={`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${
+                          fieldErrors.fullName ? 'text-error-500' : 'text-gray-400'
+                        }`}
+                      />
+                      <input
+                        ref={fullNameRef}
+                        id="signup-fullname-input"
+                        type="text"
+                        value={fullName}
+                        onChange={(e) => {
+                          setFullName(e.target.value);
+                          clearFieldError('fullName');
+                        }}
+                        placeholder="Enter your full name"
+                        className={fieldClass('fullName', 'pl-11 pr-11')}
+                      />
+                      {fieldErrors.fullName ? (
+                        <CircleAlert className="absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" />
+                      ) : null}
+                    </div>
+                    {fieldErrors.fullName && (
+                      <p className="mt-1.5 text-xs font-medium text-error-600">Full Name is required.</p>
+                    )}
                   </div>
-                  {fieldErrors.fullName && (
-                    <p className="mt-1.5 text-xs font-medium text-error-600">Full Name is required.</p>
-                  )}
-                </div>
+
+                  <div>
+                    <div className="mb-1.5 flex items-center justify-between">
+                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        Username *
+                      </label>
+                      <span className="text-[11px] font-medium text-primary-600 dark:text-primary-400">
+                        Unique ID
+                      </span>
+                    </div>
+                    <div className="relative">
+                      <User
+                        className={`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${
+                          fieldErrors.username ? 'text-error-500' : 'text-gray-400'
+                        }`}
+                      />
+                      <input
+                        ref={signupUsernameRef}
+                        id="signup-username-input"
+                        type="text"
+                        autoComplete="username"
+                        required
+                        value={signupUsername}
+                        onChange={(e) => {
+                          setSignupUsername(e.target.value.trim());
+                          clearFieldError('username');
+                        }}
+                        placeholder="e.g. mudassir2k6 or solar_tech"
+                        className={fieldClass('username', 'pl-11 pr-11')}
+                      />
+                      {fieldErrors.username ? (
+                        <CircleAlert className="absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" />
+                      ) : null}
+                    </div>
+                    {fieldErrors.username && fieldErrorMessages.username ? (
+                      <p className="mt-1.5 text-xs font-semibold text-error-600 dark:text-error-400">
+                        {fieldErrorMessages.username}
+                      </p>
+                    ) : fieldErrors.username && !signupUsername.trim() ? (
+                      <p className="mt-1.5 text-xs font-medium text-error-600">Username is required.</p>
+                    ) : fieldErrors.username && signupUsername.trim().length < 3 ? (
+                      <p className="mt-1.5 text-xs font-medium text-error-600">Username must be at least 3 characters.</p>
+                    ) : (
+                      <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                        Unique handle for your public solar profile.
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      Email Address *
+                    </label>
+                    <div className="relative">
+                      <Mail
+                        className={`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${
+                          fieldErrors.signupEmail ? 'text-error-500' : 'text-gray-400'
+                        }`}
+                      />
+                      <input
+                        ref={signupEmailRef}
+                        id="signup-email-input"
+                        type="email"
+                        autoComplete="email"
+                        inputMode="email"
+                        required
+                        value={signupEmail}
+                        onChange={(e) => {
+                          setSignupEmail(e.target.value.replace(/\s/g, ''));
+                          clearFieldError('signupEmail');
+                          setSignupEmailTouched(true);
+                        }}
+                        onBlur={() => setSignupEmailTouched(true)}
+                        placeholder="you@example.com"
+                        className={fieldClass(
+                          'signupEmail',
+                          `pl-11 pr-11 ${
+                            signupEmail.trim() && !isValidEmail(signupEmail) ? 'border-error-400' : ''
+                          }`
+                        )}
+                      />
+                      {fieldErrors.signupEmail ||
+                      (signupEmailTouched && signupEmail.trim() && !isValidEmail(signupEmail)) ? (
+                        <CircleAlert className="absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" />
+                      ) : null}
+                    </div>
+                    {fieldErrors.signupEmail && fieldErrorMessages.signupEmail ? (
+                      <p className="mt-1.5 text-xs font-semibold text-error-600 dark:text-error-400">
+                        {fieldErrorMessages.signupEmail}
+                      </p>
+                    ) : fieldErrors.signupEmail && !signupEmail.trim() ? (
+                      <p className="mt-1.5 text-xs font-medium text-error-600">Email address is mandatory.</p>
+                    ) : (signupEmailTouched || fieldErrors.signupEmail) &&
+                      signupEmail.trim() &&
+                      !isValidEmail(signupEmail) ? (
+                      <p className="mt-1.5 text-xs font-medium text-error-600">
+                        Please enter a valid email address (e.g. you@example.com).
+                      </p>
+                    ) : (
+                      <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                        Mandatory. Official notifications and account recovery will be sent here.
+                      </p>
+                    )}
+                  </div>
+                </>
               )}
 
-              {view !== 'reset' && (
+              {view === 'forgot' && (
                 <div>
                   <label className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    Email *
+                    Registered Email Address *
                   </label>
                   <div className="relative">
                     <Mail
@@ -520,6 +891,8 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                       }`}
                     />
                     <input
+                      ref={emailRef}
+                      id="forgot-email-input"
                       type="email"
                       autoComplete="email"
                       inputMode="email"
@@ -545,12 +918,64 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                     ) : null}
                   </div>
                   {fieldErrors.email && !email.trim() ? (
-                    <p className="mt-1.5 text-xs font-medium text-error-600">Email is required.</p>
+                    <p className="mt-1.5 text-xs font-medium text-error-600">Email address is required.</p>
                   ) : email.trim() && !isValidEmail(email) ? (
                     <p className="mt-1.5 text-xs font-medium text-error-600">
-                      Please enter a valid email address (e.g. you@example.com).
+                      Please enter a valid email address (e.g. you@example.com) to receive the password reset link.
                     </p>
-                  ) : null}
+                  ) : (
+                    <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                      ✉️ A secure password reset link will be sent to your verified email address.
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {view === 'login' && (
+                <div>
+                  <div className="mb-1.5 flex items-center justify-between">
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      Username *
+                    </label>
+                    <span className="text-[11px] font-medium text-gray-400 dark:text-gray-500">
+                      Unique ID / Mobile / CNIC
+                    </span>
+                  </div>
+                  <div className="relative">
+                    <User
+                      className={`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${
+                        fieldErrors.email ? 'text-error-500' : 'text-gray-400'
+                      }`}
+                    />
+                    <input
+                      ref={emailRef}
+                      id="login-username-input"
+                      type="text"
+                      autoComplete="username"
+                      required
+                      value={email}
+                      onChange={(e) => {
+                        setEmail(e.target.value.trim());
+                        clearFieldError('email');
+                        setEmailTouched(true);
+                      }}
+                      onBlur={() => setEmailTouched(true)}
+                      placeholder="e.g. mudassir2k6, 03001234567, or 35201-1234567-1"
+                      className={fieldClass('email', 'pl-11 pr-11')}
+                    />
+                    {fieldErrors.email ? (
+                      <CircleAlert className="absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" />
+                    ) : null}
+                  </div>
+                  {fieldErrors.email && !email.trim() ? (
+                    <p className="mt-1.5 text-xs font-medium text-error-600">
+                      Username is required.
+                    </p>
+                  ) : (
+                    <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                      💡 <span className="font-semibold text-gray-700 dark:text-gray-300">Hint:</span> Enter your unique username, mobile number (03XXXXXXXXX), or CNIC.
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -566,6 +991,8 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                       }`}
                     />
                     <input
+                      ref={passwordRef}
+                      id="auth-password-input"
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => {
@@ -604,9 +1031,14 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                     Confirm password *
                   </label>
                   <input
+                    ref={confirmPasswordRef}
+                    id="auth-confirm-password-input"
                     type="password"
                     value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value);
+                      clearFieldError('confirmPassword');
+                    }}
                     placeholder="Re-enter new password"
                     className="input-field"
                   />
@@ -638,6 +1070,8 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                         }`}
                       />
                       <input
+                        ref={phoneRef}
+                        id="signup-phone-input"
                         type="tel"
                         inputMode="numeric"
                         maxLength={11}
@@ -653,9 +1087,13 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                         <CircleAlert className="absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" />
                       ) : null}
                     </div>
-                    {fieldErrors.phone ? (
+                    {fieldErrors.phone && fieldErrorMessages.phone ? (
+                      <p className="mt-1.5 text-xs font-semibold text-error-600 dark:text-error-400">
+                        {fieldErrorMessages.phone}
+                      </p>
+                    ) : fieldErrors.phone ? (
                       <p className="mt-1.5 text-xs font-medium text-error-600">
-                        {phone ? 'Phone number must be exactly 11 digits.' : 'Phone is required.'}
+                        {phone ? 'Phone number must be exactly 11 digits (e.g. 03001234567).' : 'Phone is required.'}
                       </p>
                     ) : (
                       <p className="mt-1.5 text-xs text-gray-400">
@@ -674,6 +1112,8 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                         }`}
                       />
                       <select
+                        ref={cityRef}
+                        id="signup-city-select"
                         value={city}
                         onChange={(e) => {
                           setCity(e.target.value);
@@ -715,6 +1155,8 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                             }`}
                           />
                           <input
+                            ref={cnicRef}
+                            id="signup-cnic-input"
                             type="text"
                             value={cnic}
                             onChange={(e) => {
@@ -728,6 +1170,13 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                             <CircleAlert className="absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" />
                           ) : null}
                         </div>
+                        {fieldErrors.cnic && fieldErrorMessages.cnic ? (
+                          <p className="mt-1.5 text-xs font-semibold text-error-600 dark:text-error-400">
+                            {fieldErrorMessages.cnic}
+                          </p>
+                        ) : fieldErrors.cnic ? (
+                          <p className="mt-1.5 text-xs font-medium text-error-600">CNIC is required for dealers.</p>
+                        ) : null}
                       </div>
                       <div>
                         <label className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300">
@@ -735,6 +1184,8 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                         </label>
                         <div className="relative">
                           <input
+                            ref={businessNameRef}
+                            id="signup-business-name-input"
                             type="text"
                             value={businessName}
                             onChange={(e) => {
@@ -755,6 +1206,8 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                         </label>
                         <div className="relative">
                           <input
+                            ref={businessAddressRef}
+                            id="signup-business-address-input"
                             type="text"
                             value={businessAddress}
                             onChange={(e) => {
@@ -778,7 +1231,10 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                           <input
                             type="text"
                             value={visitingCard}
-                            onChange={(e) => setVisitingCard(e.target.value)}
+                            onChange={(e) => {
+                              setVisitingCard(e.target.value);
+                              setError(null);
+                            }}
                             placeholder="https://..."
                             className="input-field pl-11"
                           />
@@ -791,28 +1247,36 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
 
               {error && (
                 <div className="space-y-2">
-                  <div className="flex items-start gap-2 rounded-lg bg-error-50 dark:bg-error-950/40 p-3 text-sm text-error-700 dark:text-error-300 border border-error-200 dark:border-error-800">
-                    <CircleAlert className="mt-0.5 h-4 w-4 shrink-0" />
+                  <div
+                    id="auth-error-alert"
+                    tabIndex={-1}
+                    className="flex items-start gap-2.5 rounded-xl bg-error-50 dark:bg-error-950/50 p-3.5 text-sm font-medium text-error-700 dark:text-error-300 border border-error-200 dark:border-error-800 shadow-xs"
+                  >
+                    <CircleAlert className="mt-0.5 h-4.5 w-4.5 shrink-0 text-error-600 dark:text-error-400" />
                     <div className="flex-1">
-                      <span>{error}</span>
+                      <span className="font-semibold">{error}</span>
                     </div>
                   </div>
-                  {error.includes('already registered') && (
+                  {(error.toLowerCase().includes('already taken') ||
+                    error.toLowerCase().includes('already registered') ||
+                    error.toLowerCase().includes('already exists')) && (
                     <button
                       type="button"
                       onClick={() => go('login')}
-                      className="w-full text-center text-xs font-bold text-primary-600 hover:text-primary-700 dark:text-primary-400 py-1 cursor-pointer"
+                      className="w-full text-center text-xs font-bold text-primary-600 hover:text-primary-700 dark:text-primary-400 py-1.5 rounded-lg bg-primary-50 dark:bg-primary-950/40 hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-colors cursor-pointer"
                     >
-                      Click here to go to Login &rarr;
+                      Already registered? Click here to Log In &rarr;
                     </button>
                   )}
-                  {(error.toLowerCase().includes('sign up') || error.toLowerCase().includes('no account') || error.toLowerCase().includes('not registered')) && (
+                  {(error.toLowerCase().includes('sign up') ||
+                    error.toLowerCase().includes('no account') ||
+                    error.toLowerCase().includes('not registered')) && (
                     <button
                       type="button"
                       onClick={() => go('signup')}
                       className="w-full text-center text-xs font-bold text-primary-600 hover:text-primary-700 dark:text-primary-400 py-1.5 rounded-lg bg-primary-50 dark:bg-primary-950/40 hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-colors cursor-pointer"
                     >
-                      Don't have an account? Click here to Sign Up &rarr;
+                      Don&apos;t have an account? Click here to Sign Up &rarr;
                     </button>
                   )}
                 </div>

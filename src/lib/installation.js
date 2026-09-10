@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { isValidUuid } from './auth';
 
 export const ADMIN_NOTIFICATION_EMAIL = 'mudassir2k6@gmail.com';
 
@@ -29,7 +30,7 @@ export async function submitInstallationRequest({
     created_at: new Date().toISOString(),
   };
 
-  if (userId) {
+  if (userId && isValidUuid(userId)) {
     payload.user_id = userId;
   }
 

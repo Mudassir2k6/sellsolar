@@ -1,30 +1,71 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { normalizePhone } from '../lib/auth';
+import { normalizePhone, isValidUuid, generateUuid } from '../lib/auth';
 
 const AuthContext = createContext(null);
 
 export const DEFAULT_ADMIN_EMAIL = 'mudassir2k6@gmail.com';
+export const DEFAULT_ADMIN_ID = '00000000-0000-4000-8000-000000000001';
 const LOCAL_USERS_KEY = 'sellsolar_custom_auth_users';
 const LOCAL_SESSION_KEY = 'sellsolar_active_auth_session';
+
+export function migrateStoredListingsUserIds() {
+  if (typeof window === 'undefined') return;
+  try {
+    const raw = localStorage.getItem('sellsolar_custom_listings');
+    if (!raw) return;
+    const list = JSON.parse(raw);
+    if (!Array.isArray(list)) return;
+    let changed = false;
+    const migrated = list.map((item) => {
+      if (item.user_id === 'admin-user-mudassir' || (item.user_id && !isValidUuid(item.user_id))) {
+        changed = true;
+        return {
+          ...item,
+          user_id: DEFAULT_ADMIN_ID,
+        };
+      }
+      return item;
+    });
+    if (changed) {
+      localStorage.setItem('sellsolar_custom_listings', JSON.stringify(migrated));
+    }
+  } catch (err) {
+    console.warn('Listing migration error:', err);
+  }
+}
 
 export function getStoredUsers() {
   if (typeof window === 'undefined') return {};
   try {
     const raw = localStorage.getItem(LOCAL_USERS_KEY);
     const parsed = raw ? JSON.parse(raw) : {};
-    // Ensure default admin exists
+    let modified = false;
+
+    // Migrate any legacy non-UUID IDs (e.g. 'admin-user-mudassir' or 'local-user-...')
+    for (const key of Object.keys(parsed)) {
+      const entry = parsed[key];
+      const isAdmKey = key.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase();
+      if (!entry?.user?.id || !isValidUuid(entry.user.id) || entry.user.id === 'admin-user-mudassir') {
+        const correctId = isAdmKey ? DEFAULT_ADMIN_ID : generateUuid();
+        if (entry.user) entry.user.id = correctId;
+        if (entry.profile) entry.profile.id = correctId;
+        modified = true;
+      }
+    }
+
+    // Ensure default admin exists with valid UUID
     const adminKey = DEFAULT_ADMIN_EMAIL.toLowerCase();
     if (!parsed[adminKey]) {
       parsed[adminKey] = {
         password: '12345678',
         user: {
-          id: 'admin-user-mudassir',
+          id: DEFAULT_ADMIN_ID,
           email: DEFAULT_ADMIN_EMAIL,
           user_metadata: { full_name: 'Mudassir (Admin)' },
         },
         profile: {
-          id: 'admin-user-mudassir',
+          id: DEFAULT_ADMIN_ID,
           email: DEFAULT_ADMIN_EMAIL,
           full_name: 'Mudassir (Admin)',
           phone: '03001234567',
@@ -35,6 +76,10 @@ export function getStoredUsers() {
           created_at: '2026-01-01T00:00:00Z',
         },
       };
+      modified = true;
+    }
+
+    if (modified) {
       localStorage.setItem(LOCAL_USERS_KEY, JSON.stringify(parsed));
     }
     return parsed;
@@ -43,12 +88,12 @@ export function getStoredUsers() {
       [DEFAULT_ADMIN_EMAIL.toLowerCase()]: {
         password: '12345678',
         user: {
-          id: 'admin-user-mudassir',
+          id: DEFAULT_ADMIN_ID,
           email: DEFAULT_ADMIN_EMAIL,
           user_metadata: { full_name: 'Mudassir (Admin)' },
         },
         profile: {
-          id: 'admin-user-mudassir',
+          id: DEFAULT_ADMIN_ID,
           email: DEFAULT_ADMIN_EMAIL,
           full_name: 'Mudassir (Admin)',
           phone: '03001234567',
@@ -76,7 +121,28 @@ export function getStoredSession() {
   if (typeof window === 'undefined') return null;
   try {
     const raw = localStorage.getItem(LOCAL_SESSION_KEY);
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+    const session = JSON.parse(raw);
+    if (!session || !session.user) return null;
+
+    let modified = false;
+    const userEmail = (session.user.email || '').toLowerCase();
+    const isDefaultAdmin = userEmail === DEFAULT_ADMIN_EMAIL.toLowerCase();
+
+    // Migrate any legacy non-UUID user id (e.g. 'admin-user-mudassir') to valid UUID
+    if (!session.user.id || !isValidUuid(session.user.id) || session.user.id === 'admin-user-mudassir') {
+      const fixedId = isDefaultAdmin ? DEFAULT_ADMIN_ID : generateUuid();
+      session.user.id = fixedId;
+      if (session.profile) {
+        session.profile.id = fixedId;
+      }
+      modified = true;
+    }
+
+    if (modified) {
+      saveStoredSession(session);
+    }
+    return session;
   } catch {
     return null;
   }
@@ -129,7 +195,7 @@ export function AuthProvider({ children }) {
     if (isSupabaseConfigured()) {
       try {
         let query = supabase.from('profiles').select('*');
-        if (userId && !userId.startsWith('admin-') && !userId.startsWith('local-')) {
+        if (userId && isValidUuid(userId)) {
           query = query.eq('id', userId);
         } else if (targetEmail) {
           query = query.eq('email', targetEmail);
@@ -157,8 +223,10 @@ export function AuthProvider({ children }) {
     // 3. Fallback default admin profile
     if (targetEmail === DEFAULT_ADMIN_EMAIL.toLowerCase()) {
       const adminProf = {
-        id: 'admin-user-mudassir',
+        id: DEFAULT_ADMIN_ID,
         email: DEFAULT_ADMIN_EMAIL,
+        username: 'mudassir2k6',
+        display_identifier: 'mudassir2k6',
         full_name: 'Mudassir (Admin)',
         phone: '03001234567',
         city: 'Lahore',
@@ -195,6 +263,7 @@ export function AuthProvider({ children }) {
     }
 
     // Check local session first for instantaneous boot
+    migrateStoredListingsUserIds();
     const localSess = getStoredSession();
     if (localSess?.user) {
       setUser(localSess.user);
@@ -261,6 +330,7 @@ export function AuthProvider({ children }) {
 
   const signUp = useCallback(
     async ({
+      username = null,
       email,
       password,
       fullName,
@@ -272,10 +342,16 @@ export function AuthProvider({ children }) {
       businessAddress = null,
       visitingCard = null,
     }) => {
-      const cleanEmail = email.trim().toLowerCase();
+      const rawIdentifier = (username || (email && !email.includes('@') ? email : fullName) || '').trim();
+      const rawEmail = (email || '').trim().toLowerCase();
+      const cleanEmail = rawEmail.includes('@')
+        ? rawEmail
+        : `${rawIdentifier.toLowerCase().replace(/[^a-z0-9._-]/g, '')}@sellsolar.local`;
       const cleanPass = password.trim();
       const cleanPhone = normalizePhone(phone);
-      const isAdm = cleanEmail === DEFAULT_ADMIN_EMAIL.toLowerCase();
+      const isAdm =
+        cleanEmail === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
+        rawIdentifier.toLowerCase() === 'mudassir2k6';
 
       let supabaseUserId = null;
       if (isSupabaseConfigured()) {
@@ -285,6 +361,7 @@ export function AuthProvider({ children }) {
             password: cleanPass,
             options: {
               data: {
+                username: rawIdentifier,
                 account_type: accountType,
                 full_name: fullName.trim(),
                 phone: cleanPhone,
@@ -296,19 +373,24 @@ export function AuthProvider({ children }) {
               },
             },
           });
-          if (!error && data?.user) {
+          if (error) {
+            throw error;
+          }
+          if (data?.user) {
             supabaseUserId = data.user.id;
           }
         } catch (err) {
           console.warn('Supabase signup fallback:', err);
+          throw err;
         }
       }
 
-      const newId = supabaseUserId || (isAdm ? 'admin-user-mudassir' : `local-user-${Date.now()}`);
+      const newId = supabaseUserId || (isAdm ? DEFAULT_ADMIN_ID : generateUuid());
       const newUser = {
         id: newId,
         email: cleanEmail,
         user_metadata: {
+          username: rawIdentifier,
           full_name: fullName.trim(),
           account_type: accountType,
         },
@@ -316,7 +398,9 @@ export function AuthProvider({ children }) {
 
       const newProfile = {
         id: newId,
+        username: rawIdentifier,
         email: cleanEmail,
+        display_identifier: rawIdentifier || cleanEmail,
         full_name: fullName.trim(),
         phone: cleanPhone,
         city: city || null,
@@ -330,13 +414,17 @@ export function AuthProvider({ children }) {
         created_at: new Date().toISOString(),
       };
 
-      // Save to local users store
+      // Save to local users store (indexed by email AND raw identifier/username)
       const localUsers = getStoredUsers();
-      localUsers[cleanEmail] = {
+      const userRecord = {
         password: cleanPass,
         user: newUser,
         profile: newProfile,
       };
+      localUsers[cleanEmail] = userRecord;
+      if (rawIdentifier) {
+        localUsers[rawIdentifier.toLowerCase()] = userRecord;
+      }
       saveStoredUsers(localUsers);
 
       // Save to active session
@@ -359,16 +447,52 @@ export function AuthProvider({ children }) {
   );
 
   const signIn = useCallback(
-    async (email, password) => {
-      const cleanEmail = email.trim().toLowerCase();
+    async (identifier, password) => {
+      const cleanIdentifier = (identifier || '').trim().toLowerCase();
       const cleanPass = password.trim();
-      const isAdm = cleanEmail === DEFAULT_ADMIN_EMAIL.toLowerCase();
+      const digitsOnly = cleanIdentifier.replace(/\D/g, '');
 
-      // 1. Try Supabase if configured (catch any errors silently)
-      if (isSupabaseConfigured()) {
+      const isAdm =
+        cleanIdentifier === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
+        cleanIdentifier === 'mudassir2k6' ||
+        cleanIdentifier === 'mudassir' ||
+        (digitsOnly.length >= 10 && digitsOnly === '03001234567');
+
+      // 1. Check local users store first to find matching user record
+      const users = getStoredUsers();
+      let record = users[cleanIdentifier];
+      let matchedEmail = cleanIdentifier.includes('@') ? cleanIdentifier : null;
+
+      if (!record) {
+        for (const [key, val] of Object.entries(users)) {
+          const prof = val?.profile || {};
+          const keyDigits = (prof.phone || '').replace(/\D/g, '');
+          const cnicDigits = (prof.cnic || '').replace(/\D/g, '');
+          const emailPrefix = key.split('@')[0]?.toLowerCase();
+          const storedUsername = (prof.username || '').toLowerCase();
+
+          if (
+            key.toLowerCase() === cleanIdentifier ||
+            storedUsername === cleanIdentifier ||
+            (emailPrefix && emailPrefix === cleanIdentifier) ||
+            (digitsOnly.length >= 7 && keyDigits && keyDigits === digitsOnly) ||
+            (digitsOnly.length >= 7 && cnicDigits && cnicDigits === digitsOnly) ||
+            (prof.cnic && prof.cnic.toLowerCase() === cleanIdentifier)
+          ) {
+            record = val;
+            matchedEmail = key.includes('@') ? key : prof.email || key;
+            break;
+          }
+        }
+      } else {
+        matchedEmail = record.profile?.email || cleanIdentifier;
+      }
+
+      // 2. Try Supabase if configured and we resolved an email
+      if (isSupabaseConfigured() && matchedEmail && matchedEmail.includes('@')) {
         try {
           const { data, error } = await supabase.auth.signInWithPassword({
-            email: cleanEmail,
+            email: matchedEmail,
             password: cleanPass,
           });
           if (!error && data?.session?.user) {
@@ -376,9 +500,9 @@ export function AuthProvider({ children }) {
             await loadProfile(data.session.user.id, data.session.user.email);
             const activeProfile = {
               id: data.session.user.id,
-              email: cleanEmail,
-              full_name: data.session.user.user_metadata?.full_name || cleanEmail.split('@')[0],
-              is_admin: isAdm,
+              email: matchedEmail,
+              full_name: data.session.user.user_metadata?.full_name || matchedEmail.split('@')[0],
+              is_admin: isAdm || matchedEmail.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase(),
             };
             saveStoredSession({
               user: data.session.user,
@@ -391,29 +515,26 @@ export function AuthProvider({ children }) {
         }
       }
 
-      // 2. Local credentials check
-      const users = getStoredUsers();
-      const record = users[cleanEmail];
-
-      // 3. Admin credentials check (mudassir2k6@gmail.com)
+      // 3. Admin credentials check (mudassir2k6@gmail.com / mudassir2k6 / 03001234567)
       if (isAdm) {
         if (record && (record.password === cleanPass || cleanPass === '12345678')) {
-          const activeUser = record.user;
-          const activeProfile = record.profile;
+          const activeUser = { ...record.user, id: DEFAULT_ADMIN_ID };
+          const activeProfile = { ...record.profile, id: DEFAULT_ADMIN_ID };
           setUser(activeUser);
           setProfile(activeProfile);
           saveStoredSession({ user: activeUser, profile: activeProfile });
           return { success: true, user: activeUser, profile: activeProfile };
         }
-        if (!record && cleanPass === '12345678') {
+        if (!record && (cleanPass === '12345678' || record?.password === cleanPass)) {
           const defaultUser = {
-            id: 'admin-user-mudassir',
+            id: DEFAULT_ADMIN_ID,
             email: DEFAULT_ADMIN_EMAIL,
             user_metadata: { full_name: 'Mudassir (Admin)' },
           };
           const defaultProfile = {
-            id: 'admin-user-mudassir',
+            id: DEFAULT_ADMIN_ID,
             email: DEFAULT_ADMIN_EMAIL,
+            username: 'mudassir2k6',
             full_name: 'Mudassir (Admin)',
             phone: '03001234567',
             city: 'Lahore',
@@ -422,11 +543,14 @@ export function AuthProvider({ children }) {
             is_verified_dealer: false,
             created_at: '2026-01-01T00:00:00Z',
           };
-          users[cleanEmail] = {
+          const adminRec = {
             password: cleanPass,
             user: defaultUser,
             profile: defaultProfile,
           };
+          users[DEFAULT_ADMIN_EMAIL.toLowerCase()] = adminRec;
+          users['mudassir2k6'] = adminRec;
+          users['03001234567'] = adminRec;
           saveStoredUsers(users);
           setUser(defaultUser);
           setProfile(defaultProfile);
@@ -450,7 +574,7 @@ export function AuthProvider({ children }) {
       }
 
       // 5. Account not found (never signed up) -> DO NOT auto-create!
-      throw new Error('No account found with this email. Please sign up first.');
+      throw new Error('No account found with this username, mobile, CNIC, or email. Please sign up first.');
     },
     [loadProfile]
   );
@@ -465,13 +589,14 @@ export function AuthProvider({ children }) {
         users[email].password = newPassword;
         saveStoredUsers(users);
       } else {
+        const fallbackId = email === DEFAULT_ADMIN_EMAIL.toLowerCase() ? DEFAULT_ADMIN_ID : generateUuid();
         const fallbackUser = {
-          id: `local-user-${Date.now()}`,
+          id: fallbackId,
           email,
           user_metadata: { full_name: email.split('@')[0] },
         };
         const fallbackProfile = {
-          id: fallbackUser.id,
+          id: fallbackId,
           email,
           full_name: email.split('@')[0],
           phone: '03001234567',

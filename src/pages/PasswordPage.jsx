@@ -18,6 +18,7 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { useAuth, getStoredUsers } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { isValidEmail } from '../lib/auth';
+import { checkRateLimit, isBotHoneypotTriggered, sanitizeText } from '../lib/security';
 
 function getPasswordStrength(pass) {
   if (!pass) return { score: 0, text: '', color: 'bg-gray-200', width: 'w-0' };
@@ -47,6 +48,8 @@ export default function PasswordPage({
   const [mode, setMode] = useState(initialMode);
   
   const [email, setEmail] = useState(user?.email || '');
+  const [verificationCode, setVerificationCode] = useState('');
+  const [honeypot, setHoneypot] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -79,6 +82,7 @@ export default function PasswordPage({
   // Send password reset email link
   const handleSendResetEmail = async (e) => {
     e?.preventDefault();
+    if (isBotHoneypotTriggered(honeypot)) return;
     setError(null);
     setSuccessMessage(null);
 
@@ -89,6 +93,12 @@ export default function PasswordPage({
     }
     if (!isValidEmail(targetEmail)) {
       setError('Please enter a valid email address.');
+      return;
+    }
+
+    const rateCheck = checkRateLimit('password_reset', targetEmail || 'global');
+    if (!rateCheck.allowed) {
+      setError(rateCheck.reason);
       return;
     }
 
@@ -119,10 +129,29 @@ export default function PasswordPage({
   // Update password (from email recovery link OR while logged in)
   const handleUpdatePassword = async (e) => {
     e?.preventDefault();
+    if (isBotHoneypotTriggered(honeypot)) return;
     setError(null);
     setSuccessMessage(null);
 
-    if (mode === 'change' && !currentPassword) {
+    const targetIdentifier = (user?.email || email || '').trim();
+
+    if (!user && !targetIdentifier) {
+      setError('Please enter your registered email address or username.');
+      return;
+    }
+
+    if (!user && !verificationCode.trim()) {
+      setError('Security verification required: Enter your registered mobile number, CNIC, or Admin Master PIN to verify ownership.');
+      return;
+    }
+
+    const rateCheck = checkRateLimit('password_reset', targetIdentifier || 'global');
+    if (!rateCheck.allowed) {
+      setError(rateCheck.reason);
+      return;
+    }
+
+    if (mode === 'change' && user && !currentPassword) {
       setError('Current password is required.');
       return;
     }
@@ -166,7 +195,7 @@ export default function PasswordPage({
 
       // Update the user's password in Supabase and local store
       if (updatePassword) {
-        await updatePassword(newPassword, user?.email || email);
+        await updatePassword(newPassword, targetIdentifier, verificationCode.trim());
       }
       try {
         await supabase.auth.updateUser({
@@ -186,6 +215,7 @@ export default function PasswordPage({
       setNewPassword('');
       setConfirmPassword('');
       setCurrentPassword('');
+      setVerificationCode('');
 
       setTimeout(() => {
         if (onSuccess) {
@@ -392,6 +422,68 @@ export default function PasswordPage({
             {/* MODE 2 & 3: SET NEW PASSWORD / CHANGE PASSWORD */}
             {(mode === 'change' || mode === 'reset') && (
               <form onSubmit={handleUpdatePassword} className="mt-6 space-y-4">
+                {/* Anti-Bot Honeypot */}
+                <div className="absolute -left-[9999px] top-0 opacity-0 pointer-events-none h-0 w-0 overflow-hidden" aria-hidden="true">
+                  <label htmlFor="pwd-hp-token">Security Token</label>
+                  <input
+                    id="pwd-hp-token"
+                    type="text"
+                    name="pwd_hp_token"
+                    value={honeypot}
+                    onChange={(e) => setHoneypot(e.target.value)}
+                    tabIndex={-1}
+                    autoComplete="off"
+                  />
+                </div>
+
+                {/* If unauthenticated, require account identifier and verification code */}
+                {!user && (
+                  <>
+                    <div>
+                      <div className="mb-1.5 flex items-center justify-between">
+                        <label className="block text-sm font-semibold text-gray-700">
+                          Registered Email or Username *
+                        </label>
+                        <span className="text-[11px] font-medium text-gray-400">Account ID</span>
+                      </div>
+                      <div className="relative">
+                        <Mail className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+                        <input
+                          type="text"
+                          required
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value.trim())}
+                          placeholder="e.g. mudassir2k6@gmail.com or username"
+                          className="input-field pl-11 pr-4"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="mb-1.5 flex items-center justify-between">
+                        <label className="block text-sm font-semibold text-gray-700">
+                          Security Verification (Mobile / CNIC) *
+                        </label>
+                        <span className="text-[11px] font-semibold text-primary-600">Anti-Hack check</span>
+                      </div>
+                      <div className="relative">
+                        <ShieldCheck className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+                        <input
+                          type="text"
+                          required
+                          value={verificationCode}
+                          onChange={(e) => setVerificationCode(e.target.value.trim())}
+                          placeholder="e.g. 03001234567, CNIC, or Admin PIN"
+                          className="input-field pl-11 pr-4"
+                        />
+                      </div>
+                      <p className="mt-1 text-xs text-gray-500">
+                        🛡️ Anti-Hack Protection: Required to confirm you are the true owner of this account.
+                      </p>
+                    </div>
+                  </>
+                )}
+
                 {/* If mode === 'change' and user is logged in, optional current password */}
                 {mode === 'change' && user && (
                   <div>

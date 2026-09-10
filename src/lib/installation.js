@@ -1,10 +1,15 @@
 import { supabase } from './supabase';
 import { isValidUuid } from './auth';
+import { checkRateLimit, recordRateLimitAttempt, sanitizeText } from './security';
 
 export const ADMIN_NOTIFICATION_EMAIL = 'mudassir2k6@gmail.com';
 
 /**
  * Submit an installation request and trigger admin email notification
+ * Hardened with:
+ * - Rate limiting (Max 3 requests per 5 minutes per phone/client)
+ * - Input sanitization against script injection & oversized payloads
+ * - Safe storage quota management
  */
 export async function submitInstallationRequest({
   fullName,
@@ -15,18 +20,43 @@ export async function submitInstallationRequest({
   propertyType = 'Residential',
   notes = '',
   userId = null,
+  honeypot = '',
 }) {
+  // Anti-bot Honeypot check
+  if (honeypot && String(honeypot).trim().length > 0) {
+    console.warn('[SECURITY] Bot submission trapped by installation honeypot.');
+    return {
+      success: true,
+      data: { id: `trapped_${Date.now()}` },
+      emailStatus: { sent: true, adminEmail: ADMIN_NOTIFICATION_EMAIL, simulated: true },
+    };
+  }
+
   const cleanPhone = String(phone).replace(/[^0-9]/g, '');
-  
+
+  // Rate Limiting & DoS / Spam flood protection
+  const rateCheck = checkRateLimit('installation_request', cleanPhone || 'global');
+  if (!rateCheck.allowed) {
+    throw new Error(rateCheck.reason);
+  }
+
+  // Sanitize all inputs to prevent XSS and payload corruption
+  const safeFullName = sanitizeText(fullName, 100);
+  const safeCity = sanitizeText(city, 60);
+  const safeAddress = sanitizeText(address, 250);
+  const safeSystemSize = sanitizeText(systemSize, 80);
+  const safePropertyType = sanitizeText(propertyType, 50);
+  const safeNotes = notes ? sanitizeText(notes, 1000) : null;
+
   // 1. Insert into Supabase table
   const payload = {
-    full_name: fullName.trim(),
-    city: city.trim(),
-    address: address.trim(),
+    full_name: safeFullName,
+    city: safeCity,
+    address: safeAddress,
     contact_phone: cleanPhone,
-    system_size: systemSize,
-    property_type: propertyType,
-    notes: notes ? notes.trim() : null,
+    system_size: safeSystemSize,
+    property_type: safePropertyType,
+    notes: safeNotes,
     created_at: new Date().toISOString(),
   };
 
@@ -73,7 +103,10 @@ export async function submitInstallationRequest({
     console.warn('Database insert warning (using local fallback if network issues):', err);
   }
 
-  // Also save to local storage history as safety redundancy
+  // Record rate limit attempt
+  recordRateLimitAttempt('installation_request', cleanPhone || 'global');
+
+  // Also save to local storage history with quota cap (50 items max)
   try {
     const existing = JSON.parse(localStorage.getItem('sellsolar_install_requests') || '[]');
     existing.unshift({

@@ -1606,7 +1606,7 @@ function yx({
 }){
   const{
     profile:r,user:seller
-  }=useAuth(),[n,s]=useState(!1),[a,l]=useState(null),[o,c]=useState(!1),[u,d]=useState(""),[h,p]=useState(""),[y,w]=useState("panel"),[j,C]=useState("new"),[g,f]=useState(""),[m,v]=useState((r==null?void 0:r.city)||""),[k,x]=useState(""),[S,L]=useState(""),[z,I]=useState(""),[Y,ke]=useState(""),[ye,Be]=useState((r==null?void 0:r.full_name)||""),[le,We]=useState((r==null?void 0:r.phone)||""),[uploadedFiles,setUploadedFiles]=useState([]),[uploadNotice,setUploadNotice]=useState(""),Xe=async()=>{
+  }=useAuth(),[n,s]=useState(!1),[a,l]=useState(null),[o,c]=useState(!1),[u,d]=useState(""),[h,p]=useState(""),[y,w]=useState("panel"),[j,C]=useState("used"),[g,f]=useState(""),[m,v]=useState((r==null?void 0:r.city)||""),[k,x]=useState(""),[S,L]=useState(""),[z,I]=useState(""),[Y,ke]=useState(""),[ye,Be]=useState((r==null?void 0:r.full_name)||""),[le,We]=useState((r==null?void 0:r.phone)||""),[uploadedFiles,setUploadedFiles]=useState([]),[uploadNotice,setUploadNotice]=useState(""),Xe=async()=>{
     if(l(null),!u.trim()||!h.trim()||!g.trim()||!m.trim()){
       l("Please fill in all required fields (title, brand, price, city)");
       return
@@ -1755,6 +1755,7 @@ function yx({
                   className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"Condition *"
                 }),jsx("div",{
                   className:"flex gap-2",children:gx.map(_=>jsx("button",{
+                    type:"button",
                     onClick:()=>C(_),className:`flex-1 rounded-xl border-2 py-3 text-sm font-semibold capitalize transition-all ${j===_?"border-primary-500 bg-primary-50 text-primary-700":"border-gray-200 text-gray-600 hover:border-gray-300"}`,children:_
                   },_))
                 })]

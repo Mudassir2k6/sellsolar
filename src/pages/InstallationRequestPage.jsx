@@ -63,6 +63,8 @@ export default function InstallationRequestPage({ onBack }) {
   const [systemSize, setSystemSize] = useState('5 kW (Standard 5-10 Marla Home)');
   const [propertyType, setPropertyType] = useState('Residential');
   const [notes, setNotes] = useState('');
+  const [honeypot, setHoneypot] = useState('');
+  const [formMountTime] = useState(() => Date.now());
   
   const [fieldErrors, setFieldErrors] = useState({});
   const [busy, setBusy] = useState(false);
@@ -85,6 +87,13 @@ export default function InstallationRequestPage({ onBack }) {
   const handleSubmit = async (e) => {
     e?.preventDefault();
     setError(null);
+
+    // Anti-Bot Protection
+    if (honeypot.trim() || (Date.now() - formMountTime < 800)) {
+      console.warn('[SECURITY] Automated submission blocked.');
+      setError('Request could not be processed due to automated activity. Please try again.');
+      return;
+    }
 
     const actualCity = city === 'Other' ? customCity.trim() : city.trim();
 
@@ -119,6 +128,7 @@ export default function InstallationRequestPage({ onBack }) {
         propertyType,
         notes: notes.trim(),
         userId: user?.id || null,
+        honeypot: honeypot.trim(),
       });
 
       if (!res.success) {
@@ -304,6 +314,20 @@ export default function InstallationRequestPage({ onBack }) {
               </div>
 
               <form className="mt-6 space-y-5" onSubmit={handleSubmit} noValidate>
+                {/* Anti-Bot Honeypot */}
+                <div className="absolute -left-[9999px] top-0 opacity-0 pointer-events-none h-0 w-0 overflow-hidden" aria-hidden="true">
+                  <label htmlFor="install-site-token">Website Security Token</label>
+                  <input
+                    id="install-site-token"
+                    type="text"
+                    name="install_site_token"
+                    value={honeypot}
+                    onChange={(e) => setHoneypot(e.target.value)}
+                    tabIndex={-1}
+                    autoComplete="off"
+                  />
+                </div>
+
                 {/* 1. Full Name (MANDATORY) */}
                 <div id="field-fullName">
                   <label className="mb-1.5 flex items-center justify-between text-sm font-bold text-gray-800 dark:text-gray-200">

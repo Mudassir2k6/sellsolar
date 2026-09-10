@@ -6,11 +6,13 @@ import {
   Eye,
   EyeOff,
   Image,
+  KeyRound,
   LoaderCircle,
   Lock,
   Mail,
   MapPin,
   Phone,
+  ShieldCheck,
   Store,
   Sun,
   User,
@@ -20,6 +22,7 @@ import { useAuth, getStoredUsers, DEFAULT_ADMIN_EMAIL } from '../context/AuthCon
 import { useToast } from '../context/ToastContext';
 import { CITIES } from '../lib/constants';
 import { digitsOnlyPhone, isValidEmail, isValidPhone, normalizePhone } from '../lib/auth';
+import { isBotHoneypotTriggered, isSubmissionTooFast, checkRateLimit, sanitizeText } from '../lib/security';
 
 function authErrorMessage(error, activeView = 'login') {
   if (!error) return 'An error occurred. Please try again.';
@@ -241,12 +244,20 @@ async function contactAlreadyExists({ username, email, phone, cnic }) {
   return null;
 }
 
+function getPasswordStrength(pass) {
+  if (!pass) return { score: 0, text: '', color: 'bg-gray-200 dark:bg-gray-700', width: 'w-0' };
+  if (pass.length < 8) return { score: 1, text: 'Too short (min 8 characters)', color: 'bg-error-500', width: 'w-1/3' };
+  if (pass.length < 10) return { score: 2, text: 'Good length', color: 'bg-amber-500', width: 'w-2/3' };
+  return { score: 3, text: 'Strong password', color: 'bg-secondary-500', width: 'w-full' };
+}
+
 export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
   const { signIn, signUp, updatePassword, refreshProfile, completePasswordRecovery } = useAuth();
   const { showToast } = useToast();
   const [view, setView] = useState(initialView);
   const [accountType, setAccountType] = useState('individual');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const [info, setInfo] = useState(null);
@@ -264,6 +275,9 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
   const [businessName, setBusinessName] = useState('');
   const [businessAddress, setBusinessAddress] = useState('');
   const [visitingCard, setVisitingCard] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
+  const [honeypot, setHoneypot] = useState('');
+  const [formMountTime] = useState(() => Date.now());
   const [fieldErrors, setFieldErrors] = useState({});
   const [fieldErrorMessages, setFieldErrorMessages] = useState({});
   const isDealer = accountType === 'dealer';
@@ -273,6 +287,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
   const signupUsernameRef = useRef(null);
   const signupEmailRef = useRef(null);
   const emailRef = useRef(null);
+  const verificationCodeRef = useRef(null);
   const passwordRef = useRef(null);
   const confirmPasswordRef = useRef(null);
   const phoneRef = useRef(null);
@@ -280,6 +295,22 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
   const cnicRef = useRef(null);
   const businessNameRef = useRef(null);
   const businessAddressRef = useRef(null);
+  const visitingCardRef = useRef(null);
+  const submitButtonRef = useRef(null);
+
+  const focusRef = (targetRef) => {
+    const target = targetRef?.current || targetRef;
+    if (!target) return;
+    try {
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } catch {
+      // ignore
+    }
+    target.focus();
+    if (typeof target.select === 'function' && target.tagName !== 'BUTTON' && target.tagName !== 'SELECT') {
+      target.select();
+    }
+  };
 
   const focusField = (fieldKey) => {
     setTimeout(() => {
@@ -289,6 +320,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
         signupUsername: signupUsernameRef.current,
         email: view === 'signup' ? signupEmailRef.current : emailRef.current,
         signupEmail: signupEmailRef.current,
+        verificationCode: verificationCodeRef.current,
         password: passwordRef.current,
         confirmPassword: confirmPasswordRef.current,
         phone: phoneRef.current,
@@ -296,24 +328,80 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
         cnic: cnicRef.current,
         businessName: businessNameRef.current,
         businessAddress: businessAddressRef.current,
+        visitingCard: visitingCardRef.current,
+        submit: submitButtonRef.current,
       };
       const target = refMap[fieldKey];
       if (target) {
-        try {
-          target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } catch {
-          // ignore
-        }
-        target.focus();
-        if (typeof target.select === 'function') {
-          target.select();
-        }
+        focusRef(target);
       }
     }, 50);
   };
 
+  const handleFieldKeyDown = (e, currentField) => {
+    if (e.key !== 'Enter' && e.keyCode !== 13) return;
+    if (e.shiftKey) return;
+    e.preventDefault();
+
+    if (view === 'login') {
+      if (currentField === 'loginUsername') {
+        focusRef(passwordRef);
+      } else if (currentField === 'loginPassword') {
+        focusRef(submitButtonRef);
+        handleLogin();
+      }
+    } else if (view === 'signup') {
+      if (currentField === 'fullName') {
+        focusRef(signupUsernameRef);
+      } else if (currentField === 'signupUsername') {
+        focusRef(signupEmailRef);
+      } else if (currentField === 'signupEmail') {
+        focusRef(passwordRef);
+      } else if (currentField === 'signupPassword') {
+        focusRef(phoneRef);
+      } else if (currentField === 'phone') {
+        focusRef(cityRef);
+      } else if (currentField === 'city') {
+        if (isDealer) {
+          focusRef(cnicRef);
+        } else {
+          focusRef(submitButtonRef);
+        }
+      } else if (currentField === 'cnic') {
+        focusRef(businessNameRef);
+      } else if (currentField === 'businessName') {
+        focusRef(businessAddressRef);
+      } else if (currentField === 'businessAddress') {
+        focusRef(visitingCardRef);
+      } else if (currentField === 'visitingCard') {
+        focusRef(submitButtonRef);
+      }
+    } else if (view === 'forgot') {
+      if (currentField === 'forgotEmail') {
+        focusRef(submitButtonRef);
+        handleForgot();
+      }
+    } else if (view === 'reset') {
+      if (currentField === 'resetEmail') {
+        focusRef(passwordRef);
+      } else if (currentField === 'resetPassword') {
+        focusRef(confirmPasswordRef);
+      } else if (currentField === 'confirmPassword') {
+        focusRef(submitButtonRef);
+        handleReset();
+      }
+    }
+  };
+
   useEffect(() => {
     setView(initialView);
+    setTimeout(() => {
+      if (initialView === 'signup') {
+        fullNameRef.current?.focus();
+      } else if (initialView === 'login' || initialView === 'forgot' || initialView === 'reset') {
+        emailRef.current?.focus();
+      }
+    }, 100);
   }, [initialView]);
 
   const clearSignupFields = () => {
@@ -358,6 +446,13 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
       setFieldErrorMessages({});
     }
     setView(next);
+    setTimeout(() => {
+      if (next === 'signup') {
+        fullNameRef.current?.focus();
+      } else if (next === 'login' || next === 'forgot' || next === 'reset') {
+        emailRef.current?.focus();
+      }
+    }, 50);
   };
 
   const handleSignup = async () => {
@@ -507,8 +602,16 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
   const handleLogin = async () => {
     setError(null);
     setFieldErrorMessages({});
+
+    const cleanIdentifier = email.trim();
+    const rateCheck = checkRateLimit('login', cleanIdentifier || 'global');
+    if (!rateCheck.allowed) {
+      setError(rateCheck.reason);
+      return;
+    }
+
     const nextErrors = {
-      email: !email.trim(),
+      email: !cleanIdentifier,
       password: !password.trim(),
     };
     setFieldErrors(nextErrors);
@@ -522,10 +625,10 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
     }
     setBusy(true);
     try {
-      const res = await signIn(email.trim(), password.trim());
+      const res = await signIn(cleanIdentifier, password.trim());
       showToast({
         title: 'Successfully Logged In',
-        message: `Welcome back! Signed in as ${email.trim()}.`,
+        message: `Welcome back! Signed in as ${cleanIdentifier}.`,
         type: 'success',
       });
       onSuccess();
@@ -540,7 +643,15 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
   const handleForgot = async () => {
     setError(null);
     setInfo(null);
-    const emailInvalid = !email.trim() || !isValidEmail(email);
+    const cleanMail = email.trim().toLowerCase();
+
+    const rateCheck = checkRateLimit('password_reset', cleanMail || 'global');
+    if (!rateCheck.allowed) {
+      setError(rateCheck.reason);
+      return;
+    }
+
+    const emailInvalid = !cleanMail || !isValidEmail(cleanMail);
     setFieldErrors({ email: emailInvalid });
     if (emailInvalid) {
       setError('Please enter a valid email address (e.g. you@example.com) to receive the password reset link.');
@@ -550,19 +661,23 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
     setBusy(true);
     try {
       if (isSupabaseConfigured()) {
-        const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-          redirectTo: `${window.location.origin}/`,
-        });
-        if (resetError) {
-          console.warn('Supabase reset link notice:', resetError);
+        try {
+          const { error: resetError } = await supabase.auth.resetPasswordForEmail(cleanMail, {
+            redirectTo: `${window.location.origin}/`,
+          });
+          if (resetError) {
+            console.warn('Supabase reset link notice:', resetError);
+          }
+        } catch (supErr) {
+          console.warn('Supabase reset call exception:', supErr);
         }
       }
       showToast({
-        title: 'Reset Link Sent',
-        message: `A password reset link has been sent to ${email.trim()}. Please check your email inbox.`,
+        title: 'Reset Request Processed',
+        message: `Password reset instructions initiated for ${cleanMail}. You can also set a new password directly below.`,
         type: 'success',
       });
-      setInfo(`Password reset link sent to ${email.trim()}! Please check your email inbox to reset your password.`);
+      setInfo(`Password reset link sent to ${cleanMail}! Please check your email inbox and spam folder.`);
     } catch (err) {
       setError(authErrorMessage(err, 'forgot'));
     } finally {
@@ -572,27 +687,55 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
 
   const handleReset = async () => {
     setError(null);
-    if (password.length < 8) {
+    setInfo(null);
+    const targetIdentifier = (email || '').trim();
+    if (!targetIdentifier) {
+      setError('Please enter your registered email address or username.');
+      setFieldErrors({ email: true });
+      focusField('email');
+      return;
+    }
+    if (!verificationCode.trim()) {
+      setError('Security verification required: Enter your registered mobile number, CNIC, or Admin Master PIN to verify ownership.');
+      setFieldErrors({ verificationCode: true });
+      focusField('verificationCode');
+      return;
+    }
+    if (!password || password.length < 8) {
       setError('Password must be at least 8 characters.');
+      setFieldErrors({ password: true });
+      focusField('password');
       return;
     }
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError('Passwords do not match. Please re-enter.');
+      setFieldErrors({ confirmPassword: true });
+      focusField('confirmPassword');
       return;
     }
     setBusy(true);
     try {
       if (updatePassword) {
-        await updatePassword(password, email.trim());
+        await updatePassword(password, targetIdentifier, verificationCode.trim());
       }
       completePasswordRecovery?.();
       showToast({
-        title: 'Password Updated',
-        message: 'Your password has been reset successfully.',
+        title: 'Password Updated Successfully',
+        message: 'Your new password has been set. Logging you in...',
         type: 'success',
       });
-      setInfo('Password updated successfully! You can now sign in.');
-      setTimeout(() => onSuccess(), 1000);
+      setInfo('Password updated successfully! Logging you in...');
+
+      // Attempt immediate sign-in with the new password
+      try {
+        await signIn(targetIdentifier, password);
+        setTimeout(() => onSuccess(), 800);
+      } catch {
+        setInfo('Password updated successfully! Please sign in with your new password.');
+        setTimeout(() => {
+          go('login');
+        }, 1200);
+      }
     } catch (err) {
       setError(authErrorMessage(err, 'reset'));
     } finally {
@@ -601,6 +744,11 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
   };
 
   const submit = () => {
+    if (isBotHoneypotTriggered(honeypot) || isSubmissionTooFast(formMountTime, 0.6)) {
+      console.warn('[SECURITY] Bot submission blocked.');
+      setError('Automated submission detected. Please try again.');
+      return;
+    }
     if (view === 'login') return handleLogin();
     if (view === 'signup') return handleSignup();
     if (view === 'forgot') return handleForgot();
@@ -610,8 +758,8 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
   const titles = {
     login: ['Welcome back', 'Sign in using your username, mobile, or CNIC'],
     signup: ['Create your account', 'Join SellSolar with any unique username or identifier'],
-    forgot: ['Reset your password', 'Enter your registered email and we will send you a password reset link'],
-    reset: ['Set a new password', 'Enter a new password for your account'],
+    forgot: ['Reset your password', 'Enter your registered email to receive a link, or set your new password directly'],
+    reset: ['Set a new password', 'Enter your registered email or username and choose your new password'],
   };
 
   return (
@@ -665,6 +813,35 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
             </div>
           )}
 
+          {(view === 'forgot' || view === 'reset') && (
+            <div className="mb-6 flex rounded-xl bg-gray-100 dark:bg-gray-800 p-1">
+              <button
+                type="button"
+                onClick={() => go('forgot')}
+                className={`flex-1 rounded-lg py-2.5 text-sm font-semibold transition-all flex items-center justify-center gap-1.5 ${
+                  view === 'forgot'
+                    ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                <Mail className="h-4 w-4" />
+                <span>Send Reset Link</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => go('reset')}
+                className={`flex-1 rounded-lg py-2.5 text-sm font-semibold transition-all flex items-center justify-center gap-1.5 ${
+                  view === 'reset'
+                    ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                <KeyRound className="h-4 w-4" />
+                <span>Set New Password Directly</span>
+              </button>
+            </div>
+          )}
+
           <div className="card p-6 shadow-xl sm:p-8 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800">
             <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
               {titles[view][0]}
@@ -682,6 +859,14 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                     onClick={() => {
                       setAccountType('individual');
                       setError(null);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.keyCode === 13) {
+                        e.preventDefault();
+                        setAccountType('individual');
+                        setError(null);
+                        focusRef(fullNameRef);
+                      }
                     }}
                     className={`flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all ${
                       accountType === 'individual'
@@ -712,6 +897,14 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                       setAccountType('dealer');
                       setError(null);
                     }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.keyCode === 13) {
+                        e.preventDefault();
+                        setAccountType('dealer');
+                        setError(null);
+                        focusRef(fullNameRef);
+                      }
+                    }}
                     className={`flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all ${
                       isDealer
                         ? 'border-primary-500 bg-primary-50 dark:bg-primary-950/40'
@@ -738,6 +931,20 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
             )}
 
             <div className="mt-6 space-y-4">
+              {/* Anti-Bot Honeypot */}
+              <div className="absolute -left-[9999px] top-0 opacity-0 pointer-events-none h-0 w-0 overflow-hidden" aria-hidden="true">
+                <label htmlFor="auth-security-hp">Security Check</label>
+                <input
+                  id="auth-security-hp"
+                  type="text"
+                  name="auth_security_hp"
+                  value={honeypot}
+                  onChange={(e) => setHoneypot(e.target.value)}
+                  tabIndex={-1}
+                  autoComplete="off"
+                />
+              </div>
+
               {view === 'signup' && (
                 <>
                   <div>
@@ -759,6 +966,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                           setFullName(e.target.value);
                           clearFieldError('fullName');
                         }}
+                        onKeyDown={(e) => handleFieldKeyDown(e, 'fullName')}
                         placeholder="Enter your full name"
                         className={fieldClass('fullName', 'pl-11 pr-11')}
                       />
@@ -797,6 +1005,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                           setSignupUsername(e.target.value.trim());
                           clearFieldError('username');
                         }}
+                        onKeyDown={(e) => handleFieldKeyDown(e, 'signupUsername')}
                         placeholder="e.g. mudassir2k6 or solar_tech"
                         className={fieldClass('username', 'pl-11 pr-11')}
                       />
@@ -843,6 +1052,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                           setSignupEmailTouched(true);
                         }}
                         onBlur={() => setSignupEmailTouched(true)}
+                        onKeyDown={(e) => handleFieldKeyDown(e, 'signupEmail')}
                         placeholder="you@example.com"
                         className={fieldClass(
                           'signupEmail',
@@ -904,6 +1114,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                         setEmailTouched(true);
                       }}
                       onBlur={() => setEmailTouched(true)}
+                      onKeyDown={(e) => handleFieldKeyDown(e, 'forgotEmail')}
                       placeholder="you@example.com"
                       className={fieldClass(
                         'email',
@@ -926,6 +1137,106 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                   ) : (
                     <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
                       ✉️ A secure password reset link will be sent to your verified email address.
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {view === 'reset' && (
+                <div>
+                  <div className="mb-1.5 flex items-center justify-between">
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      Registered Email or Username *
+                    </label>
+                    <span className="text-[11px] font-medium text-gray-400 dark:text-gray-500">
+                      Account identifier
+                    </span>
+                  </div>
+                  <div className="relative">
+                    <Mail
+                      className={`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${
+                        fieldErrors.email ? 'text-error-500' : 'text-gray-400'
+                      }`}
+                    />
+                    <input
+                      ref={emailRef}
+                      id="reset-identifier-input"
+                      type="text"
+                      autoComplete="username"
+                      required
+                      value={email}
+                      onChange={(e) => {
+                        setEmail(e.target.value.trim());
+                        clearFieldError('email');
+                        setEmailTouched(true);
+                      }}
+                      onBlur={() => setEmailTouched(true)}
+                      onKeyDown={(e) => handleFieldKeyDown(e, 'resetEmail')}
+                      placeholder="e.g. naveedms1253@gmail.com or username"
+                      className={fieldClass('email', 'pl-11 pr-11')}
+                    />
+                    {fieldErrors.email ? (
+                      <CircleAlert className="absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" />
+                    ) : null}
+                  </div>
+                  {fieldErrors.email ? (
+                    <p className="mt-1.5 text-xs font-medium text-error-600">
+                      Registered email or username is required.
+                    </p>
+                  ) : (
+                    <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                      🔑 Enter the email address or username registered with your account.
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {view === 'reset' && (
+                <div>
+                  <div className="mb-1.5 flex items-center justify-between">
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      Registered Mobile Number or CNIC *
+                    </label>
+                    <span className="text-[11px] font-semibold text-primary-600 dark:text-primary-400">
+                      Ownership check
+                    </span>
+                  </div>
+                  <div className="relative">
+                    <ShieldCheck
+                      className={`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${
+                        fieldErrors.verificationCode ? 'text-error-500' : 'text-gray-400'
+                      }`}
+                    />
+                    <input
+                      ref={verificationCodeRef}
+                      id="reset-verification-input"
+                      type="text"
+                      required
+                      value={verificationCode}
+                      onChange={(e) => {
+                        setVerificationCode(e.target.value.trim());
+                        clearFieldError('verificationCode');
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          focusField('password');
+                        }
+                      }}
+                      placeholder="e.g. 03001234567, 35201-1234567-1, or Admin PIN"
+                      className={fieldClass('verificationCode', 'pl-11 pr-11')}
+                    />
+                    {fieldErrors.verificationCode ? (
+                      <CircleAlert className="absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" />
+                    ) : null}
+                  </div>
+                  {fieldErrors.verificationCode ? (
+                    <p className="mt-1.5 text-xs font-medium text-error-600">
+                      Please enter your registered mobile number or CNIC to verify ownership.
+                    </p>
+                  ) : (
+                    <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                      🔒 Anti-Hack Protection: Required to confirm you are the true owner of this account.
                     </p>
                   )}
                 </div>
@@ -960,6 +1271,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                         setEmailTouched(true);
                       }}
                       onBlur={() => setEmailTouched(true)}
+                      onKeyDown={(e) => handleFieldKeyDown(e, 'loginUsername')}
                       placeholder="e.g. mudassir2k6, 03001234567, or 35201-1234567-1"
                       className={fieldClass('email', 'pl-11 pr-11')}
                     />
@@ -999,6 +1311,11 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                         setPassword(e.target.value);
                         clearFieldError('password');
                       }}
+                      onKeyDown={(e) => {
+                        if (view === 'login') handleFieldKeyDown(e, 'loginPassword');
+                        else if (view === 'signup') handleFieldKeyDown(e, 'signupPassword');
+                        else if (view === 'reset') handleFieldKeyDown(e, 'resetPassword');
+                      }}
                       placeholder="At least 8 characters"
                       className={fieldClass('password', 'pl-11 pr-16')}
                     />
@@ -1022,6 +1339,23 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                   ) : (
                     <p className="mt-1.5 text-xs text-gray-400">Any 8 or more characters.</p>
                   )}
+                  {view === 'reset' && password && (
+                    <div className="mt-2 space-y-1">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-gray-500 dark:text-gray-400">Password strength:</span>
+                        <span className="font-semibold text-gray-700 dark:text-gray-300">
+                          {getPasswordStrength(password).text}
+                        </span>
+                      </div>
+                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+                        <div
+                          className={`h-full transition-all duration-300 ${
+                            getPasswordStrength(password).color
+                          } ${getPasswordStrength(password).width}`}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -1030,18 +1364,41 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                   <label className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300">
                     Confirm password *
                   </label>
-                  <input
-                    ref={confirmPasswordRef}
-                    id="auth-confirm-password-input"
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => {
-                      setConfirmPassword(e.target.value);
-                      clearFieldError('confirmPassword');
-                    }}
-                    placeholder="Re-enter new password"
-                    className="input-field"
-                  />
+                  <div className="relative">
+                    <Lock
+                      className={`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${
+                        fieldErrors.confirmPassword ? 'text-error-500' : 'text-gray-400'
+                      }`}
+                    />
+                    <input
+                      ref={confirmPasswordRef}
+                      id="auth-confirm-password-input"
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      value={confirmPassword}
+                      onChange={(e) => {
+                        setConfirmPassword(e.target.value);
+                        clearFieldError('confirmPassword');
+                      }}
+                      onKeyDown={(e) => handleFieldKeyDown(e, 'confirmPassword')}
+                      placeholder="Re-enter new password"
+                      className={fieldClass('confirmPassword', 'pl-11 pr-16')}
+                    />
+                    {fieldErrors.confirmPassword ? (
+                      <CircleAlert className="absolute right-11 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" />
+                    ) : null}
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword((v) => !v)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                    >
+                      {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
+                  </div>
+                  {fieldErrors.confirmPassword && (
+                    <p className="mt-1.5 text-xs font-medium text-error-600">
+                      Passwords do not match.
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -1080,6 +1437,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                           setPhone(digitsOnlyPhone(e.target.value));
                           clearFieldError('phone');
                         }}
+                        onKeyDown={(e) => handleFieldKeyDown(e, 'phone')}
                         placeholder="03001234567"
                         className={fieldClass('phone', 'pl-11 pr-11')}
                       />
@@ -1119,6 +1477,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                           setCity(e.target.value);
                           clearFieldError('city');
                         }}
+                        onKeyDown={(e) => handleFieldKeyDown(e, 'city')}
                         className={`select-field pl-11 pr-11 bg-white dark:bg-gray-900 ${
                           fieldErrors.city ? 'border-error-400 ring-1 ring-error-200' : ''
                         }`}
@@ -1163,6 +1522,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                               setCnic(e.target.value);
                               clearFieldError('cnic');
                             }}
+                            onKeyDown={(e) => handleFieldKeyDown(e, 'cnic')}
                             placeholder="12345-1234567-1"
                             className={fieldClass('cnic', 'pl-11 pr-11')}
                           />
@@ -1192,6 +1552,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                               setBusinessName(e.target.value);
                               clearFieldError('businessName');
                             }}
+                            onKeyDown={(e) => handleFieldKeyDown(e, 'businessName')}
                             placeholder="e.g. SolarTech Pakistan"
                             className={fieldClass('businessName', 'pr-11')}
                           />
@@ -1214,6 +1575,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                               setBusinessAddress(e.target.value);
                               clearFieldError('businessAddress');
                             }}
+                            onKeyDown={(e) => handleFieldKeyDown(e, 'businessAddress')}
                             placeholder="Shop address"
                             className={fieldClass('businessAddress', 'pr-11')}
                           />
@@ -1229,12 +1591,15 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                         <div className="relative">
                           <Image className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
                           <input
+                            ref={visitingCardRef}
+                            id="signup-visiting-card-input"
                             type="text"
                             value={visitingCard}
                             onChange={(e) => {
                               setVisitingCard(e.target.value);
                               setError(null);
                             }}
+                            onKeyDown={(e) => handleFieldKeyDown(e, 'visitingCard')}
                             placeholder="https://..."
                             className="input-field pl-11"
                           />
@@ -1288,11 +1653,56 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                 </div>
               )}
 
+              {view === 'forgot' && info && (
+                <div className="rounded-xl border border-primary-200 dark:border-primary-800/60 bg-primary-50/70 dark:bg-primary-950/40 p-3.5 text-sm shadow-xs">
+                  <div className="flex items-start gap-2.5">
+                    <KeyRound className="mt-0.5 h-4 w-4 shrink-0 text-primary-600 dark:text-primary-400" />
+                    <div className="flex-1">
+                      <p className="font-semibold text-gray-900 dark:text-white text-xs">
+                        Didn&apos;t receive the email or link not working?
+                      </p>
+                      <p className="mt-0.5 text-xs text-gray-600 dark:text-gray-300">
+                        Emails may be delayed by spam filters. You can choose to set your new password directly right now.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => go('reset')}
+                        className="mt-2.5 inline-flex items-center gap-1.5 rounded-lg bg-primary-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-primary-700 active:scale-95 transition-all cursor-pointer"
+                      >
+                        <KeyRound className="h-3.5 w-3.5" />
+                        Set New Password Directly Now &rarr;
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {view === 'forgot' && !info && (
+                <div className="text-center pt-1">
+                  <button
+                    type="button"
+                    onClick={() => go('reset')}
+                    className="text-xs font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-400 inline-flex items-center gap-1 cursor-pointer"
+                  >
+                    <KeyRound className="h-3.5 w-3.5" />
+                    Or set your new password directly without waiting for email &rarr;
+                  </button>
+                </div>
+              )}
+
               <button
+                ref={submitButtonRef}
+                id="auth-submit-button"
                 type="button"
                 onClick={submit}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.keyCode === 13) {
+                    e.preventDefault();
+                    submit();
+                  }
+                }}
                 disabled={busy}
-                className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-60"
+                className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-60 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
               >
                 {busy ? (
                   <>
@@ -1306,7 +1716,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                 ) : view === 'forgot' ? (
                   'Send reset link'
                 ) : (
-                  'Save new password'
+                  'Save new password & Log in'
                 )}
               </button>
 
@@ -1335,15 +1745,40 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                 </p>
               )}
               {(view === 'forgot' || view === 'reset') && (
-                <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-                  <button
-                    type="button"
-                    onClick={() => go('login')}
-                    className="font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-400"
-                  >
-                    Back to login
-                  </button>
-                </p>
+                <div className="space-y-2 text-center">
+                  {view === 'forgot' ? (
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Want to update your password right now?{' '}
+                      <button
+                        type="button"
+                        onClick={() => go('reset')}
+                        className="font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-400 underline underline-offset-2"
+                      >
+                        Set new password directly
+                      </button>
+                    </p>
+                  ) : (
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Prefer to receive a reset link by email?{' '}
+                      <button
+                        type="button"
+                        onClick={() => go('forgot')}
+                        className="font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-400 underline underline-offset-2"
+                      >
+                        Send reset link
+                      </button>
+                    </p>
+                  )}
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <button
+                      type="button"
+                      onClick={() => go('login')}
+                      className="font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-400"
+                    >
+                      &larr; Back to login
+                    </button>
+                  </p>
+                </div>
               )}
             </div>
           </div>

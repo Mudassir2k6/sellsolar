@@ -1,8 +1,15 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { normalizePhone, isValidPhone, isValidEmail, isValidUuid, generateUuid } from '../lib/auth';
+import { normalizePhone, isValidPhone, digitsOnlyPhone, isValidEmail, isValidUuid, generateUuid } from '../lib/auth';
+import {
+  checkRateLimit,
+  recordRateLimitAttempt,
+  clearRateLimit,
+  verifyAccountRecoveryCredentials,
+  sanitizeText,
+} from '../lib/security';
 
-const AuthContext = createContext(null);
+export const AuthContext = createContext(null);
 
 export const DEFAULT_ADMIN_EMAIL = 'mudassir2k6@gmail.com';
 export const DEFAULT_ADMIN_ID = '00000000-0000-4000-8000-000000000001';
@@ -342,7 +349,7 @@ export function AuthProvider({ children }) {
       businessAddress = null,
       visitingCard = null,
     }) => {
-      const rawIdentifier = (username || (email && !email.includes('@') ? email : fullName) || '').trim();
+      const rawIdentifier = sanitizeText(username || (email && !email.includes('@') ? email : fullName) || '', 60);
       const rawEmail = (email || '').trim().toLowerCase();
       const cleanEmail = rawEmail.includes('@')
         ? rawEmail
@@ -352,6 +359,17 @@ export function AuthProvider({ children }) {
       const isAdm =
         cleanEmail === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
         rawIdentifier.toLowerCase() === 'mudassir2k6';
+
+      // Security check: Rate limit account creation to prevent bot spam
+      const rateCheck = checkRateLimit('signup', cleanEmail || 'global');
+      if (!rateCheck.allowed) {
+        throw new Error(rateCheck.reason);
+      }
+
+      const cleanFullName = sanitizeText(fullName, 100);
+      const cleanCity = sanitizeText(city, 80);
+      const cleanBusinessName = businessName ? sanitizeText(businessName, 120) : null;
+      const cleanBusinessAddress = businessAddress ? sanitizeText(businessAddress, 250) : null;
 
       let supabaseUserId = null;
       if (isSupabaseConfigured()) {
@@ -363,12 +381,12 @@ export function AuthProvider({ children }) {
               data: {
                 username: rawIdentifier,
                 account_type: accountType,
-                full_name: fullName.trim(),
+                full_name: cleanFullName,
                 phone: cleanPhone,
-                city: city || null,
+                city: cleanCity || null,
                 cnic,
-                business_name: businessName,
-                business_address: businessAddress,
+                business_name: cleanBusinessName,
+                business_address: cleanBusinessAddress,
                 visiting_card_url: visitingCard,
               },
             },
@@ -391,7 +409,7 @@ export function AuthProvider({ children }) {
         email: cleanEmail,
         user_metadata: {
           username: rawIdentifier,
-          full_name: fullName.trim(),
+          full_name: cleanFullName,
           account_type: accountType,
         },
       };
@@ -401,18 +419,21 @@ export function AuthProvider({ children }) {
         username: rawIdentifier,
         email: cleanEmail,
         display_identifier: rawIdentifier || cleanEmail,
-        full_name: fullName.trim(),
+        full_name: cleanFullName,
         phone: cleanPhone,
-        city: city || null,
+        city: cleanCity || null,
         account_type: accountType,
         cnic,
-        business_name: businessName,
-        business_address: businessAddress,
+        business_name: cleanBusinessName,
+        business_address: cleanBusinessAddress,
         visiting_card_url: visitingCard,
         is_admin: isAdm,
         is_verified_dealer: false,
         created_at: new Date().toISOString(),
       };
+
+      // Record successful signup
+      recordRateLimitAttempt('signup', cleanEmail || 'global');
 
       // Save to local users store (indexed by email AND raw identifier/username)
       const localUsers = getStoredUsers();
@@ -451,6 +472,12 @@ export function AuthProvider({ children }) {
       const cleanIdentifier = (identifier || '').trim().toLowerCase();
       const cleanPass = password.trim();
       const digitsOnly = cleanIdentifier.replace(/\D/g, '');
+
+      // Security check: Brute force & DoS lockout protection
+      const rateCheck = checkRateLimit('login', cleanIdentifier || 'global');
+      if (!rateCheck.allowed) {
+        throw new Error(rateCheck.reason);
+      }
 
       const isAdm =
         cleanIdentifier === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
@@ -496,6 +523,7 @@ export function AuthProvider({ children }) {
             password: cleanPass,
           });
           if (!error && data?.session?.user) {
+            clearRateLimit('login', cleanIdentifier || 'global');
             setUser(data.session.user);
             await loadProfile(data.session.user.id, data.session.user.email);
             const activeProfile = {
@@ -518,6 +546,7 @@ export function AuthProvider({ children }) {
       // 3. Admin credentials check (mudassir2k6@gmail.com / mudassir2k6 / 03001234567)
       if (isAdm) {
         if (record && (record.password === cleanPass || cleanPass === '12345678')) {
+          clearRateLimit('login', cleanIdentifier || 'global');
           const activeUser = { ...record.user, id: DEFAULT_ADMIN_ID };
           const activeProfile = { ...record.profile, id: DEFAULT_ADMIN_ID };
           setUser(activeUser);
@@ -526,6 +555,7 @@ export function AuthProvider({ children }) {
           return { success: true, user: activeUser, profile: activeProfile };
         }
         if (!record && (cleanPass === '12345678' || record?.password === cleanPass)) {
+          clearRateLimit('login', cleanIdentifier || 'global');
           const defaultUser = {
             id: DEFAULT_ADMIN_ID,
             email: DEFAULT_ADMIN_EMAIL,
@@ -557,12 +587,14 @@ export function AuthProvider({ children }) {
           saveStoredSession({ user: defaultUser, profile: defaultProfile });
           return { success: true, user: defaultUser, profile: defaultProfile };
         }
+        recordRateLimitAttempt('login', cleanIdentifier || 'global');
         throw new Error('Incorrect password for admin account.');
       }
 
       // 4. Existing registered user check
       if (record) {
         if (record.password === cleanPass) {
+          clearRateLimit('login', cleanIdentifier || 'global');
           const activeUser = record.user;
           const activeProfile = record.profile;
           setUser(activeUser);
@@ -570,49 +602,102 @@ export function AuthProvider({ children }) {
           saveStoredSession({ user: activeUser, profile: activeProfile });
           return { success: true, user: activeUser, profile: activeProfile };
         }
+        recordRateLimitAttempt('login', cleanIdentifier || 'global');
         throw new Error('Incorrect password. Please try again or use "Forgot password?".');
       }
 
-      // 5. Account not found (never signed up) -> DO NOT auto-create!
+      // 5. Account not found
+      recordRateLimitAttempt('login', cleanIdentifier || 'global');
       throw new Error('No account found with this username, mobile, CNIC, or email. Please sign up first.');
     },
     [loadProfile]
   );
 
   const updatePassword = useCallback(
-    async (newPassword, targetEmail) => {
-      const email = (targetEmail || user?.email || DEFAULT_ADMIN_EMAIL).toLowerCase();
-      
+    async (newPassword, targetEmail, verificationValue = null) => {
+      const cleanTarget = (targetEmail || user?.email || DEFAULT_ADMIN_EMAIL).trim().toLowerCase();
+      const digitsOnly = cleanTarget.replace(/\D/g, '');
+
+      // Security check: If unauthenticated, enforce rate limiting on password reset
+      if (!user) {
+        const rateCheck = checkRateLimit('password_reset', cleanTarget || 'global');
+        if (!rateCheck.allowed) {
+          throw new Error(rateCheck.reason);
+        }
+      }
+
       // Update local store
       const users = getStoredUsers();
-      if (users[email]) {
-        users[email].password = newPassword;
-        saveStoredUsers(users);
-      } else {
-        const fallbackId = email === DEFAULT_ADMIN_EMAIL.toLowerCase() ? DEFAULT_ADMIN_ID : generateUuid();
+
+      // Security verification: If resetting while unauthenticated, verify account identity
+      if (!user) {
+        const verifyRes = verifyAccountRecoveryCredentials(cleanTarget, verificationValue, users);
+        if (!verifyRes.ok) {
+          recordRateLimitAttempt('password_reset', cleanTarget || 'global');
+          throw new Error(verifyRes.error);
+        }
+        clearRateLimit('password_reset', cleanTarget || 'global');
+      }
+
+      let matchedAny = false;
+
+      // Scan all user records to update password everywhere for this user
+      for (const [key, val] of Object.entries(users)) {
+        if (!val) continue;
+        const prof = val.profile || {};
+        const keyDigits = (prof.phone || '').replace(/\D/g, '');
+        const cnicDigits = (prof.cnic || '').replace(/\D/g, '');
+        const storedEmail = (prof.email || key || '').toLowerCase();
+        const storedUsername = (prof.username || '').toLowerCase();
+        const emailPrefix = storedEmail.split('@')[0]?.toLowerCase();
+
+        if (
+          key.toLowerCase() === cleanTarget ||
+          storedEmail === cleanTarget ||
+          storedUsername === cleanTarget ||
+          (emailPrefix && emailPrefix === cleanTarget) ||
+          (digitsOnly.length >= 7 && keyDigits && keyDigits === digitsOnly) ||
+          (digitsOnly.length >= 7 && cnicDigits && cnicDigits === digitsOnly)
+        ) {
+          val.password = newPassword;
+          matchedAny = true;
+        }
+      }
+
+      if (!matchedAny) {
+        // Create user record if not already found so they can sign in immediately
+        const isAdm = cleanTarget === DEFAULT_ADMIN_EMAIL.toLowerCase() || cleanTarget === 'mudassir2k6';
+        const fallbackId = isAdm ? DEFAULT_ADMIN_ID : generateUuid();
+        const emailToUse = cleanTarget.includes('@') ? cleanTarget : `${cleanTarget}@sellsolar.local`;
         const fallbackUser = {
           id: fallbackId,
-          email,
-          user_metadata: { full_name: email.split('@')[0] },
+          email: emailToUse,
+          user_metadata: { full_name: cleanTarget.split('@')[0] },
         };
         const fallbackProfile = {
           id: fallbackId,
-          email,
-          full_name: email.split('@')[0],
-          phone: '03001234567',
+          email: emailToUse,
+          username: cleanTarget.includes('@') ? cleanTarget.split('@')[0] : cleanTarget,
+          full_name: cleanTarget.split('@')[0],
+          phone: verificationValue && digitsOnlyPhone(verificationValue) ? digitsOnlyPhone(verificationValue) : (digitsOnly.length >= 10 ? digitsOnly : '03001234567'),
           city: 'Lahore',
           account_type: 'individual',
-          is_admin: email === DEFAULT_ADMIN_EMAIL.toLowerCase(),
+          is_admin: isAdm,
           is_verified_dealer: false,
           created_at: new Date().toISOString(),
         };
-        users[email] = {
+        const newRec = {
           password: newPassword,
           user: fallbackUser,
           profile: fallbackProfile,
         };
-        saveStoredUsers(users);
+        users[cleanTarget] = newRec;
+        if (emailToUse !== cleanTarget) {
+          users[emailToUse] = newRec;
+        }
       }
+
+      saveStoredUsers(users);
 
       // Update Supabase if session active
       if (isSupabaseConfigured()) {

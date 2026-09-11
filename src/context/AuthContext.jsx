@@ -1034,10 +1034,13 @@ export function AuthProvider({ children }) {
       throw new Error(rateCheck.reason);
     }
 
-    const redirectTo =
-      typeof window !== 'undefined'
-        ? `${window.location.origin}/`
-        : 'https://sellsolar.pk/';
+    // Always return users to the current origin (localhost or sellsolar.pk).
+    // Supabase Redirect URLs allow-list must include this exact origin.
+    const origin =
+      typeof window !== 'undefined' && window.location?.origin
+        ? window.location.origin
+        : 'https://sellsolar.pk';
+    const redirectTo = `${origin}/`;
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',

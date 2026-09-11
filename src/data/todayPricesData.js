@@ -2,10 +2,18 @@
 // Automatically updated every 12:00 at night (Midnight PKT)
 // Sourced from Hall Road Lahore, Saddar Karachi, College Road Rawalpindi, and authorized distributors.
 // NOTE: CUSTOMER & DEALER ADS ARE 100% PROTECTED AND NEVER ALTERED BY THIS BENCHMARK UPDATE.
+import { getPakistanDateDetails } from '../lib/dateUtils';
 
-export const TODAY_DATE_STR = "8 September 2026";
-export const LAST_MIDNIGHT_UPDATE = "08-Sept-2026 (Islamabad Ready Stock Verified)";
-export const LAST_UPDATE_ISO = "2026-09-08T09:44:00.000Z";
+const _currentPkt = typeof window !== 'undefined' ? getPakistanDateDetails() : {
+  todayStr: "11 September 2026",
+  shortDate: "11-Sep-2026",
+  lastMidnightStr: "11-Sep-2026 (Islamabad Ready Stock Verified)",
+  iso: "2026-09-11T04:48:03.554Z",
+};
+
+export const TODAY_DATE_STR = _currentPkt.todayStr;
+export const LAST_MIDNIGHT_UPDATE = _currentPkt.lastMidnightStr;
+export const LAST_UPDATE_ISO = _currentPkt.iso;
 
 // Islamabad Ready Stock Daily Sheets Comparison (07-Sep vs 08-Sep 2026)
 export const ISLAMABAD_DAILY_SHEETS = {

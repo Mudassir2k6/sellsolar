@@ -1143,7 +1143,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                           clearFieldError('username');
                         }}
                         onKeyDown={(e) => handleFieldKeyDown(e, 'signupUsername')}
-                        placeholder="e.g. mudassir2k6 or solar_tech"
+                        placeholder=""
                         className={fieldClass('username', 'pl-11 pr-11')}
                       />
                       {fieldErrors.username ? (
@@ -1409,7 +1409,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                       }}
                       onBlur={() => setEmailTouched(true)}
                       onKeyDown={(e) => handleFieldKeyDown(e, 'loginUsername')}
-                      placeholder="e.g. mudassir2k6, 03001234567, or 35201-1234567-1"
+                      placeholder=""
                       className={fieldClass('email', 'pl-11 pr-11')}
                     />
                     {fieldErrors.email ? (
@@ -1420,11 +1420,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                     <p className="mt-1.5 text-xs font-medium text-error-600">
                       Username is required.
                     </p>
-                  ) : (
-                    <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-                      💡 <span className="font-semibold text-gray-700 dark:text-gray-300">Hint:</span> Enter your unique username, mobile number (03XXXXXXXXX), or CNIC.
-                    </p>
-                  )}
+                  ) : null}
                 </div>
               )}
 
@@ -1453,7 +1449,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                         else if (view === 'signup') handleFieldKeyDown(e, 'signupPassword');
                         else if (view === 'reset') handleFieldKeyDown(e, 'resetPassword');
                       }}
-                      placeholder="At least 8 characters"
+                      placeholder=""
                       className={fieldClass('password', 'pl-11 pr-16')}
                     />
                     {fieldErrors.password ? (
@@ -1499,7 +1495,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
               {(view === 'signup' || view === 'reset') && (
                 <div>
                   <label className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    Confirm password *
+                    Confirm Password *
                   </label>
                   <div className="relative">
                     <Lock
@@ -1520,9 +1516,10 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                         }
                       }}
                       onKeyDown={(e) => handleFieldKeyDown(e, 'confirmPassword')}
-                      placeholder={view === 'signup' ? 'Re-enter password' : 'Re-enter new password'}
+                      placeholder=""
                       className={fieldClass('confirmPassword', 'pl-11 pr-16')}
                       autoComplete="new-password"
+                      required={view === 'signup' || view === 'reset'}
                     />
                     {fieldErrors.confirmPassword ? (
                       <CircleAlert className="absolute right-11 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" />
@@ -1531,6 +1528,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                       type="button"
                       onClick={() => setShowConfirmPassword((v) => !v)}
                       className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                      aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
                     >
                       {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                     </button>

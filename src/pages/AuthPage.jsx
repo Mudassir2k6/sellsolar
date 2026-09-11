@@ -935,12 +935,13 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{titles[view][1]}</p>
 
             {(view === 'login' || view === 'signup') && (
-              <div className="mt-6 space-y-4">
+              <div className="mt-6 space-y-4" data-auth-google="true">
                 <button
                   type="button"
                   onClick={handleGoogleSignIn}
                   disabled={busy || googleBusy}
-                  className="flex w-full items-center justify-center gap-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-950 px-4 py-3 text-sm font-bold text-gray-800 dark:text-gray-100 shadow-sm transition-all hover:bg-gray-50 dark:hover:bg-gray-900 disabled:cursor-not-allowed disabled:opacity-60"
+                  aria-label={view === 'signup' ? 'Continue with Google' : 'Sign in with Google'}
+                  className="flex w-full items-center justify-center gap-3 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-950 px-4 py-3.5 text-sm font-bold text-gray-800 dark:text-gray-100 shadow-sm transition-all hover:bg-gray-50 dark:hover:bg-gray-900 hover:border-primary-400 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {googleBusy ? (
                     <LoaderCircle className="h-5 w-5 animate-spin text-primary-500" />

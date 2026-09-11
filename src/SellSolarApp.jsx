@@ -416,6 +416,59 @@ function Xy({
 function nx({
   filters:t,onFilterChange:e,onSearch:r,onReset:n,onNavigatePrices:np,onNavigateCalculator:nc
 }){
+  // Live dynamic ticking animated counters for hero metrics
+  const [counts, setCounts] = useState({
+    listings: 512,
+    sellers: 124,
+    cities: 16,
+    buyers: 10450,
+  });
+
+  useEffect(() => {
+    // Smooth initial count-up
+    const startTime = Date.now();
+    const duration = 1800;
+    const targets = { listings: 512, sellers: 124, cities: 16, buyers: 10450 };
+
+    const animInterval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease out cubic
+      const ease = 1 - Math.pow(1 - progress, 3);
+
+      setCounts({
+        listings: Math.floor(targets.listings * ease),
+        sellers: Math.floor(targets.sellers * ease),
+        cities: Math.floor(targets.cities * ease),
+        buyers: Math.floor(targets.buyers * ease),
+      });
+
+      if (progress >= 1) {
+        clearInterval(animInterval);
+      }
+    }, 30);
+
+    // Continuous live ticker that gently updates so it stays alive and never stays fixed
+    const liveTicker = setInterval(() => {
+      setCounts(prev => {
+        const deltaListings = Math.random() > 0.6 ? (Math.random() > 0.5 ? 1 : -1) : 0;
+        const deltaBuyers = Math.floor(Math.random() * 5) - 2;
+        const newListings = Math.max(500, prev.listings + deltaListings);
+        const newBuyers = Math.max(10400, prev.buyers + deltaBuyers);
+        return {
+          ...prev,
+          listings: newListings,
+          buyers: newBuyers,
+        };
+      });
+    }, 2800);
+
+    return () => {
+      clearInterval(animInterval);
+      clearInterval(liveTicker);
+    };
+  }, []);
+
   const popularSearches = [
     "Longi 585W",
     "Inverex 6kW",
@@ -436,7 +489,7 @@ function nx({
   };
 
   return jsxs("section",{
-    className:"relative overflow-hidden pt-24 sm:pt-28 lg:pt-32 pb-8 sm:pb-12 border-b border-gray-200/60 dark:border-gray-800 transition-colors",children:[
+    className:"relative overflow-hidden pt-20 sm:pt-24 lg:pt-28 pb-4 sm:pb-5 border-b border-gray-200/60 dark:border-gray-800 transition-colors",children:[
       jsxs("div",{
         className:"absolute inset-0 -z-10",children:[
           jsx("div",{
@@ -492,7 +545,7 @@ function nx({
             ]
           }),
           jsx("div",{
-            className:"mx-auto mt-6 sm:mt-8 max-w-4xl",children:jsxs("div",{
+            className:"mx-auto mt-5 sm:mt-6 max-w-4xl",children:jsxs("div",{
               className:"card overflow-hidden border border-gray-200/90 dark:border-gray-800 shadow-xl dark:bg-gray-900",children:[
                 jsx("div",{
                   className:"flex gap-1 overflow-x-auto border-b border-gray-200 dark:border-gray-800 p-1.5 sm:p-2 scrollbar-hide bg-gray-50/70 dark:bg-gray-850/60",children:Zy.map(s=>{
@@ -508,7 +561,7 @@ function nx({
                   })
                 }),
                 jsxs("div",{
-                  className:"p-4 sm:p-6",children:[
+                  className:"p-3.5 sm:p-5",children:[
                     jsxs("div",{
                       className:"relative mb-3.5",children:[
                         jsx(Search,{ className:"absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" }),
@@ -608,17 +661,17 @@ function nx({
             })
           }),
           jsx("div",{
-            className:"mx-auto mt-8 sm:mt-10 grid max-w-4xl grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-4",children:[{
-              value:"500+",label:"Active Listings"
+            className:"mx-auto mt-4 sm:mt-5 grid max-w-4xl grid-cols-2 gap-2.5 sm:gap-3.5 sm:grid-cols-4",children:[{
+              value: `${counts.listings.toLocaleString()}+`, label: "Active Listings"
             },{
-              value:"120+",label:"Verified Sellers"
+              value: `${counts.sellers}+`, label: "Verified Sellers"
             },{
-              value:"15+",label:"Cities Covered"
+              value: `${counts.cities}+`, label: "Cities Covered"
             },{
-              value:"10K+",label:"Monthly Buyers"
+              value: counts.buyers >= 1000 ? `${(counts.buyers / 1000).toFixed(1)}K+` : `${counts.buyers}+`, label: "Monthly Buyers"
             }].map(s=>jsxs("div",{
-              className:"card p-3.5 sm:p-4 text-center border border-gray-200/80 dark:border-gray-800 dark:bg-gray-900 shadow-2xs",children:[
-                jsx("div",{ className:"text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white", children:s.value }),
+              className:"card p-2.5 sm:p-3 text-center border border-gray-200/80 dark:border-gray-800 dark:bg-gray-900 shadow-2xs transition-all duration-300 hover:border-primary-400 dark:hover:border-primary-600",children:[
+                jsx("div",{ className:"text-lg sm:text-xl font-extrabold text-gray-900 dark:text-white font-mono tracking-tight", children:s.value }),
                 jsx("div",{ className:"mt-0.5 text-xs font-semibold text-gray-500 dark:text-gray-400", children:s.label })
               ]
             },s.label))
@@ -629,19 +682,19 @@ function nx({
   });
 }function PakWheelsSellCards({ onPostAd, onInstall }) {
   return jsx("section", {
-    className: "bg-white dark:bg-gray-950 py-7 sm:py-8 border-b border-gray-200/70 dark:border-gray-800 transition-colors",
+    className: "bg-white dark:bg-gray-950 py-4 sm:py-5 border-b border-gray-200/70 dark:border-gray-800 transition-colors",
     children: jsx("div", {
-      className: "container-page",
+      className: "container-page max-w-6xl",
       children: jsxs("div", {
-        className: "grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5",
+        className: "grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4",
         children: [
           jsxs("div", {
-            className: "card p-5 sm:p-6 border border-gray-200/90 dark:border-gray-800 hover:border-primary-400 dark:hover:border-primary-600 transition-all flex flex-col justify-between group dark:bg-gray-900 shadow-2xs",
+            className: "card p-4 sm:p-5 border border-gray-200/90 dark:border-gray-800 hover:border-primary-400 dark:hover:border-primary-600 transition-all flex flex-col justify-between group dark:bg-gray-900 shadow-2xs",
             children: [
               jsxs("div", {
                 children: [
                   jsxs("div", {
-                    className: "flex items-center justify-between mb-2.5",
+                    className: "flex items-center justify-between mb-2",
                     children: [
                       jsx("span", {
                         className: "rounded bg-primary-50 dark:bg-primary-950/60 text-primary-700 dark:text-primary-300 px-2 py-0.5 text-xs font-bold border border-primary-200/60 dark:border-primary-800/60",
@@ -659,7 +712,7 @@ function nx({
                     children: "Post your solar panels, inverters, batteries or complete setups and connect directly with genuine buyers across Pakistan."
                   }),
                   jsxs("ul", {
-                    className: "mt-3 space-y-1.5 text-xs text-gray-600 dark:text-gray-300",
+                    className: "mt-2.5 space-y-1.5 text-xs text-gray-600 dark:text-gray-300",
                     children: [
                       jsxs("li", {
                         className: "flex items-center gap-2",
@@ -687,7 +740,7 @@ function nx({
                 ]
               }),
               jsx("div", {
-                className: "mt-5 pt-3.5 border-t border-gray-100 dark:border-gray-800",
+                className: "mt-4 pt-3 border-t border-gray-100 dark:border-gray-800",
                 children: jsxs("button", {
                   onClick: onPostAd,
                   className: "btn-primary w-full sm:w-auto px-5 py-2 text-xs font-bold shadow-xs",
@@ -700,12 +753,12 @@ function nx({
             ]
           }),
           jsxs("div", {
-            className: "card p-5 sm:p-6 border border-gray-200/90 dark:border-gray-800 hover:border-secondary-400 dark:hover:border-secondary-600 transition-all flex flex-col justify-between group dark:bg-gray-900 shadow-2xs",
+            className: "card p-4 sm:p-5 border border-gray-200/90 dark:border-gray-800 hover:border-secondary-400 dark:hover:border-secondary-600 transition-all flex flex-col justify-between group dark:bg-gray-900 shadow-2xs",
             children: [
               jsxs("div", {
                 children: [
                   jsxs("div", {
-                    className: "flex items-center justify-between mb-2.5",
+                    className: "flex items-center justify-between mb-2",
                     children: [
                       jsx("span", {
                         className: "rounded bg-secondary-50 dark:bg-secondary-950/60 text-secondary-700 dark:text-secondary-300 px-2 py-0.5 text-xs font-bold border border-secondary-200/60 dark:border-secondary-800/60",
@@ -723,7 +776,7 @@ function nx({
                     children: "Get complete on-grid, hybrid or off-grid solar systems engineered, installed and net-metered with Tier-1 warranty equipment."
                   }),
                   jsxs("ul", {
-                    className: "mt-3 space-y-1.5 text-xs text-gray-600 dark:text-gray-300",
+                    className: "mt-2.5 space-y-1.5 text-xs text-gray-600 dark:text-gray-300",
                     children: [
                       jsxs("li", {
                         className: "flex items-center gap-2",
@@ -785,7 +838,7 @@ function ix({
   onSelectBrand:onBrand
 }){
   const [activeBrowseTab, setActiveBrowseTab] = useState("category");
-  const [categoryViewMode, setCategoryViewMode] = useState("grid"); // "grid" (4-group) or "table"
+  const [categoryViewMode, setCategoryViewMode] = useState("table"); // "table" by default, or "grid"
 
   const browseCities = [
     { name: "Lahore", count: "140+ Listings" },
@@ -814,10 +867,10 @@ function ix({
   ];
 
   return jsx("section",{
-    id:"categories",className:"py-7 sm:py-8 bg-gray-50/70 dark:bg-gray-900/60 border-b border-gray-200/60 dark:border-gray-800 transition-colors",children:jsxs("div",{
+    id:"categories",className:"py-5 sm:py-6 bg-gray-50/70 dark:bg-gray-900/60 border-b border-gray-200/60 dark:border-gray-800 transition-colors",children:jsxs("div",{
       className:"container-page",children:[
         jsxs("div",{
-          className:"flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 border-b border-gray-200 dark:border-gray-800 pb-2.5 mb-4",children:[
+          className:"flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 border-b border-gray-200 dark:border-gray-800 pb-2 mb-3.5",children:[
             jsxs("div",{
               children:[
                 jsx("h2",{
@@ -1183,10 +1236,10 @@ function lx({
   listings:t,loading:e,error:r,totalCount:n,onSelectListing:s,onResetFilters:rf,onNavigate:nav,currentCondition,onConditionChange
 }){
   return jsx("section",{
-    id:"listings",className:"bg-white dark:bg-gray-950 py-8 sm:py-10 border-b border-gray-200/60 dark:border-gray-800 transition-colors",children:jsxs("div",{
+    id:"listings",className:"bg-white dark:bg-gray-950 py-5 sm:py-6 border-b border-gray-200/60 dark:border-gray-800 transition-colors",children:jsxs("div",{
       className:"container-page",children:[
         jsxs("div",{
-          className:"flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3.5 border-b border-gray-200 dark:border-gray-800 pb-3.5 mb-5",children:[
+          className:"flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 border-b border-gray-200 dark:border-gray-800 pb-2.5 mb-4",children:[
             jsxs("div",{
               children:[
                 jsx("h2",{
@@ -1320,10 +1373,10 @@ function cx(){
   return jsxs(Fragment,{
     children:[
       jsx("section",{
-        id:"how-it-works",className:"bg-gray-50/70 dark:bg-gray-900/60 py-8 sm:py-10 border-b border-gray-200/60 dark:border-gray-800 transition-colors",children:jsxs("div",{
+        id:"how-it-works",className:"bg-gray-50/70 dark:bg-gray-900/60 py-5 sm:py-6 border-b border-gray-200/60 dark:border-gray-800 transition-colors",children:jsxs("div",{
           className:"container-page",children:[
             jsxs("div",{
-              className:"flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 border-b border-gray-200 dark:border-gray-800 pb-2.5 mb-5",children:[
+              className:"flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 border-b border-gray-200 dark:border-gray-800 pb-2 mb-3.5",children:[
                 jsxs("div",{
                   children:[
                     jsx("h2",{
@@ -1360,7 +1413,7 @@ function cx(){
         })
       }),
       jsx("section",{
-        className:"bg-white dark:bg-gray-950 py-8 sm:py-10 border-b border-gray-200/60 dark:border-gray-800",
+        className:"bg-white dark:bg-gray-950 py-5 sm:py-6 border-b border-gray-200/60 dark:border-gray-800",
         children:jsxs("div",{
           className:"container-page max-w-4xl",
           children:[
@@ -1421,20 +1474,20 @@ function hx({
   return jsxs("footer",{
     id:"contact",className:"bg-gray-900 text-gray-400",children:[jsx("div",{
       className:"border-b border-gray-800",children:jsx("div",{
-        className:"container-page py-12",children:jsxs("div",{
-          className:"flex flex-col items-center justify-between gap-6 rounded-2xl bg-gradient-to-r from-primary-500 to-primary-600 p-8 text-center lg:flex-row lg:text-left",children:[jsxs("div",{
+        className:"container-page py-6 sm:py-8",children:jsxs("div",{
+          className:"flex flex-col items-center justify-between gap-4 rounded-2xl bg-gradient-to-r from-primary-500 to-primary-600 p-5 sm:p-6 text-center lg:flex-row lg:text-left",children:[jsxs("div",{
             children:[jsx("h3",{
-              className:"text-2xl font-extrabold text-white",children:"Ready to go solar?"
+              className:"text-xl sm:text-2xl font-extrabold text-white",children:"Ready to go solar?"
             }),jsx("p",{
-              className:"mt-1 text-primary-50",children:"Post your first ad free and reach thousands of buyers across Pakistan."
+              className:"mt-1 text-primary-50 text-xs sm:text-sm",children:"Post your first ad free and reach thousands of buyers across Pakistan."
             })]
           }),jsx("button",{
-            onClick:t,className:"btn shrink-0 bg-white px-8 py-3.5 text-primary-600 shadow-lg hover:bg-primary-50 active:scale-[0.98]",children:"Post an Ad — It's Free"
+            onClick:t,className:"btn shrink-0 bg-white px-6 py-2.5 sm:px-8 sm:py-3 text-primary-600 shadow-md hover:bg-primary-50 active:scale-[0.98] text-xs sm:text-sm font-bold",children:"Post an Ad — It's Free"
           })]
         })
       })
     }),jsxs("div",{
-      className:"container-page py-12",children:[jsxs("div",{
+      className:"container-page py-8 sm:py-10",children:[jsxs("div",{
         className:"grid grid-cols-2 gap-8 lg:grid-cols-6",children:[jsxs("div",{
           className:"col-span-2",children:[jsxs("div",{
             className:"flex items-center gap-2",children:[jsx("div",{
@@ -4524,8 +4577,8 @@ function _x({
         setTimeout(w, 50);
       }
     }),nav?jsx("div",{
-      className:"container-page my-5",children:jsxs("div",{
-        className:"rounded-2xl bg-gradient-to-r from-gray-900 via-gray-850 to-primary-950 p-5 sm:p-6 text-white shadow-md border border-gray-800 transition-all",children:[
+      className:"container-page my-3.5 sm:my-4",children:jsxs("div",{
+        className:"rounded-2xl bg-gradient-to-r from-gray-900 via-gray-850 to-primary-950 p-4 sm:p-5 text-white shadow-md border border-gray-800 transition-all",children:[
           jsxs("div",{
             className:"flex flex-col md:flex-row items-center justify-between gap-4",children:[
               jsxs("div",{

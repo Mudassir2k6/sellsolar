@@ -14,9 +14,9 @@ const NOINDEX = 'noindex,nofollow';
 
 export const PAGE_SEO = {
   home: {
-    title: 'Buy & Sell Solar in Pakistan | SellSolar',
+    title: 'Buy Solar Panels & Inverters in Pakistan | SellSolar',
     description:
-      'Pakistan solar marketplace for new and used solar panels, hybrid inverters, lithium batteries and complete systems. Compare prices in Lahore, Karachi, Islamabad and more.',
+      'Buy & sell solar panels, inverters and batteries in Pakistan. Compare live prices from verified sellers in Lahore, Karachi and Islamabad.',
     path: '/',
     robots: INDEXABLE,
   },

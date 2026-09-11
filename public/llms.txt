@@ -1,18 +1,26 @@
 # SellSolar
 
-> Pakistan's solar marketplace to buy and sell solar panels, hybrid inverters, lithium batteries and complete systems.
+> Pakistan marketplace to sell and buy used and new solar panels, hybrid inverters, lithium batteries and complete systems.
 
 ## Site
 - Homepage: https://sellsolar.pk/
 - Contact: info@sellsolar.pk
 - Location: Islamabad, Pakistan
 
+## Key intents
+- used solar panels for sale Pakistan
+- buy used solar inverter / battery
+- sell used solar equipment free
+- today's solar rates Pakistan
+- solar load calculator Pakistan
+
 ## Key pages
+- [Homepage](https://sellsolar.pk/): Sell & buy used and new solar equipment
 - [Today's solar rates](https://sellsolar.pk/prices): Live per-watt panel, inverter and battery prices in PKR
 - [Solar load calculator](https://sellsolar.pk/calculator): Free kW, panel count and battery sizing tool
 - [Verified dealers](https://sellsolar.pk/dealers): Trusted solar sellers across Pakistan
-- [Buy solar](https://sellsolar.pk/buy-solar): Buying guides for panels, inverters and batteries
-- [Sell solar](https://sellsolar.pk/sell-solar): Free listing for new and used equipment
+- [Buy solar](https://sellsolar.pk/buy-solar): Buy used and new panels, inverters and batteries
+- [Sell solar](https://sellsolar.pk/sell-solar): Free listing for used and new equipment
 - [Blog](https://sellsolar.pk/blog): Net metering guides and Tier-1 brand comparisons
 - [Help](https://sellsolar.pk/help): FAQs and support
 - [About](https://sellsolar.pk/about): Company information

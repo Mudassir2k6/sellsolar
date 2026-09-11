@@ -7,16 +7,16 @@ export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.jpg`;
 export const DEFAULT_OG_IMAGE_WIDTH = '1200';
 export const DEFAULT_OG_IMAGE_HEIGHT = '630';
 export const DEFAULT_KEYWORDS =
-  'solar panels Pakistan, buy solar panels, solar inverter price Pakistan, lithium battery, solar marketplace, net metering, solar load calculator, Longi, Jinko, Inverex';
+  'used solar Pakistan, used solar panels for sale, buy used solar, sell used solar, used solar inverter, second hand solar system, solar marketplace Pakistan, Longi, Jinko, Inverex';
 
 const INDEXABLE = 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1';
 const NOINDEX = 'noindex,nofollow';
 
 export const PAGE_SEO = {
   home: {
-    title: 'Sell & Buy Solar Equipment in Pakistan | SellSolar',
+    title: 'Sell & Buy Used Solar Equipment Pakistan | SellSolar',
     description:
-      'Sell & buy solar panels, inverters and batteries in Pakistan. Compare live prices from verified sellers in Lahore, Karachi and Islamabad.',
+      'Sell & buy used and new solar panels, inverters and batteries in Pakistan. Compare live prices from verified sellers in Lahore, Karachi and Islamabad.',
     path: '/',
     robots: INDEXABLE,
   },
@@ -133,14 +133,14 @@ export const PAGE_SEO = {
     robots: INDEXABLE,
   },
   'buy-solar': {
-    title: 'How to Buy Solar in Pakistan | SellSolar',
-    description: 'Comprehensive buying guide and tips to purchase authentic solar equipment in Pakistan.',
+    title: 'Buy Used & New Solar Pakistan | SellSolar',
+    description: 'Buy used and new solar panels, inverters and batteries in Pakistan from verified sellers. Filter by city, brand and condition.',
     path: '/buy-solar',
     robots: INDEXABLE,
   },
   'sell-solar': {
-    title: 'Sell Solar Equipment Free | SellSolar',
-    description: 'List your new or used solar panels, inverters and batteries for thousands of buyers across Pakistan.',
+    title: 'Sell Used Solar Free in Pakistan | SellSolar',
+    description: 'Sell used or new solar panels, inverters and batteries free on SellSolar. Reach buyers across Lahore, Karachi, Islamabad and more.',
     path: '/sell-solar',
     robots: INDEXABLE,
   },

@@ -465,11 +465,11 @@ function nx({
               }),
               jsx("h1",{
                 className:"text-balance text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white leading-tight",
-                children:"Find Solar Panels, Inverters & Systems in Pakistan"
+                children:"Sell & Buy Used Solar Panels in Pakistan"
               }),
               jsx("p",{
                 className:"mx-auto mt-3 max-w-2xl text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed",
-                children:"Search from 500+ verified new and used solar equipment listings across Pakistan at live market rates."
+                children:"Search 500+ verified used and new solar panels, inverters and batteries across Pakistan at live market rates."
               }),
               (nc||np)&&jsxs("div",{
                 className:"mt-4 flex flex-wrap items-center justify-center gap-2.5",children:[
@@ -1190,10 +1190,10 @@ function lx({
             jsxs("div",{
               children:[
                 jsx("h2",{
-                  className:"text-lg sm:text-xl font-bold tracking-tight text-gray-900 dark:text-white",children:"Featured Solar Products"
+                  className:"text-lg sm:text-xl font-bold tracking-tight text-gray-900 dark:text-white",children:"Used & New Solar Products for Sale"
                 }),
                 jsx("p",{
-                  className:"mt-0.5 text-xs text-gray-500 dark:text-gray-400",children:e?"Loading equipment...":`${n} ${n===1?"listing":"listings"} available across Pakistan`
+                  className:"mt-0.5 text-xs text-gray-500 dark:text-gray-400",children:e?"Loading equipment...":`${n} ${n===1?"listing":"listings"} — filter Used or New across Pakistan`
                 })
               ]
             }),
@@ -1366,15 +1366,15 @@ function cx(){
           children:[
             jsx("h2",{
               className:"text-lg sm:text-xl font-bold tracking-tight text-gray-900 dark:text-white",
-              children:"Buy and sell solar equipment across Pakistan"
+              children:"Sell and buy used solar equipment across Pakistan"
             }),
             jsx("p",{
               className:"mt-3 text-sm leading-relaxed text-gray-600 dark:text-gray-300",
-              children:"SellSolar helps homeowners, businesses and dealers compare solar panels, hybrid inverters, lithium batteries and complete rooftop systems with transparent PKR pricing. Check today’s per-watt rates, size your load with the free calculator, and contact verified sellers in Lahore, Karachi, Islamabad, Rawalpindi, Faisalabad, Multan and more."
+              children:"Looking for used solar panels, second-hand inverters or lithium batteries? SellSolar is Pakistan’s marketplace to sell and buy used and new solar equipment with transparent PKR pricing. Filter by Used condition, compare verified sellers in Lahore, Karachi, Islamabad, Rawalpindi, Faisalabad and Multan, then contact them directly on WhatsApp."
             }),
             jsx("p",{
               className:"mt-3 text-sm leading-relaxed text-gray-600 dark:text-gray-300",
-              children:"Whether you need a 3kW backup kit, a 5kW hybrid setup or a 10kW–20kW net-metered system, browse Longi, Jinko, Canadian Solar, Inverex, Knox, Homage, Growatt, Solis and Huawei listings before you buy. Sellers can post free ads for new or used equipment and reach buyers nationwide."
+              children:"Post a free ad to sell used solar panels, hybrid inverters, batteries or complete systems. Shoppers can also check today’s per-watt rates and use the free load calculator before buying a 3kW, 5kW, 10kW or 15kW setup from Longi, Jinko, Inverex, Knox, Homage and more."
             })
           ]
         })

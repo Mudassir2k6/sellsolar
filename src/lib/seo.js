@@ -3,7 +3,11 @@ import { listingImages } from './images';
 export const SITE_NAME = 'SellSolar';
 export const SITE_URL = 'https://sellsolar.pk';
 export const SITE_EMAIL = 'info@sellsolar.pk';
-export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.svg`;
+export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.jpg`;
+export const DEFAULT_OG_IMAGE_WIDTH = '1200';
+export const DEFAULT_OG_IMAGE_HEIGHT = '630';
+export const DEFAULT_KEYWORDS =
+  'solar panels Pakistan, buy solar panels, solar inverter price Pakistan, lithium battery, solar marketplace, net metering, solar load calculator, Longi, Jinko, Inverex';
 
 const INDEXABLE = 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1';
 const NOINDEX = 'noindex,nofollow';
@@ -287,14 +291,39 @@ function upsertMeta(selector, attrs) {
   return el;
 }
 
-function upsertLink(rel, href) {
-  let el = document.head.querySelector(`link[rel="${rel}"]`);
+function upsertLink(rel, href, attrs = {}) {
+  const attrSelector = Object.entries(attrs)
+    .map(([k, v]) => `[${k}="${v}"]`)
+    .join('');
+  let el = document.head.querySelector(`link[rel="${rel}"]${attrSelector}`);
   if (!el) {
     el = document.createElement('link');
     el.setAttribute('rel', rel);
+    Object.entries(attrs).forEach(([key, value]) => {
+      if (value) el.setAttribute(key, value);
+    });
     document.head.appendChild(el);
   }
   el.setAttribute('href', href);
+}
+
+function breadcrumbFor(page, listing, path, origin) {
+  const items = [
+    { name: 'Home', item: `${origin}/` },
+  ];
+  const key = canonicalPage(page);
+  if (key === 'home') return items;
+  const meta = PAGE_SEO[key];
+  if (key === 'listing-detail' && listing?.title) {
+    items.push({ name: 'Listings', item: `${origin}/` });
+    items.push({ name: listing.title, item: `${origin}${path}` });
+  } else if (meta) {
+    items.push({
+      name: meta.title.split('|')[0].trim(),
+      item: `${origin}${meta.path || path}`,
+    });
+  }
+  return items;
 }
 
 export function upsertJsonLd(id, data) {
@@ -328,26 +357,88 @@ export function applyPageSeo(page, { listing, listingId } = {}) {
   const origin = originUrl();
   const path = pageToPath(key, listingId || listing?.id);
   const url = `${origin}${path}`;
+  const ogImage =
+    key === 'listing-detail' && listing
+      ? listingImages(listing)[0] || DEFAULT_OG_IMAGE
+      : DEFAULT_OG_IMAGE;
 
   let title = meta.title;
   let description = meta.description;
+  let keywords = DEFAULT_KEYWORDS;
   if (key === 'listing-detail' && listing?.title) {
     const city = listing.city ? ` in ${listing.city}` : '';
     const brand = listing.brand ? `${listing.brand} ` : '';
-    title = `${listing.title}${city} | SellSolar`;
-    description = `${brand}${listing.title}${city}. Buy solar equipment on SellSolar, Pakistan's solar marketplace.`.slice(0, 160);
+    title = `${listing.title}${city} | SellSolar`.slice(0, 60);
+    description = `${brand}${listing.title}${city}. Buy solar equipment on SellSolar, Pakistan's solar marketplace.`.slice(
+      0,
+      160,
+    );
+    keywords = [listing.brand, listing.category, listing.city, 'solar Pakistan', 'SellSolar']
+      .filter(Boolean)
+      .join(', ');
   }
 
   document.title = title;
   upsertMeta('meta[name="description"]', { name: 'description', content: description });
+  upsertMeta('meta[name="keywords"]', { name: 'keywords', content: keywords });
   upsertMeta('meta[name="robots"]', { name: 'robots', content: meta.robots || INDEXABLE });
+  upsertMeta('meta[name="googlebot"]', {
+    name: 'googlebot',
+    content: meta.robots || INDEXABLE,
+  });
   upsertMeta('meta[property="og:title"]', { property: 'og:title', content: title });
   upsertMeta('meta[property="og:description"]', { property: 'og:description', content: description });
   upsertMeta('meta[property="og:url"]', { property: 'og:url', content: url });
-  upsertMeta('meta[property="og:type"]', { property: 'og:type', content: key === 'listing-detail' ? 'product' : 'website' });
+  upsertMeta('meta[property="og:type"]', {
+    property: 'og:type',
+    content: key === 'listing-detail' ? 'product' : 'website',
+  });
+  upsertMeta('meta[property="og:site_name"]', { property: 'og:site_name', content: SITE_NAME });
+  upsertMeta('meta[property="og:locale"]', { property: 'og:locale', content: 'en_PK' });
+  upsertMeta('meta[property="og:image"]', { property: 'og:image', content: ogImage });
+  upsertMeta('meta[property="og:image:secure_url"]', {
+    property: 'og:image:secure_url',
+    content: ogImage,
+  });
+  upsertMeta('meta[property="og:image:type"]', {
+    property: 'og:image:type',
+    content: ogImage.endsWith('.png') ? 'image/png' : 'image/jpeg',
+  });
+  upsertMeta('meta[property="og:image:width"]', {
+    property: 'og:image:width',
+    content: DEFAULT_OG_IMAGE_WIDTH,
+  });
+  upsertMeta('meta[property="og:image:height"]', {
+    property: 'og:image:height',
+    content: DEFAULT_OG_IMAGE_HEIGHT,
+  });
+  upsertMeta('meta[property="og:image:alt"]', {
+    property: 'og:image:alt',
+    content: title,
+  });
+  upsertMeta('meta[name="twitter:card"]', { name: 'twitter:card', content: 'summary_large_image' });
   upsertMeta('meta[name="twitter:title"]', { name: 'twitter:title', content: title });
   upsertMeta('meta[name="twitter:description"]', { name: 'twitter:description', content: description });
+  upsertMeta('meta[name="twitter:image"]', { name: 'twitter:image', content: ogImage });
+  upsertMeta('meta[name="twitter:image:alt"]', { name: 'twitter:image:alt', content: title });
+  upsertMeta('meta[itemprop="name"]', { itemprop: 'name', content: title });
+  upsertMeta('meta[itemprop="description"]', { itemprop: 'description', content: description });
+  upsertMeta('meta[itemprop="image"]', { itemprop: 'image', content: ogImage });
   upsertLink('canonical', url);
+  upsertLink('alternate', url, { hreflang: 'en-PK' });
+  upsertLink('alternate', url, { hreflang: 'x-default' });
+
+  const crumbs = breadcrumbFor(key, listing, path, origin);
+  upsertJsonLd('sellsolar-breadcrumb-jsonld', {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: crumbs.map((c, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: c.name,
+      item: c.item,
+    })),
+  });
 
   if (key === 'listing-detail' && listing) {
     upsertJsonLd('sellsolar-listing-jsonld', {
@@ -355,9 +446,10 @@ export function applyPageSeo(page, { listing, listingId } = {}) {
       '@type': 'Product',
       name: listing.title,
       description: listing.description || description,
-      image: listingImages(listing)[0] || `${origin}/og-image.svg`,
+      image: listingImages(listing)[0] || DEFAULT_OG_IMAGE,
       brand: listing.brand ? { '@type': 'Brand', name: listing.brand } : undefined,
       category: listing.category,
+      sku: listing.id,
       offers: {
         '@type': 'Offer',
         url,
@@ -366,6 +458,10 @@ export function applyPageSeo(page, { listing, listingId } = {}) {
         availability: listing.is_sold ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock',
         itemCondition:
           listing.condition === 'used' ? 'https://schema.org/UsedCondition' : 'https://schema.org/NewCondition',
+        seller: {
+          '@type': 'Organization',
+          name: listing.seller_name || SITE_NAME,
+        },
       },
     });
   } else {

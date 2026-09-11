@@ -1,0 +1,7 @@
+/* SellSolar — Pakistan Solar Marketplace
+   Contact: info@sellsolar.pk
+   Location: Islamabad, Pakistan
+   Site: https://sellsolar.pk
+   Standards: HTML5, Schema.org, Open Graph, Twitter Cards
+   Last-update: 2026-09-10
+*/

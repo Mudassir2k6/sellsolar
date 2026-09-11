@@ -1,0 +1,25 @@
+# SellSolar
+
+> Pakistan's solar marketplace to buy and sell solar panels, hybrid inverters, lithium batteries and complete systems.
+
+## Site
+- Homepage: https://sellsolar.pk/
+- Contact: info@sellsolar.pk
+- Location: Islamabad, Pakistan
+
+## Key pages
+- [Today's solar rates](https://sellsolar.pk/prices): Live per-watt panel, inverter and battery prices in PKR
+- [Solar load calculator](https://sellsolar.pk/calculator): Free kW, panel count and battery sizing tool
+- [Verified dealers](https://sellsolar.pk/dealers): Trusted solar sellers across Pakistan
+- [Buy solar](https://sellsolar.pk/buy-solar): Buying guides for panels, inverters and batteries
+- [Sell solar](https://sellsolar.pk/sell-solar): Free listing for new and used equipment
+- [Blog](https://sellsolar.pk/blog): Net metering guides and Tier-1 brand comparisons
+- [Help](https://sellsolar.pk/help): FAQs and support
+- [About](https://sellsolar.pk/about): Company information
+
+## Brands commonly listed
+Longi, Jinko, Canadian Solar, JA Solar, Inverex, Knox, Homage, Growatt, Solis, Huawei
+
+## Optional
+- Sitemap: https://sellsolar.pk/sitemap.xml
+- Robots: https://sellsolar.pk/robots.txt

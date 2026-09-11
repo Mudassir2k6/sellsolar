@@ -1,5 +1,21 @@
+# SellSolar robots.txt — https://sellsolar.pk
 User-agent: *
 Allow: /
+Allow: /assets/
+Allow: /*.css$
+Allow: /*.js$
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.png$
+Allow: /*.svg$
+Allow: /*.webp$
+Allow: /og-image.jpg
+Allow: /og-image.png
+Allow: /sitemap.xml
+Allow: /robots.txt
+Allow: /site.webmanifest
+
+# Auth & private areas
 Disallow: /login
 Disallow: /dashboard
 Disallow: /admin
@@ -8,5 +24,42 @@ Disallow: /password
 Disallow: /forgot-password
 Disallow: /reset-password
 Disallow: /post-ad
+Disallow: /change-password
+
+# Crawl budget — avoid duplicate query variants
+Disallow: /*?*utm_
+Disallow: /*?*fbclid=
+Disallow: /*?*gclid=
+
+# Google
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+# Bing
+User-agent: Bingbot
+Allow: /
+
+# AI / LLM crawlers (helpful for AI visibility)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
 
 Sitemap: https://sellsolar.pk/sitemap.xml
+Host: https://sellsolar.pk

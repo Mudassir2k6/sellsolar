@@ -36,7 +36,6 @@ import {
   DollarSign,
   Eye,
   EyeOff,
-  Facebook,
   FilePen,
   FileText,
   Filter,
@@ -45,10 +44,8 @@ import {
   Headphones,
   Heart,
   Image,
-  Instagram,
   Layers,
   LayoutDashboard,
-  Linkedin,
   LoaderCircle,
   Lock,
   LogOut,
@@ -75,7 +72,6 @@ import {
   Tag,
   Trash2,
   TrendingUp,
-  Twitter,
   User,
   Users,
   Wrench,
@@ -1393,7 +1389,7 @@ const ux={
     { label: "Cookie Policy", page: "cookies" },
     { label: "Disclaimer", page: "disclaimer" }
   ]
-},dx=[Facebook,Twitter,Instagram,Linkedin];
+};
 function hx({
   onPostAd:t,
   onNavigate:navigate
@@ -1463,11 +1459,16 @@ function hx({
         className:"mt-12 flex flex-col items-center justify-between gap-4 border-t border-gray-800 pt-8 sm:flex-row",children:[jsx("p",{
           className:"text-sm",children:"© 2026 SellSolar. All rights reserved."
         }),jsx("div",{
-          className:"flex gap-3",children:dx.map((e,r)=>jsx("a",{
-            href:"#",className:"flex h-9 w-9 items-center justify-center rounded-lg bg-gray-800 transition-colors hover:bg-primary-500",children:jsx(e,{
-              className:"h-4 w-4"
-            })
-          },r))
+          className:"flex gap-3",children:[
+            { href: "mailto:info@sellsolar.pk", label: "Email SellSolar", Icon: Mail },
+            { href: "/contact", label: "Contact SellSolar", Icon: MapPin },
+          ].map(({ href, label, Icon }) => jsx("a", {
+            href,
+            "aria-label": label,
+            title: label,
+            className: "flex h-9 w-9 items-center justify-center rounded-lg bg-gray-800 transition-colors hover:bg-primary-500",
+            children: jsx(Icon, { className: "h-4 w-4" })
+          }, label))
         })]
       })]
     })]
@@ -4113,6 +4114,7 @@ function yx({
         }
         const k = found;
         n(k);
+        applyPageSeo('listing-detail', { listing: k, listingId: t });
         if(k.user_id && isValidUuid(k.user_id)){
           try {
             const{
@@ -4247,7 +4249,7 @@ function yx({
               }),photos.length > 1 && jsx("div",{
                 className:"p-3 flex gap-2 overflow-x-auto bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800",children:photos.map((ph, idx)=>jsx("button",{
                   onClick:()=>setActivePhotoIdx(idx),className:`relative h-16 w-16 shrink-0 rounded-lg overflow-hidden border-2 transition-all ${activePhotoIdx===idx?"border-primary-500 ring-2 ring-primary-500/30 scale-105":"border-transparent opacity-70 hover:opacity-100"}`,children:jsx("img",{
-                    src:ph,alt:"",className:"h-full w-full object-cover"
+                    src:ph,alt:`${r.title} photo ${idx + 1}`,className:"h-full w-full object-cover"
                   })
                 },idx))
               })]

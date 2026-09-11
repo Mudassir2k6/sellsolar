@@ -98,7 +98,7 @@ export default function ListingPhotoUploader({ files, onChange, disabled }) {
             key={`${file.name}-${file.lastModified}-${index}`}
             className="relative aspect-square overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800 ring-1 ring-gray-200 dark:ring-gray-700 group"
           >
-            <img src={previews[index]} alt="" className="h-full w-full object-cover" />
+            <img src={previews[index]} alt={`Listing photo ${index + 1}`} className="h-full w-full object-cover" />
             <button
               type="button"
               disabled={disabled}

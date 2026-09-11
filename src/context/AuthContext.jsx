@@ -321,6 +321,15 @@ export function AuthProvider({ children }) {
               is_verified_dealer: false,
             };
             saveStoredSession({ user: session.user, profile: oauthProfile });
+            // Email confirmation / OAuth return — mark local mirror confirmed
+            if (session.user.email && (event === 'SIGNED_IN' || event === 'USER_UPDATED' || event === 'PASSWORD_RECOVERY')) {
+              const localUsers = getStoredUsers();
+              const key = session.user.email.toLowerCase();
+              if (localUsers[key]) {
+                localUsers[key].emailConfirmed = true;
+                saveStoredUsers(localUsers);
+              }
+            }
             loadProfile(session.user.id, session.user.email);
           } else {
             const currentLocal = getStoredSession();
@@ -386,12 +395,20 @@ export function AuthProvider({ children }) {
       const cleanBusinessAddress = businessAddress ? sanitizeText(businessAddress, 250) : null;
 
       let supabaseUserId = null;
+      let needsEmailConfirmation = false;
+      const origin =
+        typeof window !== 'undefined' && window.location?.origin
+          ? window.location.origin
+          : 'https://sellsolar.pk';
+      const emailRedirectTo = `${origin}/`;
+
       if (isSupabaseConfigured()) {
         try {
           const { data, error } = await supabase.auth.signUp({
             email: cleanEmail,
             password: cleanPass,
             options: {
+              emailRedirectTo,
               data: {
                 username: rawIdentifier,
                 account_type: accountType,
@@ -408,9 +425,15 @@ export function AuthProvider({ children }) {
           if (error) {
             throw error;
           }
+          // Obfuscated "already registered" response from Supabase
+          if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+            throw new Error('This Email Address is already registered. Please log in or use a different email.');
+          }
           if (data?.user) {
             supabaseUserId = data.user.id;
           }
+          // No session means Confirm Email is required before login
+          needsEmailConfirmation = !data?.session;
         } catch (err) {
           console.warn('Supabase signup fallback:', err);
           throw err;
@@ -455,6 +478,7 @@ export function AuthProvider({ children }) {
         password: cleanPass,
         user: newUser,
         profile: newProfile,
+        emailConfirmed: !needsEmailConfirmation,
       };
       localUsers[cleanEmail] = userRecord;
       if (rawIdentifier) {
@@ -462,12 +486,27 @@ export function AuthProvider({ children }) {
       }
       saveStoredUsers(localUsers);
 
-      // Save to active session
+      // If email confirmation is required, do NOT create an active session yet
+      if (needsEmailConfirmation) {
+        try {
+          await supabase.from('profiles').upsert(newProfile);
+        } catch (dbErr) {
+          console.warn('Profile sync fallback:', dbErr);
+        }
+        return {
+          success: true,
+          needsEmailConfirmation: true,
+          email: cleanEmail,
+          user: null,
+          profile: newProfile,
+        };
+      }
+
+      // Email already confirmed (or local-only mode) — log the user in
       setUser(newUser);
       setProfile(newProfile);
       saveStoredSession({ user: newUser, profile: newProfile });
 
-      // If Supabase is active, sync profile row
       if (isSupabaseConfigured() && supabaseUserId) {
         try {
           await supabase.from('profiles').upsert(newProfile);
@@ -476,10 +515,46 @@ export function AuthProvider({ children }) {
         }
       }
 
-      return { success: true, user: newUser, profile: newProfile };
+      return {
+        success: true,
+        needsEmailConfirmation: false,
+        email: cleanEmail,
+        user: newUser,
+        profile: newProfile,
+      };
     },
     []
   );
+
+  const resendConfirmationEmail = useCallback(async (email) => {
+    if (!isSupabaseConfigured()) {
+      throw new Error('Email verification is unavailable right now.');
+    }
+    const cleanEmail = (email || '').trim().toLowerCase();
+    if (!isValidEmail(cleanEmail)) {
+      throw new Error('Please enter a valid email address to resend the confirmation link.');
+    }
+    const rateCheck = checkRateLimit('signup', cleanEmail || 'global');
+    if (!rateCheck.allowed) {
+      throw new Error(rateCheck.reason);
+    }
+    const origin =
+      typeof window !== 'undefined' && window.location?.origin
+        ? window.location.origin
+        : 'https://sellsolar.pk';
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: cleanEmail,
+      options: {
+        emailRedirectTo: `${origin}/`,
+      },
+    });
+    if (error) {
+      throw error;
+    }
+    recordRateLimitAttempt('signup', cleanEmail || 'global');
+    return { success: true };
+  }, []);
 
   const signIn = useCallback(
     async (identifier, password) => {
@@ -530,13 +605,27 @@ export function AuthProvider({ children }) {
       }
 
       // 2. Try Supabase if configured and we resolved an email
-      if (isSupabaseConfigured() && matchedEmail && matchedEmail.includes('@')) {
+      if (isSupabaseConfigured() && matchedEmail && matchedEmail.includes('@') && !matchedEmail.endsWith('@sellsolar.local')) {
         try {
           const { data, error } = await supabase.auth.signInWithPassword({
             email: matchedEmail,
             password: cleanPass,
           });
-          if (!error && data?.session?.user) {
+          if (error) {
+            const msg = (error.message || '').toLowerCase();
+            if (msg.includes('email not confirmed') || error.code === 'email_not_confirmed') {
+              const confirmErr = new Error(
+                'Please confirm your email before logging in. Check your inbox for the verification link.'
+              );
+              confirmErr.code = 'email_not_confirmed';
+              confirmErr.email = matchedEmail;
+              throw confirmErr;
+            }
+            // Wrong password / invalid login — fall through only for local/admin accounts
+            if (!msg.includes('invalid login') && !msg.includes('invalid credentials')) {
+              throw error;
+            }
+          } else if (data?.session?.user) {
             clearRateLimit('login', cleanIdentifier || 'global');
             setUser(data.session.user);
             await loadProfile(data.session.user.id, data.session.user.email);
@@ -550,11 +639,30 @@ export function AuthProvider({ children }) {
               user: data.session.user,
               profile: activeProfile,
             });
+            // Mark local mirror as confirmed after successful cloud login
+            const localUsers = getStoredUsers();
+            if (localUsers[matchedEmail]) {
+              localUsers[matchedEmail].emailConfirmed = true;
+              saveStoredUsers(localUsers);
+            }
             return { success: true, user: data.session.user };
           }
         } catch (err) {
+          if (err?.code === 'email_not_confirmed' || (err?.message || '').toLowerCase().includes('confirm your email')) {
+            throw err;
+          }
           console.warn('Supabase signin attempt bypassed:', err);
         }
+      }
+
+      // Block local login for accounts that still need email confirmation
+      if (record && record.emailConfirmed === false && matchedEmail && !matchedEmail.endsWith('@sellsolar.local')) {
+        const confirmErr = new Error(
+          'Please confirm your email before logging in. Check your inbox for the verification link.'
+        );
+        confirmErr.code = 'email_not_confirmed';
+        confirmErr.email = matchedEmail;
+        throw confirmErr;
       }
 
       // 3. Admin credentials check (mudassir2k6@gmail.com / mudassir2k6 / 03001234567)
@@ -1085,12 +1193,13 @@ export function AuthProvider({ children }) {
       signIn,
       signInWithGoogle,
       signUp,
+      resendConfirmationEmail,
       updatePassword,
       updateProfile,
       refreshProfile,
       completePasswordRecovery,
     }),
-    [user, profile, loading, passwordRecovery, signOut, signIn, signInWithGoogle, signUp, updatePassword, updateProfile, refreshProfile, completePasswordRecovery]
+    [user, profile, loading, passwordRecovery, signOut, signIn, signInWithGoogle, signUp, resendConfirmationEmail, updatePassword, updateProfile, refreshProfile, completePasswordRecovery]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

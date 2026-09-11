@@ -63,8 +63,8 @@ function authErrorMessage(error, activeView = 'login') {
   if (message.includes('rate limit') || message.includes('email_rate_limit')) {
     return 'Too many attempts. Please wait a moment and try again.';
   }
-  if (message.includes('email not confirmed')) {
-    return 'Please check your email to confirm your account, or sign in directly.';
+  if (message.includes('email not confirmed') || error?.code === 'email_not_confirmed' || message.includes('confirm your email')) {
+    return 'Please confirm your email before logging in. Open the verification link we sent to your inbox (and spam folder).';
   }
   if (message.includes('invalid email') || message.includes('unable to validate email') || (message.includes('email address') && message.includes('invalid'))) {
     return 'Please enter a valid username, mobile, or email address.';
@@ -258,7 +258,7 @@ function getPasswordStrength(pass) {
 }
 
 export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
-  const { signIn, signInWithGoogle, signUp, updatePassword, refreshProfile, completePasswordRecovery } = useAuth();
+  const { signIn, signInWithGoogle, signUp, resendConfirmationEmail, updatePassword, refreshProfile, completePasswordRecovery } = useAuth();
   const { showToast } = useToast();
   const [view, setView] = useState(initialView);
   const [accountType, setAccountType] = useState('individual');
@@ -365,6 +365,8 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
       } else if (currentField === 'signupEmail') {
         focusRef(passwordRef);
       } else if (currentField === 'signupPassword') {
+        focusRef(confirmPasswordRef);
+      } else if (currentField === 'confirmPassword') {
         focusRef(phoneRef);
       } else if (currentField === 'phone') {
         focusRef(cityRef);
@@ -469,11 +471,13 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
     const cleanMail = signupEmail.trim().toLowerCase();
     const isMailValid = isValidEmail(cleanMail);
 
+    const passwordsMatch = password.trim() === confirmPassword.trim();
     const nextErrors = {
       fullName: !fullName.trim(),
       username: !cleanUName || cleanUName.length < 3,
       signupEmail: !cleanMail || !isMailValid,
       password: !password.trim() || password.length < 8,
+      confirmPassword: !confirmPassword.trim() || !passwordsMatch,
       phone: !isValidPhone(phone),
       city: !city.trim(),
       cnic: isDealer && !cnic.trim(),
@@ -505,6 +509,15 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
     }
     if (nextErrors.password) {
       focusField('password');
+      return;
+    }
+    if (nextErrors.confirmPassword) {
+      setError(
+        !confirmPassword.trim()
+          ? 'Please confirm your password.'
+          : 'Passwords do not match. Please re-enter.'
+      );
+      focusField('confirmPassword');
       return;
     }
     if (nextErrors.phone) {
@@ -560,6 +573,22 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
 
       if (!res?.success) {
         throw new Error('Could not create account. Please try again.');
+      }
+
+      if (res.needsEmailConfirmation) {
+        showToast({
+          title: 'Confirm your email',
+          message: `We sent a verification link to ${cleanMail}. Confirm your email, then log in.`,
+          type: 'success',
+        });
+        setEmail(cleanMail);
+        setPassword('');
+        setConfirmPassword('');
+        go('login');
+        setInfo(
+          `Account created. Please confirm your email (${cleanMail}) before logging in. Check inbox and spam folder.`
+        );
+        return;
       }
 
       showToast({
@@ -640,8 +669,40 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
       });
       onSuccess();
     } catch (err) {
-      setError(authErrorMessage(err, 'login'));
+      const msg = authErrorMessage(err, 'login');
+      setError(msg);
+      if (err?.code === 'email_not_confirmed' || (err?.message || '').toLowerCase().includes('confirm your email')) {
+        const pendingEmail = err.email || (isValidEmail(cleanIdentifier) ? cleanIdentifier.toLowerCase() : '');
+        if (pendingEmail) {
+          setInfo(`Email not confirmed yet. Use Resend verification below for ${pendingEmail}.`);
+          setEmail(pendingEmail);
+        }
+      }
       focusField('password');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleResendConfirmation = async () => {
+    setError(null);
+    const cleanMail = (email || signupEmail || '').trim().toLowerCase();
+    if (!isValidEmail(cleanMail)) {
+      setError('Enter your signup email address, then click Resend verification.');
+      focusField('email');
+      return;
+    }
+    setBusy(true);
+    try {
+      await resendConfirmationEmail(cleanMail);
+      setInfo(`Verification email sent again to ${cleanMail}. Check inbox and spam folder.`);
+      showToast({
+        title: 'Verification email sent',
+        message: `Open the link in ${cleanMail} to confirm your account, then log in.`,
+        type: 'success',
+      });
+    } catch (err) {
+      setError(authErrorMessage(err, 'login'));
     } finally {
       setBusy(false);
     }
@@ -673,18 +734,18 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
             redirectTo: `${window.location.origin}/`,
           });
           if (resetError) {
-            console.warn('Supabase reset link notice:', resetError);
+            throw resetError;
           }
         } catch (supErr) {
-          console.warn('Supabase reset call exception:', supErr);
+          throw supErr;
         }
       }
       showToast({
-        title: 'Reset Request Processed',
-        message: `Password reset instructions initiated for ${cleanMail}. You can also set a new password directly below.`,
+        title: 'Reset email sent',
+        message: `Check ${cleanMail} for the password reset link (inbox and spam).`,
         type: 'success',
       });
-      setInfo(`Password reset link sent to ${cleanMail}! Please check your email inbox and spam folder.`);
+      setInfo(`Password reset link sent to ${cleanMail}. Open the email link to verify and set a new password.`);
     } catch (err) {
       setError(authErrorMessage(err, 'forgot'));
     } finally {
@@ -1434,7 +1495,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                 </div>
               )}
 
-              {view === 'reset' && (
+              {(view === 'signup' || view === 'reset') && (
                 <div>
                   <label className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300">
                     Confirm password *
@@ -1453,10 +1514,14 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                       onChange={(e) => {
                         setConfirmPassword(e.target.value);
                         clearFieldError('confirmPassword');
+                        if (error && (error.toLowerCase().includes('password') || error.toLowerCase().includes('match'))) {
+                          setError(null);
+                        }
                       }}
                       onKeyDown={(e) => handleFieldKeyDown(e, 'confirmPassword')}
-                      placeholder="Re-enter new password"
+                      placeholder={view === 'signup' ? 'Re-enter password' : 'Re-enter new password'}
                       className={fieldClass('confirmPassword', 'pl-11 pr-16')}
+                      autoComplete="new-password"
                     />
                     {fieldErrors.confirmPassword ? (
                       <CircleAlert className="absolute right-11 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" />
@@ -1471,7 +1536,9 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                   </div>
                   {fieldErrors.confirmPassword && (
                     <p className="mt-1.5 text-xs font-medium text-error-600">
-                      Passwords do not match.
+                      {!confirmPassword.trim()
+                        ? 'Please confirm your password.'
+                        : 'Passwords do not match.'}
                     </p>
                   )}
                 </div>
@@ -1719,12 +1786,39 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                       Don&apos;t have an account? Click here to Sign Up &rarr;
                     </button>
                   )}
+                  {(view === 'login' &&
+                    (error.toLowerCase().includes('confirm your email') ||
+                      error.toLowerCase().includes('email not confirmed') ||
+                      error.toLowerCase().includes('verification'))) && (
+                    <button
+                      type="button"
+                      onClick={handleResendConfirmation}
+                      disabled={busy}
+                      className="w-full text-center text-xs font-bold text-primary-600 hover:text-primary-700 dark:text-primary-400 py-1.5 rounded-lg bg-primary-50 dark:bg-primary-950/40 hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-colors cursor-pointer disabled:opacity-60"
+                    >
+                      Resend verification email &rarr;
+                    </button>
+                  )}
                 </div>
               )}
               {info && (
-                <div className="flex items-start gap-2 rounded-lg bg-secondary-50 dark:bg-secondary-950/40 p-3 text-sm font-medium text-secondary-700 dark:text-secondary-300 border border-secondary-200 dark:border-secondary-800">
-                  <CircleCheck className="mt-0.5 h-4 w-4 shrink-0" />
-                  <span>{info}</span>
+                <div className="space-y-2">
+                  <div className="flex items-start gap-2 rounded-lg bg-secondary-50 dark:bg-secondary-950/40 p-3 text-sm font-medium text-secondary-700 dark:text-secondary-300 border border-secondary-200 dark:border-secondary-800">
+                    <CircleCheck className="mt-0.5 h-4 w-4 shrink-0" />
+                    <span>{info}</span>
+                  </div>
+                  {view === 'login' &&
+                    (info.toLowerCase().includes('confirm') ||
+                      info.toLowerCase().includes('verification')) && (
+                      <button
+                        type="button"
+                        onClick={handleResendConfirmation}
+                        disabled={busy}
+                        className="w-full text-center text-xs font-bold text-primary-600 hover:text-primary-700 dark:text-primary-400 py-1.5 rounded-lg bg-primary-50 dark:bg-primary-950/40 hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-colors cursor-pointer disabled:opacity-60"
+                      >
+                        Resend verification email &rarr;
+                      </button>
+                    )}
                 </div>
               )}
 

@@ -307,6 +307,20 @@ export function AuthProvider({ children }) {
           }
           if (session?.user) {
             setUser(session.user);
+            const metaName =
+              session.user.user_metadata?.full_name ||
+              session.user.user_metadata?.name ||
+              session.user.email?.split('@')[0] ||
+              'User';
+            const oauthProfile = {
+              id: session.user.id,
+              email: session.user.email,
+              full_name: metaName,
+              account_type: 'individual',
+              is_admin: (session.user.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase(),
+              is_verified_dealer: false,
+            };
+            saveStoredSession({ user: session.user, profile: oauthProfile });
             loadProfile(session.user.id, session.user.email);
           } else {
             const currentLocal = getStoredSession();
@@ -1010,6 +1024,40 @@ export function AuthProvider({ children }) {
     [user, profile]
   );
 
+  const signInWithGoogle = useCallback(async () => {
+    if (!isSupabaseConfigured()) {
+      throw new Error('Google sign-in is unavailable right now. Please use email login.');
+    }
+
+    const rateCheck = checkRateLimit('login', 'google-oauth');
+    if (!rateCheck.allowed) {
+      throw new Error(rateCheck.reason);
+    }
+
+    const redirectTo =
+      typeof window !== 'undefined'
+        ? `${window.location.origin}/`
+        : 'https://sellsolar.pk/';
+
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'select_account',
+        },
+        scopes: 'openid email profile',
+      },
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    return { success: true, url: data?.url || null };
+  }, []);
+
   const signOut = useCallback(async () => {
     if (isSupabaseConfigured()) {
       try {
@@ -1032,13 +1080,14 @@ export function AuthProvider({ children }) {
       passwordRecovery,
       signOut,
       signIn,
+      signInWithGoogle,
       signUp,
       updatePassword,
       updateProfile,
       refreshProfile,
       completePasswordRecovery,
     }),
-    [user, profile, loading, passwordRecovery, signOut, signIn, signUp, updatePassword, updateProfile, refreshProfile, completePasswordRecovery]
+    [user, profile, loading, passwordRecovery, signOut, signIn, signInWithGoogle, signUp, updatePassword, updateProfile, refreshProfile, completePasswordRecovery]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

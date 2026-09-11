@@ -37,15 +37,20 @@ import {
   LAST_MIDNIGHT_UPDATE,
   ISLAMABAD_DAILY_SHEETS,
 } from '../data/todayPricesData';
+import { getPakistanDateDetails } from '../lib/dateUtils';
 import { formatPrice } from '../lib/constants';
 
 export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
+  const pktDateInfo = useMemo(() => getPakistanDateDetails(), []);
+  const todayDateLabel = pktDateInfo.shortDate; // e.g. "11-Sep-2026"
+  const yesterdayDateLabel = pktDateInfo.yesterdayShortDate || '10-Sep-2026';
+
   const [selectedCategory, setSelectedCategory] = useState('all'); // 'all', 'panel', 'inverter', 'battery', 'complete_system', 'structure_accessories'
   const [selectedBrand, setSelectedBrand] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('popular'); // 'popular', 'price_asc', 'price_desc', 'name'
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'table'
-  const [dailySheetDate, setDailySheetDate] = useState('07-Sep-2026'); // '07-Sep-2026' | '08-Sep-2026' | 'compare'
+  const [dailySheetDate, setDailySheetDate] = useState('today'); // 'today' | 'yesterday' | 'compare'
   const [showDailySheetDetail, setShowDailySheetDetail] = useState(true);
   const [sheetSearchQuery, setSheetSearchQuery] = useState('');
   const [sheetFilterStatus, setSheetFilterStatus] = useState('all'); // 'all' | 'changed' | 'canadian' | 'astronergy' | 'aiko'
@@ -174,10 +179,10 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
 
   // Filtered Islamabad Daily Sheet Rates
   const displayedSheetRates = useMemo(() => {
-    const isYesterday = dailySheetDate === '07-Sep-2026';
+    const isYesterday = dailySheetDate === 'yesterday' || dailySheetDate === '07-Sep-2026';
     const activeData = isYesterday
-      ? ISLAMABAD_DAILY_SHEETS['07-Sep-2026']?.rates || []
-      : ISLAMABAD_DAILY_SHEETS['08-Sep-2026']?.rates || [];
+      ? (ISLAMABAD_DAILY_SHEETS['yesterday']?.rates || ISLAMABAD_DAILY_SHEETS['07-Sep-2026']?.rates || [])
+      : (ISLAMABAD_DAILY_SHEETS['today']?.rates || ISLAMABAD_DAILY_SHEETS['08-Sep-2026']?.rates || []);
 
     return activeData.filter((item) => {
       if (sheetFilterStatus === 'changed' && item.change === 0) return false;
@@ -383,31 +388,31 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                 Solar Panels — Ready Stock Available Islamabad
               </h2>
               <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
-                Wholesale ready stock trade sheet (07-Sep-2026) for Tier-1 N-Type TOPCon & Bifacial modules.
+                Wholesale ready stock trade sheet ({todayDateLabel}) for Tier-1 N-Type TOPCon & Bifacial modules.
               </p>
             </div>
 
             {/* Date Selection Toggle */}
             <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl border border-gray-200 dark:border-gray-700 self-start md:self-auto">
               <button
-                onClick={() => setDailySheetDate('07-Sep-2026')}
+                onClick={() => setDailySheetDate('today')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  dailySheetDate === '07-Sep-2026'
+                  dailySheetDate === 'today' || dailySheetDate === '08-Sep-2026'
                     ? 'bg-primary-600 text-white shadow-sm'
                     : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
-                07-Sep Sheet
+                {todayDateLabel} (Live)
               </button>
               <button
-                onClick={() => setDailySheetDate('08-Sep-2026')}
+                onClick={() => setDailySheetDate('yesterday')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  dailySheetDate === '08-Sep-2026'
+                  dailySheetDate === 'yesterday' || dailySheetDate === '07-Sep-2026'
                     ? 'bg-primary-600 text-white shadow-sm'
                     : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
-                08-Sep Live
+                {yesterdayDateLabel} (Sheet)
               </button>
               <button
                 onClick={() => setDailySheetDate('compare')}
@@ -506,13 +511,17 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                       <th className="px-3.5 py-2.5">Brand & Module</th>
                       <th className="px-3 py-2.5">Wattage</th>
                       <th className="px-3 py-2.5">
-                        {dailySheetDate === '07-Sep-2026' ? '07-Sep Ready Rate' : '07-Sep (Sheet)'}
+                        {dailySheetDate === 'yesterday' || dailySheetDate === '07-Sep-2026'
+                          ? `${yesterdayDateLabel} Ready Rate`
+                          : `${todayDateLabel} Live Rate`}
                       </th>
                       <th className="px-3 py-2.5">
-                        {dailySheetDate === '07-Sep-2026' ? 'Benchmark Ref' : '08-Sep (Today)'}
+                        {dailySheetDate === 'yesterday' || dailySheetDate === '07-Sep-2026'
+                          ? 'Benchmark Ref'
+                          : `${yesterdayDateLabel} (Sheet Ref)`}
                       </th>
                       <th className="px-3 py-2.5">
-                        {dailySheetDate === '07-Sep-2026' ? 'Stock Trend' : 'Difference'}
+                        {dailySheetDate === 'yesterday' || dailySheetDate === '07-Sep-2026' ? 'Stock Trend' : 'Difference'}
                       </th>
                       <th className="px-3 py-2.5">Plate Price (Est.)</th>
                       <th className="px-3 py-2.5 text-right">Action</th>
@@ -532,6 +541,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                         const isAstro625 = item.brand === 'Astronergy' && item.model.includes('625');
                         const isCanadian625 = item.brand === 'Canadian Solar' && item.model.includes('625');
                         const isAstro580 = item.brand === 'Astronergy' && item.model.includes('580');
+                        const isYesterdayView = dailySheetDate === 'yesterday' || dailySheetDate === '07-Sep-2026';
 
                         return (
                           <tr
@@ -560,11 +570,11 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                             <td className="px-3 py-2.5 text-gray-800 dark:text-gray-200 font-semibold">
                               {item.model}
                             </td>
-                            <td className="px-3 py-2.5 text-gray-600 dark:text-gray-300">
-                              Rs. {dailySheetDate === '07-Sep-2026' ? item.rate.toFixed(2) : item.prevRate.toFixed(2)}/W
+                            <td className="px-3 py-2.5 font-semibold text-gray-900 dark:text-white">
+                              Rs. {isYesterdayView ? item.rate.toFixed(2) : item.rate.toFixed(2)}/W
                             </td>
-                            <td className="px-3 py-2.5 font-bold text-primary-700 dark:text-amber-300">
-                              Rs. {dailySheetDate === '07-Sep-2026' ? item.prevRate.toFixed(2) : item.rate.toFixed(2)}/W
+                            <td className="px-3 py-2.5 text-gray-600 dark:text-gray-300">
+                              Rs. {isYesterdayView ? item.prevRate.toFixed(2) : item.prevRate.toFixed(2)}/W
                             </td>
                             <td className="px-3 py-2.5">
                               {item.change < 0 ? (
@@ -614,7 +624,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
           <div className="mt-3 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-200 dark:border-gray-800">
             <span className="flex items-center gap-1">
               <Clock className="h-3.5 w-3.5 text-gray-400" />
-              Verified daily at 12:00 Midnight PKT from wholesale suppliers in Islamabad.
+              Verified daily at 12:00 Midnight PKT from wholesale suppliers in Pakistan.
             </span>
             <button
               onClick={() => setShowDailySheetDetail(!showDailySheetDetail)}

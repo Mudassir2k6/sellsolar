@@ -36,9 +36,15 @@ export function getPakistanDateDetails() {
   const shortDateRaw = shortDateFormatter.format(now);
   const shortDateKey = shortDateRaw.replace(/\s+/g, '-'); // e.g. "11-Sep-2026"
 
+  // Yesterday date calculation for comparison sheets
+  const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const yesterdayShortRaw = shortDateFormatter.format(yesterday);
+  const yesterdayShortKey = yesterdayShortRaw.replace(/\s+/g, '-');
+
   return {
     todayStr: formattedTodayStr,
     shortDate: shortDateKey,
+    yesterdayShortDate: yesterdayShortKey,
     lastMidnightStr: `${shortDateKey} (Islamabad Ready Stock Verified)`,
     iso: now.toISOString(),
   };

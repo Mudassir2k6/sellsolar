@@ -69,6 +69,13 @@ export const ISLAMABAD_DAILY_SHEETS = {
   }
 };
 
+// Provide dynamic references so today/yesterday always resolve smoothly
+ISLAMABAD_DAILY_SHEETS["today"] = ISLAMABAD_DAILY_SHEETS["08-Sep-2026"];
+ISLAMABAD_DAILY_SHEETS["yesterday"] = ISLAMABAD_DAILY_SHEETS["07-Sep-2026"];
+if (_currentPkt?.shortDate) {
+  ISLAMABAD_DAILY_SHEETS[_currentPkt.shortDate] = ISLAMABAD_DAILY_SHEETS["08-Sep-2026"];
+}
+
 export const MARKET_SUMMARY = {
   "panelsPerWattAvg": "Rs 36.75 – 44.50 / W",
   "panelsTrend": "Upward movement (+Rs 3 – 6/W) across ready stock Tier-1 N-Type TOPCon & HJT in Islamabad/Rawalpindi",

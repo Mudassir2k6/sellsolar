@@ -1,0 +1,59 @@
+# SellSolar redirects (Cloudflare Pages / Netlify compatible)
+# WWW → apex (canonical host)
+https://www.sellsolar.pk/*  https://sellsolar.pk/:splat  301!
+http://www.sellsolar.pk/*   https://sellsolar.pk/:splat  301!
+http://sellsolar.pk/*       https://sellsolar.pk/:splat  301!
+
+# Index file cleanup
+/index.html  /  301!
+/index.php   /  301!
+/home.html   /  301!
+/home.php    /  301!
+/default.html / 301!
+/default.php  / 301!
+
+# Known SPA routes (200 rewrite)
+/                     /index.html  200
+/prices               /index.html  200
+/today-prices         /index.html  200
+/calculator           /index.html  200
+/load-calculator      /index.html  200
+/dealers              /index.html  200
+/install              /index.html  200
+/login                /index.html  200
+/post-ad              /index.html  200
+/dashboard            /index.html  200
+/admin                /index.html  200
+/admin-dashboard      /index.html  200
+/password             /index.html  200
+/forgot-password      /index.html  200
+/reset-password       /index.html  200
+/change-password      /index.html  200
+/about                /index.html  200
+/about-us             /index.html  200
+/careers              /index.html  200
+/press                /index.html  200
+/blog                 /index.html  200
+/buy-solar            /index.html  200
+/sell-solar           /index.html  200
+/how-it-works         /index.html  200
+/pricing              /index.html  200
+/help                 /index.html  200
+/help-center          /index.html  200
+/contact              /index.html  200
+/contact-us           /index.html  200
+/safety               /index.html  200
+/safety-tips          /index.html  200
+/report               /index.html  200
+/report-issue         /index.html  200
+/terms                /index.html  200
+/terms-of-service     /index.html  200
+/privacy              /index.html  200
+/privacy-policy       /index.html  200
+/cookies              /index.html  200
+/cookie-policy        /index.html  200
+/disclaimer           /index.html  200
+/listing/*            /index.html  200
+
+# True 404 for unknown URLs (fixes soft-404 / 200 on missing pages)
+/*  /404.html  404

@@ -2,10 +2,261 @@
   command = "npm run build"
   publish = "dist"
 
+# WWW → apex
 [[redirects]]
-  from = "/*"
+  from = "https://www.sellsolar.pk/*"
+  to = "https://sellsolar.pk/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://www.sellsolar.pk/*"
+  to = "https://sellsolar.pk/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://sellsolar.pk/*"
+  to = "https://sellsolar.pk/:splat"
+  status = 301
+  force = true
+
+# Index file cleanup
+[[redirects]]
+  from = "/index.html"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/index.php"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/home.html"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/home.php"
+  to = "/"
+  status = 301
+  force = true
+
+# Known SPA routes
+[[redirects]]
+  from = "/"
   to = "/index.html"
   status = 200
+
+[[redirects]]
+  from = "/prices"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/today-prices"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/calculator"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/load-calculator"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/dealers"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/install"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/login"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/post-ad"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/dashboard"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin-dashboard"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/password"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/forgot-password"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/reset-password"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/change-password"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/about"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/about-us"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/careers"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/press"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/blog"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/buy-solar"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/sell-solar"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/how-it-works"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/pricing"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/help"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/help-center"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/contact"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/contact-us"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/safety"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/safety-tips"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/report"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/report-issue"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/terms"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/terms-of-service"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/privacy"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/privacy-policy"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/cookies"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/cookie-policy"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/disclaimer"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/listing/*"
+  to = "/index.html"
+  status = 200
+
+# Unknown routes → real 404
+[[redirects]]
+  from = "/*"
+  to = "/404.html"
+  status = 404
 
 [[headers]]
   for = "/*"

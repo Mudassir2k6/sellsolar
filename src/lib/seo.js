@@ -14,35 +14,35 @@ const NOINDEX = 'noindex,nofollow';
 
 export const PAGE_SEO = {
   home: {
-    title: 'SellSolar | Buy & Sell Solar Panels, Inverters & Batteries in Pakistan',
+    title: 'Buy & Sell Solar in Pakistan | SellSolar',
     description:
       'Pakistan solar marketplace for new and used solar panels, hybrid inverters, lithium batteries and complete systems. Compare prices in Lahore, Karachi, Islamabad and more.',
     path: '/',
     robots: INDEXABLE,
   },
   prices: {
-    title: "Today's Solar Panel Rates in Pakistan (PKR) | SellSolar",
+    title: "Today's Solar Rates Pakistan | SellSolar",
     description:
       "Live solar market rates in Pakistan: panel per-watt prices, hybrid inverter costs, and lithium battery rates. Updated daily so you can budget a 5kW–20kW system.",
     path: '/prices',
     robots: INDEXABLE,
   },
   calculator: {
-    title: 'Solar Load Calculator Pakistan | kW, Panels & Battery Size | SellSolar',
+    title: 'Solar Load Calculator Pakistan | SellSolar',
     description:
       'Free Pakistan solar load calculator. Enter fans, lights, inverter ACs and motors to get system kW, panel count, inverter size and battery backup in minutes.',
     path: '/calculator',
     robots: INDEXABLE,
   },
   dealers: {
-    title: 'Verified Solar Dealers in Pakistan | SellSolar',
+    title: 'Verified Solar Dealers Pakistan | SellSolar',
     description:
       'Browse verified solar equipment dealers across Pakistan. Find trusted sellers of Longi, Jinko, Inverex and Homage products in your city.',
     path: '/dealers',
     robots: INDEXABLE,
   },
   install: {
-    title: 'Request Solar Installation in Pakistan | SellSolar',
+    title: 'Solar Installation Request | SellSolar',
     description:
       'Request professional solar installation. Share your name, address and contact number and SellSolar will arrange a site visit across Pakistan.',
     path: '/install',
@@ -102,6 +102,12 @@ export const PAGE_SEO = {
     path: '/listing',
     robots: INDEXABLE,
   },
+  'not-found': {
+    title: 'Page Not Found (404) | SellSolar',
+    description: 'This SellSolar page does not exist. Return to the homepage to browse solar listings and tools.',
+    path: '/404',
+    robots: NOINDEX,
+  },
   about: {
     title: 'About Us | SellSolar Pakistan',
     description: 'Learn about SellSolar.pk, Pakistan’s dedicated clean energy and solar equipment marketplace.',
@@ -109,31 +115,31 @@ export const PAGE_SEO = {
     robots: INDEXABLE,
   },
   careers: {
-    title: 'Careers at SellSolar | Join the Solar Movement in Pakistan',
+    title: 'Careers at SellSolar | Solar Jobs PK',
     description: 'Join our mission-driven team solving renewable energy challenges across Pakistan.',
     path: '/careers',
     robots: INDEXABLE,
   },
   press: {
-    title: 'Press & Media Newsroom | SellSolar Pakistan',
+    title: 'Press & Media | SellSolar Pakistan',
     description: 'Latest news releases, media kit, and industry insights from SellSolar.pk.',
     path: '/press',
     robots: INDEXABLE,
   },
   blog: {
-    title: 'Solar Guides, Net Metering & Insights Blog | SellSolar',
+    title: 'Solar Blog & Net Metering Guides | SellSolar',
     description: 'Solar buying tips, Tier-1 module comparisons, inverter reviews and net-metering guides for Pakistan.',
     path: '/blog',
     robots: INDEXABLE,
   },
   'buy-solar': {
-    title: 'How to Buy Solar Panels, Inverters & Batteries | SellSolar',
+    title: 'How to Buy Solar in Pakistan | SellSolar',
     description: 'Comprehensive buying guide and tips to purchase authentic solar equipment in Pakistan.',
     path: '/buy-solar',
     robots: INDEXABLE,
   },
   'sell-solar': {
-    title: 'Sell Solar Equipment Free in Pakistan | SellSolar',
+    title: 'Sell Solar Equipment Free | SellSolar',
     description: 'List your new or used solar panels, inverters and batteries for thousands of buyers across Pakistan.',
     path: '/sell-solar',
     robots: INDEXABLE,
@@ -145,13 +151,13 @@ export const PAGE_SEO = {
     robots: INDEXABLE,
   },
   pricing: {
-    title: 'Pricing & Packages | SellSolar Pakistan',
+    title: 'Pricing & Packages | SellSolar',
     description: 'Transparent free individual ad listing and premium verified dealer plans.',
     path: '/pricing',
     robots: INDEXABLE,
   },
   help: {
-    title: 'Help Center & FAQs | SellSolar Pakistan',
+    title: 'Help Center & FAQs | SellSolar',
     description: 'Frequently asked questions, troubleshooting and customer support for SellSolar users.',
     path: '/help',
     robots: INDEXABLE,
@@ -163,19 +169,19 @@ export const PAGE_SEO = {
     robots: INDEXABLE,
   },
   safety: {
-    title: 'Solar Safety & Anti-Fraud Tips | SellSolar Pakistan',
+    title: 'Solar Safety Tips | SellSolar Pakistan',
     description: 'Essential guidelines to avoid fake solar panels, check barcodes and transact safely in Pakistan.',
     path: '/safety',
     robots: INDEXABLE,
   },
   'report-issue': {
-    title: 'Report an Issue or Fraudulent Ad | SellSolar Pakistan',
+    title: 'Report an Issue | SellSolar Pakistan',
     description: 'Report counterfeit equipment, scams or technical issues for swift investigation.',
     path: '/report-issue',
     robots: INDEXABLE,
   },
   terms: {
-    title: 'Terms of Service | SellSolar Pakistan',
+    title: 'Terms of Service | SellSolar',
     description: 'Terms and conditions governing the use of SellSolar.pk online solar marketplace.',
     path: '/terms',
     robots: INDEXABLE,
@@ -193,7 +199,7 @@ export const PAGE_SEO = {
     robots: INDEXABLE,
   },
   disclaimer: {
-    title: 'Disclaimer & Technical Notices | SellSolar Pakistan',
+    title: 'Disclaimer | SellSolar Pakistan',
     description: 'Important disclaimers on solar equipment warranties, rates and net metering regulations.',
     path: '/disclaimer',
     robots: INDEXABLE,
@@ -276,7 +282,11 @@ export function parseLocation(pathname = '/', hash = '') {
     '/disclaimer': 'disclaimer',
   };
 
-  return { page: map[path] || 'home', listingId: null, hash };
+  if (map[path]) {
+    return { page: map[path], listingId: null, hash };
+  }
+
+  return { page: 'not-found', listingId: null, hash };
 }
 
 function upsertMeta(selector, attrs) {

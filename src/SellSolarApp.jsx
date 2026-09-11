@@ -1317,45 +1317,69 @@ const ox=[{
 }];
 
 function cx(){
-  return jsx("section",{
-    id:"how-it-works",className:"bg-gray-50/70 dark:bg-gray-900/60 py-8 sm:py-10 border-b border-gray-200/60 dark:border-gray-800 transition-colors",children:jsxs("div",{
-      className:"container-page",children:[
-        jsxs("div",{
-          className:"flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 border-b border-gray-200 dark:border-gray-800 pb-2.5 mb-5",children:[
+  return jsxs(Fragment,{
+    children:[
+      jsx("section",{
+        id:"how-it-works",className:"bg-gray-50/70 dark:bg-gray-900/60 py-8 sm:py-10 border-b border-gray-200/60 dark:border-gray-800 transition-colors",children:jsxs("div",{
+          className:"container-page",children:[
             jsxs("div",{
-              children:[
-                jsx("h2",{
-                  className:"text-lg sm:text-xl font-bold tracking-tight text-gray-900 dark:text-white",children:"Why SellSolar Pakistan"
-                }),
-                jsx("p",{
-                  className:"mt-0.5 text-xs text-gray-500 dark:text-gray-400",children:"Pakistan's trusted marketplace for solar panels, inverters & turnkey installation"
+              className:"flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 border-b border-gray-200 dark:border-gray-800 pb-2.5 mb-5",children:[
+                jsxs("div",{
+                  children:[
+                    jsx("h2",{
+                      className:"text-lg sm:text-xl font-bold tracking-tight text-gray-900 dark:text-white",children:"Why SellSolar Pakistan"
+                    }),
+                    jsx("p",{
+                      className:"mt-0.5 text-xs text-gray-500 dark:text-gray-400",children:"Pakistan's trusted marketplace for solar panels, inverters & turnkey installation"
+                    })
+                  ]
                 })
               ]
+            }),
+            jsx("div",{
+              className:"grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3",children:ox.map(t=>{
+                const e=t.icon;
+                return jsxs("div",{
+                  className:"card p-4 sm:p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:bg-gray-900 border border-gray-200/90 dark:border-gray-800 shadow-2xs",children:[
+                    jsx("div",{
+                      className:`mb-3 flex h-10 w-10 items-center justify-center rounded-lg ${t.bg}`,children:jsx(e,{
+                        className:`h-5 w-5 ${t.color}`,strokeWidth:2
+                      })
+                    }),
+                    jsx("h3",{
+                      className:"text-sm sm:text-base font-bold text-gray-900 dark:text-white",children:t.title
+                    }),
+                    jsx("p",{
+                      className:"mt-1 text-xs leading-relaxed text-gray-500 dark:text-gray-400",children:t.desc
+                    })
+                  ]
+                },t.title)
+              })
             })
           ]
-        }),
-        jsx("div",{
-          className:"grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3",children:ox.map(t=>{
-            const e=t.icon;
-            return jsxs("div",{
-              className:"card p-4 sm:p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:bg-gray-900 border border-gray-200/90 dark:border-gray-800 shadow-2xs",children:[
-                jsx("div",{
-                  className:`mb-3 flex h-10 w-10 items-center justify-center rounded-lg ${t.bg}`,children:jsx(e,{
-                    className:`h-5 w-5 ${t.color}`,strokeWidth:2
-                  })
-                }),
-                jsx("h3",{
-                  className:"text-sm sm:text-base font-bold text-gray-900 dark:text-white",children:t.title
-                }),
-                jsx("p",{
-                  className:"mt-1 text-xs leading-relaxed text-gray-500 dark:text-gray-400",children:t.desc
-                })
-              ]
-            },t.title)
-          })
         })
-      ]
-    })
+      }),
+      jsx("section",{
+        className:"bg-white dark:bg-gray-950 py-8 sm:py-10 border-b border-gray-200/60 dark:border-gray-800",
+        children:jsxs("div",{
+          className:"container-page max-w-4xl",
+          children:[
+            jsx("h2",{
+              className:"text-lg sm:text-xl font-bold tracking-tight text-gray-900 dark:text-white",
+              children:"Buy and sell solar equipment across Pakistan"
+            }),
+            jsx("p",{
+              className:"mt-3 text-sm leading-relaxed text-gray-600 dark:text-gray-300",
+              children:"SellSolar helps homeowners, businesses and dealers compare solar panels, hybrid inverters, lithium batteries and complete rooftop systems with transparent PKR pricing. Check today’s per-watt rates, size your load with the free calculator, and contact verified sellers in Lahore, Karachi, Islamabad, Rawalpindi, Faisalabad, Multan and more."
+            }),
+            jsx("p",{
+              className:"mt-3 text-sm leading-relaxed text-gray-600 dark:text-gray-300",
+              children:"Whether you need a 3kW backup kit, a 5kW hybrid setup or a 10kW–20kW net-metered system, browse Longi, Jinko, Canadian Solar, Inverex, Knox, Homage, Growatt, Solis and Huawei listings before you buy. Sellers can post free ads for new or used equipment and reach buyers nationwide."
+            })
+          ]
+        })
+      })
+    ]
   })
 }const FOOTER_PAGES_KEYS = [
   "about", "careers", "press", "blog",
@@ -4721,6 +4745,48 @@ function _x({
     onSuccess: () => o("dashboard"), onBack: () => o("home")
   }) : n === "listing-detail" && a ? jsx(jx, {
     listingId: a, onBack: () => o("home")
+  }) : n === "not-found" ? jsxs("div", {
+    className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100",
+    children: [
+      jsx(Xy, {
+        onNavigate: d => {
+          d === "post-ad" ? c() : o(d === "dashboard" ? (t ? "dashboard" : "login") : d)
+        },
+        currentPage: "home",
+        onSelectListing: u,
+        onSearchSubmit: handleGlobalSearchSubmit
+      }),
+      jsx("main", {
+        id: "main",
+        className: "container-page flex min-h-[70vh] flex-col items-center justify-center py-20 text-center",
+        children: jsxs("div", {
+          className: "max-w-lg",
+          children: [
+            jsx("p", {
+              className: "text-xs font-bold uppercase tracking-wide text-amber-600",
+              children: "Error 404"
+            }),
+            jsx("h1", {
+              className: "mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl",
+              children: "Page not found"
+            }),
+            jsx("p", {
+              className: "mt-3 text-sm leading-relaxed text-gray-600 dark:text-gray-300",
+              children: "This URL is not a valid SellSolar page. Go back to the homepage to browse solar panels, inverters, batteries, today's rates and the load calculator."
+            }),
+            jsx("button", {
+              type: "button",
+              onClick: () => o("home"),
+              className: "btn-primary mt-8",
+              children: "Back to homepage"
+            })
+          ]
+        })
+      }),
+      jsx(hx, {
+        onPostAd: c, onNavigate: o
+      })
+    ]
   }) : jsxs("div", {
     className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
       onNavigate: d => {

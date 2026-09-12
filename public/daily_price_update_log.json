@@ -1,5 +1,17 @@
 [
   {
+    "updated_at": "13-Sept-2026, 2:07:23 am",
+    "iso": "2026-09-12T21:07:23.706Z",
+    "date_str": "13 September 2026",
+    "panels_count": 20,
+    "inverters_count": 15,
+    "batteries_count": 11,
+    "average_panel_rate": "Rs 36.75 – 44.50 / W",
+    "customer_dealer_ads_protected": true,
+    "ads_modified_count": 0,
+    "status": "SUCCESS"
+  },
+  {
     "updated_at": "12-Sept-2026, 2:27:11 am",
     "iso": "2026-09-11T21:27:11.430Z",
     "date_str": "12 September 2026",

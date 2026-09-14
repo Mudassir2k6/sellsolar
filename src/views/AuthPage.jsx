@@ -1117,14 +1117,9 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                   </div>
 
                   <div>
-                    <div className="mb-1.5 flex items-center justify-between">
-                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                        Username *
-                      </label>
-                      <span className="text-[11px] font-medium text-primary-600 dark:text-primary-400">
-                        Unique ID
-                      </span>
-                    </div>
+                    <label className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      Username *
+                    </label>
                     <div className="relative">
                       <User
                         className={`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${
@@ -1158,11 +1153,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                       <p className="mt-1.5 text-xs font-medium text-error-600">Username is required.</p>
                     ) : fieldErrors.username && signupUsername.trim().length < 3 ? (
                       <p className="mt-1.5 text-xs font-medium text-error-600">Username must be at least 3 characters.</p>
-                    ) : (
-                      <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-                        Unique handle for your public solar profile.
-                      </p>
-                    )}
+                    ) : null}
                   </div>
 
                   <div>
@@ -1381,14 +1372,9 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
 
               {view === 'login' && (
                 <div>
-                  <div className="mb-1.5 flex items-center justify-between">
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                      Username *
-                    </label>
-                    <span className="text-[11px] font-medium text-gray-400 dark:text-gray-500">
-                      Unique ID / Mobile / CNIC
-                    </span>
-                  </div>
+                  <label className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    Username *
+                  </label>
                   <div className="relative">
                     <User
                       className={`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${
@@ -1579,7 +1565,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                           clearFieldError('phone');
                         }}
                         onKeyDown={(e) => handleFieldKeyDown(e, 'phone')}
-                        placeholder="03001234567"
+                        placeholder=""
                         className={fieldClass('phone', 'pl-11 pr-11')}
                       />
                       {fieldErrors.phone ? (
@@ -1592,13 +1578,9 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                       </p>
                     ) : fieldErrors.phone ? (
                       <p className="mt-1.5 text-xs font-medium text-error-600">
-                        {phone ? 'Phone number must be exactly 11 digits (e.g. 03001234567).' : 'Phone is required.'}
+                        {phone ? 'Phone number must be exactly 11 digits.' : 'Phone is required.'}
                       </p>
-                    ) : (
-                      <p className="mt-1.5 text-xs text-gray-400">
-                        Must be 11 digits, e.g. 03001234567
-                      </p>
-                    )}
+                    ) : null}
                   </div>
                   <div>
                     <label className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300">

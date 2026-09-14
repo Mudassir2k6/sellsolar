@@ -107,15 +107,6 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en-PK" dir="ltr" className={plusJakarta.variable} suppressHydrationWarning>
-      <head>
-        <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
-        <link
-          rel="search"
-          type="application/opensearchdescription+xml"
-          title="SellSolar"
-          href="/opensearch.xml"
-        />
-      </head>
       <body className="font-sans antialiased" suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>

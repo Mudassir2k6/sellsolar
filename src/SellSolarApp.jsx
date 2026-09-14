@@ -4832,27 +4832,166 @@ function _x({
       }),
       jsx("main", {
         id: "main",
-        className: "container-page flex min-h-[70vh] flex-col items-center justify-center py-20 text-center",
+        className: "container-page py-12 sm:py-16 text-center max-w-4xl mx-auto px-4",
         children: jsxs("div", {
-          className: "max-w-lg",
+          className: "flex flex-col items-center",
           children: [
-            jsx("p", {
-              className: "text-xs font-bold uppercase tracking-wide text-amber-600",
-              children: "Error 404"
+            jsx("div", {
+              className: "inline-flex items-center gap-2 px-3.5 py-1.5 mb-6 rounded-full bg-amber-100 dark:bg-amber-950/70 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-300 text-xs font-bold tracking-wide shadow-sm",
+              children: [
+                jsx("span", { className: "w-2 h-2 rounded-full bg-emerald-500 animate-pulse" }),
+                "HTTP 404 • Marketplace Operational"
+              ]
             }),
             jsx("h1", {
-              className: "mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl",
-              children: "Page not found"
+              className: "text-3xl sm:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white max-w-2xl leading-tight mb-4",
+              children: "This page is missing, but SellSolar is online"
             }),
             jsx("p", {
-              className: "mt-3 text-sm leading-relaxed text-gray-600 dark:text-gray-300",
-              children: "This URL is not a valid SellSolar page. Go back to the homepage to browse solar panels, inverters, batteries, today's rates and the load calculator."
+              className: "text-gray-600 dark:text-gray-300 max-w-xl text-base sm:text-lg leading-relaxed mb-8",
+              children: "The link you followed may be broken, outdated, or mistyped. Don't worry — our marketplace, daily rates, load calculator, and seller directory are running normally."
             }),
-            jsx("button", {
-              type: "button",
-              onClick: () => o("home"),
-              className: "btn-primary mt-8",
-              children: "Back to homepage"
+            jsxs("div", {
+              className: "flex flex-wrap items-center justify-center gap-3 mb-10",
+              children: [
+                jsx("button", {
+                  type: "button",
+                  onClick: () => o("home"),
+                  className: "btn-primary",
+                  id: "app-404-btn-home",
+                  children: "Return to Homepage"
+                }),
+                jsx("button", {
+                  type: "button",
+                  onClick: () => o("buy-solar"),
+                  className: "btn-secondary",
+                  id: "app-404-btn-buy",
+                  children: "Browse Solar Marketplace"
+                }),
+                jsx("button", {
+                  type: "button",
+                  onClick: () => o("calculator"),
+                  className: "btn-secondary",
+                  id: "app-404-btn-calc",
+                  children: "Load Calculator"
+                })
+              ]
+            }),
+            jsxs("div", {
+              className: "w-full text-left mb-10",
+              children: [
+                jsx("h2", {
+                  className: "text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-4 text-center",
+                  children: "Helpful Sections You Might Be Looking For"
+                }),
+                jsxs("div", {
+                  className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5",
+                  children: [
+                    jsx("button", {
+                      type: "button",
+                      onClick: () => o("prices"),
+                      className: "p-4 text-left rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-amber-500 transition-all group",
+                      id: "app-404-card-rates",
+                      children: jsxs("div", {
+                        children: [
+                          jsx("h3", { className: "text-sm font-bold text-gray-900 dark:text-white group-hover:text-amber-600", children: "📈 Today's Solar Rates" }),
+                          jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: "Live daily market prices for panels, inverters & batteries." })
+                        ]
+                      })
+                    }),
+                    jsx("button", {
+                      type: "button",
+                      onClick: () => o("calculator"),
+                      className: "p-4 text-left rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-amber-500 transition-all group",
+                      id: "app-404-card-calc",
+                      children: jsxs("div", {
+                        children: [
+                          jsx("h3", { className: "text-sm font-bold text-gray-900 dark:text-white group-hover:text-amber-600", children: "⚡ Solar Load Calculator" }),
+                          jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: "Calculate required kW system size & battery backup." })
+                        ]
+                      })
+                    }),
+                    jsx("button", {
+                      type: "button",
+                      onClick: () => o("buy-solar"),
+                      className: "p-4 text-left rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-amber-500 transition-all group",
+                      id: "app-404-card-buy",
+                      children: jsxs("div", {
+                        children: [
+                          jsx("h3", { className: "text-sm font-bold text-gray-900 dark:text-white group-hover:text-amber-600", children: "🛒 Buy Solar Equipment" }),
+                          jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: "Browse verified listings for new & used solar panels." })
+                        ]
+                      })
+                    }),
+                    jsx("button", {
+                      type: "button",
+                      onClick: () => o("dealers"),
+                      className: "p-4 text-left rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-amber-500 transition-all group",
+                      id: "app-404-card-dealers",
+                      children: jsxs("div", {
+                        children: [
+                          jsx("h3", { className: "text-sm font-bold text-gray-900 dark:text-white group-hover:text-amber-600", children: "🛡 Verified Dealers" }),
+                          jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: "Directory of certified distributors in major cities." })
+                        ]
+                      })
+                    }),
+                    jsx("button", {
+                      type: "button",
+                      onClick: () => o("install"),
+                      className: "p-4 text-left rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-amber-500 transition-all group",
+                      id: "app-404-card-install",
+                      children: jsxs("div", {
+                        children: [
+                          jsx("h3", { className: "text-sm font-bold text-gray-900 dark:text-white group-hover:text-amber-600", children: "🔧 Solar Installation" }),
+                          jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: "Professional installation and net-metering consultancy." })
+                        ]
+                      })
+                    }),
+                    jsx("button", {
+                      type: "button",
+                      onClick: c,
+                      className: "p-4 text-left rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-amber-500 transition-all group",
+                      id: "app-404-card-post",
+                      children: jsxs("div", {
+                        children: [
+                          jsx("h3", { className: "text-sm font-bold text-gray-900 dark:text-white group-hover:text-amber-600", children: "➕ Sell Solar (Free Ad)" }),
+                          jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: "List your equipment for free to thousands of buyers." })
+                        ]
+                      })
+                    })
+                  ]
+                })
+              ]
+            }),
+            jsxs("div", {
+              className: "w-full max-w-2xl rounded-2xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/50 dark:bg-gray-900 p-5 text-left flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4",
+              children: [
+                jsxs("div", {
+                  children: [
+                    jsx("h3", { className: "text-sm font-bold text-gray-900 dark:text-white", children: "Found a broken link or technical bug?" }),
+                    jsx("p", { className: "text-xs text-gray-600 dark:text-gray-300 mt-1", children: "Help us keep SellSolar working smoothly by reporting missing links or errors." })
+                  ]
+                }),
+                jsxs("div", {
+                  className: "flex items-center gap-2 shrink-0",
+                  children: [
+                    jsx("button", {
+                      type: "button",
+                      onClick: () => o("report-issue"),
+                      className: "px-3.5 py-1.5 rounded-lg bg-gray-900 hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-100 text-white dark:text-gray-950 text-xs font-bold transition-colors",
+                      id: "app-404-report-btn",
+                      children: "Report Issue"
+                    }),
+                    jsx("button", {
+                      type: "button",
+                      onClick: () => o("contact"),
+                      className: "px-3.5 py-1.5 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors",
+                      id: "app-404-contact-btn",
+                      children: "Contact"
+                    })
+                  ]
+                })
+              ]
             })
           ]
         })

@@ -2,89 +2,383 @@
 <html lang="en-PK">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Page Not Found (404) | SellSolar</title>
-    <meta name="description" content="This page does not exist on SellSolar. Return to the Pakistan solar marketplace homepage." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Page Not Found (404) | SellSolar Pakistan</title>
+    <meta name="description" content="This specific page could not be found on SellSolar, but our solar marketplace, daily rates, and tools are online and operational." />
     <meta name="robots" content="noindex,nofollow" />
     <link rel="canonical" href="https://sellsolar.pk/404" />
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <style>
-      :root { color-scheme: light; }
+      :root {
+        --primary: #f59e0b;
+        --primary-hover: #d97706;
+        --bg: #f8fafc;
+        --card-bg: #ffffff;
+        --text: #0f172a;
+        --muted: #64748b;
+        --border: #e2e8f0;
+        --accent: #10b981;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0b0f19;
+          --card-bg: #111827;
+          --text: #f8fafc;
+          --muted: #94a3b8;
+          --border: #1f2937;
+        }
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
       body {
-        margin: 0;
         min-height: 100vh;
-        display: grid;
-        place-items: center;
-        font-family: "Plus Jakarta Sans", system-ui, sans-serif;
-        background: linear-gradient(180deg, #f8fafc 0%, #ffffff 55%, #fffbeb 100%);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.5;
+      }
+      header {
+        border-bottom: 1px solid var(--border);
+        background: var(--card-bg);
+        padding: 12px 24px;
+      }
+      .header-inner {
+        max-width: 1000px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        color: var(--text);
+        font-weight: 800;
+        font-size: 1.15rem;
+      }
+      .logo-icon {
+        width: 34px;
+        height: 34px;
+        background: #f59e0b;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         color: #0f172a;
-        padding: 24px;
+        font-size: 18px;
       }
-      main {
-        max-width: 560px;
+      .main-container {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 48px 20px;
         text-align: center;
+        flex: 1;
       }
-      .badge {
-        display: inline-block;
-        margin-bottom: 16px;
-        padding: 6px 12px;
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 14px;
         border-radius: 999px;
         background: #fef3c7;
         color: #92400e;
+        border: 1px solid #fde68a;
         font-size: 12px;
         font-weight: 700;
-        letter-spacing: 0.04em;
+        margin-bottom: 20px;
+      }
+      @media (prefers-color-scheme: dark) {
+        .status-pill {
+          background: #451a03;
+          color: #fcd34d;
+          border-color: #78350f;
+        }
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        background: #10b981;
+        border-radius: 50%;
       }
       h1 {
-        margin: 0 0 12px;
-        font-size: clamp(2rem, 5vw, 2.75rem);
-        line-height: 1.15;
-        letter-spacing: -0.03em;
+        font-size: clamp(1.85rem, 4vw, 2.6rem);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        margin-bottom: 14px;
       }
-      p {
-        margin: 0 0 28px;
-        color: #475569;
+      h1 span { color: #f59e0b; }
+      .desc {
+        max-width: 600px;
+        margin: 0 auto 28px;
+        color: var(--muted);
+        font-size: 1rem;
         line-height: 1.6;
       }
-      a {
+      .search-box {
+        max-width: 520px;
+        margin: 0 auto 36px;
+      }
+      .search-form {
+        display: flex;
+        position: relative;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      }
+      .search-form input {
+        width: 100%;
+        padding: 13px 100px 13px 16px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: var(--card-bg);
+        color: var(--text);
+        font-size: 14px;
+        outline: none;
+      }
+      .search-form input:focus {
+        border-color: #f59e0b;
+        box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.25);
+      }
+      .search-form button {
+        position: absolute;
+        right: 6px;
+        top: 6px;
+        bottom: 6px;
+        padding: 0 18px;
+        background: #f59e0b;
+        color: #0f172a;
+        border: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .search-form button:hover { background: #d97706; }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: center;
+        margin-bottom: 40px;
+      }
+      .btn {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
-        padding: 12px 20px;
+        padding: 11px 22px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.15s ease;
+      }
+      .btn-primary {
+        background: #f59e0b;
+        color: #0f172a;
+      }
+      .btn-primary:hover { background: #d97706; }
+      .btn-outline {
+        background: var(--card-bg);
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
+      .btn-outline:hover {
+        border-color: #f59e0b;
+        background: var(--bg);
+      }
+      .cards-title {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--muted);
+        margin-bottom: 16px;
+      }
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 14px;
+        margin-bottom: 36px;
+        text-align: left;
+      }
+      .card {
+        padding: 16px;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
         border-radius: 12px;
-        background: #eab308;
-        color: #111827;
-        font-weight: 800;
+        text-decoration: none;
+        color: inherit;
+        transition: transform 0.15s ease, border-color 0.15s ease;
+      }
+      .card:hover {
+        transform: translateY(-2px);
+        border-color: #f59e0b;
+      }
+      .card-title {
+        font-weight: 700;
+        font-size: 14px;
+        margin-bottom: 4px;
+        color: var(--text);
+      }
+      .card-desc {
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.4;
+      }
+      .report-box {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        text-align: left;
+        max-width: 680px;
+        margin: 0 auto;
+      }
+      .report-box h3 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+      .report-box p { font-size: 12px; color: var(--muted); }
+      .report-btn {
+        padding: 9px 16px;
+        background: #0f172a;
+        color: #ffffff;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        white-space: nowrap;
+      }
+      @media (prefers-color-scheme: dark) {
+        .report-btn {
+          background: #f8fafc;
+          color: #0f172a;
+        }
+      }
+      footer {
+        border-top: 1px solid var(--border);
+        background: var(--card-bg);
+        padding: 18px 24px;
+        font-size: 12px;
+        color: var(--muted);
+        text-align: center;
+      }
+      .footer-inner {
+        max-width: 1000px;
+        margin: 0 auto;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .footer-links {
+        display: flex;
+        gap: 16px;
+      }
+      .footer-links a {
+        color: var(--muted);
         text-decoration: none;
       }
-      a:hover { filter: brightness(0.97); }
-      .links { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
-      .links a {
-        background: transparent;
-        color: #334155;
-        border: 1px solid #e2e8f0;
-        font-weight: 600;
-        padding: 10px 14px;
-      }
+      .footer-links a:hover { text-decoration: underline; color: var(--text); }
     </style>
   </head>
   <body>
-    <main>
-      <div class="badge">HTTP 404</div>
-      <h1>Page not found</h1>
-      <p>
-        The URL you opened is not a valid SellSolar page. Browse live solar panel, inverter and battery
-        listings, today's rates, or the free load calculator from the homepage.
+    <header>
+      <div class="header-inner">
+        <a href="/" class="logo" id="cf-404-logo">
+          <div class="logo-icon">☀</div>
+          <span>SellSolar<span style="color:#f59e0b">.pk</span></span>
+        </a>
+        <div style="display:flex;gap:10px;">
+          <a href="/prices" class="btn btn-outline" style="padding:7px 14px;font-size:12px;" id="cf-404-rates-btn">Live Rates</a>
+          <a href="/" class="btn btn-primary" style="padding:7px 14px;font-size:12px;" id="cf-404-home-btn">Homepage</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-container">
+      <div class="status-pill">
+        <span class="dot"></span>
+        HTTP 404 • Marketplace Operational
+      </div>
+
+      <h1>This page is missing, but <span>SellSolar is online</span></h1>
+      <p class="desc">
+        The link or page you requested does not exist or has been moved. Don't worry — our marketplace, daily rates, load calculator, and seller directory are running normally.
       </p>
-      <a href="/">Back to SellSolar homepage</a>
-      <div class="links">
-        <a href="/prices">Today's rates</a>
-        <a href="/calculator">Load calculator</a>
-        <a href="/buy-solar">Buy solar</a>
-        <a href="/contact">Contact</a>
+
+      <div class="search-box">
+        <form action="/buy-solar" method="GET" class="search-form" id="cf-404-search-form">
+          <input type="text" name="q" placeholder="Search panels, inverters, batteries, or brands..." />
+          <button type="submit" id="cf-404-search-btn">Search</button>
+        </form>
+      </div>
+
+      <div class="actions">
+        <a href="/" class="btn btn-primary" id="cf-404-cta-home">Return to Homepage</a>
+        <a href="/buy-solar" class="btn btn-outline" id="cf-404-cta-marketplace">Browse Solar Marketplace</a>
+        <a href="/calculator" class="btn btn-outline" id="cf-404-cta-calculator">Solar Load Calculator</a>
+      </div>
+
+      <div class="cards-title">Explore Popular Sections</div>
+      <div class="cards">
+        <a href="/prices" class="card" id="cf-card-rates">
+          <div class="card-title">📈 Today's Solar Rates</div>
+          <div class="card-desc">Live daily market prices for Tier-1 solar panels, inverters &amp; batteries across Pakistan.</div>
+        </a>
+        <a href="/calculator" class="card" id="cf-card-calculator">
+          <div class="card-title">⚡ Solar Load Calculator</div>
+          <div class="card-desc">Calculate required solar system size (kW), panel wattage &amp; battery backup hours for free.</div>
+        </a>
+        <a href="/buy-solar" class="card" id="cf-card-buy">
+          <div class="card-title">🛒 Buy Solar Equipment</div>
+          <div class="card-desc">Explore verified listings for used and brand-new solar equipment with seller contact info.</div>
+        </a>
+        <a href="/dealers" class="card" id="cf-card-dealers">
+          <div class="card-title">🛡 Verified Solar Dealers</div>
+          <div class="card-desc">Direct directory of reputable solar hardware importers &amp; suppliers in major cities.</div>
+        </a>
+        <a href="/install" class="card" id="cf-card-install">
+          <div class="card-title">🔧 Professional Installation</div>
+          <div class="card-desc">Request certified rooftop installation and On-Grid net-metering consultancy.</div>
+        </a>
+        <a href="/post-ad" class="card" id="cf-card-post">
+          <div class="card-title">➕ Sell Solar (Free Ad)</div>
+          <div class="card-desc">Post a free classified ad to sell your used or surplus solar panels to active buyers.</div>
+        </a>
+      </div>
+
+      <div class="report-box">
+        <div>
+          <h3>Found a broken link or technical bug?</h3>
+          <p>If an internal link led you to this missing page, please report it so our team can fix it.</p>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <a href="/report-issue" class="report-btn" id="cf-404-report-btn">Report Issue</a>
+          <a href="/contact" class="btn btn-outline" style="padding:9px 14px;font-size:12px;" id="cf-404-contact-btn">Contact Support</a>
+        </div>
       </div>
     </main>
+
+    <footer>
+      <div class="footer-inner">
+        <div>© 2026 SellSolar.pk • Pakistan's Dedicated Solar Marketplace</div>
+        <div class="footer-links">
+          <a href="/">Home</a>
+          <a href="/prices">Rates</a>
+          <a href="/calculator">Calculator</a>
+          <a href="/about">About</a>
+          <a href="/help">Help</a>
+          <a href="/report-issue">Report Issue</a>
+        </div>
+      </div>
+    </footer>
   </body>
 </html>

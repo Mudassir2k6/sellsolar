@@ -5,21 +5,77 @@
 import { getPakistanDateDetails } from '../lib/dateUtils';
 
 const _currentPkt = typeof window !== 'undefined' ? getPakistanDateDetails() : {
-  todayStr: "11 September 2026",
-  shortDate: "11-Sep-2026",
-  lastMidnightStr: "11-Sep-2026 (Islamabad Ready Stock Verified)",
-  iso: "2026-09-11T04:48:03.554Z",
+  todayStr: "14 September 2026",
+  shortDate: "14-Sep-2026",
+  lastMidnightStr: "14-Sep-2026 (Islamabad Ready Stock Verified)",
+  iso: "2026-09-14T07:00:00.000Z",
 };
 
 export const TODAY_DATE_STR = _currentPkt.todayStr;
 export const LAST_MIDNIGHT_UPDATE = _currentPkt.lastMidnightStr;
 export const LAST_UPDATE_ISO = _currentPkt.iso;
 
-// Islamabad Ready Stock Daily Sheets Comparison (07-Sep vs 08-Sep 2026)
+// Islamabad Ready Stock Daily Sheets Comparison (14-Sep vs 13-Sep 2026)
 export const ISLAMABAD_DAILY_SHEETS = {
-  "08-Sep-2026": {
-    date: "08-September-2026",
-    label: "08-Sep-2026 (Today)",
+  "14-Sep-2026": {
+    date: "14-September-2026",
+    label: "14-Sep-2026 (Today)",
+    rates: [
+      { brand: "Canadian Solar", model: "585W", rate: 41.60, prevRate: 41.60, change: 0, status: "stable" },
+      { brand: "Canadian Solar", model: "625W", rate: 41.75, prevRate: 41.75, change: 0, status: "stable" },
+      { brand: "Aiko Solar", model: "645W", rate: 42.50, prevRate: 42.50, change: 0, status: "stable" },
+      { brand: "Aiko Solar", model: "665W", rate: 43.50, prevRate: 43.50, change: 0, status: "stable" },
+      { brand: "Aiko Solar", model: "770W", rate: 44.50, prevRate: 44.50, change: 0, status: "stable", badge: "770W Flagship" },
+      { brand: "Jinko Solar", model: "585W", rate: 41.25, prevRate: 40.00, change: 1.25, status: "up", badge: "High Demand" },
+      { brand: "Jinko Solar", model: "645W", rate: 41.50, prevRate: 41.25, change: 0.25, status: "up", deliveryDate: "15/09/2026", note: "Delivery: 15/09/2026" },
+      { brand: "LONGi", model: "645W x10 BF", rate: 43.25, prevRate: 42.60, change: 0.65, status: "up", badge: "HPBC 2.0 In-Demand" },
+      { brand: "JA Solar", model: "585W", rate: 38.60, prevRate: 38.60, change: 0, status: "new", badge: "New 585W Spec" },
+      { brand: "JA Solar", model: "605W", rate: 39.75, prevRate: 39.75, change: 0, status: "stable" },
+      { brand: "JA Solar", model: "625W", rate: 38.85, prevRate: 38.85, change: 0, status: "stable" },
+      { brand: "Astronergy", model: "580W", rate: 38.25, prevRate: 38.25, change: 0, status: "stable" },
+      { brand: "Astronergy", model: "620W", rate: 39.00, prevRate: 38.75, change: 0.25, status: "up" },
+      { brand: "Astronergy", model: "625W", rate: 39.00, prevRate: 39.00, change: 0, status: "stable" },
+      { brand: "Astronergy", model: "720W", rate: 39.00, prevRate: 38.75, change: 0.25, status: "new", badge: "New 720W Plate" },
+      { brand: "Risen", model: "740W HJT", rate: 41.00, prevRate: 41.00, change: 0, status: "stable" },
+      { brand: "Korean", model: "585W", rate: 37.00, prevRate: 37.00, change: 0, status: "stable" },
+      { brand: "Korean", model: "715W", rate: 38.00, prevRate: 38.00, change: 0, status: "stable" },
+      { brand: "OSDA", model: "585W", rate: 36.75, prevRate: 36.75, change: 0, status: "stable" },
+      { brand: "LEFN", model: "640W", rate: 33.00, prevRate: 37.00, change: -4.00, status: "down", badge: "Lowest Rate in PK" },
+    ],
+    inverterRates: [
+      { brand: "Inverex", model: "Nitrox 6kW Single Phase 48V", capacity: "6.0 kW", type: "Hybrid On/Off-Grid", rate: 266000, prevRate: 266000, change: 0, status: "stable", badge: "Pakistan #1 Hybrid", warranty: "5 Yrs Replacement" },
+      { brand: "Inverex", model: "Nitrox 10kW Three Phase", capacity: "10.0 kW", type: "Hybrid 3-Phase", rate: 465000, prevRate: 460000, change: 5000, status: "up", badge: "Heavy Residential", warranty: "5 Yrs Replacement", note: "Ready Stock" },
+      { brand: "Inverex", model: "Nitrox 12kW Commercial", capacity: "12.0 kW", type: "Hybrid 3-Phase Commercial", rate: 549000, prevRate: 549000, change: 0, status: "stable", badge: "Commercial Grade", warranty: "5 Yrs Warranty" },
+      { brand: "Inverex", model: "Veyron II 3.2kW / 5.2kW MPPT", capacity: "3.2kW – 5.2kW", type: "Off-Grid / Hybrid", rate: 95000, prevRate: 95000, change: 0, status: "stable", badge: "Affordable Hybrid", warranty: "2 Yrs Warranty" },
+      { brand: "Knox", model: "Krypton 6kW Hybrid 48V", capacity: "6.0 kW", type: "Hybrid On/Off-Grid (IP65)", rate: 186000, prevRate: 186000, change: 0, status: "stable", badge: "Best Value Hybrid", warranty: "5 Yrs Warranty" },
+      { brand: "Knox", model: "Krypton 8kW / 10kW Hybrid", capacity: "8.0kW – 10.0kW", type: "Hybrid 48V 1/3-Phase", rate: 272000, prevRate: 275000, change: -3000, status: "down", badge: "High Capacity", warranty: "5 Yrs Warranty" },
+      { brand: "Knox", model: "10kW On-Grid Inverter G4", capacity: "10.0 kW", type: "Grid-Tied 3-Phase", rate: 167000, prevRate: 167000, change: 0, status: "stable", badge: "Net Metering Approved", warranty: "5 Yrs Standard" },
+      { brand: "Fronus", model: "8.2kW Hybrid PV9200", capacity: "8.2 kW", type: "Hybrid Dual MPPT", rate: 233000, prevRate: 236000, change: -3000, status: "down", badge: "Dual AC Output", warranty: "2 Yrs Warranty" },
+      { brand: "Fronus", model: "Platinum PV 4200 / 5200", capacity: "4.2kW – 5.2kW", type: "Solar Hybrid Inverter", rate: 112000, prevRate: 112000, change: 0, status: "stable", badge: "Economy Pick", warranty: "2 Yrs Warranty" },
+      { brand: "Growatt", model: "MOD 10KTL3-X (10kW 3-Phase)", capacity: "10.0 kW", type: "On-Grid Net Metering", rate: 174000, prevRate: 174000, change: 0, status: "stable", badge: "Net Metering Approved", warranty: "5 Yrs Warranty" },
+      { brand: "Growatt", model: "SPH 10000TL 10kW Hybrid", capacity: "10.0 kW", type: "Hybrid 3-Phase IP65", rate: 374000, prevRate: 374000, change: 0, status: "stable", badge: "Premium Hybrid", warranty: "5 Yrs Extendable" },
+      { brand: "Huawei", model: "SUN2000-10KTL-M1 (10kW 3-Phase)", capacity: "10.0 kW", type: "Smart String On-Grid", rate: 323000, prevRate: 318000, change: 5000, status: "up", badge: "AI Smart AFCI", warranty: "5 / 10 Yrs Warranty" },
+      { brand: "Huawei", model: "SUN2000-20KTL-M2 (20kW 3-Phase)", capacity: "20.0 kW", type: "Commercial Smart String", rate: 440000, prevRate: 440000, change: 0, status: "stable", badge: "Commercial King", warranty: "5 Yrs Warranty" },
+      { brand: "Solis", model: "S6-EH1P6K-L-PRO (6kW Hybrid)", capacity: "6.0 kW", type: "Single Phase Hybrid (IP66)", rate: 224000, prevRate: 224000, change: 0, status: "stable", badge: "IP66 Rated", warranty: "5 Yrs Warranty" },
+      { brand: "Sungrow", model: "SG10RT (10kW Three Phase)", capacity: "10.0 kW", type: "On-Grid Multi-MPPT", rate: 187000, prevRate: 187000, change: 0, status: "stable", badge: "Global Leader", warranty: "5 Yrs Warranty" }
+    ],
+    batteryRates: [
+      { brand: "Narada", model: "NPFC100 (48V 100Ah / 5.12kWh)", capacity: "48V 100Ah (5.12 kWh)", type: "Lithium LiFePO4", rate: 238500, prevRate: 238500, change: 0, status: "stable", badge: "Top Lithium 6000 Cycles", warranty: "5 Yrs Official" },
+      { brand: "Pylontech", model: "FIDUS 5.12kWh / US3000C", capacity: "5.12 kWh (48V)", type: "LiFePO4 Modular Rack", rate: 258000, prevRate: 255000, change: 3000, status: "up", badge: "10-Year Warranty", warranty: "10 Yrs Manufacturer" },
+      { brand: "Inverex", model: "PowerWall 5.12kWh LiFePO4", capacity: "51.2V 100Ah (5.12 kWh)", type: "Wall-Mount Smart Lithium", rate: 265500, prevRate: 265500, change: 0, status: "stable", badge: "Sleek Wall-Mount", warranty: "5 Yrs Warranty" },
+      { brand: "Inverex", model: "PowerWall 11.8kWh Heavy Duty", capacity: "51.2V 230Ah (11.8 kWh)", type: "LiFePO4 High Capacity", rate: 564000, prevRate: 564000, change: 0, status: "stable", badge: "All-Night AC Backup", warranty: "5 Yrs Warranty" },
+      { brand: "Dyness", model: "A48100 Powerbox F-5.0", capacity: "48V 100Ah (5.12 kWh)", type: "LiFePO4 Lithium", rate: 242000, prevRate: 245000, change: -3000, status: "down", badge: "Certified Safe", warranty: "10 Yrs Warranty" },
+      { brand: "Phoenix", model: "TX 2500 Tubular (230Ah)", capacity: "12V 230Ah (27 Plates)", type: "Tall Tubular Deep Cycle", rate: 51500, prevRate: 50000, change: 1500, status: "up", badge: "Top Tubular 27-Plates", warranty: "1 Year Replacement" },
+      { brand: "Phoenix", model: "TX 1800 Tubular (185Ah)", capacity: "12V 185Ah (21 Plates)", type: "Tall Tubular Deep Cycle", rate: 41500, prevRate: 41500, change: 0, status: "stable", badge: "Best Value Tubular", warranty: "1 Year Replacement" },
+      { brand: "Osaka", model: "Pro 1800 / HT 2000 Tubular", capacity: "12V 185Ah – 200Ah", type: "Deep Cycle Tubular", rate: 45000, prevRate: 45000, change: 0, status: "stable", badge: "Reliable Tubular", warranty: "1 Year Warranty" },
+      { brand: "AGS", model: "SP Tall 1200 / GX 165", capacity: "12V 120Ah – 150Ah", type: "Deep Cycle Solar Battery", rate: 31500, prevRate: 32000, change: -500, status: "down", badge: "Budget Deep Cycle", warranty: "1 Year Warranty" },
+      { brand: "Daewoo", model: "DIB-200 / DIB-225 Deep Cycle", capacity: "12V 175Ah – 200Ah", type: "Maintenance-Free Tubular", rate: 47000, prevRate: 47000, change: 0, status: "stable", badge: "Low Maintenance", warranty: "1 Year Warranty" },
+      { brand: "Narada", model: "AcmeG Polymer Gel 200Ah", capacity: "12V 200Ah (Gel)", type: "VRLA Sealed Polymer Gel", rate: 75500, prevRate: 76500, change: -1000, status: "down", badge: "Sealed Zero-Fumes", warranty: "2 Yrs Warranty" }
+    ]
+  },
+  "13-Sep-2026": {
+    date: "13-September-2026",
+    label: "13-Sep-2026 (Yesterday)",
     rates: [
       { brand: "Canadian Solar", model: "585W", rate: 41.60, prevRate: 41.60, change: 0, status: "stable" },
       { brand: "Canadian Solar", model: "625W", rate: 41.75, prevRate: 41.90, change: -0.15, status: "down" },
@@ -40,48 +96,58 @@ export const ISLAMABAD_DAILY_SHEETS = {
       { brand: "Korean", model: "715W", rate: 38.00, prevRate: 38.00, change: 0, status: "stable" },
       { brand: "OSDA", model: "585W", rate: 36.75, prevRate: 36.75, change: 0, status: "stable" },
       { brand: "LEFN", model: "640W", rate: 37.00, prevRate: 37.00, change: 0, status: "stable" },
-    ]
-  },
-  "07-Sep-2026": {
-    date: "07-September-2026",
-    label: "07-Sep-2026 (Yesterday)",
-    rates: [
-      { brand: "Canadian Solar", model: "585W", rate: 41.60, prevRate: 35.90, change: 5.70, status: "up" },
-      { brand: "Canadian Solar", model: "625W", rate: 41.90, prevRate: 41.90, change: 0, status: "stable" },
-      { brand: "Aiko Solar", model: "645W", rate: 42.50, prevRate: 42.50, change: 0, status: "stable" },
-      { brand: "Aiko Solar", model: "665W", rate: 43.50, prevRate: 43.50, change: 0, status: "stable" },
-      { brand: "Aiko Solar", model: "770W", rate: 44.50, prevRate: 44.50, change: 0, status: "stable" },
-      { brand: "Jinko Solar", model: "585W", rate: 40.00, prevRate: 35.40, change: 4.60, status: "up" },
-      { brand: "Jinko Solar", model: "645W", rate: 41.25, prevRate: 41.25, change: 0, status: "stable" },
-      { brand: "LONGi", model: "645W x10 BF", rate: 42.60, prevRate: 41.10, change: 1.50, status: "up" },
-      { brand: "JA Solar", model: "605W", rate: 39.75, prevRate: 33.60, change: 6.15, status: "up" },
-      { brand: "JA Solar", model: "625W", rate: 38.85, prevRate: 38.85, change: 0, status: "stable" },
-      { brand: "Astronergy", model: "580W", rate: 38.50, prevRate: 33.70, change: 4.80, status: "up" },
-      { brand: "Astronergy", model: "620W", rate: 38.75, prevRate: 38.75, change: 0, status: "stable" },
-      { brand: "Astronergy", model: "625W", rate: 39.00, prevRate: 39.00, change: 0, status: "stable" },
-      { brand: "Astronergy", model: "715W", rate: 38.75, prevRate: 38.75, change: 0, status: "stable" },
-      { brand: "Risen", model: "740W HJT", rate: 41.00, prevRate: 41.00, change: 0, status: "stable" },
-      { brand: "Korean", model: "585W", rate: 37.00, prevRate: 37.00, change: 0, status: "stable" },
-      { brand: "Korean", model: "715W", rate: 38.00, prevRate: 38.00, change: 0, status: "stable" },
-      { brand: "OSDA", model: "585W", rate: 36.75, prevRate: 36.75, change: 0, status: "stable" },
-      { brand: "LEFN", model: "640W", rate: 37.00, prevRate: 37.00, change: 0, status: "stable" },
+    ],
+    inverterRates: [
+      { brand: "Inverex", model: "Nitrox 6kW Single Phase 48V", capacity: "6.0 kW", type: "Hybrid On/Off-Grid", rate: 266000, prevRate: 266000, change: 0, status: "stable", badge: "Pakistan #1 Hybrid", warranty: "5 Yrs Replacement" },
+      { brand: "Inverex", model: "Nitrox 10kW Three Phase", capacity: "10.0 kW", type: "Hybrid 3-Phase", rate: 460000, prevRate: 460000, change: 0, status: "stable", badge: "Heavy Residential", warranty: "5 Yrs Replacement" },
+      { brand: "Inverex", model: "Nitrox 12kW Commercial", capacity: "12.0 kW", type: "Hybrid 3-Phase Commercial", rate: 549000, prevRate: 549000, change: 0, status: "stable", badge: "Commercial Grade", warranty: "5 Yrs Warranty" },
+      { brand: "Inverex", model: "Veyron II 3.2kW / 5.2kW MPPT", capacity: "3.2kW – 5.2kW", type: "Off-Grid / Hybrid", rate: 95000, prevRate: 95000, change: 0, status: "stable", badge: "Affordable Hybrid", warranty: "2 Yrs Warranty" },
+      { brand: "Knox", model: "Krypton 6kW Hybrid 48V", capacity: "6.0 kW", type: "Hybrid On/Off-Grid (IP65)", rate: 186000, prevRate: 186000, change: 0, status: "stable", badge: "Best Value Hybrid", warranty: "5 Yrs Warranty" },
+      { brand: "Knox", model: "Krypton 8kW / 10kW Hybrid", capacity: "8.0kW – 10.0kW", type: "Hybrid 48V 1/3-Phase", rate: 275000, prevRate: 275000, change: 0, status: "stable", badge: "High Capacity", warranty: "5 Yrs Warranty" },
+      { brand: "Knox", model: "10kW On-Grid Inverter G4", capacity: "10.0 kW", type: "Grid-Tied 3-Phase", rate: 167000, prevRate: 167000, change: 0, status: "stable", badge: "Net Metering Approved", warranty: "5 Yrs Standard" },
+      { brand: "Fronus", model: "8.2kW Hybrid PV9200", capacity: "8.2 kW", type: "Hybrid Dual MPPT", rate: 236000, prevRate: 236000, change: 0, status: "stable", badge: "Dual AC Output", warranty: "2 Yrs Warranty" },
+      { brand: "Fronus", model: "Platinum PV 4200 / 5200", capacity: "4.2kW – 5.2kW", type: "Solar Hybrid Inverter", rate: 112000, prevRate: 112000, change: 0, status: "stable", badge: "Economy Pick", warranty: "2 Yrs Warranty" },
+      { brand: "Growatt", model: "MOD 10KTL3-X (10kW 3-Phase)", capacity: "10.0 kW", type: "On-Grid Net Metering", rate: 174000, prevRate: 174000, change: 0, status: "stable", badge: "Net Metering Approved", warranty: "5 Yrs Warranty" },
+      { brand: "Growatt", model: "SPH 10000TL 10kW Hybrid", capacity: "10.0 kW", type: "Hybrid 3-Phase IP65", rate: 374000, prevRate: 374000, change: 0, status: "stable", badge: "Premium Hybrid", warranty: "5 Yrs Extendable" },
+      { brand: "Huawei", model: "SUN2000-10KTL-M1 (10kW 3-Phase)", capacity: "10.0 kW", type: "Smart String On-Grid", rate: 318000, prevRate: 318000, change: 0, status: "stable", badge: "AI Smart AFCI", warranty: "5 / 10 Yrs Warranty" },
+      { brand: "Huawei", model: "SUN2000-20KTL-M2 (20kW 3-Phase)", capacity: "20.0 kW", type: "Commercial Smart String", rate: 440000, prevRate: 440000, change: 0, status: "stable", badge: "Commercial King", warranty: "5 Yrs Warranty" },
+      { brand: "Solis", model: "S6-EH1P6K-L-PRO (6kW Hybrid)", capacity: "6.0 kW", type: "Single Phase Hybrid (IP66)", rate: 224000, prevRate: 224000, change: 0, status: "stable", badge: "IP66 Rated", warranty: "5 Yrs Warranty" },
+      { brand: "Sungrow", model: "SG10RT (10kW Three Phase)", capacity: "10.0 kW", type: "On-Grid Multi-MPPT", rate: 187000, prevRate: 187000, change: 0, status: "stable", badge: "Global Leader", warranty: "5 Yrs Warranty" }
+    ],
+    batteryRates: [
+      { brand: "Narada", model: "NPFC100 (48V 100Ah / 5.12kWh)", capacity: "48V 100Ah (5.12 kWh)", type: "Lithium LiFePO4", rate: 238500, prevRate: 238500, change: 0, status: "stable", badge: "Top Lithium 6000 Cycles", warranty: "5 Yrs Official" },
+      { brand: "Pylontech", model: "FIDUS 5.12kWh / US3000C", capacity: "5.12 kWh (48V)", type: "LiFePO4 Modular Rack", rate: 255000, prevRate: 255000, change: 0, status: "stable", badge: "10-Year Warranty", warranty: "10 Yrs Manufacturer" },
+      { brand: "Inverex", model: "PowerWall 5.12kWh LiFePO4", capacity: "51.2V 100Ah (5.12 kWh)", type: "Wall-Mount Smart Lithium", rate: 265500, prevRate: 265500, change: 0, status: "stable", badge: "Sleek Wall-Mount", warranty: "5 Yrs Warranty" },
+      { brand: "Inverex", model: "PowerWall 11.8kWh Heavy Duty", capacity: "51.2V 230Ah (11.8 kWh)", type: "LiFePO4 High Capacity", rate: 564000, prevRate: 564000, change: 0, status: "stable", badge: "All-Night AC Backup", warranty: "5 Yrs Warranty" },
+      { brand: "Dyness", model: "A48100 Powerbox F-5.0", capacity: "48V 100Ah (5.12 kWh)", type: "LiFePO4 Lithium", rate: 245000, prevRate: 245000, change: 0, status: "stable", badge: "Certified Safe", warranty: "10 Yrs Warranty" },
+      { brand: "Phoenix", model: "TX 2500 Tubular (230Ah)", capacity: "12V 230Ah (27 Plates)", type: "Tall Tubular Deep Cycle", rate: 50000, prevRate: 50000, change: 0, status: "stable", badge: "Top Tubular 27-Plates", warranty: "1 Year Replacement" },
+      { brand: "Phoenix", model: "TX 1800 Tubular (185Ah)", capacity: "12V 185Ah (21 Plates)", type: "Tall Tubular Deep Cycle", rate: 41500, prevRate: 41500, change: 0, status: "stable", badge: "Best Value Tubular", warranty: "1 Year Replacement" },
+      { brand: "Osaka", model: "Pro 1800 / HT 2000 Tubular", capacity: "12V 185Ah – 200Ah", type: "Deep Cycle Tubular", rate: 45000, prevRate: 45000, change: 0, status: "stable", badge: "Reliable Tubular", warranty: "1 Year Warranty" },
+      { brand: "AGS", model: "SP Tall 1200 / GX 165", capacity: "12V 120Ah – 150Ah", type: "Deep Cycle Solar Battery", rate: 32000, prevRate: 32000, change: 0, status: "stable", badge: "Budget Deep Cycle", warranty: "1 Year Warranty" },
+      { brand: "Daewoo", model: "DIB-200 / DIB-225 Deep Cycle", capacity: "12V 175Ah – 200Ah", type: "Maintenance-Free Tubular", rate: 47000, prevRate: 47000, change: 0, status: "stable", badge: "Low Maintenance", warranty: "1 Year Warranty" },
+      { brand: "Narada", model: "AcmeG Polymer Gel 200Ah", capacity: "12V 200Ah (Gel)", type: "VRLA Sealed Polymer Gel", rate: 76500, prevRate: 76500, change: 0, status: "stable", badge: "Sealed Zero-Fumes", warranty: "2 Yrs Warranty" }
     ]
   }
 };
 
 // Provide dynamic references so today/yesterday always resolve smoothly
-ISLAMABAD_DAILY_SHEETS["today"] = ISLAMABAD_DAILY_SHEETS["08-Sep-2026"];
-ISLAMABAD_DAILY_SHEETS["yesterday"] = ISLAMABAD_DAILY_SHEETS["07-Sep-2026"];
+ISLAMABAD_DAILY_SHEETS["today"] = ISLAMABAD_DAILY_SHEETS["14-Sep-2026"];
+ISLAMABAD_DAILY_SHEETS["yesterday"] = ISLAMABAD_DAILY_SHEETS["13-Sep-2026"];
+ISLAMABAD_DAILY_SHEETS["14-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["14-Sep-2026"];
+ISLAMABAD_DAILY_SHEETS["13-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["13-Sep-2026"];
+// Backwards compatibility references
+ISLAMABAD_DAILY_SHEETS["08-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["14-Sep-2026"];
+ISLAMABAD_DAILY_SHEETS["07-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["13-Sep-2026"];
 if (_currentPkt?.shortDate) {
-  ISLAMABAD_DAILY_SHEETS[_currentPkt.shortDate] = ISLAMABAD_DAILY_SHEETS["08-Sep-2026"];
+  ISLAMABAD_DAILY_SHEETS[_currentPkt.shortDate] = ISLAMABAD_DAILY_SHEETS["14-Sep-2026"];
 }
 
 export const MARKET_SUMMARY = {
-  "panelsPerWattAvg": "Rs 36.75 – 44.50 / W",
-  "panelsTrend": "Upward movement (+Rs 3 – 6/W) across ready stock Tier-1 N-Type TOPCon & HJT in Islamabad/Rawalpindi",
+  "panelsPerWattAvg": "Rs 33.00 – 44.50 / W",
+  "panelsTrend": "Mixed movements on 14-Sep: Jinko (+Rs 1.25/W) & LONGi X10 (+Rs 0.65/W) up on strong demand; LEFN 640W dropped to Rs 33.00/W on fresh container arrivals.",
   "invertersTrend": "Hybrid inverters steady demand with high stock availability",
   "batteriesTrend": "LiFePO4 Lithium batteries gaining rapid share over tubular batteries",
-  "lastMidnightUpdate": "08-Sept-2026 (Islamabad Ready Stock Verified)",
+  "lastMidnightUpdate": "14-Sep-2026 (Islamabad Ready Stock Verified)",
   "schedule": "Daily verified trade benchmark & ready stock feed",
   "cities": [
     {
@@ -225,16 +291,16 @@ export const SOLAR_PRICES_DATA = [
     "model": "Jinko Tiger Neo 72HL4-BDV (585W)",
     "type": "N-Type TOPCon Dual-Glass Bifacial",
     "capacity": "585W",
-    "pricePerWatt": 40.00,
-    "pricePerWattRange": "Rs 40.00 / W",
-    "unitPriceMin": 23400,
-    "unitPriceMax": 23400,
+    "pricePerWatt": 41.25,
+    "pricePerWattRange": "Rs 41.25 / W",
+    "unitPriceMin": 24131,
+    "unitPriceMax": 24131,
     "trend": "hot",
-    "trendPercent": "+Rs 4.60/W",
+    "trendPercent": "+Rs 1.25/W",
     "efficiency": "22.65%",
     "warranty": "12 Yrs Product / 30 Yrs Power",
     "badge": "Tier-1 Top Demand",
-    "description": "Pakistan's most popular N-Type solar panel with SMBB technology and exceptional high-temperature yield.",
+    "description": "Pakistan's most popular N-Type solar panel with SMBB technology and exceptional high-temperature yield. Per-watt price up on tight ready stock.",
     "popular": true
   },
   {
@@ -244,16 +310,16 @@ export const SOLAR_PRICES_DATA = [
     "model": "Jinko Tiger Neo 78HL4-BDV (645W)",
     "type": "N-Type TOPCon Dual-Glass Bifacial",
     "capacity": "645W",
-    "pricePerWatt": 41.25,
-    "pricePerWattRange": "Rs 41.25 / W",
-    "unitPriceMin": 26606,
-    "unitPriceMax": 26606,
+    "pricePerWatt": 41.50,
+    "pricePerWattRange": "Rs 41.50 / W",
+    "unitPriceMin": 26768,
+    "unitPriceMax": 26768,
     "trend": "hot",
-    "trendPercent": "Ready Stock",
+    "trendPercent": "Delivery: 15/09/2026",
     "efficiency": "22.85%",
     "warranty": "12 Yrs Product / 30 Yrs Power",
-    "badge": "High Demand 645W",
-    "description": "645W large format Tiger Neo bifacial module optimized for high-capacity residential and commercial net metering.",
+    "badge": "Delivery 15-Sep",
+    "description": "645W large format Tiger Neo bifacial module. Next container delivery date: 15/09/2026 booking at Rs 41.50/W.",
     "popular": true
   },
 
@@ -265,16 +331,16 @@ export const SOLAR_PRICES_DATA = [
     "model": "Longi Hi-MO X10 BF (645W)",
     "type": "HPBC 2.0 High Efficiency Bifacial",
     "capacity": "645W",
-    "pricePerWatt": 42.60,
-    "pricePerWattRange": "Rs 42.60 / W",
-    "unitPriceMin": 27477,
-    "unitPriceMax": 27477,
+    "pricePerWatt": 43.25,
+    "pricePerWattRange": "Rs 43.25 / W",
+    "unitPriceMin": 27896,
+    "unitPriceMax": 27896,
     "trend": "hot",
-    "trendPercent": "+Rs 1.50/W",
+    "trendPercent": "+Rs 0.65/W",
     "efficiency": "24.8%",
     "warranty": "15 Yrs Product / 30 Yrs Linear",
-    "badge": "HPBC 2.0 Bifacial",
-    "description": "Longi latest Hi-MO X10 HPBC 2.0 bifacial panel with TaiRay wafer technology and anti-dust accumulation coating.",
+    "badge": "HPBC 2.0 In-Demand",
+    "description": "Longi latest Hi-MO X10 HPBC 2.0 bifacial panel with TaiRay wafer technology and anti-dust accumulation coating. Strong commercial installer interest.",
     "popular": true
   },
   {
@@ -299,6 +365,25 @@ export const SOLAR_PRICES_DATA = [
 
   // ---------------- JA SOLAR ----------------
   {
+    "id": "panel-ja-585",
+    "category": "panel",
+    "brand": "JA Solar",
+    "model": "JA Solar DeepBlue 4.0 Pro (585W)",
+    "type": "Bycium+ N-Type TOPCon Bifacial",
+    "capacity": "585W",
+    "pricePerWatt": 38.60,
+    "pricePerWattRange": "Rs 38.60 / W",
+    "unitPriceMin": 22581,
+    "unitPriceMax": 22581,
+    "trend": "hot",
+    "trendPercent": "New 585W Rate",
+    "efficiency": "22.6%",
+    "warranty": "12 Yrs Product / 30 Yrs Power",
+    "badge": "Ready Stock 585W",
+    "description": "JA Solar DeepBlue 4.0 Pro 585W Bycium+ N-Type TOPCon bifacial module with 16BB rectangular wafer technology.",
+    "popular": true
+  },
+  {
     "id": "panel-ja-605",
     "category": "panel",
     "brand": "JA Solar",
@@ -310,7 +395,7 @@ export const SOLAR_PRICES_DATA = [
     "unitPriceMin": 24049,
     "unitPriceMax": 24049,
     "trend": "hot",
-    "trendPercent": "+Rs 6.15/W",
+    "trendPercent": "Stable Trade",
     "efficiency": "22.7%",
     "warranty": "12 Yrs Product / 30 Yrs Power",
     "badge": "Islamabad Ready Stock",
@@ -349,8 +434,8 @@ export const SOLAR_PRICES_DATA = [
     "pricePerWattRange": "Rs 38.25 / W",
     "unitPriceMin": 22185,
     "unitPriceMax": 22185,
-    "trend": "hot",
-    "trendPercent": "+Rs 4.55/W",
+    "trend": "stable",
+    "trendPercent": "Stable Stock",
     "efficiency": "22.5%",
     "warranty": "12 Yrs Product / 30 Yrs Power",
     "badge": "CHINT Group Tier-1",
@@ -364,16 +449,16 @@ export const SOLAR_PRICES_DATA = [
     "model": "Astronergy ASTRO N5s (620W)",
     "type": "N-Type TOPCon Dual-Glass Bifacial",
     "capacity": "620W",
-    "pricePerWatt": 38.75,
-    "pricePerWattRange": "Rs 38.75 / W",
-    "unitPriceMin": 24025,
-    "unitPriceMax": 24025,
-    "trend": "stable",
-    "trendPercent": "Ready Stock",
+    "pricePerWatt": 39.00,
+    "pricePerWattRange": "Rs 39.00 / W",
+    "unitPriceMin": 24180,
+    "unitPriceMax": 24180,
+    "trend": "hot",
+    "trendPercent": "+Rs 0.25/W",
     "efficiency": "22.7%",
     "warranty": "12 Yrs Product / 30 Yrs Power",
     "badge": "Islamabad Stock",
-    "description": "620W high efficiency module with non-destructive cutting technology reducing micro-crack risks.",
+    "description": "620W high efficiency module with non-destructive cutting technology reducing micro-crack risks. Price adjusted to Rs 39.00/W.",
     "popular": false
   },
   {
@@ -388,7 +473,7 @@ export const SOLAR_PRICES_DATA = [
     "unitPriceMin": 24375,
     "unitPriceMax": 24375,
     "trend": "stable",
-    "trendPercent": "Ready Stock (07-Sep)",
+    "trendPercent": "Ready Stock",
     "efficiency": "22.8%",
     "warranty": "12 Yrs Product / 30 Yrs Power",
     "badge": "625W Stock",
@@ -412,6 +497,25 @@ export const SOLAR_PRICES_DATA = [
     "warranty": "12 Yrs Product / 30 Yrs Power",
     "badge": "715W Commercial",
     "description": "715W high-density commercial module designed for large scale rooftop and ground mount installations.",
+    "popular": true
+  },
+  {
+    "id": "panel-astro-720",
+    "category": "panel",
+    "brand": "Astronergy",
+    "model": "Astronergy ASTRO N7 (720W)",
+    "type": "N-Type TOPCon Large Format Bifacial",
+    "capacity": "720W",
+    "pricePerWatt": 39.00,
+    "pricePerWattRange": "Rs 39.00 / W",
+    "unitPriceMin": 28080,
+    "unitPriceMax": 28080,
+    "trend": "hot",
+    "trendPercent": "New 720W Plate",
+    "efficiency": "23.2%",
+    "warranty": "12 Yrs Product / 30 Yrs Power",
+    "badge": "720W Commercial",
+    "description": "Astronergy 720W high-power ASTRO N7 commercial bifacial module engineered for high ROI utility and industrial rooftops.",
     "popular": true
   },
 
@@ -505,17 +609,17 @@ export const SOLAR_PRICES_DATA = [
     "model": "LEFN Solar N-Type (640W)",
     "type": "N-Type TOPCon Dual-Glass Bifacial",
     "capacity": "640W",
-    "pricePerWatt": 37.00,
-    "pricePerWattRange": "Rs 37.00 / W",
-    "unitPriceMin": 23680,
-    "unitPriceMax": 23680,
-    "trend": "stable",
-    "trendPercent": "Direct Stock",
+    "pricePerWatt": 33.00,
+    "pricePerWattRange": "Rs 33.00 / W",
+    "unitPriceMin": 21120,
+    "unitPriceMax": 21120,
+    "trend": "drop",
+    "trendPercent": "-Rs 4.00/W Drop",
     "efficiency": "22.65%",
     "warranty": "12 Yrs Product / 25 Yrs Linear",
-    "badge": "Best 640W Value",
-    "description": "Heavy-duty 640W module offering premium wattage output at an economical Rs 37.00/W trade rate.",
-    "popular": false
+    "badge": "Lowest Rate in PK",
+    "description": "Heavy-duty 640W module offering premium wattage output at an economical Rs 33.00/W trade rate. Best per-watt price in Pakistan on fresh container arrivals.",
+    "popular": true
   },
   {
     "id": "inv-inverex-nitrox-6kw",

@@ -1,7 +1,8 @@
 // Google Analytics 4 (GA4) Integration & SEO Diagnostics
+import { getPublicEnv } from './env';
 
 export const GA_MEASUREMENT_ID =
-  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GA_MEASUREMENT_ID) ||
+  getPublicEnv('GA_MEASUREMENT_ID') ||
   (typeof window !== 'undefined' && window.ENV_GA_ID) ||
   'G-SELLSOLAR01';
 

@@ -1,10 +1,9 @@
 /
   Cache-Control: public, max-age=0, must-revalidate
-  X-SellSolar-Build: google-auth-v2
+  X-SellSolar-Framework: nextjs
 
 /index.html
   Cache-Control: public, max-age=0, must-revalidate
-  X-SellSolar-Build: google-auth-v2
 
-/assets/*
+/_next/static/*
   Cache-Control: public, max-age=31536000, immutable

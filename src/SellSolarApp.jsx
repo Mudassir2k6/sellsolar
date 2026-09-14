@@ -1,3 +1,5 @@
+'use client';
+
 import {
   useCallback,
   useEffect,
@@ -5,13 +7,13 @@ import {
   useState,
 } from 'react';
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
-import AuthPage from './pages/AuthPage';
-import PasswordPage from './pages/PasswordPage';
-import TodayPricesPage from './pages/TodayPricesPage';
-import LoadCalculatorPage from './pages/LoadCalculatorPage';
+import AuthPage from './views/AuthPage';
+import PasswordPage from './views/PasswordPage';
+import TodayPricesPage from './views/TodayPricesPage';
+import LoadCalculatorPage from './views/LoadCalculatorPage';
 import SolarLoadCalculator from './components/SolarLoadCalculator';
 import FloatingPostAdButton from './components/FloatingPostAdButton';
-import CompanyMarketplacePage from './pages/CompanyMarketplacePage';
+import CompanyMarketplacePage from './views/CompanyMarketplacePage';
 import { applyPageSeo, parseLocation, pageToPath } from './lib/seo';
 import {
   ArrowLeft,
@@ -87,7 +89,7 @@ import { getLocalOrSeedListings, getLocalOrSeedListingById } from './data/seedLi
 import { getEquipmentFallbackImage } from './utils/solarImages';
 import ThemeRadioToggle from './components/ThemeRadioToggle';
 import WarrantySelector, { formatWarrantyShort, formatWarrantyLong } from './components/WarrantySelector';
-import InstallationRequestPage from './pages/InstallationRequestPage';
+import InstallationRequestPage from './views/InstallationRequestPage';
 import ListingPhotoUploader from './components/ListingPhotoUploader';
 import { listingImages, uploadListingPhotos } from './lib/images';
 import GlobalNavbarSearch from './components/GlobalNavbarSearch';

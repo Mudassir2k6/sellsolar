@@ -1,8 +1,12 @@
 node_modules
 dist
+out
+.next
 .env
 .env.local
 .DS_Store
 _download
 .vercel
 .netlify
+next-env.d.ts
+*.tsbuildinfo

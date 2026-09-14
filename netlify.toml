@@ -1,6 +1,6 @@
 [build]
   command = "npm run build"
-  publish = "dist"
+  publish = "out"
 
 # WWW → apex
 [[redirects]]
@@ -21,265 +21,87 @@
   status = 301
   force = true
 
-# Index file cleanup
-[[redirects]]
-  from = "/index.html"
-  to = "/"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "/index.php"
-  to = "/"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "/home.html"
-  to = "/"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "/home.php"
-  to = "/"
-  status = 301
-  force = true
-
-# Known SPA routes
-[[redirects]]
-  from = "/"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/prices"
-  to = "/index.html"
-  status = 200
-
+# Legacy path aliases
 [[redirects]]
   from = "/today-prices"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/calculator"
-  to = "/index.html"
-  status = 200
+  to = "/prices"
+  status = 301
 
 [[redirects]]
   from = "/load-calculator"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/dealers"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/install"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/login"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/post-ad"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/dashboard"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/admin"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/admin-dashboard"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/password"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/forgot-password"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/reset-password"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/change-password"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/about"
-  to = "/index.html"
-  status = 200
+  to = "/calculator"
+  status = 301
 
 [[redirects]]
   from = "/about-us"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/careers"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/press"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/blog"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/buy-solar"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/sell-solar"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/how-it-works"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/pricing"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/help"
-  to = "/index.html"
-  status = 200
+  to = "/about"
+  status = 301
 
 [[redirects]]
   from = "/help-center"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/contact"
-  to = "/index.html"
-  status = 200
+  to = "/help"
+  status = 301
 
 [[redirects]]
   from = "/contact-us"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/safety"
-  to = "/index.html"
-  status = 200
+  to = "/contact"
+  status = 301
 
 [[redirects]]
   from = "/safety-tips"
-  to = "/index.html"
-  status = 200
+  to = "/safety"
+  status = 301
 
 [[redirects]]
   from = "/report"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/report-issue"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/terms"
-  to = "/index.html"
-  status = 200
+  to = "/report-issue"
+  status = 301
 
 [[redirects]]
   from = "/terms-of-service"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/privacy"
-  to = "/index.html"
-  status = 200
+  to = "/terms"
+  status = 301
 
 [[redirects]]
   from = "/privacy-policy"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/cookies"
-  to = "/index.html"
-  status = 200
+  to = "/privacy"
+  status = 301
 
 [[redirects]]
   from = "/cookie-policy"
-  to = "/index.html"
-  status = 200
+  to = "/cookies"
+  status = 301
 
 [[redirects]]
-  from = "/disclaimer"
-  to = "/index.html"
-  status = 200
+  from = "/change-password"
+  to = "/password"
+  status = 301
 
+[[redirects]]
+  from = "/installation"
+  to = "/install"
+  status = 301
+
+[[redirects]]
+  from = "/request-installation"
+  to = "/install"
+  status = 301
+
+# Dynamic listing deep-links (client-routed)
 [[redirects]]
   from = "/listing/*"
   to = "/index.html"
   status = 200
 
-# Unknown routes → real 404
-[[redirects]]
-  from = "/*"
-  to = "/404.html"
-  status = 404
-
 [[headers]]
   for = "/*"
   [headers.values]
+    X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
-    X-Frame-Options = "SAMEORIGIN"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
-    X-XSS-Protection = "1; mode=block"
 
 [[headers]]
-  for = "/sitemap.xml"
-  [headers.values]
-    Content-Type = "application/xml; charset=utf-8"
-    Cache-Control = "public, max-age=3600"
-
-[[headers]]
-  for = "/robots.txt"
-  [headers.values]
-    Content-Type = "text/plain; charset=utf-8"
-    Cache-Control = "public, max-age=3600"
-
-[[headers]]
-  for = "/assets/*"
+  for = "/_next/static/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"

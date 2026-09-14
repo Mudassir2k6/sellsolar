@@ -1,12 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
+import { getPublicEnv } from './env';
 
 const DEFAULT_SUPABASE_URL = 'https://zgfycrnmivfybbclflwf.supabase.co';
 const DEFAULT_ANON_KEY =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpnZnljcm5taXZmeWJiY2xmbHdmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxNjMzNDQsImV4cCI6MjEwMzczOTM0NH0.30oiwuVIdIjaMMZGyobVqZk8HA18vVIhq2jN6jFgyao';
 
 export function isSupabaseConfigured() {
-  const url = getValidSupabaseUrl(import.meta.env.VITE_SUPABASE_URL);
-  const key = getValidAnonKey(import.meta.env.VITE_SUPABASE_ANON_KEY);
+  const url = getValidSupabaseUrl(getPublicEnv('SUPABASE_URL'));
+  const key = getValidAnonKey(getPublicEnv('SUPABASE_ANON_KEY'));
   if (!key || typeof key !== 'string' || !url || typeof url !== 'string') return false;
   const trimmedKey = key.trim();
   const trimmedUrl = url.trim();
@@ -77,8 +78,8 @@ function getValidAnonKey(rawKey) {
   return trimmed;
 }
 
-const supabaseUrl = getValidSupabaseUrl(import.meta.env.VITE_SUPABASE_URL);
-const supabaseAnonKey = getValidAnonKey(import.meta.env.VITE_SUPABASE_ANON_KEY);
+const supabaseUrl = getValidSupabaseUrl(getPublicEnv('SUPABASE_URL'));
+const supabaseAnonKey = getValidAnonKey(getPublicEnv('SUPABASE_ANON_KEY'));
 
 let client;
 try {

@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { normalizePhone, isValidPhone, digitsOnlyPhone, isValidEmail, isValidUuid, generateUuid } from '../lib/auth';

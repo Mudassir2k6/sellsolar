@@ -12,6 +12,7 @@ const nextConfig = {
   },
   reactStrictMode: true,
   trailingSlash: false,
+  // Keep tracing rooted in this app (parent folder also has a lockfile)
   outputFileTracingRoot: path.join(__dirname),
 };
 

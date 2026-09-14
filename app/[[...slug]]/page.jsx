@@ -1,4 +1,5 @@
 import SellSolarClient from '../sellsolar-client';
+import { buildMetadataForSlug, getGlobalJsonLd } from '@/lib/seo-next';
 
 const STATIC_SLUGS = [
   [],
@@ -26,6 +27,11 @@ const STATIC_SLUGS = [
   ['blog'],
   ['buy-solar'],
   ['sell-solar'],
+  ['used-solar'],
+  ['solar-price'],
+  ['solar-inverter'],
+  ['solar-batteries'],
+  ['solar-panels'],
   ['how-it-works'],
   ['pricing'],
   ['help'],
@@ -49,6 +55,22 @@ export function generateStaticParams() {
   return STATIC_SLUGS.map((slug) => ({ slug }));
 }
 
-export default function CatchAllPage() {
-  return <SellSolarClient />;
+export async function generateMetadata({ params }) {
+  const resolved = await params;
+  return buildMetadataForSlug(resolved?.slug);
+}
+
+export default async function CatchAllPage({ params }) {
+  const resolved = await params;
+  const jsonLd = getGlobalJsonLd();
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <SellSolarClient key={(resolved?.slug || []).join('/') || 'home'} />
+    </>
+  );
 }

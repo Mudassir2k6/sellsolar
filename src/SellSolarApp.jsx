@@ -14,6 +14,7 @@ import LoadCalculatorPage from './views/LoadCalculatorPage';
 import SolarLoadCalculator from './components/SolarLoadCalculator';
 import FloatingPostAdButton from './components/FloatingPostAdButton';
 import CompanyMarketplacePage from './views/CompanyMarketplacePage';
+import KeywordLandingPage, { KEYWORD_LANDING_KEYS } from './views/KeywordLandingPage';
 import { applyPageSeo, parseLocation, pageToPath } from './lib/seo';
 import {
   ArrowLeft,
@@ -1453,6 +1454,11 @@ const ux={
   Marketplace:[
     { label: "Buy Solar", page: "buy-solar" },
     { label: "Sell Solar", page: "sell-solar" },
+    { label: "Used Solar", page: "used-solar" },
+    { label: "Solar Price", page: "solar-price" },
+    { label: "Solar Inverter", page: "solar-inverter" },
+    { label: "Solar Batteries", page: "solar-batteries" },
+    { label: "Solar Panels", page: "solar-panels" },
     { label: "How It Works", page: "how-it-works" },
     { label: "Pricing", page: "pricing" }
   ],
@@ -4765,6 +4771,19 @@ function _x({
             if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
           }, 100);
         }
+      })
+    }), jsx(hx, {
+      onPostAd: c, onNavigate: o
+    })]
+  }) : KEYWORD_LANDING_KEYS.includes(n) ? jsxs("div", {
+    className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
+      onNavigate: d => {
+        d === "post-ad" ? c() : d === "admin" || d === "admin-dashboard" ? t && (e != null && e.is_admin) ? o("admin-dashboard") : o("login") : d === "password" || d === "change-password" ? o("password") : o(d === "dashboard" ? t ? "dashboard" : "login" : d)
+      }, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
+    }), jsx("main", {
+      id: "main",
+      children: jsx(KeywordLandingPage, {
+        pageKey: n, onNavigate: o
       })
     }), jsx(hx, {
       onPostAd: c, onNavigate: o

@@ -1,6 +1,6 @@
 # SellSolar
 
-> Pakistan marketplace to sell and buy used and new solar panels, hybrid inverters, lithium batteries and complete systems.
+> Pakistan marketplace to sell and buy used and new solar panels, hybrid inverters, lithium batteries and complete systems. Target searches: solar price, used solar, solar inverter, solar batteries.
 
 ## Site
 - Homepage: https://sellsolar.pk/
@@ -8,22 +8,25 @@
 - Location: Islamabad, Pakistan
 
 ## Key intents
+- solar price Pakistan / solar rates today
 - used solar panels for sale Pakistan
-- buy used solar inverter / battery
+- solar inverter price / used inverter
+- solar batteries / lithium battery price
 - sell used solar equipment free
-- today's solar rates Pakistan
 - solar load calculator Pakistan
 
 ## Key pages
-- [Homepage](https://sellsolar.pk/): Sell & buy used and new solar equipment
-- [Today's solar rates](https://sellsolar.pk/prices): Live per-watt panel, inverter and battery prices in PKR
-- [Solar load calculator](https://sellsolar.pk/calculator): Free kW, panel count and battery sizing tool
-- [Verified dealers](https://sellsolar.pk/dealers): Trusted solar sellers across Pakistan
-- [Buy solar](https://sellsolar.pk/buy-solar): Buy used and new panels, inverters and batteries
-- [Sell solar](https://sellsolar.pk/sell-solar): Free listing for used and new equipment
-- [Blog](https://sellsolar.pk/blog): Net metering guides and Tier-1 brand comparisons
-- [Help](https://sellsolar.pk/help): FAQs and support
-- [About](https://sellsolar.pk/about): Company information
+- [Homepage](https://sellsolar.pk/): Solar price, used solar, inverters and batteries
+- [Solar price](https://sellsolar.pk/solar-price): Panel, inverter and battery rate intent page
+- [Today's solar rates](https://sellsolar.pk/prices): Live PKR market benchmarks
+- [Used solar](https://sellsolar.pk/used-solar): Used panels, inverters and batteries
+- [Solar inverter](https://sellsolar.pk/solar-inverter): Hybrid and on-grid inverter deals
+- [Solar batteries](https://sellsolar.pk/solar-batteries): Lithium and tubular battery listings
+- [Solar panels](https://sellsolar.pk/solar-panels): Used and new modules
+- [Solar load calculator](https://sellsolar.pk/calculator): Free kW sizing tool
+- [Buy solar](https://sellsolar.pk/buy-solar): Buy used and new equipment
+- [Sell solar](https://sellsolar.pk/sell-solar): Free listing for sellers
+- [Blog](https://sellsolar.pk/blog): Guides and brand comparisons
 
 ## Brands commonly listed
 Longi, Jinko, Canadian Solar, JA Solar, Inverex, Knox, Homage, Growatt, Solis, Huawei

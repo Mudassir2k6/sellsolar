@@ -9,9 +9,9 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 const SITE_URL = 'https://sellsolar.pk';
-const TITLE = 'Sell & Buy Used Solar Equipment Pakistan | SellSolar';
+const TITLE = 'Solar Price, Used Solar & Inverters Pakistan | SellSolar';
 const DESCRIPTION =
-  'Sell & buy used and new solar panels, inverters and batteries in Pakistan. Compare live prices from verified sellers in Lahore, Karachi and Islamabad.';
+  'Sell & buy used solar panels, inverters and batteries in Pakistan. Check solar price today and find verified sellers in Lahore, Karachi and Islamabad.';
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),
@@ -21,11 +21,15 @@ export const metadata = {
   },
   description: DESCRIPTION,
   keywords: [
-    'used solar Pakistan',
-    'used solar panels for sale',
-    'buy used solar panels',
-    'sell used solar',
-    'used solar inverter Pakistan',
+    'solar Pakistan',
+    'solar price Pakistan',
+    'used solar',
+    'used solar panels',
+    'solar inverter price',
+    'solar batteries',
+    'lithium battery Pakistan',
+    'sell solar',
+    'buy solar',
     'solar marketplace Pakistan',
   ],
   authors: [{ name: 'SellSolar' }],

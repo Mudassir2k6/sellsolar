@@ -7,32 +7,36 @@ export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.jpg`;
 export const DEFAULT_OG_IMAGE_WIDTH = '1200';
 export const DEFAULT_OG_IMAGE_HEIGHT = '630';
 export const DEFAULT_KEYWORDS =
-  'used solar Pakistan, used solar panels for sale, buy used solar, sell used solar, used solar inverter, second hand solar system, solar marketplace Pakistan, Longi, Jinko, Inverex';
+  'solar Pakistan, solar price Pakistan, used solar, used solar panels, solar inverter price, solar batteries, lithium battery Pakistan, sell solar, buy solar, solar marketplace Pakistan, Longi, Jinko, Inverex';
 
 const INDEXABLE = 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1';
 const NOINDEX = 'noindex,nofollow';
 
 export const PAGE_SEO = {
   home: {
-    title: 'Sell & Buy Used Solar Equipment Pakistan | SellSolar',
+    title: 'Solar Price, Used Solar & Inverters Pakistan | SellSolar',
     description:
-      'Sell & buy used and new solar panels, inverters and batteries in Pakistan. Compare live prices from verified sellers in Lahore, Karachi and Islamabad.',
+      'Sell & buy used solar panels, inverters and batteries in Pakistan. Check solar price today and find verified sellers in Lahore, Karachi and Islamabad.',
     path: '/',
     robots: INDEXABLE,
+    keywords:
+      'solar Pakistan, solar price, used solar, solar inverter, solar batteries, sell solar Pakistan',
   },
   prices: {
-    title: "Today's Solar Rates Pakistan | SellSolar",
+    title: 'Solar Price Today Pakistan | Panels Inverters Batteries',
     description:
-      "Live solar market rates in Pakistan: panel per-watt prices, hybrid inverter costs, and lithium battery rates. Updated daily so you can budget a 5kW–20kW system.",
+      'Live solar price in Pakistan: panel PKR/watt, hybrid inverter cost and lithium battery rates. Updated daily for 5kW–20kW system budgeting.',
     path: '/prices',
     robots: INDEXABLE,
+    keywords: 'solar price Pakistan, solar panel price, inverter price, battery price today',
   },
   calculator: {
-    title: 'Solar Load Calculator Pakistan | SellSolar',
+    title: 'Solar Load Calculator Pakistan | System Size kW',
     description:
-      'Free Pakistan solar load calculator. Enter fans, lights, inverter ACs and motors to get system kW, panel count, inverter size and battery backup in minutes.',
+      'Free Pakistan solar load calculator. Enter fans, lights and ACs to get system kW, panel count, inverter size and battery backup.',
     path: '/calculator',
     robots: INDEXABLE,
+    keywords: 'solar load calculator Pakistan, solar system size, inverter size calculator',
   },
   dealers: {
     title: 'Verified Solar Dealers Pakistan | SellSolar',
@@ -47,6 +51,46 @@ export const PAGE_SEO = {
       'Request professional solar installation. Share your name, address and contact number and SellSolar will arrange a site visit across Pakistan.',
     path: '/install',
     robots: INDEXABLE,
+  },
+  'used-solar': {
+    title: 'Used Solar for Sale Pakistan | Panels Inverters Batteries',
+    description:
+      'Buy and sell used solar equipment in Pakistan. Browse used solar panels, hybrid inverters and batteries from sellers in major cities.',
+    path: '/used-solar',
+    robots: INDEXABLE,
+    keywords: 'used solar Pakistan, used solar panels for sale, second hand solar system',
+  },
+  'solar-price': {
+    title: 'Solar Price Pakistan Today | Panel Inverter Battery Rates',
+    description:
+      'Check solar price Pakistan today for panels, inverters and batteries. Compare market rates before you buy used or new solar equipment.',
+    path: '/solar-price',
+    robots: INDEXABLE,
+    keywords: 'solar price Pakistan, solar rates today, panel price per watt',
+  },
+  'solar-inverter': {
+    title: 'Solar Inverter Price & Used Inverters Pakistan',
+    description:
+      'Find solar inverter price and used inverters for sale in Pakistan — hybrid and on-grid brands like Inverex, Homage, Growatt and GoodWe.',
+    path: '/solar-inverter',
+    robots: INDEXABLE,
+    keywords: 'solar inverter price Pakistan, used inverter, hybrid inverter for sale',
+  },
+  'solar-batteries': {
+    title: 'Solar Batteries & Lithium Battery Price Pakistan',
+    description:
+      'Buy solar batteries in Pakistan — lithium, tubular and gel. Compare lithium battery price and used battery listings from local sellers.',
+    path: '/solar-batteries',
+    robots: INDEXABLE,
+    keywords: 'solar batteries Pakistan, lithium battery price, used solar battery',
+  },
+  'solar-panels': {
+    title: 'Solar Panels for Sale Pakistan | Used & New Modules',
+    description:
+      'Solar panels for sale in Pakistan — used and new Longi, Jinko, JA and Canadian modules. Filter by city, wattage and condition on SellSolar.',
+    path: '/solar-panels',
+    robots: INDEXABLE,
+    keywords: 'solar panels Pakistan, used solar panels, solar panel price',
   },
   login: {
     title: 'Login or Create Account | SellSolar',
@@ -133,16 +177,20 @@ export const PAGE_SEO = {
     robots: INDEXABLE,
   },
   'buy-solar': {
-    title: 'Buy Used & New Solar Pakistan | SellSolar',
-    description: 'Buy used and new solar panels, inverters and batteries in Pakistan from verified sellers. Filter by city, brand and condition.',
+    title: 'Buy Used & New Solar Pakistan | Panels Inverters Batteries',
+    description:
+      'Buy used and new solar panels, inverters and batteries in Pakistan from verified sellers. Filter by city, brand and condition.',
     path: '/buy-solar',
     robots: INDEXABLE,
+    keywords: 'buy solar Pakistan, buy used solar panels, buy solar inverter',
   },
   'sell-solar': {
     title: 'Sell Used Solar Free in Pakistan | SellSolar',
-    description: 'Sell used or new solar panels, inverters and batteries free on SellSolar. Reach buyers across Lahore, Karachi, Islamabad and more.',
+    description:
+      'Sell used or new solar panels, inverters and batteries free on SellSolar. Reach buyers across Lahore, Karachi, Islamabad and more.',
     path: '/sell-solar',
     robots: INDEXABLE,
+    keywords: 'sell used solar Pakistan, sell solar panels, post solar ad',
   },
   'how-it-works': {
     title: 'How It Works | SellSolar Pakistan',
@@ -263,6 +311,11 @@ export function parseLocation(pathname = '/', hash = '') {
     '/blog': 'blog',
     '/buy-solar': 'buy-solar',
     '/sell-solar': 'sell-solar',
+    '/used-solar': 'used-solar',
+    '/solar-price': 'solar-price',
+    '/solar-inverter': 'solar-inverter',
+    '/solar-batteries': 'solar-batteries',
+    '/solar-panels': 'solar-panels',
     '/how-it-works': 'how-it-works',
     '/pricing': 'pricing',
     '/help': 'help',
@@ -374,7 +427,7 @@ export function applyPageSeo(page, { listing, listingId } = {}) {
 
   let title = meta.title;
   let description = meta.description;
-  let keywords = DEFAULT_KEYWORDS;
+  let keywords = meta.keywords || DEFAULT_KEYWORDS;
   if (key === 'listing-detail' && listing?.title) {
     const city = listing.city ? ` in ${listing.city}` : '';
     const brand = listing.brand ? `${listing.brand} ` : '';

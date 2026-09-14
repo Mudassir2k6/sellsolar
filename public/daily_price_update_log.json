@@ -1,5 +1,32 @@
 [
   {
+    "updated_at": "15-Sept-2026, 3:12:33 am",
+    "iso": "2026-09-14T22:12:33.403Z",
+    "date_str": "15 September 2026",
+    "panels_count": 22,
+    "inverters_count": 15,
+    "batteries_count": 11,
+    "average_panel_rate": "Rs 33.00 – 44.50 / W",
+    "average_inverter_rate": "Rs 112,000 – 549,000",
+    "average_battery_lithium_rate": "Rs 238,500 – 564,000",
+    "average_battery_tubular_rate": "Rs 31,500 – 51,500",
+    "categories_benchmarked": [
+      "Solar Panels (Plates)",
+      "Solar Inverters",
+      "Solar Batteries"
+    ],
+    "tags_active": [
+      "Pakistan #1 Hybrid",
+      "Net Metering Approved",
+      "Top Lithium 6000 Cycles",
+      "Tall Tubular 27-Plates",
+      "AI Smart AFCI"
+    ],
+    "customer_dealer_ads_protected": true,
+    "ads_modified_count": 0,
+    "status": "SUCCESS"
+  },
+  {
     "updated_at": "14-Sept-2026, 12:20:43 pm",
     "iso": "2026-09-14T07:20:43.322Z",
     "date_str": "14 September 2026",

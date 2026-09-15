@@ -245,6 +245,14 @@ export function AuthProvider({ children }) {
         created_at: '2026-01-01T00:00:00Z',
       };
       setProfile(adminProf);
+      return;
+    }
+
+    // 4. Fallback from current stored session if matching
+    const currentSess = getStoredSession();
+    if (currentSess?.profile && (currentSess.profile.id === userId || currentSess.profile.email?.toLowerCase() === targetEmail)) {
+      setProfile(currentSess.profile);
+      return;
     }
   }, []);
 
@@ -322,6 +330,7 @@ export function AuthProvider({ children }) {
               is_admin: (session.user.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase(),
               is_verified_dealer: false,
             };
+            setProfile(oauthProfile);
             saveStoredSession({ user: session.user, profile: oauthProfile });
             // Email confirmation / OAuth return — mark local mirror confirmed
             if (session.user.email && (event === 'SIGNED_IN' || event === 'USER_UPDATED' || event === 'PASSWORD_RECOVERY')) {
@@ -330,9 +339,34 @@ export function AuthProvider({ children }) {
               if (localUsers[key]) {
                 localUsers[key].emailConfirmed = true;
                 saveStoredUsers(localUsers);
+              } else {
+                localUsers[key] = {
+                  profile: oauthProfile,
+                  user: session.user,
+                  emailConfirmed: true,
+                };
+                saveStoredUsers(localUsers);
               }
             }
-            loadProfile(session.user.id, session.user.email);
+            if (isSupabaseConfigured()) {
+              supabase.from('profiles').upsert(
+                {
+                  id: session.user.id,
+                  email: session.user.email,
+                  full_name: metaName,
+                  account_type: 'individual',
+                  is_verified_dealer: false,
+                  is_admin: (session.user.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase(),
+                },
+                { onConflict: 'id' }
+              ).then(() => {
+                loadProfile(session.user.id, session.user.email);
+              }).catch(() => {
+                loadProfile(session.user.id, session.user.email);
+              });
+            } else {
+              loadProfile(session.user.id, session.user.email);
+            }
           } else {
             const currentLocal = getStoredSession();
             if (!currentLocal?.user) {
@@ -1144,18 +1178,19 @@ export function AuthProvider({ children }) {
       throw new Error(rateCheck.reason);
     }
 
-    // Always return users to the current origin (localhost or sellsolar.pk).
-    // Supabase Redirect URLs allow-list must include this exact origin.
     const origin =
       typeof window !== 'undefined' && window.location?.origin
         ? window.location.origin
         : 'https://sellsolar.pk';
-    const redirectTo = `${origin}/`;
+
+    const isIframe = typeof window !== 'undefined' && window.self !== window.top;
+    const redirectTo = `${origin}/auth/callback`;
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo,
+        skipBrowserRedirect: true,
         queryParams: {
           access_type: 'offline',
           prompt: 'select_account',
@@ -1168,8 +1203,184 @@ export function AuthProvider({ children }) {
       throw error;
     }
 
-    return { success: true, url: data?.url || null };
-  }, []);
+    if (!data?.url) {
+      throw new Error('Could not retrieve Google authorization URL. Please try again.');
+    }
+
+    const authUrl = data.url;
+
+    return new Promise((resolve, reject) => {
+      let resolved = false;
+      let checkInterval = null;
+      let messageHandler = null;
+      let storageHandler = null;
+
+      const cleanup = () => {
+        if (checkInterval) {
+          clearInterval(checkInterval);
+          checkInterval = null;
+        }
+        if (messageHandler && typeof window !== 'undefined') {
+          window.removeEventListener('message', messageHandler);
+        }
+        if (storageHandler && typeof window !== 'undefined') {
+          window.removeEventListener('storage', storageHandler);
+        }
+      };
+
+      const finishSuccess = async (activeSession) => {
+        if (resolved) return;
+        resolved = true;
+        cleanup();
+
+        try {
+          let s = activeSession;
+          if (!s) {
+            const sessRes = await supabase.auth.getSession();
+            s = sessRes?.data?.session;
+          }
+
+          if (s?.user) {
+            setUser(s.user);
+            const metaName =
+              s.user.user_metadata?.full_name ||
+              s.user.user_metadata?.name ||
+              s.user.email?.split('@')[0] ||
+              'User';
+            const oauthProfile = {
+              id: s.user.id,
+              email: s.user.email,
+              full_name: metaName,
+              account_type: 'individual',
+              is_admin: (s.user.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase(),
+              is_verified_dealer: false,
+            };
+            setProfile(oauthProfile);
+            saveStoredSession({ user: s.user, profile: oauthProfile });
+
+            try {
+              await supabase.from('profiles').upsert(
+                {
+                  id: s.user.id,
+                  email: s.user.email,
+                  full_name: metaName,
+                  account_type: 'individual',
+                  is_verified_dealer: false,
+                  is_admin: (s.user.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase(),
+                },
+                { onConflict: 'id' }
+              );
+            } catch (upsertErr) {
+              console.warn('[OAuth] profile upsert error:', upsertErr);
+            }
+
+            await loadProfile(s.user.id, s.user.email);
+            resolve({ success: true, user: s.user, profile: oauthProfile });
+            return;
+          }
+        } catch (e) {
+          console.warn('[OAuth] finish error:', e);
+        }
+
+        resolve({ success: true });
+      };
+
+      messageHandler = (event) => {
+        if (event.data?.type === 'SELLSOLAR_GOOGLE_AUTH_SUCCESS') {
+          finishSuccess(event.data.session);
+        }
+      };
+      if (typeof window !== 'undefined') {
+        window.addEventListener('message', messageHandler);
+      }
+
+      storageHandler = (e) => {
+        if (e.key && (e.key.includes('auth-token') || e.key === 'sellsolar_auth_session')) {
+          setTimeout(() => finishSuccess(), 200);
+        }
+      };
+      if (typeof window !== 'undefined') {
+        window.addEventListener('storage', storageHandler);
+      }
+
+      const width = 500;
+      const height = 650;
+      const left = typeof window !== 'undefined' ? Math.max(0, (window.screen.width - width) / 2) : 100;
+      const top = typeof window !== 'undefined' ? Math.max(0, (window.screen.height - height) / 2) : 100;
+
+      let popup = null;
+      try {
+        popup = window.open(
+          authUrl,
+          'sellsolar_google_auth',
+          `width=${width},height=${height},top=${top},left=${left},status=no,resizable=yes,scrollbars=yes`
+        );
+      } catch (openErr) {
+        console.warn('[OAuth] window.open exception:', openErr);
+      }
+
+      if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+        cleanup();
+        if (!isIframe) {
+          window.location.assign(authUrl);
+          return;
+        } else {
+          reject(new Error(`POPUP_BLOCKED:${authUrl}`));
+          return;
+        }
+      }
+
+      try {
+        popup.focus();
+      } catch {}
+
+      let attempts = 0;
+      checkInterval = setInterval(async () => {
+        attempts++;
+
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session?.user) {
+            try {
+              if (popup && !popup.closed) popup.close();
+            } catch {}
+            finishSuccess(session);
+            return;
+          }
+        } catch {}
+
+        if (popup.closed) {
+          clearInterval(checkInterval);
+          checkInterval = null;
+          setTimeout(async () => {
+            try {
+              const { data: { session } } = await supabase.auth.getSession();
+              if (session?.user) {
+                finishSuccess(session);
+                return;
+              }
+            } catch {}
+            if (!resolved) {
+              resolved = true;
+              cleanup();
+              reject(new Error('Google Sign-In was cancelled or closed before completing.'));
+            }
+          }, 600);
+        }
+
+        if (attempts > 360) {
+          cleanup();
+          if (!resolved) {
+            resolved = true;
+            try {
+              if (popup && !popup.closed) popup.close();
+            } catch {}
+            reject(new Error('Google Sign-In timed out. Please try again.'));
+          }
+        }
+      }, 500);
+    });
+  }, [loadProfile]);
 
   const signOut = useCallback(async () => {
     if (isSupabaseConfigured()) {

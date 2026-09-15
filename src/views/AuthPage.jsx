@@ -266,6 +266,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [googleBusy, setGoogleBusy] = useState(false);
+  const [googleBlockedUrl, setGoogleBlockedUrl] = useState(null);
   const [error, setError] = useState(null);
   const [info, setInfo] = useState(null);
   const [email, setEmail] = useState('');
@@ -814,17 +815,35 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
   const handleGoogleSignIn = async () => {
     setError(null);
     setInfo(null);
+    setGoogleBlockedUrl(null);
     setGoogleBusy(true);
     try {
-      await signInWithGoogle();
-      // Browser redirects to Google; session restores on return via AuthContext.
+      const res = await signInWithGoogle();
+      if (res?.success) {
+        showToast({
+          title: 'Google Sign-In Successful',
+          description: res.profile?.full_name ? `Welcome back, ${res.profile.full_name}!` : 'Signed in with Google successfully.',
+          variant: 'success',
+        });
+        if (typeof onSuccess === 'function') {
+          setTimeout(() => onSuccess(), 300);
+        }
+      }
     } catch (err) {
-      setError(authErrorMessage(err, view));
-      showToast({
-        title: 'Google Sign-In Failed',
-        description: authErrorMessage(err, view),
-        variant: 'error',
-      });
+      const msg = err?.message || '';
+      if (msg.startsWith('POPUP_BLOCKED:')) {
+        const directUrl = msg.replace('POPUP_BLOCKED:', '');
+        setGoogleBlockedUrl(directUrl);
+        setError('Google popup window was blocked by your browser. Please click the button below to continue:');
+      } else {
+        setError(authErrorMessage(err, view));
+        showToast({
+          title: 'Google Sign-In Failed',
+          description: authErrorMessage(err, view),
+          variant: 'error',
+        });
+      }
+    } finally {
       setGoogleBusy(false);
     }
   };
@@ -971,6 +990,23 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                       ? 'Continue with Google'
                       : 'Sign in with Google'}
                 </button>
+
+                {googleBlockedUrl && (
+                  <div className="p-3 bg-amber-50 dark:bg-amber-950/50 border border-amber-300 dark:border-amber-700/60 rounded-xl text-center space-y-2">
+                    <p className="text-xs text-amber-900 dark:text-amber-200 font-medium">
+                      Browser blocked popup. Click below to continue:
+                    </p>
+                    <a
+                      href={googleBlockedUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow transition-colors"
+                      onClick={() => setGoogleBusy(true)}
+                    >
+                      Open Google Sign-In Window
+                    </a>
+                  </div>
+                )}
 
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center" aria-hidden="true">

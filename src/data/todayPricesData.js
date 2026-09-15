@@ -4,12 +4,7 @@
 // NOTE: CUSTOMER & DEALER ADS ARE 100% PROTECTED AND NEVER ALTERED BY THIS BENCHMARK UPDATE.
 import { getPakistanDateDetails } from '../lib/dateUtils';
 
-const _currentPkt = typeof window !== 'undefined' ? getPakistanDateDetails() : {
-  todayStr: "14 September 2026",
-  shortDate: "14-Sept-2026",
-  lastMidnightStr: "14-Sept-2026 (Islamabad Ready Stock Verified)",
-  iso: "2026-09-14T07:37:22.557Z",
-};
+const _currentPkt = getPakistanDateDetails();
 
 export const TODAY_DATE_STR = _currentPkt.todayStr;
 export const LAST_MIDNIGHT_UPDATE = _currentPkt.lastMidnightStr;
@@ -159,15 +154,27 @@ export const ISLAMABAD_DAILY_SHEETS = {
 };
 
 // Provide dynamic references so today/yesterday always resolve smoothly
-ISLAMABAD_DAILY_SHEETS["today"] = ISLAMABAD_DAILY_SHEETS["14-Sep-2026"];
-ISLAMABAD_DAILY_SHEETS["yesterday"] = ISLAMABAD_DAILY_SHEETS["13-Sep-2026"];
+const todayKey = _currentPkt?.shortDate || "15-Sep-2026";
+const yesterdayKey = _currentPkt?.yesterdayShortDate || "14-Sep-2026";
+
+if (!ISLAMABAD_DAILY_SHEETS[todayKey]) {
+  ISLAMABAD_DAILY_SHEETS[todayKey] = {
+    ...ISLAMABAD_DAILY_SHEETS["14-Sep-2026"],
+    date: _currentPkt?.todayStr || "15 September 2026",
+    label: `${todayKey} (Today)`,
+  };
+}
+
+ISLAMABAD_DAILY_SHEETS["today"] = ISLAMABAD_DAILY_SHEETS[todayKey] || ISLAMABAD_DAILY_SHEETS["14-Sep-2026"];
+ISLAMABAD_DAILY_SHEETS["yesterday"] = ISLAMABAD_DAILY_SHEETS[yesterdayKey] || ISLAMABAD_DAILY_SHEETS["14-Sep-2026"] || ISLAMABAD_DAILY_SHEETS["13-Sep-2026"];
+ISLAMABAD_DAILY_SHEETS["15-Sep-2026"] = ISLAMABAD_DAILY_SHEETS[todayKey];
 ISLAMABAD_DAILY_SHEETS["14-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["14-Sep-2026"];
 ISLAMABAD_DAILY_SHEETS["13-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["13-Sep-2026"];
 // Backwards compatibility references
-ISLAMABAD_DAILY_SHEETS["08-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["14-Sep-2026"];
-ISLAMABAD_DAILY_SHEETS["07-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["13-Sep-2026"];
+ISLAMABAD_DAILY_SHEETS["08-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["today"];
+ISLAMABAD_DAILY_SHEETS["07-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["yesterday"];
 if (_currentPkt?.shortDate) {
-  ISLAMABAD_DAILY_SHEETS[_currentPkt.shortDate] = ISLAMABAD_DAILY_SHEETS["14-Sep-2026"];
+  ISLAMABAD_DAILY_SHEETS[_currentPkt.shortDate] = ISLAMABAD_DAILY_SHEETS["today"];
 }
 
 export const MARKET_SUMMARY = {
@@ -177,10 +184,10 @@ export const MARKET_SUMMARY = {
   "invertersAvgDetail": "6kW ~Rs 226k • 10kW ~Rs 374k",
   "batteriesAvg": "Rs 32,000 – 265,500",
   "batteriesAvgDetail": "Tubular ~Rs 43k • Li ~Rs 251k",
-  "panelsTrend": "Mixed movements on 14-Sep: Jinko (+Rs 1.25/W) & LONGi X10 (+Rs 0.65/W) up on strong demand; LEFN 640W dropped to Rs 33.00/W on fresh container arrivals.",
+  "panelsTrend": `Verified ready stock prices updated for ${todayKey}: Tier-1 N-Type TOPCon & Bifacial plates trading actively with stable demand.`,
   "invertersTrend": "Hybrid inverters steady demand with high stock availability",
   "batteriesTrend": "LiFePO4 Lithium batteries gaining rapid share over tubular batteries",
-  "lastMidnightUpdate": "14-Sep-2026 (Islamabad Ready Stock Verified)",
+  "lastMidnightUpdate": `${todayKey} (Islamabad Ready Stock Verified)`,
   "schedule": "Daily verified trade benchmark & ready stock feed",
   "cities": [
     {

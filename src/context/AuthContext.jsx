@@ -189,7 +189,7 @@ function hasRecoveryParams() {
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => typeof window !== 'undefined');
   const [passwordRecovery, setPasswordRecovery] = useState(() => hasRecoveryParams());
 
   const loadProfile = useCallback(async (userId, userEmail) => {

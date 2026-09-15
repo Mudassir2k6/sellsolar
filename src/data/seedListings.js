@@ -257,13 +257,15 @@ export const SEED_LISTINGS = [
 
 export function getLocalOrSeedListings(filters = {}) {
   let userCustomListings = [];
-  try {
-    const raw = localStorage.getItem('sellsolar_custom_listings');
-    if (raw) {
-      userCustomListings = JSON.parse(raw);
+  if (typeof window !== 'undefined') {
+    try {
+      const raw = localStorage.getItem('sellsolar_custom_listings');
+      if (raw) {
+        userCustomListings = JSON.parse(raw);
+      }
+    } catch (e) {
+      console.warn('Could not read user custom listings:', e);
     }
-  } catch (e) {
-    console.warn('Could not read user custom listings:', e);
   }
 
   const all = [...userCustomListings, ...SEED_LISTINGS];
@@ -290,13 +292,15 @@ export function getLocalOrSeedListings(filters = {}) {
 
 export function getLocalOrSeedListingById(id) {
   let userCustomListings = [];
-  try {
-    const raw = localStorage.getItem('sellsolar_custom_listings');
-    if (raw) {
-      userCustomListings = JSON.parse(raw);
+  if (typeof window !== 'undefined') {
+    try {
+      const raw = localStorage.getItem('sellsolar_custom_listings');
+      if (raw) {
+        userCustomListings = JSON.parse(raw);
+      }
+    } catch (e) {
+      console.warn('Could not read user custom listings:', e);
     }
-  } catch (e) {
-    console.warn('Could not read user custom listings:', e);
   }
 
   const all = [...userCustomListings, ...SEED_LISTINGS];

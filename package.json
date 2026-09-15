@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "next dev -p 3000 -H 0.0.0.0",
-    "build": "NODE_ENV=production next build && node scripts/sync-dist.js",
+    "build": "NODE_ENV=production next build && node scripts/sync-dist.mjs",
     "start": "next start -p 3000",
     "lint": "NODE_ENV=production next build",
     "update-prices": "node scripts/update-today-prices.js",

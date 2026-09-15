@@ -62,6 +62,8 @@ export async function generateMetadata({ params }) {
 
 export default async function CatchAllPage({ params }) {
   const resolved = await params;
+  const slugArray = resolved?.slug || [];
+  const pathname = slugArray.length > 0 ? `/${slugArray.join('/')}` : '/';
   const jsonLd = getGlobalJsonLd();
 
   return (
@@ -70,7 +72,11 @@ export default async function CatchAllPage({ params }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <SellSolarClient key={(resolved?.slug || []).join('/') || 'home'} />
+      <SellSolarClient
+        key={pathname}
+        initialPathname={pathname}
+        initialSlug={slugArray}
+      />
     </>
   );
 }

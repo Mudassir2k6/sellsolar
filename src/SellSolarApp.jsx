@@ -4652,15 +4652,38 @@ function _x({
       }
     }),jsx(cx,{})]
   })
-}export default function App(){
+}export default function App({ initialPathname, initialSlug }){
   const {
     user: t, profile: e, loading: r, passwordRecovery: pr
   } = useAuth();
   
-  const initialLoc = typeof window !== 'undefined' ? parseLocation(window.location.pathname, window.location.hash) : { page: 'home', listingId: null };
+  const getInitialLocation = () => {
+    if (typeof window !== 'undefined') {
+      return parseLocation(window.location.pathname, window.location.hash);
+    }
+    if (initialPathname) {
+      return parseLocation(initialPathname, '');
+    }
+    if (initialSlug && initialSlug.length > 0) {
+      return parseLocation(`/${initialSlug.join('/')}`, '');
+    }
+    return { page: 'home', listingId: null };
+  };
+
+  const initialLoc = getInitialLocation();
   const [n, s] = useState(initialLoc.page || "home");
   const [a, l] = useState(initialLoc.listingId || null);
   const [searchFilters, setSearchFilters] = useState(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const loc = parseLocation(window.location.pathname, window.location.hash);
+      if (loc.page && loc.page !== n) {
+        s(loc.page);
+        if (loc.listingId) l(loc.listingId);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     applyPageSeo(n, { listingId: a });
@@ -4719,7 +4742,8 @@ function _x({
     }, 150);
   };
 
-  const pageContent = r ? jsx("div", {
+  const isAuthProtectedPage = n === "dashboard" || n === "admin-dashboard" || n === "post-ad";
+  const pageContent = (r && isAuthProtectedPage) ? jsx("div", {
     className: "flex min-h-screen items-center justify-center bg-white dark:bg-gray-950", children: jsx("div", {
       className: "flex h-12 w-12 animate-spin rounded-full border-4 border-primary-200 dark:border-primary-800 border-t-primary-500"
     })

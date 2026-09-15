@@ -191,8 +191,8 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
   const displayedSheetRates = useMemo(() => {
     const isYesterday = dailySheetDate === 'yesterday';
     const sheet = isYesterday
-      ? (ISLAMABAD_DAILY_SHEETS['yesterday'] || ISLAMABAD_DAILY_SHEETS['13-Sep-2026'])
-      : (ISLAMABAD_DAILY_SHEETS['today'] || ISLAMABAD_DAILY_SHEETS['14-Sep-2026']);
+      ? (ISLAMABAD_DAILY_SHEETS['yesterday'] || ISLAMABAD_DAILY_SHEETS[yesterdayDateLabel] || ISLAMABAD_DAILY_SHEETS['14-Sep-2026'] || ISLAMABAD_DAILY_SHEETS['13-Sep-2026'])
+      : (ISLAMABAD_DAILY_SHEETS['today'] || ISLAMABAD_DAILY_SHEETS[todayDateLabel] || ISLAMABAD_DAILY_SHEETS['15-Sep-2026'] || ISLAMABAD_DAILY_SHEETS['14-Sep-2026']);
 
     let activeData = [];
     if (sheetCategory === 'inverter') {
@@ -569,7 +569,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
               <button
                 onClick={() => setDailySheetDate('today')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  dailySheetDate === 'today' || dailySheetDate === '14-Sep-2026'
+                  dailySheetDate === 'today' || dailySheetDate === todayDateLabel
                     ? 'bg-primary-600 text-white shadow-sm'
                     : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                 }`}
@@ -579,7 +579,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
               <button
                 onClick={() => setDailySheetDate('yesterday')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  dailySheetDate === 'yesterday' || dailySheetDate === '13-Sep-2026'
+                  dailySheetDate === 'yesterday' || dailySheetDate === yesterdayDateLabel
                     ? 'bg-primary-600 text-white shadow-sm'
                     : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                 }`}

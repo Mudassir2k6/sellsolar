@@ -296,6 +296,8 @@ export function parseLocation(pathname = '/', hash = '') {
     '/load-calculator': 'calculator',
     '/dealers': 'dealers',
     '/install': 'install',
+    '/installation': 'install',
+    '/request-installation': 'install',
     '/login': 'login',
     '/auth': 'login',
     '/auth/callback': 'home',

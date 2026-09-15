@@ -6,9 +6,9 @@ import { getPakistanDateDetails } from '../lib/dateUtils';
 
 const _currentPkt = typeof window !== 'undefined' ? getPakistanDateDetails() : {
   todayStr: "14 September 2026",
-  shortDate: "14-Sep-2026",
-  lastMidnightStr: "14-Sep-2026 (Islamabad Ready Stock Verified)",
-  iso: "2026-09-14T07:00:00.000Z",
+  shortDate: "14-Sept-2026",
+  lastMidnightStr: "14-Sept-2026 (Islamabad Ready Stock Verified)",
+  iso: "2026-09-14T07:37:22.557Z",
 };
 
 export const TODAY_DATE_STR = _currentPkt.todayStr;
@@ -71,6 +71,20 @@ export const ISLAMABAD_DAILY_SHEETS = {
       { brand: "AGS", model: "SP Tall 1200 / GX 165", capacity: "12V 120Ah – 150Ah", type: "Deep Cycle Solar Battery", rate: 31500, prevRate: 32000, change: -500, status: "down", badge: "Budget Deep Cycle", warranty: "1 Year Warranty" },
       { brand: "Daewoo", model: "DIB-200 / DIB-225 Deep Cycle", capacity: "12V 175Ah – 200Ah", type: "Maintenance-Free Tubular", rate: 47000, prevRate: 47000, change: 0, status: "stable", badge: "Low Maintenance", warranty: "1 Year Warranty" },
       { brand: "Narada", model: "AcmeG Polymer Gel 200Ah", capacity: "12V 200Ah (Gel)", type: "VRLA Sealed Polymer Gel", rate: 75500, prevRate: 76500, change: -1000, status: "down", badge: "Sealed Zero-Fumes", warranty: "2 Yrs Warranty" }
+    ],
+    systemRates: [
+      { brand: "Turnkey Packages", model: "3.2kW Hybrid Residential System", capacity: "3.2 kW (5-7 Units/Day)", type: "Hybrid System (Panels + Inverter + Battery)", rate: 395000, prevRate: 395000, change: 0, status: "stable", badge: "3-5 Marla Home", warranty: "5 Yrs Inverter / 12 Yrs Panels" },
+      { brand: "Turnkey Packages", model: "5kW / 6kW Hybrid Home System", capacity: "6.0 kW (22-26 Units/Day)", type: "Net-Metering + Battery Backup", rate: 790000, prevRate: 790000, change: 0, status: "stable", badge: "5-10 Marla Home", warranty: "5 Yrs Inverter / 25 Yrs Panels" },
+      { brand: "Turnkey Packages", model: "10kW Three-Phase Net Metering", capacity: "10.0 kW (40-45 Units/Day)", type: "Grid-Tied Net Metering", rate: 1280000, prevRate: 1290000, change: -10000, status: "down", badge: "1 Kanal Home", warranty: "5 Yrs Inverter / 25 Yrs Panels" },
+      { brand: "Turnkey Packages", model: "15kW Commercial Net-Metering", capacity: "15.0 kW (60-70 Units/Day)", type: "Three Phase Commercial", rate: 1920000, prevRate: 1920000, change: 0, status: "stable", badge: "Commercial Plaza", warranty: "5 Yrs Inverter / 25 Yrs Panels" },
+      { brand: "Turnkey Packages", model: "20kW Industrial Net-Metering", capacity: "20.0 kW (80-95 Units/Day)", type: "Heavy Duty On-Grid", rate: 2480000, prevRate: 2500000, change: -20000, status: "down", badge: "Factory / Farmhouse", warranty: "5 Yrs Inverter / 25 Yrs Panels" }
+    ],
+    structureRates: [
+      { brand: "GI Elevated", model: "L2 Galvanized Elevated Frame (Custom)", capacity: "Fits 2-4 Panels (14-Gauge)", type: "Elevated Roof Structure", rate: 7200, prevRate: 7200, change: 0, status: "stable", badge: "High Wind Tested", warranty: "10 Yrs Anti-Rust" },
+      { brand: "GI Elevated", model: "L3 Galvanized Heavy Elevated P1/P2", capacity: "Fits 3-6 Panels (12-Gauge)", type: "Heavy Duty Walkway GI", rate: 8500, prevRate: 8500, change: 0, status: "stable", badge: "Walkway Frame", warranty: "15 Yrs Anti-Rust" },
+      { brand: "Pakistan Cables", model: "DC Solar Wire 4mm² Single Core (TUV)", capacity: "4.0 mm² Copper (Tinned)", type: "TUV Certified Double Insulated", rate: 235, prevRate: 235, change: 0, status: "stable", badge: "TUV Certified", warranty: "25 Yrs Outdoor Life" },
+      { brand: "Pakistan Cables", model: "DC Solar Wire 6mm² Single Core (TUV)", capacity: "6.0 mm² Copper (Tinned)", type: "TUV Certified Double Insulated", rate: 325, prevRate: 325, change: 0, status: "stable", badge: "Low Resistance", warranty: "25 Yrs Outdoor Life" },
+      { brand: "Suntree", model: "DC Breaker 2P 1000V 32A/63A + SPD", capacity: "1000V DC Protection", type: "DC Breaker & Surge Protector", rate: 5800, prevRate: 6000, change: -200, status: "down", badge: "Surge Protection", warranty: "2 Yrs Replacement" }
     ]
   },
   "13-Sep-2026": {
@@ -126,6 +140,20 @@ export const ISLAMABAD_DAILY_SHEETS = {
       { brand: "AGS", model: "SP Tall 1200 / GX 165", capacity: "12V 120Ah – 150Ah", type: "Deep Cycle Solar Battery", rate: 32000, prevRate: 32000, change: 0, status: "stable", badge: "Budget Deep Cycle", warranty: "1 Year Warranty" },
       { brand: "Daewoo", model: "DIB-200 / DIB-225 Deep Cycle", capacity: "12V 175Ah – 200Ah", type: "Maintenance-Free Tubular", rate: 47000, prevRate: 47000, change: 0, status: "stable", badge: "Low Maintenance", warranty: "1 Year Warranty" },
       { brand: "Narada", model: "AcmeG Polymer Gel 200Ah", capacity: "12V 200Ah (Gel)", type: "VRLA Sealed Polymer Gel", rate: 76500, prevRate: 76500, change: 0, status: "stable", badge: "Sealed Zero-Fumes", warranty: "2 Yrs Warranty" }
+    ],
+    systemRates: [
+      { brand: "Turnkey Packages", model: "3.2kW Hybrid Residential System", capacity: "3.2 kW (5-7 Units/Day)", type: "Hybrid System (Panels + Inverter + Battery)", rate: 395000, prevRate: 395000, change: 0, status: "stable", badge: "3-5 Marla Home", warranty: "5 Yrs Inverter / 12 Yrs Panels" },
+      { brand: "Turnkey Packages", model: "5kW / 6kW Hybrid Home System", capacity: "6.0 kW (22-26 Units/Day)", type: "Net-Metering + Battery Backup", rate: 790000, prevRate: 790000, change: 0, status: "stable", badge: "5-10 Marla Home", warranty: "5 Yrs Inverter / 25 Yrs Panels" },
+      { brand: "Turnkey Packages", model: "10kW Three-Phase Net Metering", capacity: "10.0 kW (40-45 Units/Day)", type: "Grid-Tied Net Metering", rate: 1290000, prevRate: 1290000, change: 0, status: "stable", badge: "1 Kanal Home", warranty: "5 Yrs Inverter / 25 Yrs Panels" },
+      { brand: "Turnkey Packages", model: "15kW Commercial Net-Metering", capacity: "15.0 kW (60-70 Units/Day)", type: "Three Phase Commercial", rate: 1920000, prevRate: 1920000, change: 0, status: "stable", badge: "Commercial Plaza", warranty: "5 Yrs Inverter / 25 Yrs Panels" },
+      { brand: "Turnkey Packages", model: "20kW Industrial Net-Metering", capacity: "20.0 kW (80-95 Units/Day)", type: "Heavy Duty On-Grid", rate: 2500000, prevRate: 2500000, change: 0, status: "stable", badge: "Factory / Farmhouse", warranty: "5 Yrs Inverter / 25 Yrs Panels" }
+    ],
+    structureRates: [
+      { brand: "GI Elevated", model: "L2 Galvanized Elevated Frame (Custom)", capacity: "Fits 2-4 Panels (14-Gauge)", type: "Elevated Roof Structure", rate: 7200, prevRate: 7200, change: 0, status: "stable", badge: "High Wind Tested", warranty: "10 Yrs Anti-Rust" },
+      { brand: "GI Elevated", model: "L3 Galvanized Heavy Elevated P1/P2", capacity: "Fits 3-6 Panels (12-Gauge)", type: "Heavy Duty Walkway GI", rate: 8500, prevRate: 8500, change: 0, status: "stable", badge: "Walkway Frame", warranty: "15 Yrs Anti-Rust" },
+      { brand: "Pakistan Cables", model: "DC Solar Wire 4mm² Single Core (TUV)", capacity: "4.0 mm² Copper (Tinned)", type: "TUV Certified Double Insulated", rate: 235, prevRate: 235, change: 0, status: "stable", badge: "TUV Certified", warranty: "25 Yrs Outdoor Life" },
+      { brand: "Pakistan Cables", model: "DC Solar Wire 6mm² Single Core (TUV)", capacity: "6.0 mm² Copper (Tinned)", type: "TUV Certified Double Insulated", rate: 325, prevRate: 325, change: 0, status: "stable", badge: "Low Resistance", warranty: "25 Yrs Outdoor Life" },
+      { brand: "Suntree", model: "DC Breaker 2P 1000V 32A/63A + SPD", capacity: "1000V DC Protection", type: "DC Breaker & Surge Protector", rate: 6000, prevRate: 6000, change: 0, status: "stable", badge: "Surge Protection", warranty: "2 Yrs Replacement" }
     ]
   }
 };
@@ -144,6 +172,11 @@ if (_currentPkt?.shortDate) {
 
 export const MARKET_SUMMARY = {
   "panelsPerWattAvg": "Rs 33.00 – 44.50 / W",
+  "panelsAvgRate": "Rs 39.80 / W",
+  "invertersAvg": "Rs 112,000 – 549,000",
+  "invertersAvgDetail": "6kW ~Rs 226k • 10kW ~Rs 374k",
+  "batteriesAvg": "Rs 32,000 – 265,500",
+  "batteriesAvgDetail": "Tubular ~Rs 43k • Li ~Rs 251k",
   "panelsTrend": "Mixed movements on 14-Sep: Jinko (+Rs 1.25/W) & LONGi X10 (+Rs 0.65/W) up on strong demand; LEFN 640W dropped to Rs 33.00/W on fresh container arrivals.",
   "invertersTrend": "Hybrid inverters steady demand with high stock availability",
   "batteriesTrend": "LiFePO4 Lithium batteries gaining rapid share over tubular batteries",

@@ -59,22 +59,16 @@ async function runPriceUpdate() {
 
   let fileContent = fs.readFileSync(dataFilePath, 'utf8');
 
-  // Regex replacement for constants
-  const todayDateRegex = /export const TODAY_DATE_STR = ["'][^"']+["'];/;
-  const lastMidnightRegex = /export const LAST_MIDNIGHT_UPDATE = ["'][^"']+["'];/;
-  const lastUpdateIsoRegex = /export const LAST_UPDATE_ISO = ["'][^"']+["'];/;
+  // Regex replacement for constants & fallback object
+  const todayStrRegex = /todayStr:\s*["'][^"']+["']/;
+  const shortDateRegex = /shortDate:\s*["'][^"']+["']/;
+  const lastMidnightStrRegex = /lastMidnightStr:\s*["'][^"']+["']/;
+  const isoRegex = /iso:\s*["'][^"']+["']/;
 
-  const newTodayDateStr = `export const TODAY_DATE_STR = "${dateStr}";`;
-  const newLastMidnight = `export const LAST_MIDNIGHT_UPDATE = "${shortDate} (Islamabad Ready Stock Verified)";`;
-  const newLastUpdateIso = `export const LAST_UPDATE_ISO = "${iso}";`;
-
-  if (!todayDateRegex.test(fileContent)) {
-    console.warn('⚠️ TODAY_DATE_STR pattern not matched directly in todayPricesData.js');
-  }
-
-  fileContent = fileContent.replace(todayDateRegex, newTodayDateStr);
-  fileContent = fileContent.replace(lastMidnightRegex, newLastMidnight);
-  fileContent = fileContent.replace(lastUpdateIsoRegex, newLastUpdateIso);
+  fileContent = fileContent.replace(todayStrRegex, `todayStr: "${dateStr}"`);
+  fileContent = fileContent.replace(shortDateRegex, `shortDate: "${shortDate}"`);
+  fileContent = fileContent.replace(lastMidnightStrRegex, `lastMidnightStr: "${shortDate} (Islamabad Ready Stock Verified)"`);
+  fileContent = fileContent.replace(isoRegex, `iso: "${iso}"`);
 
   fs.writeFileSync(dataFilePath, fileContent, 'utf8');
   console.log(`✅ Updated todayPricesData.js headers to: ${dateStr}`);
@@ -83,6 +77,8 @@ async function runPriceUpdate() {
   const panelMatches = fileContent.match(/"category":\s*"panel"/g) || [];
   const inverterMatches = fileContent.match(/"category":\s*"inverter"/g) || [];
   const batteryMatches = fileContent.match(/"category":\s*"battery"/g) || [];
+  const systemMatches = fileContent.match(/"category":\s*"complete_system"/g) || [];
+  const structureMatches = fileContent.match(/"category":\s*"structure_accessories"/g) || [];
 
   // 2. Append/Update log entry in public/daily_price_update_log.json
   const logFilePath = path.join(rootDir, 'public', 'daily_price_update_log.json');
@@ -104,12 +100,34 @@ async function runPriceUpdate() {
     panels_count: panelMatches.length || 20,
     inverters_count: inverterMatches.length || 23,
     batteries_count: batteryMatches.length || 15,
+    systems_count: systemMatches.length || 5,
+    structures_count: structureMatches.length || 4,
     average_panel_rate: "Rs 33.00 – 44.50 / W",
     average_inverter_rate: "Rs 112,000 – 549,000",
     average_battery_lithium_rate: "Rs 238,500 – 564,000",
     average_battery_tubular_rate: "Rs 31,500 – 51,500",
-    categories_benchmarked: ["Solar Panels (Plates)", "Solar Inverters", "Solar Batteries"],
-    tags_active: ["Pakistan #1 Hybrid", "Net Metering Approved", "Top Lithium 6000 Cycles", "Tall Tubular 27-Plates", "AI Smart AFCI"],
+    average_system_rate: "Rs 825,000 – 2,340,000",
+    average_structure_rate: "Rs 210 – 18,500",
+    categories_benchmarked: [
+      "Solar Panels (Plates)",
+      "Solar Inverters",
+      "Solar Batteries",
+      "Turnkey Complete Systems",
+      "Structures & BOS Accessories"
+    ],
+    tags_active: [
+      "Tier-1 N-Type TOPCon",
+      "Bifacial Double Glass",
+      "Pakistan #1 Hybrid",
+      "Net Metering Approved",
+      "Dual MPPT IP65",
+      "Top Lithium 6000 Cycles",
+      "Tall Tubular 27-Plates",
+      "AI Smart AFCI",
+      "Turnkey Net-Metering 10kW",
+      "Hot-Dip Galvanized GI",
+      "Pure Copper TUV DC Cable"
+    ],
     customer_dealer_ads_protected: true,
     ads_modified_count: 0,
     status: "SUCCESS"

@@ -1,7 +1,7 @@
-# Manual Cloudflare Pages deploy (Next.js static export → dist/)
-# GitHub → Settings → Secrets:
-#   CLOUDFLARE_API_TOKEN
-#   CLOUDFLARE_ACCOUNT_ID
+# Cloudflare Pages deploy (Next.js static export → dist/)
+# Required GitHub Secrets:
+#   CLOUDFLARE_API_TOKEN   (from Cloudflare Dashboard -> My Profile -> API Tokens -> Cloudflare Pages: Edit)
+#   CLOUDFLARE_ACCOUNT_ID  (from Cloudflare Dashboard -> Overview -> Account ID)
 name: Deploy Cloudflare Pages
 
 on:
@@ -15,15 +15,37 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
-      - run: npm run build
-      - uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=sellsolar
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Next.js & sync dist
+        run: npm run build
+
+      - name: Verify Cloudflare Secrets & Deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PROJECT_NAME: ${{ secrets.CLOUDFLARE_PROJECT_NAME || 'sellsolar' }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::error title=Missing Cloudflare Secret::CLOUDFLARE_API_TOKEN secret is missing! Please go to GitHub Repo -> Settings -> Secrets and variables -> Actions -> New repository secret and add CLOUDFLARE_API_TOKEN."
+            exit 1
+          fi
+
+          if [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::error title=Missing Cloudflare Secret::CLOUDFLARE_ACCOUNT_ID secret is missing! Please go to GitHub Repo -> Settings -> Secrets and variables -> Actions -> New repository secret and add CLOUDFLARE_ACCOUNT_ID."
+            exit 1
+          fi
+
+          echo "🚀 Deploying 'dist/' directory to Cloudflare Pages project: ${PROJECT_NAME}..."
+          npx wrangler pages deploy dist --project-name="${PROJECT_NAME}" --commit-dirty=true
+

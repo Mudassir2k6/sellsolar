@@ -117,6 +117,18 @@ async function run() {
     fs.appendFileSync(process.env.GITHUB_ENV, `TARGET_PROJECT_NAME=${targetProject}\n`);
   }
 
+  // Write to public/cf-status.json
+  try {
+    const debugLog = {
+      timestamp: new Date().toISOString(),
+      targetProject,
+      summaryNotes,
+    };
+    fs.writeFileSync('public/cf-status.json', JSON.stringify(debugLog, null, 2));
+  } catch (logErr) {
+    console.log('[cf-helper] Error writing cf-status.json:', logErr.message);
+  }
+
   // Append summary to GITHUB_STEP_SUMMARY if available
   if (process.env.GITHUB_STEP_SUMMARY) {
     const summaryMd = `### 🛰️ Cloudflare Deployment Diagnosis

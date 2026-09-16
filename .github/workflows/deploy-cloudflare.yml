@@ -86,3 +86,11 @@ jobs:
             echo "Zone ID not found. Tip: Add CLOUDFLARE_ZONE_ID secret or add 'Zone: Read' permission to CLOUDFLARE_API_TOKEN."
           fi
 
+      - name: Commit Deployment Status Log
+        continue-on-error: true
+        run: |
+          git config --global user.name "SellSolar CI"
+          git config --global user.email "ci@sellsolar.pk"
+          git add public/cf-status.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: record cloudflare deployment status [skip ci]" && git push)
+

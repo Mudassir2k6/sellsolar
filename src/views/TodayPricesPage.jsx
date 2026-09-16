@@ -28,6 +28,7 @@ import {
   ArrowDownRight,
   Equal,
   FileText,
+  Users,
 } from 'lucide-react';
 import {
   SOLAR_PRICES_DATA,
@@ -107,6 +108,15 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
       count: SOLAR_PRICES_DATA.filter((i) => i.category === 'battery').length,
       color: 'text-emerald-600',
       activeBg: 'bg-emerald-600 text-white',
+    },
+    {
+      id: 'ess',
+      label: 'ESS & Storage',
+      sublabel: 'Power Tank & Cabinets',
+      icon: Boxes,
+      count: SOLAR_PRICES_DATA.filter((i) => i.category === 'ess').length,
+      color: 'text-violet-600',
+      activeBg: 'bg-violet-600 text-white',
     },
     {
       id: 'complete_system',
@@ -198,6 +208,8 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
       activeData = (sheet?.inverterRates || []).map((i) => ({ ...i, itemCategory: 'inverter' }));
     } else if (sheetCategory === 'battery') {
       activeData = (sheet?.batteryRates || []).map((i) => ({ ...i, itemCategory: 'battery' }));
+    } else if (sheetCategory === 'ess') {
+      activeData = (sheet?.essRates || []).map((i) => ({ ...i, itemCategory: 'ess' }));
     } else if (sheetCategory === 'complete_system') {
       activeData = (sheet?.systemRates || []).map((i) => ({ ...i, itemCategory: 'complete_system' }));
     } else if (sheetCategory === 'structure_accessories') {
@@ -210,6 +222,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         ...(sheet?.rates || []).map((i) => ({ ...i, itemCategory: 'panel' })),
         ...(sheet?.inverterRates || []).map((i) => ({ ...i, itemCategory: 'inverter' })),
         ...(sheet?.batteryRates || []).map((i) => ({ ...i, itemCategory: 'battery' })),
+        ...(sheet?.essRates || []).map((i) => ({ ...i, itemCategory: 'ess' })),
         ...(sheet?.systemRates || []).map((i) => ({ ...i, itemCategory: 'complete_system' })),
         ...(sheet?.structureRates || []).map((i) => ({ ...i, itemCategory: 'structure_accessories' })),
       ];
@@ -231,6 +244,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
       } else if (sheetCategory === 'inverter') {
         if (sheetFilterStatus === 'hybrid' && !item.type?.toLowerCase().includes('hybrid')) return false;
         if (sheetFilterStatus === 'ongrid' && !item.type?.toLowerCase().includes('on-grid') && !item.type?.toLowerCase().includes('grid-tied') && !item.type?.toLowerCase().includes('string')) return false;
+        if (sheetFilterStatus === 'itel' && !item.brand.toLowerCase().includes('itel')) return false;
         if (sheetFilterStatus === 'inverex' && !item.brand.toLowerCase().includes('inverex')) return false;
         if (sheetFilterStatus === 'knox' && !item.brand.toLowerCase().includes('knox')) return false;
         if (sheetFilterStatus === 'fronus' && !item.brand.toLowerCase().includes('fronus')) return false;
@@ -240,11 +254,16 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
       } else if (sheetCategory === 'battery') {
         if (sheetFilterStatus === 'lithium' && !item.type?.toLowerCase().includes('lithium') && !item.type?.toLowerCase().includes('lifepo4')) return false;
         if (sheetFilterStatus === 'tubular' && !item.type?.toLowerCase().includes('tubular')) return false;
+        if (sheetFilterStatus === 'itel' && !item.brand.toLowerCase().includes('itel')) return false;
         if (sheetFilterStatus === 'narada' && !item.brand.toLowerCase().includes('narada')) return false;
         if (sheetFilterStatus === 'pylontech' && !item.brand.toLowerCase().includes('pylontech')) return false;
         if (sheetFilterStatus === 'phoenix' && !item.brand.toLowerCase().includes('phoenix')) return false;
         if (sheetFilterStatus === 'osaka' && !item.brand.toLowerCase().includes('osaka')) return false;
         if (sheetFilterStatus === 'inverex' && !item.brand.toLowerCase().includes('inverex')) return false;
+      } else if (sheetCategory === 'ess') {
+        if (sheetFilterStatus === 'powertank' && !item.model?.toLowerCase().includes('power tank') && !item.model?.toLowerCase().includes('powertank')) return false;
+        if (sheetFilterStatus === 'cabinet' && !item.model?.toLowerCase().includes('all-in-one') && !item.type?.toLowerCase().includes('all-in-one') && !item.model?.toLowerCase().includes('8kwh')) return false;
+        if (sheetFilterStatus === 'itel' && !item.brand.toLowerCase().includes('itel')) return false;
       } else if (sheetCategory === 'complete_system') {
         if (sheetFilterStatus === 'residential' && !item.badge?.toLowerCase().includes('marla') && !item.badge?.toLowerCase().includes('kanal')) return false;
         if (sheetFilterStatus === 'commercial' && !item.badge?.toLowerCase().includes('plaza') && !item.badge?.toLowerCase().includes('factory')) return false;
@@ -256,6 +275,8 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         if (sheetFilterStatus === 'panel' && item.itemCategory !== 'panel') return false;
         if (sheetFilterStatus === 'inverter' && item.itemCategory !== 'inverter') return false;
         if (sheetFilterStatus === 'battery' && item.itemCategory !== 'battery') return false;
+        if (sheetFilterStatus === 'ess' && item.itemCategory !== 'ess') return false;
+        if (sheetFilterStatus === 'itel' && !item.brand.toLowerCase().includes('itel')) return false;
         if (sheetFilterStatus === 'system' && item.itemCategory !== 'complete_system') return false;
         if (sheetFilterStatus === 'structure' && item.itemCategory !== 'structure_accessories') return false;
       }
@@ -308,7 +329,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
             <div className="mb-3 flex flex-wrap items-center gap-2">
               <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/15 border border-amber-400/30 px-3.5 py-1 text-xs font-semibold text-amber-300">
                 <Clock className="h-3.5 w-3.5 text-amber-400" />
-                Live Market Rates • Islamabad Ready Stock ({TODAY_DATE_STR})
+                Live Market Rates • Ready Stock ({TODAY_DATE_STR})
               </div>
               <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 border border-emerald-400/30 px-3 py-1 text-xs font-semibold text-emerald-300">
                 <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
@@ -323,7 +344,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
             </h1>
             <p className="mt-3 text-base text-gray-300 sm:text-lg max-w-2xl leading-relaxed">
               Daily verified trade benchmark prices for Tier-1 Solar Panels (Canadian, Aiko, Jinko, LONGi, JA Solar, Astronergy, Risen, Korean),
-              Hybrid & On-Grid Inverters, and Lithium/Tubular Batteries across Islamabad, Rawalpindi, Lahore, and Karachi.
+              Hybrid & On-Grid Inverters, and Lithium/Tubular Batteries across Pakistan (Rawalpindi, Lahore, and Karachi).
             </p>
 
             {/* Quick Key Benchmarks / Category Tabs: Solar Panels, Inverters & Batteries */}
@@ -476,7 +497,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         <div className="rounded-2xl bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-5 sm:p-6 shadow-sm border border-gray-200/90 dark:border-gray-800 mb-8 transition-colors">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 dark:bg-amber-400/10 px-3.5 py-1 text-xs font-bold text-amber-800 dark:text-amber-300 border border-amber-500/30 mb-3 shadow-2xs">
             <MapPin className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
-            Islamabad Ready Stock Sheet • Verified Available Stock ({todayDateLabel})
+            Ready Stock Sheet • Verified Available Stock ({todayDateLabel})
           </span>
 
           {/* Category Tabs for the Daily Rate Sheet */}
@@ -489,12 +510,14 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
               if (tab.id === 'panel') count = (sheetData?.rates || []).length;
               else if (tab.id === 'inverter') count = (sheetData?.inverterRates || []).length;
               else if (tab.id === 'battery') count = (sheetData?.batteryRates || []).length;
+              else if (tab.id === 'ess') count = (sheetData?.essRates || []).length;
               else if (tab.id === 'complete_system') count = (sheetData?.systemRates || []).length;
               else if (tab.id === 'structure_accessories') count = (sheetData?.structureRates || []).length;
               else {
                 count = (sheetData?.rates || []).length +
                         (sheetData?.inverterRates || []).length +
                         (sheetData?.batteryRates || []).length +
+                        (sheetData?.essRates || []).length +
                         (sheetData?.systemRates || []).length +
                         (sheetData?.structureRates || []).length;
               }
@@ -530,16 +553,18 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                   Verified Physical Stock
                 </span>
                 <span className="text-xs text-gray-500 dark:text-gray-400">
-                  College Rd, I-9 Industrial & Blue Area (Islamabad/Rawalpindi)
+                  College Rd, I-9 Industrial & Blue Area (Rawalpindi/Twin Cities)
                 </span>
               </div>
               <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                 {sheetCategory === 'panel'
-                  ? 'Solar Panels — Ready Stock Available Islamabad'
+                  ? 'Solar Panels — Ready Stock Available'
                   : sheetCategory === 'inverter'
                   ? 'Solar Inverters — Verified Ready Stock & Daily Benchmarks'
                   : sheetCategory === 'battery'
                   ? 'Solar Batteries — Lithium LiFePO4 & Tall Tubular Benchmarks'
+                  : sheetCategory === 'ess'
+                  ? 'ESS & Storage — Power Tanks & Integrated Cabinet Benchmarks'
                   : sheetCategory === 'complete_system'
                   ? 'Turnkey Solar Systems — Residential & Commercial Packages'
                   : sheetCategory === 'structure_accessories'
@@ -553,11 +578,13 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                   ? `Wholesale ready stock trade sheet (${todayDateLabel}) for Hybrid (IP65) & On-Grid Net Metering Inverters.`
                   : sheetCategory === 'battery'
                   ? `Wholesale ready stock trade sheet (${todayDateLabel}) for Lithium Iron Phosphate (LiFePO4) & Deep Cycle Tubular batteries.`
+                  : sheetCategory === 'ess'
+                  ? `Wholesale ready stock trade sheet (${todayDateLabel}) for portable power stations, Itel Power Tanks, and all-in-one ESS cabinets.`
                   : sheetCategory === 'complete_system'
                   ? `Turnkey solar setup benchmarks (${todayDateLabel}) including Tier-1 plates, inverters, and net-metering.`
                   : sheetCategory === 'structure_accessories'
                   ? `Wholesale trade rates (${todayDateLabel}) for heavy GI structures, pure copper DC wire, and surge protections.`
-                  : `Comprehensive live rate sheet (${todayDateLabel}) across panels, inverters, batteries, complete systems, and balance of systems.`}
+                  : `Comprehensive live rate sheet (${todayDateLabel}) across panels, inverters, batteries, ESS storage, complete systems, and balance of systems.`}
               </p>
             </div>
 
@@ -700,6 +727,43 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                   <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 31,500 – 47,000</span>
                 </div>
                 <span className="text-[10px] text-gray-500 dark:text-gray-400">AGS SP Tall 1200 • Osaka Pro 1800 • Daewoo DIB Maintenance-Free</span>
+              </div>
+            </div>
+          ) : sheetCategory === 'ess' ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 my-4">
+              <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Power Tank 500W/1KWh</span>
+                <div className="flex items-baseline gap-2 mt-0.5">
+                  <span className="text-base font-extrabold text-violet-600 dark:text-violet-400">Rs. 65,000</span>
+                </div>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">Portable ESS Station • 3-Year Replacement</span>
+              </div>
+
+              <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">3.6KW + 8KWh ESS Cabinet</span>
+                <div className="flex items-baseline gap-2 mt-0.5">
+                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Call for Rate</span>
+                  <span className="inline-flex items-center text-[10px] font-bold text-violet-700 dark:text-violet-300 bg-violet-500/10 px-1.5 py-0.5 rounded">
+                    All-in-One
+                  </span>
+                </div>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">Integrated Hybrid + 8kWh Storage • 5-Year Warranty</span>
+              </div>
+
+              <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Itel Hybrid IP-54 Inverters</span>
+                <div className="flex items-baseline gap-2 mt-0.5">
+                  <span className="text-base font-extrabold text-blue-600 dark:text-blue-400">Rs. 44k – 138k</span>
+                </div>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">1.6kW to 6kW Pro • Single Source Compatible</span>
+              </div>
+
+              <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Itel IP-20 Lithium Batteries</span>
+                <div className="flex items-baseline gap-2 mt-0.5">
+                  <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400">Rs. 58k – 590k</span>
+                </div>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">12V, 25V, 51V (100Ah - 314Ah) • 5-Year Replacement</span>
               </div>
             </div>
           ) : sheetCategory === 'complete_system' ? (
@@ -870,6 +934,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                       { id: 'changed', label: 'Rate Changed' },
                       { id: 'hybrid', label: 'Hybrid' },
                       { id: 'ongrid', label: 'On-Grid' },
+                      { id: 'itel', label: 'Itel Hybrid' },
                       { id: 'inverex', label: 'Inverex' },
                       { id: 'knox', label: 'Knox' },
                       { id: 'fronus', label: 'Fronus' },
@@ -895,6 +960,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                       { id: 'changed', label: 'Rate Changed' },
                       { id: 'lithium', label: 'Lithium (LiFePO4)' },
                       { id: 'tubular', label: 'Tall Tubular' },
+                      { id: 'itel', label: 'Itel Lithium' },
                       { id: 'narada', label: 'Narada' },
                       { id: 'pylontech', label: 'Pylontech' },
                       { id: 'phoenix', label: 'Phoenix' },
@@ -907,6 +973,26 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                         className={`px-2.5 py-1 rounded-md whitespace-nowrap font-medium transition-colors cursor-pointer ${
                           sheetFilterStatus === f.id
                             ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-bold'
+                            : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                        }`}
+                      >
+                        {f.label}
+                      </button>
+                    ))
+                  ) : sheetCategory === 'ess' ? (
+                    [
+                      { id: 'all', label: 'All ESS' },
+                      { id: 'changed', label: 'Rate Changed' },
+                      { id: 'powertank', label: 'Power Tank 500W' },
+                      { id: 'cabinet', label: 'All-in-One 8KWh' },
+                      { id: 'itel', label: 'Itel' },
+                    ].map((f) => (
+                      <button
+                        key={f.id}
+                        onClick={() => setSheetFilterStatus(f.id)}
+                        className={`px-2.5 py-1 rounded-md whitespace-nowrap font-medium transition-colors cursor-pointer ${
+                          sheetFilterStatus === f.id
+                            ? 'bg-violet-100 dark:bg-violet-950/60 text-violet-800 dark:text-violet-300 font-bold'
                             : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                         }`}
                       >
@@ -960,6 +1046,8 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                       { id: 'panel', label: 'Panels' },
                       { id: 'inverter', label: 'Inverters' },
                       { id: 'battery', label: 'Batteries' },
+                      { id: 'ess', label: 'ESS / Storage' },
+                      { id: 'itel', label: 'Itel' },
                       { id: 'system', label: 'Complete Systems' },
                       { id: 'structure', label: 'Structures & Wire' },
                     ].map((f) => (
@@ -985,7 +1073,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                     {sheetCategory === 'panel' ? (
                       <tr>
                         <th className="px-3.5 py-2.5">Brand & Module</th>
-                        <th className="px-3 py-2.5">Wattage</th>
+                        <th className="px-3 py-2.5">Model & Specifications</th>
                         <th className="px-3 py-2.5">
                           {dailySheetDate === 'yesterday' || dailySheetDate === '13-Sep-2026'
                             ? `${yesterdayDateLabel} Ready Rate`
@@ -993,19 +1081,19 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                         </th>
                         <th className="px-3 py-2.5">
                           {dailySheetDate === 'yesterday' || dailySheetDate === '13-Sep-2026'
-                            ? 'Benchmark Ref'
-                            : `${yesterdayDateLabel} (Sheet Ref)`}
+                            ? 'Previous Rate'
+                            : `${yesterdayDateLabel} Rate`}
                         </th>
                         <th className="px-3 py-2.5">
                           {dailySheetDate === 'yesterday' || dailySheetDate === '13-Sep-2026' ? 'Stock Trend' : 'Difference'}
                         </th>
-                        <th className="px-3 py-2.5">Plate Price (Est.)</th>
+                        <th className="px-3 py-2.5">Total Price (Est.)</th>
                         <th className="px-3 py-2.5 text-right">Action</th>
                       </tr>
                     ) : sheetCategory === 'inverter' ? (
                       <tr>
                         <th className="px-3.5 py-2.5">Brand & Model</th>
-                        <th className="px-3 py-2.5">Capacity & Type</th>
+                        <th className="px-3 py-2.5">Model & Specifications</th>
                         <th className="px-3 py-2.5">
                           {dailySheetDate === 'yesterday' || dailySheetDate === '13-Sep-2026'
                             ? `${yesterdayDateLabel} Ready Rate`
@@ -1013,17 +1101,17 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                         </th>
                         <th className="px-3 py-2.5">
                           {dailySheetDate === 'yesterday' || dailySheetDate === '13-Sep-2026'
-                            ? 'Benchmark Ref'
-                            : `${yesterdayDateLabel} (Sheet Ref)`}
+                            ? 'Previous Rate'
+                            : `${yesterdayDateLabel} Rate`}
                         </th>
                         <th className="px-3 py-2.5">Difference</th>
-                        <th className="px-3 py-2.5">Warranty & Specs</th>
+                        <th className="px-3 py-2.5">Total Price (Est.)</th>
                         <th className="px-3 py-2.5 text-right">Action</th>
                       </tr>
                     ) : sheetCategory === 'battery' ? (
                       <tr>
                         <th className="px-3.5 py-2.5">Brand & Model</th>
-                        <th className="px-3 py-2.5">Capacity & Chemistry</th>
+                        <th className="px-3 py-2.5">Model & Specifications</th>
                         <th className="px-3 py-2.5">
                           {dailySheetDate === 'yesterday' || dailySheetDate === '13-Sep-2026'
                             ? `${yesterdayDateLabel} Ready Rate`
@@ -1031,17 +1119,35 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                         </th>
                         <th className="px-3 py-2.5">
                           {dailySheetDate === 'yesterday' || dailySheetDate === '13-Sep-2026'
-                            ? 'Benchmark Ref'
-                            : `${yesterdayDateLabel} (Sheet Ref)`}
+                            ? 'Previous Rate'
+                            : `${yesterdayDateLabel} Rate`}
                         </th>
                         <th className="px-3 py-2.5">Difference</th>
-                        <th className="px-3 py-2.5">Warranty & Life</th>
+                        <th className="px-3 py-2.5">Total Price (Est.)</th>
+                        <th className="px-3 py-2.5 text-right">Action</th>
+                      </tr>
+                    ) : sheetCategory === 'ess' ? (
+                      <tr>
+                        <th className="px-3.5 py-2.5">Brand & ESS System</th>
+                        <th className="px-3 py-2.5">Model & Specifications</th>
+                        <th className="px-3 py-2.5">
+                          {dailySheetDate === 'yesterday' || dailySheetDate === '13-Sep-2026'
+                            ? `${yesterdayDateLabel} Ready Rate`
+                            : `${todayDateLabel} Live Rate`}
+                        </th>
+                        <th className="px-3 py-2.5">
+                          {dailySheetDate === 'yesterday' || dailySheetDate === '13-Sep-2026'
+                            ? 'Previous Rate'
+                            : `${yesterdayDateLabel} Rate`}
+                        </th>
+                        <th className="px-3 py-2.5">Difference</th>
+                        <th className="px-3 py-2.5">Total Price (Est.)</th>
                         <th className="px-3 py-2.5 text-right">Action</th>
                       </tr>
                     ) : sheetCategory === 'complete_system' ? (
                       <tr>
                         <th className="px-3.5 py-2.5">Turnkey Package</th>
-                        <th className="px-3 py-2.5">Daily Generation & Inclusions</th>
+                        <th className="px-3 py-2.5">Model & Specifications</th>
                         <th className="px-3 py-2.5">
                           {dailySheetDate === 'yesterday' || dailySheetDate === '13-Sep-2026'
                             ? `${yesterdayDateLabel} Package Rate`
@@ -1049,17 +1155,17 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                         </th>
                         <th className="px-3 py-2.5">
                           {dailySheetDate === 'yesterday' || dailySheetDate === '13-Sep-2026'
-                            ? 'Benchmark Ref'
-                            : `${yesterdayDateLabel} (Sheet Ref)`}
+                            ? 'Previous Rate'
+                            : `${yesterdayDateLabel} Rate`}
                         </th>
                         <th className="px-3 py-2.5">Difference</th>
-                        <th className="px-3 py-2.5">Warranty & Coverage</th>
+                        <th className="px-3 py-2.5">Total Price (Est.)</th>
                         <th className="px-3 py-2.5 text-right">Action</th>
                       </tr>
                     ) : sheetCategory === 'structure_accessories' ? (
                       <tr>
                         <th className="px-3.5 py-2.5">Equipment / BOS Item</th>
-                        <th className="px-3 py-2.5">Specification & Material</th>
+                        <th className="px-3 py-2.5">Model & Specifications</th>
                         <th className="px-3 py-2.5">
                           {dailySheetDate === 'yesterday' || dailySheetDate === '13-Sep-2026'
                             ? `${yesterdayDateLabel} Ready Rate`
@@ -1067,18 +1173,18 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                         </th>
                         <th className="px-3 py-2.5">
                           {dailySheetDate === 'yesterday' || dailySheetDate === '13-Sep-2026'
-                            ? 'Benchmark Ref'
-                            : `${yesterdayDateLabel} (Sheet Ref)`}
+                            ? 'Previous Rate'
+                            : `${yesterdayDateLabel} Rate`}
                         </th>
                         <th className="px-3 py-2.5">Difference</th>
-                        <th className="px-3 py-2.5">Durability Standard</th>
+                        <th className="px-3 py-2.5">Total Price (Est.)</th>
                         <th className="px-3 py-2.5 text-right">Action</th>
                       </tr>
                     ) : (
                       // 'all' category header
                       <tr>
-                        <th className="px-3.5 py-2.5">Category & Product</th>
-                        <th className="px-3 py-2.5">Rating & Specification</th>
+                        <th className="px-3.5 py-2.5">Category & Brand</th>
+                        <th className="px-3 py-2.5">Model & Specifications</th>
                         <th className="px-3 py-2.5">
                           {dailySheetDate === 'yesterday' || dailySheetDate === '13-Sep-2026'
                             ? `${yesterdayDateLabel} Ready Rate`
@@ -1086,11 +1192,11 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                         </th>
                         <th className="px-3 py-2.5">
                           {dailySheetDate === 'yesterday' || dailySheetDate === '13-Sep-2026'
-                            ? 'Benchmark Ref'
-                            : `${yesterdayDateLabel} (Sheet Ref)`}
+                            ? 'Previous Rate'
+                            : `${yesterdayDateLabel} Rate`}
                         </th>
                         <th className="px-3 py-2.5">Difference</th>
-                        <th className="px-3 py-2.5">Details / Warranty</th>
+                        <th className="px-3 py-2.5">Total Price (Est.)</th>
                         <th className="px-3 py-2.5 text-right">Action</th>
                       </tr>
                     )}
@@ -1108,7 +1214,11 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
 
                         // 1. Panel row
                         if (itemCat === 'panel') {
-                          const wattsNum = parseInt(item.model.replace(/\D/g, '')) || 585;
+                          const wattMatch =
+                            (item.capacity && item.capacity.match(/(\d{3,4})\s*W?/i)) ||
+                            (item.model && item.model.match(/(\d{3,4})\s*W/i)) ||
+                            (item.model && item.model.match(/\b(\d{3,4})\b/));
+                          const wattsNum = wattMatch ? parseInt(wattMatch[1], 10) : 585;
                           const platePrice = Math.round(item.rate * wattsNum);
 
                           return (
@@ -1176,8 +1286,13 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                                   </span>
                                 )}
                               </td>
-                              <td className="px-3 py-2.5 font-bold text-gray-900 dark:text-white">
-                                Rs. {platePrice.toLocaleString()}
+                              <td className="px-3 py-2.5">
+                                <div className="font-bold text-gray-900 dark:text-white">
+                                  Rs. {platePrice.toLocaleString()}
+                                </div>
+                                <div className="text-[10px] text-gray-500 dark:text-gray-400">
+                                  per plate ({wattsNum}W)
+                                </div>
                               </td>
                               <td className="px-3 py-2.5 text-right">
                                 <button
@@ -1242,13 +1357,17 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                                 <div className="text-[11px] text-gray-500 dark:text-gray-400">{item.capacity} • {item.type}</div>
                               </td>
                               <td className="px-3 py-2.5 font-bold text-blue-600 dark:text-blue-400">
-                                Rs. {item.rate.toLocaleString()}
+                                {item.rate != null ? `Rs. ${item.rate.toLocaleString()}` : 'Rs. N/A'}
                               </td>
                               <td className="px-3 py-2.5 text-gray-600 dark:text-gray-300">
-                                Rs. {item.prevRate.toLocaleString()}
+                                {item.prevRate != null ? `Rs. ${item.prevRate.toLocaleString()}` : 'Rs. N/A'}
                               </td>
                               <td className="px-3 py-2.5">
-                                {item.change < 0 ? (
+                                {item.rate == null ? (
+                                  <span className="inline-flex items-center gap-1 text-gray-400">
+                                    Call for Rate
+                                  </span>
+                                ) : item.change < 0 ? (
                                   <span className="inline-flex items-center gap-0.5 text-emerald-600 dark:text-emerald-400 font-bold">
                                     <ArrowDownRight className="h-3.5 w-3.5" />
                                     -Rs. {Math.abs(item.change).toLocaleString()} Drop
@@ -1264,8 +1383,13 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                                   </span>
                                 )}
                               </td>
-                              <td className="px-3 py-2.5 text-xs text-gray-600 dark:text-gray-400">
-                                {item.warranty || '5 Years Warranty'}
+                              <td className="px-3 py-2.5">
+                                <div className="font-bold text-gray-900 dark:text-white">
+                                  {item.rate != null ? `Rs. ${item.rate.toLocaleString()}` : 'Call for Rate'}
+                                </div>
+                                <div className="text-[10px] text-gray-500 dark:text-gray-400">
+                                  {item.warranty || '5 Years Warranty'}
+                                </div>
                               </td>
                               <td className="px-3 py-2.5 text-right">
                                 <button
@@ -1325,13 +1449,17 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                                 <div className="text-[11px] text-gray-500 dark:text-gray-400">{item.capacity} • {item.type}</div>
                               </td>
                               <td className="px-3 py-2.5 font-bold text-emerald-600 dark:text-emerald-400">
-                                Rs. {item.rate.toLocaleString()}
+                                {item.rate != null ? `Rs. ${item.rate.toLocaleString()}` : 'Rs. N/A'}
                               </td>
                               <td className="px-3 py-2.5 text-gray-600 dark:text-gray-300">
-                                Rs. {item.prevRate.toLocaleString()}
+                                {item.prevRate != null ? `Rs. ${item.prevRate.toLocaleString()}` : 'Rs. N/A'}
                               </td>
                               <td className="px-3 py-2.5">
-                                {item.change < 0 ? (
+                                {item.rate == null ? (
+                                  <span className="inline-flex items-center gap-1 text-gray-400">
+                                    Call for Rate
+                                  </span>
+                                ) : item.change < 0 ? (
                                   <span className="inline-flex items-center gap-0.5 text-emerald-600 dark:text-emerald-400 font-bold">
                                     <ArrowDownRight className="h-3.5 w-3.5" />
                                     -Rs. {Math.abs(item.change).toLocaleString()} Drop
@@ -1347,8 +1475,13 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                                   </span>
                                 )}
                               </td>
-                              <td className="px-3 py-2.5 text-xs text-gray-600 dark:text-gray-400">
-                                {item.warranty || '10 Years (6000 Cycles)'}
+                              <td className="px-3 py-2.5">
+                                <div className="font-bold text-gray-900 dark:text-white">
+                                  {item.rate != null ? `Rs. ${item.rate.toLocaleString()}` : 'Call for Rate'}
+                                </div>
+                                <div className="text-[10px] text-gray-500 dark:text-gray-400">
+                                  {item.warranty || '10 Years (6000 Cycles)'}
+                                </div>
                               </td>
                               <td className="px-3 py-2.5 text-right">
                                 <button
@@ -1360,6 +1493,92 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                                     if (target) target.scrollIntoView({ behavior: 'smooth' });
                                   }}
                                   className="inline-flex items-center gap-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 transition-colors cursor-pointer"
+                                >
+                                  View Stock
+                                  <ChevronRight className="h-3 w-3" />
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        }
+
+                        // 3.5. ESS / Energy Storage row
+                        if (itemCat === 'ess') {
+                          return (
+                            <tr
+                              key={idx}
+                              className={`hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors ${
+                                item.change < 0
+                                  ? 'bg-emerald-50/40 dark:bg-emerald-950/15'
+                                  : item.change > 0
+                                  ? 'bg-red-50/40 dark:bg-red-950/15'
+                                  : item.badge
+                                  ? 'bg-violet-50/30 dark:bg-violet-950/15'
+                                  : ''
+                              }`}
+                            >
+                              <td className="px-3.5 py-2.5 font-bold text-gray-900 dark:text-white flex flex-wrap items-center gap-1.5">
+                                {sheetCategory === 'all' && (
+                                  <span className="text-[10px] bg-violet-100 dark:bg-violet-900/50 text-violet-800 dark:text-violet-200 px-1.5 py-0.5 rounded font-bold">
+                                    ESS
+                                  </span>
+                                )}
+                                <span>{item.brand}</span>
+                                {item.badge && (
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded font-semibold border bg-violet-500/10 text-violet-700 dark:text-violet-300 border-violet-500/30">
+                                    {item.badge}
+                                  </span>
+                                )}
+                              </td>
+                              <td className="px-3 py-2.5 text-gray-800 dark:text-gray-200">
+                                <div className="font-semibold text-xs text-gray-900 dark:text-white">{item.model}</div>
+                                <div className="text-[11px] text-gray-500 dark:text-gray-400">{item.capacity} • {item.type}</div>
+                              </td>
+                              <td className="px-3 py-2.5 font-bold text-violet-600 dark:text-violet-400">
+                                {item.rate != null ? `Rs. ${item.rate.toLocaleString()}` : 'Rs. N/A'}
+                              </td>
+                              <td className="px-3 py-2.5 text-gray-600 dark:text-gray-300">
+                                {item.prevRate != null ? `Rs. ${item.prevRate.toLocaleString()}` : 'Rs. N/A'}
+                              </td>
+                              <td className="px-3 py-2.5">
+                                {item.rate == null ? (
+                                  <span className="inline-flex items-center gap-1 text-gray-400">
+                                    Call for Rate
+                                  </span>
+                                ) : item.change < 0 ? (
+                                  <span className="inline-flex items-center gap-0.5 text-emerald-600 dark:text-emerald-400 font-bold">
+                                    <ArrowDownRight className="h-3.5 w-3.5" />
+                                    -Rs. {Math.abs(item.change).toLocaleString()} Drop
+                                  </span>
+                                ) : item.change > 0 ? (
+                                  <span className="inline-flex items-center gap-0.5 text-red-600 dark:text-red-400 font-bold">
+                                    <TrendingUp className="h-3.5 w-3.5" />
+                                    +Rs. {item.change.toLocaleString()}
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 text-gray-400">
+                                    <Equal className="h-3 w-3" /> Stable
+                                  </span>
+                                )}
+                              </td>
+                              <td className="px-3 py-2.5">
+                                <div className="font-bold text-gray-900 dark:text-white">
+                                  {item.rate != null ? `Rs. ${item.rate.toLocaleString()}` : 'Call for Rate'}
+                                </div>
+                                <div className="text-[10px] text-gray-500 dark:text-gray-400">
+                                  {item.warranty || '3 to 5 Years Warranty'}
+                                </div>
+                              </td>
+                              <td className="px-3 py-2.5 text-right">
+                                <button
+                                  onClick={() => {
+                                    setSelectedCategory('ess');
+                                    setSelectedBrand(item.brand);
+                                    setSearchQuery(item.brand);
+                                    const target = document.getElementById('catalog-results');
+                                    if (target) target.scrollIntoView({ behavior: 'smooth' });
+                                  }}
+                                  className="inline-flex items-center gap-1 rounded-lg bg-violet-50 dark:bg-violet-950/50 hover:bg-violet-100 dark:hover:bg-violet-900/60 px-2.5 py-1 text-[11px] font-semibold text-violet-700 dark:text-violet-300 transition-colors cursor-pointer"
                                 >
                                   View Stock
                                   <ChevronRight className="h-3 w-3" />
@@ -1426,8 +1645,13 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                                   </span>
                                 )}
                               </td>
-                              <td className="px-3 py-2.5 text-xs text-gray-600 dark:text-gray-400">
-                                {item.warranty || '25-Yr Panels, 5-Yr Inverter'}
+                              <td className="px-3 py-2.5">
+                                <div className="font-bold text-gray-900 dark:text-white">
+                                  Rs. {item.rate.toLocaleString()}
+                                </div>
+                                <div className="text-[10px] text-gray-500 dark:text-gray-400">
+                                  {item.warranty || '25-Yr Panels, 5-Yr Inverter'}
+                                </div>
                               </td>
                               <td className="px-3 py-2.5 text-right">
                                 <button
@@ -1502,8 +1726,13 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                                 </span>
                               )}
                             </td>
-                            <td className="px-3 py-2.5 text-xs text-gray-600 dark:text-gray-400">
-                              {item.warranty || '25-Yr Rust Resistance'}
+                            <td className="px-3 py-2.5">
+                              <div className="font-bold text-gray-900 dark:text-white">
+                                Rs. {item.rate.toLocaleString()}
+                              </div>
+                              <div className="text-[10px] text-gray-500 dark:text-gray-400">
+                                {item.warranty || '25-Yr Rust Resistance'}
+                              </div>
                             </td>
                             <td className="px-3 py-2.5 text-right">
                               <button
@@ -1753,6 +1982,10 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                           <span className="font-extrabold text-amber-600">
                             {item.pricePerWattRange}
                           </span>
+                        ) : item.unitPriceMin == null ? (
+                          <span className="font-bold text-gray-500">
+                            Call for Rate
+                          </span>
                         ) : (
                           <span className="font-bold text-primary-600">
                             {formatPrice(item.unitPriceMin)}
@@ -1761,7 +1994,11 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                       </td>
                       <td className="px-4 py-4">
                         <div className="font-extrabold text-gray-900">
-                          {formatPrice(item.unitPriceMin)} – {formatPrice(item.unitPriceMax)}
+                          {item.unitPriceMin == null
+                            ? 'Call for Rate'
+                            : item.unitPriceMin === item.unitPriceMax
+                            ? formatPrice(item.unitPriceMin)
+                            : `${formatPrice(item.unitPriceMin)} – ${formatPrice(item.unitPriceMax)}`}
                         </div>
                         <div className="text-[11px] text-gray-400">{item.warranty}</div>
                       </td>
@@ -1966,8 +2203,18 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
               </div>
 
               <button
-                onClick={() => onNavigate('home')}
-                className="btn-primary w-full mt-4 py-2.5 text-xs font-bold flex items-center justify-center gap-2"
+                onClick={() => {
+                  if (onSelectCategory) {
+                    onSelectCategory('complete_system');
+                  } else if (onNavigate) {
+                    onNavigate('home');
+                    setTimeout(() => {
+                      const el = document.getElementById('listings');
+                      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 100);
+                  }
+                }}
+                className="btn-primary w-full mt-4 py-2.5 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-[1.01] active:scale-[0.99]"
               >
                 Find Sellers for {calcSystemSizeKw}kW Kit <ArrowRight className="h-3.5 w-3.5" />
               </button>
@@ -1995,21 +2242,36 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
             {MARKET_SUMMARY.cities.map((city) => (
               <div
                 key={city.name}
-                className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-200/80 hover:shadow-md transition-shadow"
+                onClick={() => {
+                  if (onNavigate) {
+                    onNavigate('home');
+                    setTimeout(() => {
+                      const el = document.getElementById('listings');
+                      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 100);
+                  }
+                }}
+                className="group rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-200/80 hover:shadow-md hover:ring-primary-400 cursor-pointer transition-all flex flex-col justify-between"
               >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2 font-bold text-gray-900 text-base">
-                    <MapPin className="h-4 w-4 text-primary-600" />
-                    {city.name}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2 font-bold text-gray-900 text-base group-hover:text-primary-600 transition-colors">
+                      <MapPin className="h-4 w-4 text-primary-600" />
+                      {city.name}
+                    </div>
+                    <span className="rounded-full bg-primary-50 px-2.5 py-0.5 text-[11px] font-bold text-primary-700">
+                      {city.rateStatus}
+                    </span>
                   </div>
-                  <span className="rounded-full bg-primary-50 px-2.5 py-0.5 text-[11px] font-bold text-primary-700">
-                    {city.rateStatus}
-                  </span>
+                  <p className="text-xs text-gray-500 mb-3">Main Hub: {city.market}</p>
+                  <div className="flex items-center justify-between border-t border-gray-100 pt-3 text-xs">
+                    <span className="text-gray-500">Panel Rate Avg:</span>
+                    <span className="font-extrabold text-gray-900">Rs 34.5 – 37.5 / W</span>
+                  </div>
                 </div>
-                <p className="text-xs text-gray-500 mb-3">Main Hub: {city.market}</p>
-                <div className="flex items-center justify-between border-t border-gray-100 pt-3 text-xs">
-                  <span className="text-gray-500">Panel Rate Avg:</span>
-                  <span className="font-extrabold text-gray-900">Rs 34.5 – 37.5 / W</span>
+                <div className="mt-3 pt-2 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-primary-600 group-hover:text-primary-700">
+                  <span>Browse {city.name} Ads</span>
+                  <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
                 </div>
               </div>
             ))}
@@ -2062,6 +2324,42 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                 While LiFePO4 lithium batteries cost more upfront, their 10+ year lifespan (6,000
                 cycles) makes them 40% cheaper over time than tubular batteries.
               </p>
+            </div>
+          </div>
+
+          {/* Quick Actions & Navigation Bar */}
+          <div className="mt-8 pt-6 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3">
+            <span className="text-xs font-semibold text-gray-500">
+              Need assistance with your solar setup?
+            </span>
+            <div className="flex flex-wrap gap-2.5">
+              <button
+                onClick={() => onNavigate && onNavigate('calculator')}
+                className="btn-outline text-xs px-3.5 py-1.5 font-bold flex items-center gap-1.5"
+              >
+                <Calculator className="h-3.5 w-3.5" />
+                Load Calculator
+              </button>
+              <button
+                onClick={() => onNavigate && onNavigate('install')}
+                className="btn-outline text-xs px-3.5 py-1.5 font-bold flex items-center gap-1.5"
+              >
+                <Wrench className="h-3.5 w-3.5" />
+                Request Installation
+              </button>
+              <button
+                onClick={() => onNavigate && onNavigate('dealers')}
+                className="btn-outline text-xs px-3.5 py-1.5 font-bold flex items-center gap-1.5"
+              >
+                <Users className="h-3.5 w-3.5" />
+                Verified Dealers
+              </button>
+              <button
+                onClick={() => onNavigate && onNavigate('safety')}
+                className="btn-ghost text-xs px-3 py-1.5 font-bold flex items-center gap-1 text-primary-600 hover:text-primary-700"
+              >
+                Safety Tips <ArrowRight className="h-3 w-3" />
+              </button>
             </div>
           </div>
         </section>
@@ -2128,7 +2426,9 @@ function PriceCard({ item, onExploreMarket }) {
               <div className="mt-1 flex items-center justify-between text-xs text-gray-600 border-t border-gray-200/60 pt-1.5">
                 <span>Single Plate Rate:</span>
                 <span className="font-bold text-gray-900">
-                  {formatPrice(item.unitPriceMin)} – {formatPrice(item.unitPriceMax)}
+                  {item.unitPriceMin === item.unitPriceMax
+                    ? formatPrice(item.unitPriceMin)
+                    : `${formatPrice(item.unitPriceMin)} – ${formatPrice(item.unitPriceMax)}`}
                 </span>
               </div>
             </div>
@@ -2138,7 +2438,11 @@ function PriceCard({ item, onExploreMarket }) {
                 Complete Turnkey Package Cost
               </div>
               <div className="text-xl font-extrabold text-indigo-600">
-                {formatPrice(item.unitPriceMin)} – {formatPrice(item.unitPriceMax)}
+                {item.unitPriceMin == null
+                  ? 'Call for Quote'
+                  : item.unitPriceMin === item.unitPriceMax
+                  ? formatPrice(item.unitPriceMin)
+                  : `${formatPrice(item.unitPriceMin)} – ${formatPrice(item.unitPriceMax)}`}
               </div>
               <div className="mt-1 text-[11px] text-gray-600 font-semibold">
                 Daily Generation: <span className="text-emerald-600">{item.capacity}</span>
@@ -2150,7 +2454,11 @@ function PriceCard({ item, onExploreMarket }) {
                 Mounting & BOS Trade Rate
               </div>
               <div className="text-xl font-extrabold text-slate-800">
-                {formatPrice(item.unitPriceMin)} – {formatPrice(item.unitPriceMax)}
+                {item.unitPriceMin == null
+                  ? 'Call for Rate'
+                  : item.unitPriceMin === item.unitPriceMax
+                  ? formatPrice(item.unitPriceMin)
+                  : `${formatPrice(item.unitPriceMin)} – ${formatPrice(item.unitPriceMax)}`}
               </div>
               <div className="mt-1 text-[11px] text-gray-500">
                 Rating / Size: <span className="font-semibold text-gray-800">{item.capacity}</span>
@@ -2162,7 +2470,11 @@ function PriceCard({ item, onExploreMarket }) {
                 Estimated Trade Price
               </div>
               <div className="text-xl font-extrabold text-primary-600">
-                {formatPrice(item.unitPriceMin)} – {formatPrice(item.unitPriceMax)}
+                {item.unitPriceMin == null
+                  ? 'Call for Rate'
+                  : item.unitPriceMin === item.unitPriceMax
+                  ? formatPrice(item.unitPriceMin)
+                  : `${formatPrice(item.unitPriceMin)} – ${formatPrice(item.unitPriceMax)}`}
               </div>
               <div className="mt-1 text-[11px] text-gray-500">
                 Capacity / Rating: <span className="font-semibold text-gray-800">{item.capacity}</span>

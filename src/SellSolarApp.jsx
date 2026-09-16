@@ -328,11 +328,20 @@ function Xy({
               })]
             })]
           }):jsxs(Fragment,{
-            children:[jsx("button",{
-              onClick:()=>h("login"),className:"hidden text-sm font-bold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white sm:inline-flex px-2 py-1",children:"Sign In"
+            children:[jsxs("button",{
+              onClick:()=>h("login"),
+              id:"header-signin-btn",
+              className:"inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/90 px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-750 hover:border-gray-300 dark:hover:border-gray-600 hover:text-primary-600 dark:hover:text-primary-400 transition-all shadow-2xs cursor-pointer shrink-0 active:scale-95",
+              children:[
+                jsx(User,{ className:"h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-500 dark:text-gray-400 shrink-0" }),
+                jsx("span",{ children:"Sign In" })
+              ]
             }),jsxs("button",{
-              onClick:()=>h("login"),className:"btn-primary hidden text-xs sm:text-sm sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:py-2 shadow-xs",children:[jsx(CirclePlus,{
-                className:"h-4 w-4"
+              onClick:()=>h("login"),
+              id:"header-post-ad-btn",
+              className:"btn-primary hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm shadow-xs shrink-0 cursor-pointer",
+              children:[jsx(CirclePlus,{
+                className:"h-4 w-4 shrink-0"
               }),"Post an Ad"]
             })]
           }),jsx("button",{
@@ -391,8 +400,14 @@ function Xy({
                   className:"h-4 w-4"
                 }),"Sign Out"]
               })]
-            }):jsx("button",{
-              onClick:()=>h("login"),className:"btn-primary mt-2 w-full",children:"Login / Sign Up"
+            }):jsxs("button",{
+              onClick:()=>h("login"),
+              id:"mobile-signin-btn",
+              className:"btn-primary mt-2 w-full flex items-center justify-center gap-2 py-2.5 text-sm font-bold shadow-xs cursor-pointer",
+              children:[
+                jsx(User,{ className:"h-4 w-4" }),
+                "Sign In / Register"
+              ]
             })]
           })
         })
@@ -1546,12 +1561,19 @@ function hx({
         }),jsx("div",{
           className:"flex gap-3",children:[
             { href: "mailto:info@sellsolar.pk", label: "Email SellSolar", Icon: Mail },
-            { href: "/contact", label: "Contact SellSolar", Icon: MapPin },
-          ].map(({ href, label, Icon }) => jsx("a", {
+            { href: "/contact", label: "Contact SellSolar", Icon: MapPin, page: "contact" },
+          ].map(({ href, label, Icon, page }) => jsx("a", {
             href,
+            onClick: (ev) => {
+              if (page && navigate) {
+                ev.preventDefault();
+                navigate(page);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }
+            },
             "aria-label": label,
             title: label,
-            className: "flex h-9 w-9 items-center justify-center rounded-lg bg-gray-800 transition-colors hover:bg-primary-500",
+            className: "flex h-9 w-9 items-center justify-center rounded-lg bg-gray-800 transition-colors hover:bg-primary-500 text-gray-300 hover:text-white cursor-pointer",
             children: jsx(Icon, { className: "h-4 w-4" })
           }, label))
         })]
@@ -1681,6 +1703,22 @@ function hx({
             })]
           }),h.cnic&&jsxs("div",{
             className:"mt-3 border-t border-gray-100 pt-3 text-xs text-gray-400",children:["CNIC: ",h.cnic.slice(0,5),"••••••",h.cnic.slice(-1)]
+          }),h.phone&&jsxs("div",{
+            className:"mt-4 pt-3 border-t border-gray-100 flex items-center gap-2",
+            children:[
+              jsx("a",{
+                href:`tel:${h.phone}`,
+                className:"btn-outline flex-1 text-xs py-2 font-bold justify-center flex items-center gap-1.5",
+                children:[jsx(Phone,{ className:"h-3.5 w-3.5" }),"Call"]
+              }),
+              jsx("a",{
+                href:`https://wa.me/${(h.phone.replace(/[^0-9]/g, '').startsWith('0') ? '92' + h.phone.replace(/[^0-9]/g, '').slice(1) : (h.phone.replace(/[^0-9]/g, '').startsWith('92') ? h.phone.replace(/[^0-9]/g, '') : '92' + h.phone.replace(/[^0-9]/g, '')))}?text=${encodeURIComponent(`Salam! I found your dealership "${h.business_name || h.full_name}" on SellSolar.pk.`)}`,
+                target:"_blank",
+                rel:"noopener noreferrer",
+                className:"btn flex-1 text-xs py-2 font-bold justify-center flex items-center gap-1.5 bg-[#25D366] hover:bg-[#20ba59] text-white shadow-xs",
+                children:[jsx(MessageCircle,{ className:"h-3.5 w-3.5 fill-white" }),"WhatsApp"]
+              })
+            ]
           })]
         },h.id))
       })]

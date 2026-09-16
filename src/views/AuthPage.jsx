@@ -1888,7 +1888,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                   }
                 }}
                 disabled={busy || googleBusy}
-                className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-60 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+                className="btn-primary w-full py-3 sm:py-3.5 text-sm sm:text-base font-bold flex items-center justify-center gap-2 shadow-md shadow-primary-500/20 active:scale-[0.99] transition-all cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
               >
                 {busy ? (
                   <>

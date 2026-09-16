@@ -3,6 +3,8 @@ export const CATEGORIES = {
   inverter: 'Inverters',
   battery: 'Batteries',
   complete_system: 'Complete Systems',
+  ess: 'Energy Storage (ESS)',
+  structure_accessories: 'Structures & Accessories',
 };
 
 export const CITIES = [
@@ -20,16 +22,35 @@ export const BRANDS = [
   'Longi',
   'Canadian Solar',
   'Jinko',
+  'JA Solar',
+  'Astronergy',
+  'TCL',
   'Trina',
   'Inverex',
+  'Itel',
+  'Knox',
+  'Fronus',
+  'Growatt',
+  'Huawei',
+  'Solis',
+  'Sungrow',
+  'OSDA',
+  'LEFN',
+  'Jesco',
+  'Korean',
   'Tesla',
   'Homage',
   'Phoenix',
   'Osaka',
   'AGS',
+  'Narada',
+  'Pylontech',
+  'Dyness',
 ];
 
 export function formatPrice(value) {
-  const amount = Number(value) || 0;
+  if (value === null || value === undefined) return 'Rs. N/A';
+  const amount = Number(value);
+  if (isNaN(amount)) return 'Rs. N/A';
   return `PKR ${amount.toLocaleString('en-PK')}`;
 }

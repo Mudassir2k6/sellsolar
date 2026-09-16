@@ -10,8 +10,203 @@ export const TODAY_DATE_STR = _currentPkt.todayStr;
 export const LAST_MIDNIGHT_UPDATE = _currentPkt.lastMidnightStr;
 export const LAST_UPDATE_ISO = _currentPkt.iso;
 
-// Islamabad Ready Stock Daily Sheets Comparison (14-Sep vs 13-Sep 2026)
+// Islamabad Ready Stock Daily Sheets Comparison (16-Sep vs 15-Sep/14-Sep 2026)
 export const ISLAMABAD_DAILY_SHEETS = {
+  "16-Sep-2026": {
+    date: "16-September-2026",
+    label: "16-Sep-2026 (Today)",
+    rates: [
+      { brand: "Canadian Solar", model: "585W", rate: 41.50, prevRate: 41.60, change: -0.10, status: "down", badge: "TOPCon Bifacial" },
+      { brand: "Canadian Solar", model: "590W", rate: 41.40, prevRate: 41.60, change: -0.20, status: "down", badge: "590W Ready Stock" },
+      { brand: "Canadian Solar", model: "625W", rate: 41.50, prevRate: 41.75, change: -0.25, status: "down", badge: "625W High Yield" },
+      { brand: "Jinko Solar", model: "585W", rate: 40.00, prevRate: 41.25, change: -1.25, status: "down", badge: "Tiger Neo" },
+      { brand: "Jinko Solar", model: "645W", rate: 41.00, prevRate: 41.50, change: -0.50, status: "down", deliveryDate: "16/09/2026", note: "Delivery: 16/09/2026", badge: "Delivery 16/09" },
+      { brand: "LONGi", model: "645W x10 BF", rate: 43.50, prevRate: 43.25, change: 0.25, status: "up", badge: "Hi-MO X10 In-Demand" },
+      { brand: "Inverex", model: "620W", rate: 42.50, prevRate: 42.50, change: 0, status: "new", badge: "With Warranty Card", warranty: "Official Warranty Card Included" },
+      { brand: "JA Solar", model: "585W", rate: 38.60, prevRate: 38.60, change: 0, status: "stable", badge: "DeepBlue 4.0 Pro" },
+      { brand: "JA Solar", model: "605W", rate: 39.75, prevRate: 39.75, change: 0, status: "stable" },
+      { brand: "JA Solar", model: "625W", rate: 38.85, prevRate: 38.85, change: 0, status: "stable" },
+      { brand: "Astronergy", model: "590W", rate: 38.25, prevRate: 38.25, change: 0, status: "stable", badge: "Astro 590W" },
+      { brand: "Astronergy", model: "620W", rate: 39.00, prevRate: 39.00, change: 0, status: "stable" },
+      { brand: "Astronergy", model: "625W", rate: 39.00, prevRate: 39.00, change: 0, status: "stable" },
+      { brand: "Astronergy", model: "720W", rate: 39.00, prevRate: 39.00, change: 0, status: "stable", badge: "720W Heavy Plate" },
+      { brand: "Korean", model: "585W", rate: 38.00, prevRate: 37.00, change: 1.00, status: "up", badge: "N-Type Ready" },
+      { brand: "Korean", model: "670W (ABC)", rate: 40.60, prevRate: 40.60, change: 0, status: "new", badge: "ABC Tech High Yield" },
+      { brand: "Korean", model: "715W", rate: 37.75, prevRate: 38.00, change: -0.25, status: "down" },
+      { brand: "OSDA", model: "585W", rate: 36.75, prevRate: 36.75, change: 0, status: "stable" },
+      { brand: "LEFN", model: "640W", rate: 33.50, prevRate: 33.00, change: 0.50, status: "up", badge: "Lowest Rate in PK" },
+      { brand: "Jesco", model: "585W", rate: 36.00, prevRate: 36.00, change: 0, status: "new", badge: "Budget Tier-1" },
+      { brand: "TCL", model: "615W", rate: 37.00, prevRate: 37.00, change: 0, status: "new", badge: "TCL Solar 615W" },
+      { brand: "TCL", model: "720W", rate: 38.25, prevRate: 38.25, change: 0, status: "new", badge: "TCL Solar 720W High Power" },
+      { brand: "Aiko Solar", model: "645W", rate: 42.50, prevRate: 42.50, change: 0, status: "stable" },
+      { brand: "Aiko Solar", model: "665W", rate: 43.50, prevRate: 43.50, change: 0, status: "stable" },
+      { brand: "Aiko Solar", model: "770W", rate: 44.50, prevRate: 44.50, change: 0, status: "stable", badge: "770W Flagship" },
+      { brand: "Risen", model: "740W HJT", rate: 41.00, prevRate: 41.00, change: 0, status: "stable" }
+    ],
+    inverterRates: [
+      // 50KW HYBRID INVERTER - 03 PHASE (New Arrival)
+      { brand: "Itel", model: "50KW Hybrid Inverter - 03 Phase (IP-66)", capacity: "50.0 kW (3-Phase)", type: "Commercial Hybrid IP66 3-Phase", rate: 1290000, prevRate: 1290000, change: 0, status: "new", badge: "50kW IP-66 Flagship", warranty: "05 Years Replacement + 05 Years Service Warranty", note: "50KW Hybrid 3-Phase IP-66" },
+
+      // Itel Hybrid Inverters IP-66 Series
+      { brand: "Itel", model: "6.6KW PV-13000 Single Phase IP66", capacity: "6.6 kW (PV 13000)", type: "Hybrid IP66 Single Phase", rate: 194000, prevRate: 194000, change: 0, status: "stable", badge: "12-Year Warranty IP66", warranty: "06-Yr Replacement + 06-Yr Service = 12 Years" },
+      { brand: "Itel", model: "8KW PV-16000 3-Phase IP66", capacity: "8.0 kW (PV 16000)", type: "Hybrid IP66 3-Phase", rate: 380000, prevRate: 380000, change: 0, status: "stable", badge: "IP66 3-Phase Heavy", warranty: "5-Year Replacement Warranty" },
+
+      // Itel Hybrid Inverters IP-54 Series | 3-Year Replacement Warranty (Works on single source as well)
+      { brand: "Itel", model: "1.6kW PV-3200 Hybrid IP54", capacity: "1.6 kW (PV 3200)", type: "Hybrid IP54 (Single Source)", rate: 44000, prevRate: 44000, change: 0, status: "stable", badge: "Single Source Ready", warranty: "3-Year Replacement Warranty", note: "Works on single source" },
+      { brand: "Itel", model: "3KW Pro PV-4500 Hybrid IP54", capacity: "3.0 kW (PV 4500)", type: "Hybrid IP54 Pro", rate: 78000, prevRate: 78000, change: 0, status: "stable", badge: "Best Value 3kW", warranty: "3-Year Replacement Warranty", note: "Works on single source" },
+      { brand: "Itel", model: "4KW Pro PV-6000 Hybrid IP54", capacity: "4.0 kW (PV 6000)", type: "Hybrid IP54 Pro", rate: 113000, prevRate: 113000, change: 0, status: "stable", badge: "4kW Pro PV6000", warranty: "3-Year Replacement Warranty", note: "Works on single source" },
+      { brand: "Itel", model: "6KW Pro PV-8000 Hybrid IP54", capacity: "6.0 kW (PV 8000)", type: "Hybrid IP54 Pro", rate: 138000, prevRate: 138000, change: 0, status: "stable", badge: "6kW Pro Best Seller", warranty: "3-Year Replacement Warranty", note: "Works on single source" },
+      { brand: "Itel", model: "8KW PV-16000 Hybrid IP54", capacity: "8.0 kW (PV 16000)", type: "Hybrid IP54 High PV", rate: null, prevRate: null, change: 0, status: "new", badge: "Call for Rate", warranty: "3-Year Replacement Warranty", note: "Works on single source" },
+      { brand: "Itel", model: "12KW PV-16000 Hybrid IP54", capacity: "12.0 kW (PV 16000)", type: "Hybrid IP54 High PV Commercial", rate: null, prevRate: null, change: 0, status: "new", badge: "Call for Rate", warranty: "3-Year Replacement Warranty", note: "Works on single source" },
+
+      // Established Market Benchmarks
+      { brand: "Inverex", model: "Nitrox 6kW Single Phase 48V", capacity: "6.0 kW", type: "Hybrid On/Off-Grid", rate: 266000, prevRate: 266000, change: 0, status: "stable", badge: "Pakistan #1 Hybrid", warranty: "5 Yrs Replacement" },
+      { brand: "Inverex", model: "Nitrox 10kW Three Phase", capacity: "10.0 kW", type: "Hybrid 3-Phase", rate: 465000, prevRate: 460000, change: 5000, status: "up", badge: "Heavy Residential", warranty: "5 Yrs Replacement", note: "Ready Stock" },
+      { brand: "Inverex", model: "Nitrox 12kW Commercial", capacity: "12.0 kW", type: "Hybrid 3-Phase Commercial", rate: 549000, prevRate: 549000, change: 0, status: "stable", badge: "Commercial Grade", warranty: "5 Yrs Warranty" },
+      { brand: "Inverex", model: "Veyron II 3.2kW / 5.2kW MPPT", capacity: "3.2kW – 5.2kW", type: "Off-Grid / Hybrid", rate: 95000, prevRate: 95000, change: 0, status: "stable", badge: "Affordable Hybrid", warranty: "2 Yrs Warranty" },
+      { brand: "Knox", model: "Krypton 6kW Hybrid 48V", capacity: "6.0 kW", type: "Hybrid On/Off-Grid (IP65)", rate: 186000, prevRate: 186000, change: 0, status: "stable", badge: "Best Value Hybrid", warranty: "5 Yrs Warranty" },
+      { brand: "Knox", model: "Krypton 8kW / 10kW Hybrid", capacity: "8.0kW – 10.0kW", type: "Hybrid 48V 1/3-Phase", rate: 272000, prevRate: 275000, change: -3000, status: "down", badge: "High Capacity", warranty: "5 Yrs Warranty" },
+      { brand: "Knox", model: "10kW On-Grid Inverter G4", capacity: "10.0 kW", type: "Grid-Tied 3-Phase", rate: 167000, prevRate: 167000, change: 0, status: "stable", badge: "Net Metering Approved", warranty: "5 Yrs Standard" },
+      { brand: "Fronus", model: "8.2kW Hybrid PV9200", capacity: "8.2 kW", type: "Hybrid Dual MPPT", rate: 233000, prevRate: 236000, change: -3000, status: "down", badge: "Dual AC Output", warranty: "2 Yrs Warranty" },
+      { brand: "Fronus", model: "Platinum PV 4200 / 5200", capacity: "4.2kW – 5.2kW", type: "Solar Hybrid Inverter", rate: 112000, prevRate: 112000, change: 0, status: "stable", badge: "Economy Pick", warranty: "2 Yrs Warranty" },
+      { brand: "Growatt", model: "MOD 10KTL3-X (10kW 3-Phase)", capacity: "10.0 kW", type: "On-Grid Net Metering", rate: 174000, prevRate: 174000, change: 0, status: "stable", badge: "Net Metering Approved", warranty: "5 Yrs Warranty" },
+      { brand: "Growatt", model: "SPH 10000TL 10kW Hybrid", capacity: "10.0 kW", type: "Hybrid 3-Phase IP65", rate: 374000, prevRate: 374000, change: 0, status: "stable", badge: "Premium Hybrid", warranty: "5 Yrs Extendable" },
+      { brand: "Huawei", model: "SUN2000-10KTL-M1 (10kW 3-Phase)", capacity: "10.0 kW", type: "Smart String On-Grid", rate: 323000, prevRate: 318000, change: 5000, status: "up", badge: "AI Smart AFCI", warranty: "5 / 10 Yrs Warranty" },
+      { brand: "Huawei", model: "SUN2000-20KTL-M2 (20kW 3-Phase)", capacity: "20.0 kW", type: "Commercial Smart String", rate: 440000, prevRate: 440000, change: 0, status: "stable", badge: "Commercial King", warranty: "5 Yrs Warranty" },
+      { brand: "Solis", model: "S6-EH1P6K-L-PRO (6kW Hybrid)", capacity: "6.0 kW", type: "Single Phase Hybrid (IP66)", rate: 224000, prevRate: 224000, change: 0, status: "stable", badge: "IP66 Rated", warranty: "5 Yrs Warranty" },
+      { brand: "Sungrow", model: "SG10RT (10kW Three Phase)", capacity: "10.0 kW", type: "On-Grid Multi-MPPT", rate: 187000, prevRate: 187000, change: 0, status: "stable", badge: "Global Leader", warranty: "5 Yrs Warranty" }
+    ],
+    batteryRates: [
+      // Itel HV Battery & Lithium Series
+      { brand: "Itel", model: "Itel HV Battery (51.2V 100Ah High Voltage)", capacity: "51.2V 100Ah High Voltage (5.12 kWh)", type: "High Voltage (HV) LiFePO4 Lithium", rate: 245000, prevRate: 245000, change: 0, status: "new", badge: "HV LiFePO4 51.2V 100Ah", warranty: "05 Years Replacement + 05 Years Service Warranty", note: "Spec: 51.2V 100Ah High Voltage" },
+      { brand: "Itel", model: "Itel IP-20 Lithium 12V 100Ah", capacity: "12V 100Ah (1.28 kWh)", type: "Lithium LiFePO4 (IP20)", rate: 58000, prevRate: 58000, change: 0, status: "stable", badge: "12V Lithium 100Ah", warranty: "5-Year Replacement Warranty" },
+      { brand: "Itel", model: "Itel IP-20 Lithium 25V 100Ah", capacity: "25V 100Ah (2.56 kWh)", type: "Lithium LiFePO4 (IP20)", rate: 124000, prevRate: 124000, change: 0, status: "stable", badge: "25V 100Ah Lithium", warranty: "5-Year Replacement Warranty" },
+      { brand: "Itel", model: "Itel IP-20 Lithium 51V 100Ah", capacity: "51V 100Ah (5.12 kWh)", type: "Lithium LiFePO4 (IP20)", rate: 220000, prevRate: 220000, change: 0, status: "stable", badge: "5.12kWh Best Value", warranty: "5-Year Replacement Warranty", note: "Rs 220,000 Special Rate" },
+      { brand: "Itel", model: "Itel IP-20 Lithium 51V 200Ah", capacity: "51V 200Ah (10.24 kWh)", type: "Lithium LiFePO4 (IP20)", rate: 450000, prevRate: 450000, change: 0, status: "stable", badge: "10.24kWh High Bank", warranty: "5-Year Replacement Warranty" },
+      { brand: "Itel", model: "Itel IP-20 Lithium 51V 314Ah", capacity: "51V 314Ah (16.0 kWh)", type: "Lithium LiFePO4 (IP20)", rate: 590000, prevRate: 590000, change: 0, status: "stable", badge: "16kWh Commercial Bank", warranty: "5-Year Replacement Warranty" },
+
+      // Other Benchmark Batteries
+      { brand: "Narada", model: "NPFC100 (48V 100Ah / 5.12kWh)", capacity: "48V 100Ah (5.12 kWh)", type: "Lithium LiFePO4", rate: 238500, prevRate: 238500, change: 0, status: "stable", badge: "Top Lithium 6000 Cycles", warranty: "5 Yrs Official" },
+      { brand: "Pylontech", model: "FIDUS 5.12kWh / US3000C", capacity: "5.12 kWh (48V)", type: "LiFePO4 Modular Rack", rate: 258000, prevRate: 255000, change: 3000, status: "up", badge: "10-Year Warranty", warranty: "10 Yrs Manufacturer" },
+      { brand: "Inverex", model: "PowerWall 5.12kWh LiFePO4", capacity: "51.2V 100Ah (5.12 kWh)", type: "Wall-Mount Smart Lithium", rate: 265500, prevRate: 265500, change: 0, status: "stable", badge: "Sleek Wall-Mount", warranty: "5 Yrs Warranty" },
+      { brand: "Inverex", model: "PowerWall 11.8kWh Heavy Duty", capacity: "51.2V 230Ah (11.8 kWh)", type: "LiFePO4 High Capacity", rate: 564000, prevRate: 564000, change: 0, status: "stable", badge: "All-Night AC Backup", warranty: "5 Yrs Warranty" },
+      { brand: "Dyness", model: "A48100 Powerbox F-5.0", capacity: "48V 100Ah (5.12 kWh)", type: "LiFePO4 Lithium", rate: 242000, prevRate: 245000, change: -3000, status: "down", badge: "Certified Safe", warranty: "10 Yrs Warranty" },
+      { brand: "Phoenix", model: "TX 2500 Tubular (230Ah)", capacity: "12V 230Ah (27 Plates)", type: "Tall Tubular Deep Cycle", rate: 51500, prevRate: 50000, change: 1500, status: "up", badge: "Top Tubular 27-Plates", warranty: "1 Year Replacement" },
+      { brand: "Phoenix", model: "TX 1800 Tubular (185Ah)", capacity: "12V 185Ah (21 Plates)", type: "Tall Tubular Deep Cycle", rate: 41500, prevRate: 41500, change: 0, status: "stable", badge: "Best Value Tubular", warranty: "1 Year Replacement" },
+      { brand: "Osaka", model: "Pro 1800 / HT 2000 Tubular", capacity: "12V 185Ah – 200Ah", type: "Deep Cycle Tubular", rate: 45000, prevRate: 45000, change: 0, status: "stable", badge: "Reliable Tubular", warranty: "1 Year Warranty" },
+      { brand: "AGS", model: "SP Tall 1200 / GX 165", capacity: "12V 120Ah – 150Ah", type: "Deep Cycle Solar Battery", rate: 31500, prevRate: 32000, change: -500, status: "down", badge: "Budget Deep Cycle", warranty: "1 Year Warranty" },
+      { brand: "Daewoo", model: "DIB-200 / DIB-225 Deep Cycle", capacity: "12V 175Ah – 200Ah", type: "Maintenance-Free Tubular", rate: 47000, prevRate: 47000, change: 0, status: "stable", badge: "Low Maintenance", warranty: "1 Year Warranty" },
+      { brand: "Narada", model: "AcmeG Polymer Gel 200Ah", capacity: "12V 200Ah (Gel)", type: "VRLA Sealed Polymer Gel", rate: 75500, prevRate: 76500, change: -1000, status: "down", badge: "Sealed Zero-Fumes", warranty: "2 Yrs Warranty" }
+    ],
+    essRates: [
+      // ESS / Energy Storage (Itel Power Tank, BMU & Cabinet Systems)
+      { brand: "Itel", model: "Battery Management Unit - BMU (HV Controller)", capacity: "High Voltage Master Control", type: "BMU Master Control Unit", rate: 230000, prevRate: 230000, change: 0, status: "new", badge: "HV Master BMU", warranty: "05 Years Replacement + 05 Years Service Warranty", note: "Battery Management Unit for High Voltage Systems" },
+      { brand: "Itel", model: "Power Tank 500W / 1KWh", capacity: "500W Output / 1kWh LiFePO4", type: "Portable ESS / Solar Generator", rate: 65000, prevRate: 65000, change: 0, status: "new", badge: "Portable Power Tank", warranty: "3-Year Warranty", note: "Plug & Play Power Station" },
+      { brand: "Itel", model: "3.6KW + 8KWh ESS All-in-One", capacity: "3.6kW Inverter + 8kWh Storage", type: "All-in-One Energy Storage System", rate: null, prevRate: null, change: 0, status: "new", badge: "Call for Rate", warranty: "5-Year Replacement Warranty", note: "Integrated All-in-One Cabinet" }
+    ],
+    systemRates: [
+      { brand: "Turnkey Packages", model: "3.2kW Hybrid Residential System", capacity: "3.2 kW (5-7 Units/Day)", type: "Hybrid System (Panels + Inverter + Battery)", rate: 395000, prevRate: 395000, change: 0, status: "stable", badge: "3-5 Marla Home", warranty: "5 Yrs Inverter / 12 Yrs Panels" },
+      { brand: "Turnkey Packages", model: "5kW / 6kW Hybrid Home System", capacity: "6.0 kW (22-26 Units/Day)", type: "Net-Metering + Battery Backup", rate: 790000, prevRate: 790000, change: 0, status: "stable", badge: "5-10 Marla Home", warranty: "5 Yrs Inverter / 25 Yrs Panels" },
+      { brand: "Turnkey Packages", model: "10kW Three-Phase Net Metering", capacity: "10.0 kW (40-45 Units/Day)", type: "Grid-Tied Net Metering", rate: 1280000, prevRate: 1290000, change: -10000, status: "down", badge: "1 Kanal Home", warranty: "5 Yrs Inverter / 25 Yrs Panels" },
+      { brand: "Turnkey Packages", model: "15kW Commercial Net-Metering", capacity: "15.0 kW (60-70 Units/Day)", type: "Three Phase Commercial", rate: 1920000, prevRate: 1920000, change: 0, status: "stable", badge: "Commercial Plaza", warranty: "5 Yrs Inverter / 25 Yrs Panels" },
+      { brand: "Turnkey Packages", model: "20kW Industrial Net-Metering", capacity: "20.0 kW (80-95 Units/Day)", type: "Heavy Duty On-Grid", rate: 2480000, prevRate: 2500000, change: -20000, status: "down", badge: "Factory / Farmhouse", warranty: "5 Yrs Inverter / 25 Yrs Panels" }
+    ],
+    structureRates: [
+      { brand: "Itel", model: "Battery Management Unit - BMU (HV Controller)", capacity: "High Voltage Master Control", type: "BMU Master Control Unit", rate: 230000, prevRate: 230000, change: 0, status: "new", badge: "HV Master BMU", warranty: "05 Years Replacement + 05 Years Service Warranty", note: "Battery Management Unit for High Voltage Systems" },
+      { brand: "GI Elevated", model: "L2 Galvanized Elevated Frame (Custom)", capacity: "Fits 2-4 Panels (14-Gauge)", type: "Elevated Roof Structure", rate: 7200, prevRate: 7200, change: 0, status: "stable", badge: "High Wind Tested", warranty: "10 Yrs Anti-Rust" },
+      { brand: "GI Elevated", model: "L3 Galvanized Heavy Elevated P1/P2", capacity: "Fits 3-6 Panels (12-Gauge)", type: "Heavy Duty Walkway GI", rate: 8500, prevRate: 8500, change: 0, status: "stable", badge: "Walkway Frame", warranty: "15 Yrs Anti-Rust" },
+      { brand: "Pakistan Cables", model: "DC Solar Wire 4mm² Single Core (TUV)", capacity: "4.0 mm² Copper (Tinned)", type: "TUV Certified Double Insulated", rate: 235, prevRate: 235, change: 0, status: "stable", badge: "TUV Certified", warranty: "25 Yrs Outdoor Life" },
+      { brand: "Pakistan Cables", model: "DC Solar Wire 6mm² Single Core (TUV)", capacity: "6.0 mm² Copper (Tinned)", type: "TUV Certified Double Insulated", rate: 325, prevRate: 325, change: 0, status: "stable", badge: "Low Resistance", warranty: "25 Yrs Outdoor Life" },
+      { brand: "Suntree", model: "DC Breaker 2P 1000V 32A/63A + SPD", capacity: "1000V DC Protection", type: "DC Breaker & Surge Protector", rate: 5800, prevRate: 6000, change: -200, status: "down", badge: "Surge Protection", warranty: "2 Yrs Replacement" }
+    ]
+  },
+  "15-Sep-2026": {
+    date: "15-September-2026",
+    label: "15-Sep-2026 (Yesterday)",
+    rates: [
+      { brand: "Canadian Solar", model: "585W", rate: 41.60, prevRate: 41.60, change: 0, status: "stable" },
+      { brand: "Canadian Solar", model: "625W", rate: 41.75, prevRate: 41.75, change: 0, status: "stable" },
+      { brand: "Aiko Solar", model: "645W", rate: 42.50, prevRate: 42.50, change: 0, status: "stable" },
+      { brand: "Aiko Solar", model: "665W", rate: 43.50, prevRate: 43.50, change: 0, status: "stable" },
+      { brand: "Aiko Solar", model: "770W", rate: 44.50, prevRate: 44.50, change: 0, status: "stable", badge: "770W Flagship" },
+      { brand: "Jinko Solar", model: "585W", rate: 41.25, prevRate: 40.00, change: 1.25, status: "up", badge: "High Demand" },
+      { brand: "Jinko Solar", model: "645W", rate: 41.50, prevRate: 41.25, change: 0.25, status: "up", deliveryDate: "15/09/2026", note: "Delivery: 15/09/2026" },
+      { brand: "LONGi", model: "645W x10 BF", rate: 43.25, prevRate: 42.60, change: 0.65, status: "up", badge: "HPBC 2.0 In-Demand" },
+      { brand: "JA Solar", model: "585W", rate: 38.60, prevRate: 38.60, change: 0, status: "new", badge: "New 585W Spec" },
+      { brand: "JA Solar", model: "605W", rate: 39.75, prevRate: 39.75, change: 0, status: "stable" },
+      { brand: "JA Solar", model: "625W", rate: 38.85, prevRate: 38.85, change: 0, status: "stable" },
+      { brand: "Astronergy", model: "580W", rate: 38.25, prevRate: 38.25, change: 0, status: "stable" },
+      { brand: "Astronergy", model: "620W", rate: 39.00, prevRate: 38.75, change: 0.25, status: "up" },
+      { brand: "Astronergy", model: "625W", rate: 39.00, prevRate: 39.00, change: 0, status: "stable" },
+      { brand: "Astronergy", model: "720W", rate: 39.00, prevRate: 38.75, change: 0.25, status: "new", badge: "New 720W Plate" },
+      { brand: "Risen", model: "740W HJT", rate: 41.00, prevRate: 41.00, change: 0, status: "stable" },
+      { brand: "Korean", model: "585W", rate: 37.00, prevRate: 37.00, change: 0, status: "stable" },
+      { brand: "Korean", model: "715W", rate: 38.00, prevRate: 38.00, change: 0, status: "stable" },
+      { brand: "OSDA", model: "585W", rate: 36.75, prevRate: 36.75, change: 0, status: "stable" },
+      { brand: "LEFN", model: "640W", rate: 33.00, prevRate: 37.00, change: -4.00, status: "down", badge: "Lowest Rate in PK" },
+    ],
+    inverterRates: [
+      { brand: "Itel", model: "1.6kW PV-3200 Hybrid IP54", capacity: "1.6 kW (PV 3200)", type: "Hybrid IP54 (Single Source)", rate: 44000, prevRate: 44000, change: 0, status: "stable", badge: "Single Source Ready", warranty: "3-Year Replacement Warranty", note: "Works on single source" },
+      { brand: "Itel", model: "3KW Pro PV-4500 Hybrid IP54", capacity: "3.0 kW (PV 4500)", type: "Hybrid IP54 Pro", rate: 78000, prevRate: 78000, change: 0, status: "stable", badge: "Best Value 3kW", warranty: "3-Year Replacement Warranty", note: "Works on single source" },
+      { brand: "Itel", model: "4KW Pro PV-6000 Hybrid IP54", capacity: "4.0 kW (PV 6000)", type: "Hybrid IP54 Pro", rate: 113000, prevRate: 113000, change: 0, status: "stable", badge: "4kW Pro PV6000", warranty: "3-Year Replacement Warranty", note: "Works on single source" },
+      { brand: "Itel", model: "6KW Pro PV-8000 Hybrid IP54", capacity: "6.0 kW (PV 8000)", type: "Hybrid IP54 Pro", rate: 138000, prevRate: 138000, change: 0, status: "stable", badge: "6kW Pro Best Seller", warranty: "3-Year Replacement Warranty", note: "Works on single source" },
+      { brand: "Itel", model: "8KW PV-16000 Hybrid IP54", capacity: "8.0 kW (PV 16000)", type: "Hybrid IP54 High PV", rate: null, prevRate: null, change: 0, status: "new", badge: "Call for Rate", warranty: "3-Year Replacement Warranty", note: "Works on single source" },
+      { brand: "Itel", model: "12KW PV-16000 Hybrid IP54", capacity: "12.0 kW (PV 16000)", type: "Hybrid IP54 High PV Commercial", rate: null, prevRate: null, change: 0, status: "new", badge: "Call for Rate", warranty: "3-Year Replacement Warranty", note: "Works on single source" },
+      { brand: "Itel", model: "6.6KW PV-13000 Single Phase IP66", capacity: "6.6 kW (PV 13000)", type: "Hybrid IP66 Single Phase", rate: 194000, prevRate: 194000, change: 0, status: "stable", badge: "12-Year Warranty IP66", warranty: "06-Yr Replacement + 06-Yr Service = 12 Years" },
+      { brand: "Itel", model: "8KW PV-16000 3-Phase IP66", capacity: "8.0 kW (PV 16000)", type: "Hybrid IP66 3-Phase", rate: 380000, prevRate: 380000, change: 0, status: "stable", badge: "IP66 3-Phase Heavy", warranty: "5-Year Replacement Warranty" },
+      { brand: "Inverex", model: "Nitrox 6kW Single Phase 48V", capacity: "6.0 kW", type: "Hybrid On/Off-Grid", rate: 266000, prevRate: 266000, change: 0, status: "stable", badge: "Pakistan #1 Hybrid", warranty: "5 Yrs Replacement" },
+      { brand: "Inverex", model: "Nitrox 10kW Three Phase", capacity: "10.0 kW", type: "Hybrid 3-Phase", rate: 465000, prevRate: 460000, change: 5000, status: "up", badge: "Heavy Residential", warranty: "5 Yrs Replacement", note: "Ready Stock" },
+      { brand: "Inverex", model: "Nitrox 12kW Commercial", capacity: "12.0 kW", type: "Hybrid 3-Phase Commercial", rate: 549000, prevRate: 549000, change: 0, status: "stable", badge: "Commercial Grade", warranty: "5 Yrs Warranty" },
+      { brand: "Inverex", model: "Veyron II 3.2kW / 5.2kW MPPT", capacity: "3.2kW – 5.2kW", type: "Off-Grid / Hybrid", rate: 95000, prevRate: 95000, change: 0, status: "stable", badge: "Affordable Hybrid", warranty: "2 Yrs Warranty" },
+      { brand: "Knox", model: "Krypton 6kW Hybrid 48V", capacity: "6.0 kW", type: "Hybrid On/Off-Grid (IP65)", rate: 186000, prevRate: 186000, change: 0, status: "stable", badge: "Best Value Hybrid", warranty: "5 Yrs Warranty" },
+      { brand: "Knox", model: "Krypton 8kW / 10kW Hybrid", capacity: "8.0kW – 10.0kW", type: "Hybrid 48V 1/3-Phase", rate: 272000, prevRate: 275000, change: -3000, status: "down", badge: "High Capacity", warranty: "5 Yrs Warranty" },
+      { brand: "Knox", model: "10kW On-Grid Inverter G4", capacity: "10.0 kW", type: "Grid-Tied 3-Phase", rate: 167000, prevRate: 167000, change: 0, status: "stable", badge: "Net Metering Approved", warranty: "5 Yrs Standard" },
+      { brand: "Fronus", model: "8.2kW Hybrid PV9200", capacity: "8.2 kW", type: "Hybrid Dual MPPT", rate: 233000, prevRate: 236000, change: -3000, status: "down", badge: "Dual AC Output", warranty: "2 Yrs Warranty" },
+      { brand: "Fronus", model: "Platinum PV 4200 / 5200", capacity: "4.2kW – 5.2kW", type: "Solar Hybrid Inverter", rate: 112000, prevRate: 112000, change: 0, status: "stable", badge: "Economy Pick", warranty: "2 Yrs Warranty" },
+      { brand: "Growatt", model: "MOD 10KTL3-X (10kW 3-Phase)", capacity: "10.0 kW", type: "On-Grid Net Metering", rate: 174000, prevRate: 174000, change: 0, status: "stable", badge: "Net Metering Approved", warranty: "5 Yrs Warranty" },
+      { brand: "Growatt", model: "SPH 10000TL 10kW Hybrid", capacity: "10.0 kW", type: "Hybrid 3-Phase IP65", rate: 374000, prevRate: 374000, change: 0, status: "stable", badge: "Premium Hybrid", warranty: "5 Yrs Extendable" },
+      { brand: "Huawei", model: "SUN2000-10KTL-M1 (10kW 3-Phase)", capacity: "10.0 kW", type: "Smart String On-Grid", rate: 323000, prevRate: 318000, change: 5000, status: "up", badge: "AI Smart AFCI", warranty: "5 / 10 Yrs Warranty" },
+      { brand: "Huawei", model: "SUN2000-20KTL-M2 (20kW 3-Phase)", capacity: "20.0 kW", type: "Commercial Smart String", rate: 440000, prevRate: 440000, change: 0, status: "stable", badge: "Commercial King", warranty: "5 Yrs Warranty" },
+      { brand: "Solis", model: "S6-EH1P6K-L-PRO (6kW Hybrid)", capacity: "6.0 kW", type: "Single Phase Hybrid (IP66)", rate: 224000, prevRate: 224000, change: 0, status: "stable", badge: "IP66 Rated", warranty: "5 Yrs Warranty" },
+      { brand: "Sungrow", model: "SG10RT (10kW Three Phase)", capacity: "10.0 kW", type: "On-Grid Multi-MPPT", rate: 187000, prevRate: 187000, change: 0, status: "stable", badge: "Global Leader", warranty: "5 Yrs Warranty" }
+    ],
+    batteryRates: [
+      { brand: "Itel", model: "Itel IP-20 Lithium 12V 100Ah", capacity: "12V 100Ah (1.28 kWh)", type: "Lithium LiFePO4 (IP20)", rate: 58000, prevRate: 58000, change: 0, status: "stable", badge: "12V Lithium 100Ah", warranty: "5-Year Replacement Warranty" },
+      { brand: "Itel", model: "Itel IP-20 Lithium 25V 100Ah", capacity: "25V 100Ah (2.56 kWh)", type: "Lithium LiFePO4 (IP20)", rate: 124000, prevRate: 124000, change: 0, status: "stable", badge: "25V 100Ah Lithium", warranty: "5-Year Replacement Warranty" },
+      { brand: "Itel", model: "Itel IP-20 Lithium 51V 100Ah", capacity: "51V 100Ah (5.12 kWh)", type: "Lithium LiFePO4 (IP20)", rate: 220000, prevRate: 220000, change: 0, status: "stable", badge: "5.12kWh Best Value", warranty: "5-Year Replacement Warranty", note: "Rs 220,000 Special Rate" },
+      { brand: "Itel", model: "Itel IP-20 Lithium 51V 200Ah", capacity: "51V 200Ah (10.24 kWh)", type: "Lithium LiFePO4 (IP20)", rate: 450000, prevRate: 450000, change: 0, status: "stable", badge: "10.24kWh High Bank", warranty: "5-Year Replacement Warranty" },
+      { brand: "Itel", model: "Itel IP-20 Lithium 51V 314Ah", capacity: "51V 314Ah (16.0 kWh)", type: "Lithium LiFePO4 (IP20)", rate: 590000, prevRate: 590000, change: 0, status: "stable", badge: "16kWh Commercial Bank", warranty: "5-Year Replacement Warranty" },
+      { brand: "Narada", model: "NPFC100 (48V 100Ah / 5.12kWh)", capacity: "48V 100Ah (5.12 kWh)", type: "Lithium LiFePO4", rate: 238500, prevRate: 238500, change: 0, status: "stable", badge: "Top Lithium 6000 Cycles", warranty: "5 Yrs Official" },
+      { brand: "Pylontech", model: "FIDUS 5.12kWh / US3000C", capacity: "5.12 kWh (48V)", type: "LiFePO4 Modular Rack", rate: 258000, prevRate: 255000, change: 3000, status: "up", badge: "10-Year Warranty", warranty: "10 Yrs Manufacturer" },
+      { brand: "Inverex", model: "PowerWall 5.12kWh LiFePO4", capacity: "51.2V 100Ah (5.12 kWh)", type: "Wall-Mount Smart Lithium", rate: 265500, prevRate: 265500, change: 0, status: "stable", badge: "Sleek Wall-Mount", warranty: "5 Yrs Warranty" },
+      { brand: "Inverex", model: "PowerWall 11.8kWh Heavy Duty", capacity: "51.2V 230Ah (11.8 kWh)", type: "LiFePO4 High Capacity", rate: 564000, prevRate: 564000, change: 0, status: "stable", badge: "All-Night AC Backup", warranty: "5 Yrs Warranty" },
+      { brand: "Dyness", model: "A48100 Powerbox F-5.0", capacity: "48V 100Ah (5.12 kWh)", type: "LiFePO4 Lithium", rate: 242000, prevRate: 245000, change: -3000, status: "down", badge: "Certified Safe", warranty: "10 Yrs Warranty" },
+      { brand: "Phoenix", model: "TX 2500 Tubular (230Ah)", capacity: "12V 230Ah (27 Plates)", type: "Tall Tubular Deep Cycle", rate: 51500, prevRate: 50000, change: 1500, status: "up", badge: "Top Tubular 27-Plates", warranty: "1 Year Replacement" },
+      { brand: "Phoenix", model: "TX 1800 Tubular (185Ah)", capacity: "12V 185Ah (21 Plates)", type: "Tall Tubular Deep Cycle", rate: 41500, prevRate: 41500, change: 0, status: "stable", badge: "Best Value Tubular", warranty: "1 Year Replacement" },
+      { brand: "Osaka", model: "Pro 1800 / HT 2000 Tubular", capacity: "12V 185Ah – 200Ah", type: "Deep Cycle Tubular", rate: 45000, prevRate: 45000, change: 0, status: "stable", badge: "Reliable Tubular", warranty: "1 Year Warranty" },
+      { brand: "AGS", model: "SP Tall 1200 / GX 165", capacity: "12V 120Ah – 150Ah", type: "Deep Cycle Solar Battery", rate: 31500, prevRate: 32000, change: -500, status: "down", badge: "Budget Deep Cycle", warranty: "1 Year Warranty" },
+      { brand: "Daewoo", model: "DIB-200 / DIB-225 Deep Cycle", capacity: "12V 175Ah – 200Ah", type: "Maintenance-Free Tubular", rate: 47000, prevRate: 47000, change: 0, status: "stable", badge: "Low Maintenance", warranty: "1 Year Warranty" },
+      { brand: "Narada", model: "AcmeG Polymer Gel 200Ah", capacity: "12V 200Ah (Gel)", type: "VRLA Sealed Polymer Gel", rate: 75500, prevRate: 76500, change: -1000, status: "down", badge: "Sealed Zero-Fumes", warranty: "2 Yrs Warranty" }
+    ],
+    essRates: [
+      { brand: "Itel", model: "Power Tank 500W / 1KWh", capacity: "500W Output / 1kWh LiFePO4", type: "Portable ESS / Solar Generator", rate: 65000, prevRate: 65000, change: 0, status: "new", badge: "Portable Power Tank", warranty: "3-Year Warranty", note: "Plug & Play Power Station" },
+      { brand: "Itel", model: "3.6KW + 8KWh ESS All-in-One", capacity: "3.6kW Inverter + 8kWh Storage", type: "All-in-One Energy Storage System", rate: null, prevRate: null, change: 0, status: "new", badge: "Call for Rate", warranty: "5-Year Replacement Warranty", note: "Integrated All-in-One Cabinet" }
+    ],
+    systemRates: [
+      { brand: "Turnkey Packages", model: "3.2kW Hybrid Residential System", capacity: "3.2 kW (5-7 Units/Day)", type: "Hybrid System (Panels + Inverter + Battery)", rate: 395000, prevRate: 395000, change: 0, status: "stable", badge: "3-5 Marla Home", warranty: "5 Yrs Inverter / 12 Yrs Panels" },
+      { brand: "Turnkey Packages", model: "5kW / 6kW Hybrid Home System", capacity: "6.0 kW (22-26 Units/Day)", type: "Net-Metering + Battery Backup", rate: 790000, prevRate: 790000, change: 0, status: "stable", badge: "5-10 Marla Home", warranty: "5 Yrs Inverter / 25 Yrs Panels" },
+      { brand: "Turnkey Packages", model: "10kW Three-Phase Net Metering", capacity: "10.0 kW (40-45 Units/Day)", type: "Grid-Tied Net Metering", rate: 1280000, prevRate: 1290000, change: -10000, status: "down", badge: "1 Kanal Home", warranty: "5 Yrs Inverter / 25 Yrs Panels" },
+      { brand: "Turnkey Packages", model: "15kW Commercial Net-Metering", capacity: "15.0 kW (60-70 Units/Day)", type: "Three Phase Commercial", rate: 1920000, prevRate: 1920000, change: 0, status: "stable", badge: "Commercial Plaza", warranty: "5 Yrs Inverter / 25 Yrs Panels" },
+      { brand: "Turnkey Packages", model: "20kW Industrial Net-Metering", capacity: "20.0 kW (80-95 Units/Day)", type: "Heavy Duty On-Grid", rate: 2480000, prevRate: 2500000, change: -20000, status: "down", badge: "Factory / Farmhouse", warranty: "5 Yrs Inverter / 25 Yrs Panels" }
+    ],
+    structureRates: [
+      { brand: "GI Elevated", model: "L2 Galvanized Elevated Frame (Custom)", capacity: "Fits 2-4 Panels (14-Gauge)", type: "Elevated Roof Structure", rate: 7200, prevRate: 7200, change: 0, status: "stable", badge: "High Wind Tested", warranty: "10 Yrs Anti-Rust" },
+      { brand: "GI Elevated", model: "L3 Galvanized Heavy Elevated P1/P2", capacity: "Fits 3-6 Panels (12-Gauge)", type: "Heavy Duty Walkway GI", rate: 8500, prevRate: 8500, change: 0, status: "stable", badge: "Walkway Frame", warranty: "15 Yrs Anti-Rust" },
+      { brand: "Pakistan Cables", model: "DC Solar Wire 4mm² Single Core (TUV)", capacity: "4.0 mm² Copper (Tinned)", type: "TUV Certified Double Insulated", rate: 235, prevRate: 235, change: 0, status: "stable", badge: "TUV Certified", warranty: "25 Yrs Outdoor Life" },
+      { brand: "Pakistan Cables", model: "DC Solar Wire 6mm² Single Core (TUV)", capacity: "6.0 mm² Copper (Tinned)", type: "TUV Certified Double Insulated", rate: 325, prevRate: 325, change: 0, status: "stable", badge: "Low Resistance", warranty: "25 Yrs Outdoor Life" },
+      { brand: "Suntree", model: "DC Breaker 2P 1000V 32A/63A + SPD", capacity: "1000V DC Protection", type: "DC Breaker & Surge Protector", rate: 5800, prevRate: 6000, change: -200, status: "down", badge: "Surge Protection", warranty: "2 Yrs Replacement" }
+    ]
+  },
   "14-Sep-2026": {
     date: "14-September-2026",
     label: "14-Sep-2026 (Today)",
@@ -38,6 +233,19 @@ export const ISLAMABAD_DAILY_SHEETS = {
       { brand: "LEFN", model: "640W", rate: 33.00, prevRate: 37.00, change: -4.00, status: "down", badge: "Lowest Rate in PK" },
     ],
     inverterRates: [
+      // Itel Hybrid Inverters IP-54 Series | 3-Year Replacement Warranty (Works on single source)
+      { brand: "Itel", model: "1.6kW PV-3200 Hybrid IP54", capacity: "1.6 kW (PV 3200)", type: "Hybrid IP54 (Single Source)", rate: 44000, prevRate: 44000, change: 0, status: "stable", badge: "Single Source Ready", warranty: "3-Year Replacement Warranty", note: "Works on single source" },
+      { brand: "Itel", model: "3KW Pro PV-4500 Hybrid IP54", capacity: "3.0 kW (PV 4500)", type: "Hybrid IP54 Pro", rate: 78000, prevRate: 78000, change: 0, status: "stable", badge: "Best Value 3kW", warranty: "3-Year Replacement Warranty", note: "Works on single source" },
+      { brand: "Itel", model: "4KW Pro PV-6000 Hybrid IP54", capacity: "4.0 kW (PV 6000)", type: "Hybrid IP54 Pro", rate: 113000, prevRate: 113000, change: 0, status: "stable", badge: "4kW Pro PV6000", warranty: "3-Year Replacement Warranty", note: "Works on single source" },
+      { brand: "Itel", model: "6KW Pro PV-8000 Hybrid IP54", capacity: "6.0 kW (PV 8000)", type: "Hybrid IP54 Pro", rate: 138000, prevRate: 138000, change: 0, status: "stable", badge: "6kW Pro Best Seller", warranty: "3-Year Replacement Warranty", note: "Works on single source" },
+      { brand: "Itel", model: "8KW PV-16000 Hybrid IP54", capacity: "8.0 kW (PV 16000)", type: "Hybrid IP54 High PV", rate: null, prevRate: null, change: 0, status: "new", badge: "Call for Rate", warranty: "3-Year Replacement Warranty", note: "Works on single source" },
+      { brand: "Itel", model: "12KW PV-16000 Hybrid IP54", capacity: "12.0 kW (PV 16000)", type: "Hybrid IP54 High PV Commercial", rate: null, prevRate: null, change: 0, status: "new", badge: "Call for Rate", warranty: "3-Year Replacement Warranty", note: "Works on single source" },
+
+      // Itel Hybrid Inverters IP-66 Series
+      { brand: "Itel", model: "6.6KW PV-13000 Single Phase IP66", capacity: "6.6 kW (PV 13000)", type: "Hybrid IP66 Single Phase", rate: 194000, prevRate: 194000, change: 0, status: "stable", badge: "12-Year Warranty IP66", warranty: "06-Yr Replacement + 06-Yr Service = 12 Years" },
+      { brand: "Itel", model: "8KW PV-16000 3-Phase IP66", capacity: "8.0 kW (PV 16000)", type: "Hybrid IP66 3-Phase", rate: 380000, prevRate: 380000, change: 0, status: "stable", badge: "IP66 3-Phase Heavy", warranty: "5-Year Replacement Warranty" },
+
+      // Established Market Benchmarks
       { brand: "Inverex", model: "Nitrox 6kW Single Phase 48V", capacity: "6.0 kW", type: "Hybrid On/Off-Grid", rate: 266000, prevRate: 266000, change: 0, status: "stable", badge: "Pakistan #1 Hybrid", warranty: "5 Yrs Replacement" },
       { brand: "Inverex", model: "Nitrox 10kW Three Phase", capacity: "10.0 kW", type: "Hybrid 3-Phase", rate: 465000, prevRate: 460000, change: 5000, status: "up", badge: "Heavy Residential", warranty: "5 Yrs Replacement", note: "Ready Stock" },
       { brand: "Inverex", model: "Nitrox 12kW Commercial", capacity: "12.0 kW", type: "Hybrid 3-Phase Commercial", rate: 549000, prevRate: 549000, change: 0, status: "stable", badge: "Commercial Grade", warranty: "5 Yrs Warranty" },
@@ -55,6 +263,14 @@ export const ISLAMABAD_DAILY_SHEETS = {
       { brand: "Sungrow", model: "SG10RT (10kW Three Phase)", capacity: "10.0 kW", type: "On-Grid Multi-MPPT", rate: 187000, prevRate: 187000, change: 0, status: "stable", badge: "Global Leader", warranty: "5 Yrs Warranty" }
     ],
     batteryRates: [
+      // Itel IP-20 Lithium Batteries | 5-Year Replacement Warranty
+      { brand: "Itel", model: "Itel IP-20 Lithium 12V 100Ah", capacity: "12V 100Ah (1.28 kWh)", type: "Lithium LiFePO4 (IP20)", rate: 58000, prevRate: 58000, change: 0, status: "stable", badge: "12V Lithium 100Ah", warranty: "5-Year Replacement Warranty" },
+      { brand: "Itel", model: "Itel IP-20 Lithium 25V 100Ah", capacity: "25V 100Ah (2.56 kWh)", type: "Lithium LiFePO4 (IP20)", rate: 124000, prevRate: 124000, change: 0, status: "stable", badge: "25V 100Ah Lithium", warranty: "5-Year Replacement Warranty" },
+      { brand: "Itel", model: "Itel IP-20 Lithium 51V 100Ah", capacity: "51V 100Ah (5.12 kWh)", type: "Lithium LiFePO4 (IP20)", rate: 220000, prevRate: 220000, change: 0, status: "stable", badge: "5.12kWh Best Value", warranty: "5-Year Replacement Warranty", note: "Rs 220,000 Special Rate" },
+      { brand: "Itel", model: "Itel IP-20 Lithium 51V 200Ah", capacity: "51V 200Ah (10.24 kWh)", type: "Lithium LiFePO4 (IP20)", rate: 450000, prevRate: 450000, change: 0, status: "stable", badge: "10.24kWh High Bank", warranty: "5-Year Replacement Warranty" },
+      { brand: "Itel", model: "Itel IP-20 Lithium 51V 314Ah", capacity: "51V 314Ah (16.0 kWh)", type: "Lithium LiFePO4 (IP20)", rate: 590000, prevRate: 590000, change: 0, status: "stable", badge: "16kWh Commercial Bank", warranty: "5-Year Replacement Warranty" },
+
+      // Other Benchmark Batteries
       { brand: "Narada", model: "NPFC100 (48V 100Ah / 5.12kWh)", capacity: "48V 100Ah (5.12 kWh)", type: "Lithium LiFePO4", rate: 238500, prevRate: 238500, change: 0, status: "stable", badge: "Top Lithium 6000 Cycles", warranty: "5 Yrs Official" },
       { brand: "Pylontech", model: "FIDUS 5.12kWh / US3000C", capacity: "5.12 kWh (48V)", type: "LiFePO4 Modular Rack", rate: 258000, prevRate: 255000, change: 3000, status: "up", badge: "10-Year Warranty", warranty: "10 Yrs Manufacturer" },
       { brand: "Inverex", model: "PowerWall 5.12kWh LiFePO4", capacity: "51.2V 100Ah (5.12 kWh)", type: "Wall-Mount Smart Lithium", rate: 265500, prevRate: 265500, change: 0, status: "stable", badge: "Sleek Wall-Mount", warranty: "5 Yrs Warranty" },
@@ -66,6 +282,11 @@ export const ISLAMABAD_DAILY_SHEETS = {
       { brand: "AGS", model: "SP Tall 1200 / GX 165", capacity: "12V 120Ah – 150Ah", type: "Deep Cycle Solar Battery", rate: 31500, prevRate: 32000, change: -500, status: "down", badge: "Budget Deep Cycle", warranty: "1 Year Warranty" },
       { brand: "Daewoo", model: "DIB-200 / DIB-225 Deep Cycle", capacity: "12V 175Ah – 200Ah", type: "Maintenance-Free Tubular", rate: 47000, prevRate: 47000, change: 0, status: "stable", badge: "Low Maintenance", warranty: "1 Year Warranty" },
       { brand: "Narada", model: "AcmeG Polymer Gel 200Ah", capacity: "12V 200Ah (Gel)", type: "VRLA Sealed Polymer Gel", rate: 75500, prevRate: 76500, change: -1000, status: "down", badge: "Sealed Zero-Fumes", warranty: "2 Yrs Warranty" }
+    ],
+    essRates: [
+      // ESS / Energy Storage (Itel Power Tank & Cabinet Systems)
+      { brand: "Itel", model: "Power Tank 500W / 1KWh", capacity: "500W Output / 1kWh LiFePO4", type: "Portable ESS / Solar Generator", rate: 65000, prevRate: 65000, change: 0, status: "new", badge: "Portable Power Tank", warranty: "3-Year Warranty", note: "Plug & Play Power Station" },
+      { brand: "Itel", model: "3.6KW + 8KWh ESS All-in-One", capacity: "3.6kW Inverter + 8kWh Storage", type: "All-in-One Energy Storage System", rate: null, prevRate: null, change: 0, status: "new", badge: "Call for Rate", warranty: "5-Year Replacement Warranty", note: "Integrated All-in-One Cabinet" }
     ],
     systemRates: [
       { brand: "Turnkey Packages", model: "3.2kW Hybrid Residential System", capacity: "3.2 kW (5-7 Units/Day)", type: "Hybrid System (Panels + Inverter + Battery)", rate: 395000, prevRate: 395000, change: 0, status: "stable", badge: "3-5 Marla Home", warranty: "5 Yrs Inverter / 12 Yrs Panels" },
@@ -107,6 +328,18 @@ export const ISLAMABAD_DAILY_SHEETS = {
       { brand: "LEFN", model: "640W", rate: 37.00, prevRate: 37.00, change: 0, status: "stable" },
     ],
     inverterRates: [
+      // Itel Hybrid Inverters IP-54 Series | 3-Year Replacement Warranty
+      { brand: "Itel", model: "1.6kW PV-3200 Hybrid IP54", capacity: "1.6 kW (PV 3200)", type: "Hybrid IP54 (Single Source)", rate: 44000, prevRate: 44000, change: 0, status: "stable", badge: "Single Source Ready", warranty: "3-Year Replacement Warranty", note: "Works on single source" },
+      { brand: "Itel", model: "3KW Pro PV-4500 Hybrid IP54", capacity: "3.0 kW (PV 4500)", type: "Hybrid IP54 Pro", rate: 78000, prevRate: 78000, change: 0, status: "stable", badge: "Best Value 3kW", warranty: "3-Year Replacement Warranty", note: "Works on single source" },
+      { brand: "Itel", model: "4KW Pro PV-6000 Hybrid IP54", capacity: "4.0 kW (PV 6000)", type: "Hybrid IP54 Pro", rate: 113000, prevRate: 113000, change: 0, status: "stable", badge: "4kW Pro PV6000", warranty: "3-Year Replacement Warranty", note: "Works on single source" },
+      { brand: "Itel", model: "6KW Pro PV-8000 Hybrid IP54", capacity: "6.0 kW (PV 8000)", type: "Hybrid IP54 Pro", rate: 138000, prevRate: 138000, change: 0, status: "stable", badge: "6kW Pro Best Seller", warranty: "3-Year Replacement Warranty", note: "Works on single source" },
+      { brand: "Itel", model: "8KW PV-16000 Hybrid IP54", capacity: "8.0 kW (PV 16000)", type: "Hybrid IP54 High PV", rate: null, prevRate: null, change: 0, status: "new", badge: "Call for Rate", warranty: "3-Year Replacement Warranty", note: "Works on single source" },
+      { brand: "Itel", model: "12KW PV-16000 Hybrid IP54", capacity: "12.0 kW (PV 16000)", type: "Hybrid IP54 High PV Commercial", rate: null, prevRate: null, change: 0, status: "new", badge: "Call for Rate", warranty: "3-Year Replacement Warranty", note: "Works on single source" },
+
+      // Itel Hybrid Inverters IP-66 Series
+      { brand: "Itel", model: "6.6KW PV-13000 Single Phase IP66", capacity: "6.6 kW (PV 13000)", type: "Hybrid IP66 Single Phase", rate: 194000, prevRate: 194000, change: 0, status: "stable", badge: "12-Year Warranty IP66", warranty: "06-Yr Replacement + 06-Yr Service = 12 Years" },
+      { brand: "Itel", model: "8KW PV-16000 3-Phase IP66", capacity: "8.0 kW (PV 16000)", type: "Hybrid IP66 3-Phase", rate: 380000, prevRate: 380000, change: 0, status: "stable", badge: "IP66 3-Phase Heavy", warranty: "5-Year Replacement Warranty" },
+
       { brand: "Inverex", model: "Nitrox 6kW Single Phase 48V", capacity: "6.0 kW", type: "Hybrid On/Off-Grid", rate: 266000, prevRate: 266000, change: 0, status: "stable", badge: "Pakistan #1 Hybrid", warranty: "5 Yrs Replacement" },
       { brand: "Inverex", model: "Nitrox 10kW Three Phase", capacity: "10.0 kW", type: "Hybrid 3-Phase", rate: 460000, prevRate: 460000, change: 0, status: "stable", badge: "Heavy Residential", warranty: "5 Yrs Replacement" },
       { brand: "Inverex", model: "Nitrox 12kW Commercial", capacity: "12.0 kW", type: "Hybrid 3-Phase Commercial", rate: 549000, prevRate: 549000, change: 0, status: "stable", badge: "Commercial Grade", warranty: "5 Yrs Warranty" },
@@ -124,6 +357,13 @@ export const ISLAMABAD_DAILY_SHEETS = {
       { brand: "Sungrow", model: "SG10RT (10kW Three Phase)", capacity: "10.0 kW", type: "On-Grid Multi-MPPT", rate: 187000, prevRate: 187000, change: 0, status: "stable", badge: "Global Leader", warranty: "5 Yrs Warranty" }
     ],
     batteryRates: [
+      // Itel IP-20 Lithium Batteries | 5-Year Replacement Warranty
+      { brand: "Itel", model: "Itel IP-20 Lithium 12V 100Ah", capacity: "12V 100Ah (1.28 kWh)", type: "Lithium LiFePO4 (IP20)", rate: 58000, prevRate: 58000, change: 0, status: "stable", badge: "12V Lithium 100Ah", warranty: "5-Year Replacement Warranty" },
+      { brand: "Itel", model: "Itel IP-20 Lithium 25V 100Ah", capacity: "25V 100Ah (2.56 kWh)", type: "Lithium LiFePO4 (IP20)", rate: 124000, prevRate: 124000, change: 0, status: "stable", badge: "25V 100Ah Lithium", warranty: "5-Year Replacement Warranty" },
+      { brand: "Itel", model: "Itel IP-20 Lithium 51V 100Ah", capacity: "51V 100Ah (5.12 kWh)", type: "Lithium LiFePO4 (IP20)", rate: 220000, prevRate: 220000, change: 0, status: "stable", badge: "5.12kWh Best Value", warranty: "5-Year Replacement Warranty", note: "Rs 220,000 Special Rate" },
+      { brand: "Itel", model: "Itel IP-20 Lithium 51V 200Ah", capacity: "51V 200Ah (10.24 kWh)", type: "Lithium LiFePO4 (IP20)", rate: 450000, prevRate: 450000, change: 0, status: "stable", badge: "10.24kWh High Bank", warranty: "5-Year Replacement Warranty" },
+      { brand: "Itel", model: "Itel IP-20 Lithium 51V 314Ah", capacity: "51V 314Ah (16.0 kWh)", type: "Lithium LiFePO4 (IP20)", rate: 590000, prevRate: 590000, change: 0, status: "stable", badge: "16kWh Commercial Bank", warranty: "5-Year Replacement Warranty" },
+
       { brand: "Narada", model: "NPFC100 (48V 100Ah / 5.12kWh)", capacity: "48V 100Ah (5.12 kWh)", type: "Lithium LiFePO4", rate: 238500, prevRate: 238500, change: 0, status: "stable", badge: "Top Lithium 6000 Cycles", warranty: "5 Yrs Official" },
       { brand: "Pylontech", model: "FIDUS 5.12kWh / US3000C", capacity: "5.12 kWh (48V)", type: "LiFePO4 Modular Rack", rate: 255000, prevRate: 255000, change: 0, status: "stable", badge: "10-Year Warranty", warranty: "10 Yrs Manufacturer" },
       { brand: "Inverex", model: "PowerWall 5.12kWh LiFePO4", capacity: "51.2V 100Ah (5.12 kWh)", type: "Wall-Mount Smart Lithium", rate: 265500, prevRate: 265500, change: 0, status: "stable", badge: "Sleek Wall-Mount", warranty: "5 Yrs Warranty" },
@@ -135,6 +375,11 @@ export const ISLAMABAD_DAILY_SHEETS = {
       { brand: "AGS", model: "SP Tall 1200 / GX 165", capacity: "12V 120Ah – 150Ah", type: "Deep Cycle Solar Battery", rate: 32000, prevRate: 32000, change: 0, status: "stable", badge: "Budget Deep Cycle", warranty: "1 Year Warranty" },
       { brand: "Daewoo", model: "DIB-200 / DIB-225 Deep Cycle", capacity: "12V 175Ah – 200Ah", type: "Maintenance-Free Tubular", rate: 47000, prevRate: 47000, change: 0, status: "stable", badge: "Low Maintenance", warranty: "1 Year Warranty" },
       { brand: "Narada", model: "AcmeG Polymer Gel 200Ah", capacity: "12V 200Ah (Gel)", type: "VRLA Sealed Polymer Gel", rate: 76500, prevRate: 76500, change: 0, status: "stable", badge: "Sealed Zero-Fumes", warranty: "2 Yrs Warranty" }
+    ],
+    essRates: [
+      // ESS / Energy Storage
+      { brand: "Itel", model: "Power Tank 500W / 1KWh", capacity: "500W Output / 1kWh LiFePO4", type: "Portable ESS / Solar Generator", rate: 65000, prevRate: 65000, change: 0, status: "new", badge: "Portable Power Tank", warranty: "3-Year Warranty", note: "Plug & Play Power Station" },
+      { brand: "Itel", model: "3.6KW + 8KWh ESS All-in-One", capacity: "3.6kW Inverter + 8kWh Storage", type: "All-in-One Energy Storage System", rate: null, prevRate: null, change: 0, status: "new", badge: "Call for Rate", warranty: "5-Year Replacement Warranty", note: "Integrated All-in-One Cabinet" }
     ],
     systemRates: [
       { brand: "Turnkey Packages", model: "3.2kW Hybrid Residential System", capacity: "3.2 kW (5-7 Units/Day)", type: "Hybrid System (Panels + Inverter + Battery)", rate: 395000, prevRate: 395000, change: 0, status: "stable", badge: "3-5 Marla Home", warranty: "5 Yrs Inverter / 12 Yrs Panels" },
@@ -154,20 +399,21 @@ export const ISLAMABAD_DAILY_SHEETS = {
 };
 
 // Provide dynamic references so today/yesterday always resolve smoothly
-const todayKey = _currentPkt?.shortDate || "15-Sep-2026";
-const yesterdayKey = _currentPkt?.yesterdayShortDate || "14-Sep-2026";
+const todayKey = _currentPkt?.shortDate || "16-Sep-2026";
+const yesterdayKey = _currentPkt?.yesterdayShortDate || "15-Sep-2026";
 
 if (!ISLAMABAD_DAILY_SHEETS[todayKey]) {
   ISLAMABAD_DAILY_SHEETS[todayKey] = {
-    ...ISLAMABAD_DAILY_SHEETS["14-Sep-2026"],
-    date: _currentPkt?.todayStr || "15 September 2026",
+    ...ISLAMABAD_DAILY_SHEETS["16-Sep-2026"],
+    date: _currentPkt?.todayStr || "16 September 2026",
     label: `${todayKey} (Today)`,
   };
 }
 
-ISLAMABAD_DAILY_SHEETS["today"] = ISLAMABAD_DAILY_SHEETS[todayKey] || ISLAMABAD_DAILY_SHEETS["14-Sep-2026"];
-ISLAMABAD_DAILY_SHEETS["yesterday"] = ISLAMABAD_DAILY_SHEETS[yesterdayKey] || ISLAMABAD_DAILY_SHEETS["14-Sep-2026"] || ISLAMABAD_DAILY_SHEETS["13-Sep-2026"];
-ISLAMABAD_DAILY_SHEETS["15-Sep-2026"] = ISLAMABAD_DAILY_SHEETS[todayKey];
+ISLAMABAD_DAILY_SHEETS["today"] = ISLAMABAD_DAILY_SHEETS[todayKey] || ISLAMABAD_DAILY_SHEETS["16-Sep-2026"];
+ISLAMABAD_DAILY_SHEETS["yesterday"] = ISLAMABAD_DAILY_SHEETS[yesterdayKey] || ISLAMABAD_DAILY_SHEETS["15-Sep-2026"] || ISLAMABAD_DAILY_SHEETS["14-Sep-2026"];
+ISLAMABAD_DAILY_SHEETS["16-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["16-Sep-2026"];
+ISLAMABAD_DAILY_SHEETS["15-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["15-Sep-2026"];
 ISLAMABAD_DAILY_SHEETS["14-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["14-Sep-2026"];
 ISLAMABAD_DAILY_SHEETS["13-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["13-Sep-2026"];
 // Backwards compatibility references
@@ -175,6 +421,9 @@ ISLAMABAD_DAILY_SHEETS["08-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["today"];
 ISLAMABAD_DAILY_SHEETS["07-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["yesterday"];
 if (_currentPkt?.shortDate) {
   ISLAMABAD_DAILY_SHEETS[_currentPkt.shortDate] = ISLAMABAD_DAILY_SHEETS["today"];
+}
+if (_currentPkt?.yesterdayShortDate) {
+  ISLAMABAD_DAILY_SHEETS[_currentPkt.yesterdayShortDate] = ISLAMABAD_DAILY_SHEETS["yesterday"];
 }
 
 export const MARKET_SUMMARY = {
@@ -232,16 +481,35 @@ export const SOLAR_PRICES_DATA = [
     "model": "Canadian Solar TopBiHiKu6 (585W)",
     "type": "N-Type TOPCon Dual-Glass Bifacial",
     "capacity": "585W",
-    "pricePerWatt": 41.60,
-    "pricePerWattRange": "Rs 41.60 / W",
-    "unitPriceMin": 24336,
-    "unitPriceMax": 24336,
+    "pricePerWatt": 41.50,
+    "pricePerWattRange": "Rs 41.50 / W",
+    "unitPriceMin": 24278,
+    "unitPriceMax": 24278,
     "trend": "hot",
-    "trendPercent": "+Rs 5.70/W",
+    "trendPercent": "Rs 41.50/W",
     "efficiency": "22.8%",
     "warranty": "12 Yrs Product / 30 Yrs Linear",
     "badge": "Islamabad Ready Stock",
     "description": "Canadian Solar 585W TopBiHiKu6 N-Type TOPCon bifacial module with superior high-temp performance.",
+    "popular": true
+  },
+  {
+    "id": "panel-canadian-590",
+    "category": "panel",
+    "brand": "Canadian Solar",
+    "model": "Canadian Solar TopBiHiKu6 (590W)",
+    "type": "N-Type TOPCon Dual-Glass Bifacial",
+    "capacity": "590W",
+    "pricePerWatt": 41.40,
+    "pricePerWattRange": "Rs 41.40 / W",
+    "unitPriceMin": 24426,
+    "unitPriceMax": 24426,
+    "trend": "hot",
+    "trendPercent": "Ready Stock",
+    "efficiency": "23.0%",
+    "warranty": "12 Yrs Product / 30 Yrs Linear",
+    "badge": "590W Ready Stock",
+    "description": "Canadian Solar 590W TopBiHiKu6 N-Type TOPCon high output bifacial module with enhanced lower temp coefficient.",
     "popular": true
   },
   {
@@ -251,10 +519,10 @@ export const SOLAR_PRICES_DATA = [
     "model": "Canadian Solar TopBiHiKu7 (625W)",
     "type": "N-Type TOPCon Dual-Glass Bifacial",
     "capacity": "625W",
-    "pricePerWatt": 41.75,
-    "pricePerWattRange": "Rs 41.75 / W",
-    "unitPriceMin": 26094,
-    "unitPriceMax": 26094,
+    "pricePerWatt": 41.50,
+    "pricePerWattRange": "Rs 41.50 / W",
+    "unitPriceMin": 25938,
+    "unitPriceMax": 25938,
     "trend": "hot",
     "trendPercent": "Ready Stock",
     "efficiency": "23.1%",
@@ -331,16 +599,16 @@ export const SOLAR_PRICES_DATA = [
     "model": "Jinko Tiger Neo 72HL4-BDV (585W)",
     "type": "N-Type TOPCon Dual-Glass Bifacial",
     "capacity": "585W",
-    "pricePerWatt": 41.25,
-    "pricePerWattRange": "Rs 41.25 / W",
-    "unitPriceMin": 24131,
-    "unitPriceMax": 24131,
+    "pricePerWatt": 40.00,
+    "pricePerWattRange": "Rs 40.00 / W",
+    "unitPriceMin": 23400,
+    "unitPriceMax": 23400,
     "trend": "hot",
-    "trendPercent": "+Rs 1.25/W",
+    "trendPercent": "Rs 40.00/W",
     "efficiency": "22.65%",
     "warranty": "12 Yrs Product / 30 Yrs Power",
-    "badge": "Tier-1 Top Demand",
-    "description": "Pakistan's most popular N-Type solar panel with SMBB technology and exceptional high-temperature yield. Per-watt price up on tight ready stock.",
+    "badge": "Tiger Neo Tier-1",
+    "description": "Pakistan's most popular N-Type solar panel with SMBB technology and exceptional high-temperature yield. Verified rate Rs 40.00/W.",
     "popular": true
   },
   {
@@ -350,16 +618,16 @@ export const SOLAR_PRICES_DATA = [
     "model": "Jinko Tiger Neo 78HL4-BDV (645W)",
     "type": "N-Type TOPCon Dual-Glass Bifacial",
     "capacity": "645W",
-    "pricePerWatt": 41.50,
-    "pricePerWattRange": "Rs 41.50 / W",
-    "unitPriceMin": 26768,
-    "unitPriceMax": 26768,
+    "pricePerWatt": 41.00,
+    "pricePerWattRange": "Rs 41.00 / W",
+    "unitPriceMin": 26445,
+    "unitPriceMax": 26445,
     "trend": "hot",
-    "trendPercent": "Delivery: 15/09/2026",
+    "trendPercent": "Delivery: 16/09/2026",
     "efficiency": "22.85%",
     "warranty": "12 Yrs Product / 30 Yrs Power",
-    "badge": "Delivery 15-Sep",
-    "description": "645W large format Tiger Neo bifacial module. Next container delivery date: 15/09/2026 booking at Rs 41.50/W.",
+    "badge": "Delivery 16-Sep",
+    "description": "645W large format Tiger Neo bifacial module. Next container delivery date: 16/09/2026 booking at Rs 41.00/W.",
     "popular": true
   },
 
@@ -371,16 +639,16 @@ export const SOLAR_PRICES_DATA = [
     "model": "Longi Hi-MO X10 BF (645W)",
     "type": "HPBC 2.0 High Efficiency Bifacial",
     "capacity": "645W",
-    "pricePerWatt": 43.25,
-    "pricePerWattRange": "Rs 43.25 / W",
-    "unitPriceMin": 27896,
-    "unitPriceMax": 27896,
+    "pricePerWatt": 43.50,
+    "pricePerWattRange": "Rs 43.50 / W",
+    "unitPriceMin": 28058,
+    "unitPriceMax": 28058,
     "trend": "hot",
-    "trendPercent": "+Rs 0.65/W",
+    "trendPercent": "Rs 43.50/W",
     "efficiency": "24.8%",
     "warranty": "15 Yrs Product / 30 Yrs Linear",
     "badge": "HPBC 2.0 In-Demand",
-    "description": "Longi latest Hi-MO X10 HPBC 2.0 bifacial panel with TaiRay wafer technology and anti-dust accumulation coating. Strong commercial installer interest.",
+    "description": "Longi latest Hi-MO X10 HPBC 2.0 bifacial panel with TaiRay wafer technology and anti-dust accumulation coating. Official rate Rs 43.50/W.",
     "popular": true
   },
   {
@@ -400,6 +668,27 @@ export const SOLAR_PRICES_DATA = [
     "warranty": "15 Yrs Product / 30 Yrs Linear",
     "badge": "Tier-1 Best Seller",
     "description": "Longi HPDC dual-cell N-type technology with ultra-low degradation and verified field reliability.",
+    "popular": true
+  },
+
+  // ---------------- INVEREX SOLAR PANELS ----------------
+  {
+    "id": "panel-inverex-620",
+    "category": "panel",
+    "brand": "Inverex",
+    "model": "Inverex Bifacial N-Type (620W) with Warranty Card",
+    "type": "N-Type TOPCon Dual-Glass Bifacial",
+    "capacity": "620W",
+    "pricePerWatt": 42.50,
+    "pricePerWattRange": "Rs 42.50 / W",
+    "unitPriceMin": 26350,
+    "unitPriceMax": 26350,
+    "trend": "hot",
+    "trendPercent": "With Warranty Card",
+    "efficiency": "22.9%",
+    "warranty": "Official Warranty Card Included",
+    "badge": "With Warranty Card",
+    "description": "Inverex 620W N-Type bifacial solar module complete with official verified warranty card and high energy yield.",
     "popular": true
   },
 
@@ -464,22 +753,22 @@ export const SOLAR_PRICES_DATA = [
 
   // ---------------- ASTRONERGY / ASTRO ----------------
   {
-    "id": "panel-astro-580",
+    "id": "panel-astro-590",
     "category": "panel",
     "brand": "Astronergy",
-    "model": "Astronergy ASTRO N5s (580W)",
+    "model": "Astronergy ASTRO N5s (590W)",
     "type": "N-Type TOPCon Dual-Glass Bifacial",
-    "capacity": "580W",
+    "capacity": "590W",
     "pricePerWatt": 38.25,
     "pricePerWattRange": "Rs 38.25 / W",
-    "unitPriceMin": 22185,
-    "unitPriceMax": 22185,
+    "unitPriceMin": 22568,
+    "unitPriceMax": 22568,
     "trend": "stable",
-    "trendPercent": "Stable Stock",
-    "efficiency": "22.5%",
+    "trendPercent": "Astro 590W",
+    "efficiency": "22.6%",
     "warranty": "12 Yrs Product / 30 Yrs Power",
-    "badge": "CHINT Group Tier-1",
-    "description": "Solid Tier-1 brand backed by CHINT group, delivering reliable yield at very competitive price points.",
+    "badge": "Astro 590W Ready",
+    "description": "Solid Tier-1 brand backed by CHINT group, delivering reliable yield at Rs 38.25/W.",
     "popular": true
   },
   {
@@ -494,11 +783,11 @@ export const SOLAR_PRICES_DATA = [
     "unitPriceMin": 24180,
     "unitPriceMax": 24180,
     "trend": "hot",
-    "trendPercent": "+Rs 0.25/W",
+    "trendPercent": "Rs 39.00/W",
     "efficiency": "22.7%",
     "warranty": "12 Yrs Product / 30 Yrs Power",
     "badge": "Islamabad Stock",
-    "description": "620W high efficiency module with non-destructive cutting technology reducing micro-crack risks. Price adjusted to Rs 39.00/W.",
+    "description": "620W high efficiency module with non-destructive cutting technology reducing micro-crack risks. Price: Rs 39.00/W.",
     "popular": false
   },
   {
@@ -521,25 +810,6 @@ export const SOLAR_PRICES_DATA = [
     "popular": false
   },
   {
-    "id": "panel-astro-715",
-    "category": "panel",
-    "brand": "Astronergy",
-    "model": "Astronergy ASTRO N7 (715W)",
-    "type": "N-Type TOPCon Large Format Bifacial",
-    "capacity": "715W",
-    "pricePerWatt": 38.75,
-    "pricePerWattRange": "Rs 38.75 / W",
-    "unitPriceMin": 27706,
-    "unitPriceMax": 27706,
-    "trend": "stable",
-    "trendPercent": "Heavy Output",
-    "efficiency": "23.0%",
-    "warranty": "12 Yrs Product / 30 Yrs Power",
-    "badge": "715W Commercial",
-    "description": "715W high-density commercial module designed for large scale rooftop and ground mount installations.",
-    "popular": true
-  },
-  {
     "id": "panel-astro-720",
     "category": "panel",
     "brand": "Astronergy",
@@ -551,7 +821,7 @@ export const SOLAR_PRICES_DATA = [
     "unitPriceMin": 28080,
     "unitPriceMax": 28080,
     "trend": "hot",
-    "trendPercent": "New 720W Plate",
+    "trendPercent": "Rs 39.00/W",
     "efficiency": "23.2%",
     "warranty": "12 Yrs Product / 30 Yrs Power",
     "badge": "720W Commercial",
@@ -588,17 +858,36 @@ export const SOLAR_PRICES_DATA = [
     "model": "Korean Solar N-Type (585W)",
     "type": "N-Type TOPCon Bifacial Dual Glass",
     "capacity": "585W",
-    "pricePerWatt": 37.00,
-    "pricePerWattRange": "Rs 37.00 / W",
-    "unitPriceMin": 21645,
-    "unitPriceMax": 21645,
-    "trend": "stable",
-    "trendPercent": "Budget Value",
+    "pricePerWatt": 38.00,
+    "pricePerWattRange": "Rs 38.00 / W",
+    "unitPriceMin": 22230,
+    "unitPriceMax": 22230,
+    "trend": "hot",
+    "trendPercent": "Rs 38.00/W",
     "efficiency": "22.6%",
     "warranty": "12 Yrs Product / 25 Yrs Linear",
     "badge": "Affordable Pick",
     "description": "High performance 585W dual-glass panel providing budget-friendly alternative without compromising on generation.",
     "popular": false
+  },
+  {
+    "id": "panel-korean-670-abc",
+    "category": "panel",
+    "brand": "Korean",
+    "model": "Korean Solar ABC High Efficiency (670W)",
+    "type": "ABC All-Back-Contact Dual-Glass Bifacial",
+    "capacity": "670W",
+    "pricePerWatt": 40.60,
+    "pricePerWattRange": "Rs 40.60 / W",
+    "unitPriceMin": 27202,
+    "unitPriceMax": 27202,
+    "trend": "new",
+    "trendPercent": "ABC Tech",
+    "efficiency": "23.5%",
+    "warranty": "15 Yrs Product / 30 Yrs Linear",
+    "badge": "ABC Tech High Yield",
+    "description": "Korean Solar 670W ABC (All-Back-Contact) high efficiency bifacial solar module with gridless front design.",
+    "popular": true
   },
   {
     "id": "panel-korean-715",
@@ -607,16 +896,16 @@ export const SOLAR_PRICES_DATA = [
     "model": "Korean Solar High Output (715W)",
     "type": "N-Type TOPCon Dual-Glass Bifacial",
     "capacity": "715W",
-    "pricePerWatt": 38.00,
-    "pricePerWattRange": "Rs 38.00 / W",
-    "unitPriceMin": 27170,
-    "unitPriceMax": 27170,
+    "pricePerWatt": 37.75,
+    "pricePerWattRange": "Rs 37.75 / W",
+    "unitPriceMin": 26991,
+    "unitPriceMax": 26991,
     "trend": "stable",
-    "trendPercent": "Commercial Pick",
+    "trendPercent": "Rs 37.75/W",
     "efficiency": "22.9%",
     "warranty": "12 Yrs Product / 25 Yrs Linear",
     "badge": "715W High Output",
-    "description": "Large format 715W solar panel ideal for commercial setups and tube-well agricultural projects.",
+    "description": "Large format 715W solar panel ideal for commercial setups and tube-well agricultural projects at Rs 37.75/W.",
     "popular": false
   },
 
@@ -649,18 +938,235 @@ export const SOLAR_PRICES_DATA = [
     "model": "LEFN Solar N-Type (640W)",
     "type": "N-Type TOPCon Dual-Glass Bifacial",
     "capacity": "640W",
-    "pricePerWatt": 33.00,
-    "pricePerWattRange": "Rs 33.00 / W",
-    "unitPriceMin": 21120,
-    "unitPriceMax": 21120,
+    "pricePerWatt": 33.50,
+    "pricePerWattRange": "Rs 33.50 / W",
+    "unitPriceMin": 21440,
+    "unitPriceMax": 21440,
     "trend": "drop",
-    "trendPercent": "-Rs 4.00/W Drop",
+    "trendPercent": "Rs 33.50/W",
     "efficiency": "22.65%",
     "warranty": "12 Yrs Product / 25 Yrs Linear",
     "badge": "Lowest Rate in PK",
-    "description": "Heavy-duty 640W module offering premium wattage output at an economical Rs 33.00/W trade rate. Best per-watt price in Pakistan on fresh container arrivals.",
+    "description": "Heavy-duty 640W module offering premium wattage output at an economical Rs 33.50/W trade rate. Best per-watt price in Pakistan on fresh container arrivals.",
     "popular": true
   },
+
+  // ---------------- JESCO ----------------
+  {
+    "id": "panel-jesco-585",
+    "category": "panel",
+    "brand": "Jesco",
+    "model": "Jesco Solar N-Type (585W)",
+    "type": "N-Type TOPCon Dual-Glass Bifacial",
+    "capacity": "585W",
+    "pricePerWatt": 36.00,
+    "pricePerWattRange": "Rs 36.00 / W",
+    "unitPriceMin": 21060,
+    "unitPriceMax": 21060,
+    "trend": "drop",
+    "trendPercent": "Rs 36.00/W Budget",
+    "efficiency": "22.5%",
+    "warranty": "12 Yrs Product / 25 Yrs Linear",
+    "badge": "Budget Tier-1",
+    "description": "Jesco Solar 585W N-Type bifacial solar module providing economical high efficiency power at Rs 36.00/W.",
+    "popular": true
+  },
+
+  // ---------------- TCL SOLAR ----------------
+  {
+    "id": "panel-tcl-615",
+    "category": "panel",
+    "brand": "TCL",
+    "model": "TCL Solar N-Type TOPCon (615W)",
+    "type": "N-Type TOPCon Dual-Glass Bifacial",
+    "capacity": "615W",
+    "pricePerWatt": 37.00,
+    "pricePerWattRange": "Rs 37.00 / W",
+    "unitPriceMin": 22755,
+    "unitPriceMax": 22755,
+    "trend": "new",
+    "trendPercent": "Rs 37.00/W",
+    "efficiency": "22.8%",
+    "warranty": "12 Yrs Product / 30 Yrs Linear",
+    "badge": "TCL Solar 615W",
+    "description": "TCL Solar 615W TOPCon module with excellent temperature coefficient and heavy duty dual-glass build.",
+    "popular": true
+  },
+  {
+    "id": "panel-tcl-720",
+    "category": "panel",
+    "brand": "TCL",
+    "model": "TCL Solar Commercial Bifacial (720W)",
+    "type": "N-Type TOPCon Large Format Bifacial",
+    "capacity": "720W",
+    "pricePerWatt": 38.25,
+    "pricePerWattRange": "Rs 38.25 / W",
+    "unitPriceMin": 27540,
+    "unitPriceMax": 27540,
+    "trend": "new",
+    "trendPercent": "Rs 38.25/W High Output",
+    "efficiency": "23.2%",
+    "warranty": "12 Yrs Product / 30 Yrs Linear",
+    "badge": "TCL Solar 720W High Power",
+    "description": "TCL Solar 720W large format bifacial panel engineered for commercial, industrial, and agricultural installations.",
+    "popular": true
+  },
+  // ---------------- ITEL INVERTERS ----------------
+  {
+    "id": "inv-itel-1-6kw",
+    "category": "inverter",
+    "brand": "Itel",
+    "model": "Itel 1.6kw PV-3200 Hybrid IP-54",
+    "type": "Hybrid IP-54 (Works on single source as well)",
+    "capacity": "1.6 kW (PV 3200)",
+    "unitPriceMin": 44000,
+    "unitPriceMax": 44000,
+    "trend": "stable",
+    "trendPercent": "Official Rate",
+    "efficiency": "97.0%",
+    "warranty": "3-Year Replacement Warranty",
+    "badge": "Single Source Ready",
+    "description": "Itel Hybrid IP-54 with PV-3200 input. Works on single source as well with 3-Year official replacement warranty.",
+    "popular": true
+  },
+  {
+    "id": "inv-itel-3kw-pro",
+    "category": "inverter",
+    "brand": "Itel",
+    "model": "Itel 3KW Pro PV-4500 Hybrid IP-54",
+    "type": "Hybrid IP-54 Pro",
+    "capacity": "3.0 kW (PV 4500)",
+    "unitPriceMin": 78000,
+    "unitPriceMax": 78000,
+    "trend": "stable",
+    "trendPercent": "Official Rate",
+    "efficiency": "97.5%",
+    "warranty": "3-Year Replacement Warranty",
+    "badge": "Best Value 3kW",
+    "description": "Itel 3KW Pro Hybrid IP-54 with PV-4500 input. Works on single source as well with 3-Year replacement warranty.",
+    "popular": true
+  },
+  {
+    "id": "inv-itel-4kw-pro",
+    "category": "inverter",
+    "brand": "Itel",
+    "model": "Itel 4KW Pro PV-6000 Hybrid IP-54",
+    "type": "Hybrid IP-54 Pro",
+    "capacity": "4.0 kW (PV 6000)",
+    "unitPriceMin": 113000,
+    "unitPriceMax": 113000,
+    "trend": "stable",
+    "trendPercent": "Official Rate",
+    "efficiency": "97.6%",
+    "warranty": "3-Year Replacement Warranty",
+    "badge": "4KW PV-6000",
+    "description": "Itel 4KW Pro Hybrid IP-54 with PV-6000 support. High PV capacity with 3-Year replacement warranty, works on single source.",
+    "popular": true
+  },
+  {
+    "id": "inv-itel-6kw-pro",
+    "category": "inverter",
+    "brand": "Itel",
+    "model": "Itel 6KW Pro PV-8000 Hybrid IP-54",
+    "type": "Hybrid IP-54 Pro",
+    "capacity": "6.0 kW (PV 8000)",
+    "unitPriceMin": 138000,
+    "unitPriceMax": 138000,
+    "trend": "stable",
+    "trendPercent": "Official Rate",
+    "efficiency": "97.8%",
+    "warranty": "3-Year Replacement Warranty",
+    "badge": "6KW Best Seller",
+    "description": "Itel 6KW Pro Hybrid IP-54 with massive PV-8000 input. Works on single source with 3-Year replacement warranty.",
+    "popular": true
+  },
+  {
+    "id": "inv-itel-8kw-ip54",
+    "category": "inverter",
+    "brand": "Itel",
+    "model": "Itel 8KW PV-16000 Hybrid IP-54",
+    "type": "Hybrid IP-54 High PV",
+    "capacity": "8.0 kW (PV 16000)",
+    "unitPriceMin": null,
+    "unitPriceMax": null,
+    "trend": "stable",
+    "trendPercent": "Call for Rate",
+    "efficiency": "98.0%",
+    "warranty": "3-Year Replacement Warranty",
+    "badge": "PV-16000 Input",
+    "description": "Itel 8KW Hybrid IP-54 with high PV-16000 capacity. Works on single source as well, 3-Year replacement warranty.",
+    "popular": false
+  },
+  {
+    "id": "inv-itel-12kw-ip54",
+    "category": "inverter",
+    "brand": "Itel",
+    "model": "Itel 12KW PV-16000 Hybrid IP-54",
+    "type": "Hybrid IP-54 Commercial",
+    "capacity": "12.0 kW (PV 16000)",
+    "unitPriceMin": null,
+    "unitPriceMax": null,
+    "trend": "stable",
+    "trendPercent": "Call for Rate",
+    "efficiency": "98.2%",
+    "warranty": "3-Year Replacement Warranty",
+    "badge": "Commercial Heavy",
+    "description": "Itel 12KW Hybrid IP-54 with dual/triple string PV-16000 input, 3-Year replacement warranty.",
+    "popular": false
+  },
+  {
+    "id": "inv-itel-6-6kw-ip66",
+    "category": "inverter",
+    "brand": "Itel",
+    "model": "Itel 6.6KW PV-13000 Single Phase IP-66",
+    "type": "Hybrid IP-66 Single Phase",
+    "capacity": "6.6 kW (PV 13000)",
+    "unitPriceMin": 194000,
+    "unitPriceMax": 194000,
+    "trend": "stable",
+    "trendPercent": "12-Year Warranty",
+    "efficiency": "98.0%",
+    "warranty": "06-Year Replacement + 06-Year Service = 12 Years",
+    "badge": "12-Year Total Warranty",
+    "description": "Itel Hybrid IP-66 waterproof design with PV-13000 single phase input. Unmatched warranty: 6-Year replacement + 6-Year service.",
+    "popular": true
+  },
+  {
+    "id": "inv-itel-8kw-3p-ip66",
+    "category": "inverter",
+    "brand": "Itel",
+    "model": "Itel 8KW PV-16000 3-Phase IP-66",
+    "type": "Hybrid IP-66 3-Phase",
+    "capacity": "8.0 kW (PV 16000)",
+    "unitPriceMin": 380000,
+    "unitPriceMax": 380000,
+    "trend": "stable",
+    "trendPercent": "Official Rate",
+    "efficiency": "98.4%",
+    "warranty": "5-Year Replacement Warranty",
+    "badge": "IP-66 3-Phase",
+    "description": "Itel 8KW 3-Phase Hybrid IP-66 with PV-16000 support, outdoor dust/water sealed, 5-Year replacement warranty.",
+    "popular": true
+  },
+  {
+    "id": "inv-itel-50kw-3p-ip66",
+    "category": "inverter",
+    "brand": "Itel",
+    "model": "Itel 50KW Hybrid Inverter - 03 Phase IP-66",
+    "type": "Commercial Hybrid IP-66 3-Phase",
+    "capacity": "50.0 kW (3-Phase)",
+    "unitPriceMin": 1290000,
+    "unitPriceMax": 1290000,
+    "trend": "hot",
+    "trendPercent": "New 50kW Flagship",
+    "efficiency": "98.8%",
+    "warranty": "05 Years Replacement + 05 Years Service Warranty",
+    "badge": "50kW IP-66 Flagship",
+    "description": "Itel 50KW 3-Phase commercial hybrid inverter with IP-66 rating. Heavy commercial industrial capacity with 05 Years Replacement + 05 Years Service Warranty.",
+    "popular": true
+  },
+
+  // ---------------- INVEREX ----------------
   {
     "id": "inv-inverex-nitrox-6kw",
     "category": "inverter",
@@ -916,6 +1422,111 @@ export const SOLAR_PRICES_DATA = [
     "description": "World leading inverter manufacturer with built-in PID recovery and rapid shutdown support.",
     "popular": false
   },
+  // ---------------- ITEL LITHIUM BATTERIES ----------------
+  {
+    "id": "bat-itel-12v-100ah",
+    "category": "battery",
+    "brand": "Itel",
+    "model": "Itel IP-20 Lithium Battery 12V 100Ah",
+    "type": "Lithium Iron Phosphate (LiFePO4) IP-20",
+    "capacity": "12V 100Ah (1.28 kWh)",
+    "unitPriceMin": 58000,
+    "unitPriceMax": 58000,
+    "trend": "stable",
+    "trendPercent": "Official Rate",
+    "efficiency": "6000+ Cycles",
+    "warranty": "5-Year Replacement Warranty",
+    "badge": "5-Year Replacement",
+    "description": "Itel IP-20 LiFePO4 battery pack, 12V 100Ah with built-in smart BMS and 5-Year replacement warranty.",
+    "popular": true
+  },
+  {
+    "id": "bat-itel-25v-100ah",
+    "category": "battery",
+    "brand": "Itel",
+    "model": "Itel IP-20 Lithium Battery 25V 100Ah",
+    "type": "Lithium Iron Phosphate (LiFePO4) IP-20",
+    "capacity": "25V 100Ah (2.56 kWh)",
+    "unitPriceMin": 124000,
+    "unitPriceMax": 124000,
+    "trend": "stable",
+    "trendPercent": "Official Rate",
+    "efficiency": "6000+ Cycles",
+    "warranty": "5-Year Replacement Warranty",
+    "badge": "25V / 24V Ready",
+    "description": "Itel IP-20 25.6V 100Ah lithium battery bank for 24V inverters. 5-Year official replacement warranty.",
+    "popular": true
+  },
+  {
+    "id": "bat-itel-51v-100ah",
+    "category": "battery",
+    "brand": "Itel",
+    "model": "Itel IP-20 Lithium Battery 51V 100Ah",
+    "type": "Lithium Iron Phosphate (LiFePO4) IP-20",
+    "capacity": "51V 100Ah (5.12 kWh)",
+    "unitPriceMin": 220000,
+    "unitPriceMax": 220000,
+    "trend": "stable",
+    "trendPercent": "Best Value 5.12kWh",
+    "efficiency": "6000+ Cycles @ 90% DoD",
+    "warranty": "5-Year Replacement Warranty",
+    "badge": "Rs 220,000 Special",
+    "description": "Itel IP-20 51.2V 100Ah 5.12kWh lithium storage with CAN/RS485 communication, 5-Year replacement warranty.",
+    "popular": true
+  },
+  {
+    "id": "bat-itel-51v-200ah",
+    "category": "battery",
+    "brand": "Itel",
+    "model": "Itel IP-20 Lithium Battery 51V 200Ah",
+    "type": "Lithium Iron Phosphate (LiFePO4) IP-20",
+    "capacity": "51V 200Ah (10.24 kWh)",
+    "unitPriceMin": 450000,
+    "unitPriceMax": 450000,
+    "trend": "stable",
+    "trendPercent": "Official Rate",
+    "efficiency": "6000+ Cycles",
+    "warranty": "5-Year Replacement Warranty",
+    "badge": "10.24kWh High Bank",
+    "description": "Itel IP-20 51.2V 200Ah 10.24kWh large capacity battery for full home/villa backup, 5-Year replacement warranty.",
+    "popular": true
+  },
+  {
+    "id": "bat-itel-51v-314ah",
+    "category": "battery",
+    "brand": "Itel",
+    "model": "Itel IP-20 Lithium Battery 51V 314Ah",
+    "type": "Lithium Iron Phosphate (LiFePO4) IP-20",
+    "capacity": "51V 314Ah (16.0 kWh)",
+    "unitPriceMin": 590000,
+    "unitPriceMax": 590000,
+    "trend": "stable",
+    "trendPercent": "Official Rate",
+    "efficiency": "6000+ Cycles",
+    "warranty": "5-Year Replacement Warranty",
+    "badge": "16kWh Commercial Bank",
+    "description": "Itel IP-20 51.2V 314Ah ultra-high capacity lithium bank (16.0 kWh) with 5-Year official replacement warranty.",
+    "popular": false
+  },
+  {
+    "id": "bat-itel-hv-51v-100ah",
+    "category": "battery",
+    "brand": "Itel",
+    "model": "Itel HV Battery (51.2V 100Ah High Voltage)",
+    "type": "High Voltage Lithium (LiFePO4) HV Series",
+    "capacity": "51.2V 100Ah High Voltage (5.12 kWh)",
+    "unitPriceMin": 245000,
+    "unitPriceMax": 245000,
+    "trend": "new",
+    "trendPercent": "High Voltage LiFePO4",
+    "efficiency": "6000+ Cycles @ 90% DoD",
+    "warranty": "05 Years Replacement + 05 Years Service Warranty",
+    "badge": "HV High Voltage",
+    "description": "Itel 51.2V 100Ah High Voltage (HV) battery module engineered for multi-unit high voltage stack integration. 05 Years Replacement + 05 Years Service Warranty.",
+    "popular": true
+  },
+
+  // ---------------- NARADA ----------------
   {
     "id": "bat-narada-npfc100",
     "category": "battery",
@@ -1259,5 +1870,58 @@ export const SOLAR_PRICES_DATA = [
     "badge": "WAPDA / IESCO Spec",
     "description": "Official 3-phase bidirectional energy meter with GSM/GPRS automated meter reading modem for DISCO net-metering grid connection.",
     "popular": false
+  },
+
+  // ---------------- ESS / ENERGY STORAGE SYSTEMS ----------------
+  {
+    "id": "ess-itel-powertank-500w",
+    "category": "ess",
+    "brand": "Itel",
+    "model": "Itel Power Tank 500W / 1KWh",
+    "type": "Portable Solar Power Station & ESS",
+    "capacity": "500W Inverter / 1kWh LiFePO4 Storage",
+    "unitPriceMin": 65000,
+    "unitPriceMax": 65000,
+    "trend": "new",
+    "trendPercent": "Official Rate",
+    "efficiency": "Pure Sine Wave AC Output",
+    "warranty": "3-Year Replacement Warranty",
+    "badge": "Portable Power Tank",
+    "description": "Plug-and-play portable ESS energy storage unit with built-in 500W pure sine wave inverter and 1000Wh lithium battery. Ideal for load-shedding, camping, and home emergency backup.",
+    "popular": true
+  },
+  {
+    "id": "ess-itel-3-6kw-8kwh",
+    "category": "ess",
+    "brand": "Itel",
+    "model": "Itel 3.6KW + 8KWh ESS All-in-One",
+    "type": "All-in-One Home Energy Storage Cabinet",
+    "capacity": "3.6kW Inverter + 8kWh Storage",
+    "unitPriceMin": null,
+    "unitPriceMax": null,
+    "trend": "new",
+    "trendPercent": "Call for Rate",
+    "efficiency": "Integrated Hybrid ESS",
+    "warranty": "5-Year Replacement Warranty",
+    "badge": "All-in-One Cabinet",
+    "description": "Integrated complete energy storage system combining 3.6kW hybrid inverter and 8kWh lithium battery in an aesthetic single cabinet. Zero wiring mess.",
+    "popular": false
+  },
+  {
+    "id": "ess-itel-bmu",
+    "category": "ess",
+    "brand": "Itel",
+    "model": "Itel Battery Management Unit - BMU",
+    "type": "High Voltage Master Control & BMS",
+    "capacity": "HV Battery Management System",
+    "unitPriceMin": 230000,
+    "unitPriceMax": 230000,
+    "trend": "new",
+    "trendPercent": "Official Rate",
+    "efficiency": "CAN/RS485 Dual Bus",
+    "warranty": "05 Years Replacement + 05 Years Service Warranty",
+    "badge": "HV Master Unit",
+    "description": "Itel Battery Management Unit (BMU) master control controller for HV battery series clustering, safety isolation, and synchronized communication with 3-phase hybrid inverters.",
+    "popular": true
   }
 ];

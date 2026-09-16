@@ -30,11 +30,18 @@ jobs:
       - name: Build Next.js & sync dist
         run: npm run build
 
-      - name: Verify Cloudflare Secrets & Deploy
+      - name: Detect Cloudflare Projects & Custom Domains
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           PROJECT_NAME: ${{ secrets.CLOUDFLARE_PROJECT_NAME || 'sellsolar' }}
+        run: node scripts/cloudflare-deploy-helper.mjs
+
+      - name: Verify Cloudflare Secrets & Deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          DEPLOY_PROJECT: ${{ env.TARGET_PROJECT_NAME || secrets.CLOUDFLARE_PROJECT_NAME || 'sellsolar' }}
         run: |
           if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
             echo "::error title=Missing Cloudflare Secret::CLOUDFLARE_API_TOKEN secret is missing! Please go to GitHub Repo -> Settings -> Secrets and variables -> Actions -> New repository secret and add CLOUDFLARE_API_TOKEN."
@@ -46,8 +53,8 @@ jobs:
             exit 1
           fi
 
-          echo "🚀 Deploying 'dist/' directory to Cloudflare Pages project: ${PROJECT_NAME}..."
-          npx wrangler pages deploy dist --project-name="${PROJECT_NAME}" --branch=main --commit-dirty=true
+          echo "🚀 Deploying 'dist/' directory to Cloudflare Pages project: ${DEPLOY_PROJECT} (Production branch: main)..."
+          npx wrangler pages deploy dist --project-name="${DEPLOY_PROJECT}" --branch=main --commit-dirty=true
 
       - name: Purge Cloudflare CDN Cache (Optional)
         continue-on-error: true

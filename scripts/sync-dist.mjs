@@ -12,4 +12,15 @@ if (!fs.existsSync(outDir)) {
 
 fs.rmSync(distDir, { recursive: true, force: true });
 fs.cpSync(outDir, distDir, { recursive: true });
+
+// Explicitly ensure _headers and _redirects are in dist/
+const publicDir = path.join(root, 'public');
+for (const specialFile of ['_headers', '_redirects']) {
+  const src = path.join(publicDir, specialFile);
+  const dest = path.join(distDir, specialFile);
+  if (fs.existsSync(src)) {
+    fs.copyFileSync(src, dest);
+  }
+}
+
 console.log('[deploy] Synced out/ → dist/ for Cloudflare/Netlify publish compatibility.');

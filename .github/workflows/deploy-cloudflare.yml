@@ -47,7 +47,7 @@ jobs:
           fi
 
           echo "🚀 Deploying 'dist/' directory to Cloudflare Pages project: ${PROJECT_NAME}..."
-          npx wrangler pages deploy dist --project-name="${PROJECT_NAME}" --commit-dirty=true
+          npx wrangler pages deploy dist --project-name="${PROJECT_NAME}" --branch=main --commit-dirty=true
 
       - name: Purge Cloudflare CDN Cache (Optional)
         continue-on-error: true

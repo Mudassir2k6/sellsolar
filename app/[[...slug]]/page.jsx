@@ -1,5 +1,5 @@
 import SellSolarClient from '../sellsolar-client';
-import { buildMetadataForSlug, getGlobalJsonLd } from '@/lib/seo-next';
+import { buildMetadataForSlug, getJsonLdForSlug } from '@/lib/seo-next';
 
 const STATIC_SLUGS = [
   [],
@@ -64,7 +64,7 @@ export default async function CatchAllPage({ params }) {
   const resolved = await params;
   const slugArray = resolved?.slug || [];
   const pathname = slugArray.length > 0 ? `/${slugArray.join('/')}` : '/';
-  const jsonLd = getGlobalJsonLd();
+  const jsonLd = getJsonLdForSlug(slugArray);
 
   return (
     <>

@@ -1,6 +1,8 @@
 # SellSolar robots.txt — https://sellsolar.pk
 User-agent: *
 Allow: /
+Allow: /_next/
+Allow: /_next/static/
 Allow: /assets/
 Allow: /*.css$
 Allow: /*.js$

@@ -71,13 +71,49 @@ async function run() {
       if (matchedProject) {
         console.log(`🎯 [cf-helper] Found domain sellsolar.pk attached to project: "${matchedProject}"`);
         targetProject = matchedProject;
-      } else {
-        console.log(`🌐 [cf-helper] sellsolar.pk not found on existing projects. Using default: "${defaultProject}"`);
-        // Attempt to attach sellsolar.pk to default project
-        for (const domain of ['sellsolar.pk', 'www.sellsolar.pk']) {
-          try {
+      }
+
+      // Check detailed status for each domain & attempt auto-activation
+      for (const domain of ['sellsolar.pk', 'www.sellsolar.pk']) {
+        try {
+          const detailRes = await fetch(
+            `https://api.cloudflare.com/client/v4/accounts/${accountId}/pages/projects/${targetProject}/domains/${domain}`,
+            { headers }
+          );
+          const detailData = await detailRes.json();
+          if (detailData.success && detailData.result) {
+            const d = detailData.result;
+            console.log(`🔍 [cf-helper] Domain ${domain} details:`, JSON.stringify(d));
+            summaryNotes.push(`Domain "${domain}" details: status=${d.status}, cert=${d.certificate_status}, verification=${JSON.stringify(d.verification_data || d.validation_data || {})}`);
+
+            // If pending, attempt to delete and re-add to force Cloudflare to provision the CNAME
+            if (d.status === 'pending') {
+              console.log(`🔄 [cf-helper] Domain "${domain}" is pending. Attempting re-attachment to trigger DNS binding...`);
+              const delRes = await fetch(
+                `https://api.cloudflare.com/client/v4/accounts/${accountId}/pages/projects/${targetProject}/domains/${domain}`,
+                { method: 'DELETE', headers }
+              );
+              const delData = await delRes.json();
+              console.log(`   Delete "${domain}":`, delData.success ? 'Success' : JSON.stringify(delData.errors));
+
+              await new Promise((resolve) => setTimeout(resolve, 2000));
+
+              const readdRes = await fetch(
+                `https://api.cloudflare.com/client/v4/accounts/${accountId}/pages/projects/${targetProject}/domains`,
+                {
+                  method: 'POST',
+                  headers,
+                  body: JSON.stringify({ name: domain }),
+                }
+              );
+              const readdData = await readdRes.json();
+              console.log(`   Re-add "${domain}":`, readdData.success ? 'Success' : JSON.stringify(readdData.errors));
+              summaryNotes.push(`Re-add "${domain}": ${readdData.success ? 'Success (Provisioned)' : JSON.stringify(readdData.errors)}`);
+            }
+          } else {
+            console.log(`ℹ️ [cf-helper] Domain ${domain} not found on project. Attempting initial attach...`);
             const attachRes = await fetch(
-              `https://api.cloudflare.com/client/v4/accounts/${accountId}/pages/projects/${defaultProject}/domains`,
+              `https://api.cloudflare.com/client/v4/accounts/${accountId}/pages/projects/${targetProject}/domains`,
               {
                 method: 'POST',
                 headers,
@@ -85,11 +121,12 @@ async function run() {
               }
             );
             const attachData = await attachRes.json();
-            console.log(`   Attach ${domain} to ${defaultProject}:`, attachData.success ? 'SUCCESS' : JSON.stringify(attachData.errors));
+            console.log(`   Attach ${domain} result:`, attachData.success ? 'Success' : JSON.stringify(attachData.errors));
             summaryNotes.push(`Attach ${domain} result: ${attachData.success ? 'Success' : JSON.stringify(attachData.errors)}`);
-          } catch (e) {
-            console.log(`   Error attaching ${domain}:`, e.message);
           }
+        } catch (e) {
+          console.log(`   Error handling domain ${domain}:`, e.message);
+          summaryNotes.push(`Error handling domain ${domain}: ${e.message}`);
         }
       }
     }

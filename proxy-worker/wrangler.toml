@@ -1,0 +1,8 @@
+name = "sellsolar"
+main = "index.js"
+compatibility_date = "2025-09-01"
+
+routes = [
+  { pattern = "sellsolar.pk/*", zone_id = "ae99ef284906dbb7a46869b83c21e2e9" },
+  { pattern = "www.sellsolar.pk/*", zone_id = "ae99ef284906dbb7a46869b83c21e2e9" }
+]

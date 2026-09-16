@@ -23,6 +23,16 @@ async function run() {
   let summaryNotes = [];
 
   try {
+    // 0. Verify Token
+    try {
+      const verifyRes = await fetch('https://api.cloudflare.com/client/v4/user/tokens/verify', { headers });
+      const verifyData = await verifyRes.json();
+      console.log('🔑 [cf-helper] Token verify:', verifyData.success ? 'Valid' : JSON.stringify(verifyData.errors));
+      summaryNotes.push(`Token Status: ${verifyData.success ? 'Active & Valid' : JSON.stringify(verifyData.errors)}`);
+    } catch (tErr) {
+      console.log('🔑 [cf-helper] Token verify error:', tErr.message);
+    }
+
     // 1. List all Pages projects
     const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${accountId}/pages/projects`, { headers });
     const data = await res.json();
@@ -45,11 +55,12 @@ async function run() {
             { headers }
           );
           const domData = await domRes.json();
-          const domains = (domData.result || []).map((d) => d.name);
+          const domains = (domData.result || []).map((d) => `${d.name} (status: ${d.status || 'unknown'}, ssl: ${d.certificate_status || 'unknown'})`);
           console.log(`   👉 Project "${p.name}" has domains:`, domains);
           summaryNotes.push(`Project "${p.name}" custom domains: ${domains.length > 0 ? domains.join(', ') : 'None'}`);
 
-          if (domains.includes('sellsolar.pk') || domains.includes('www.sellsolar.pk')) {
+          const rawNames = (domData.result || []).map((d) => d.name);
+          if (rawNames.includes('sellsolar.pk') || rawNames.includes('www.sellsolar.pk')) {
             matchedProject = p.name;
           }
         } catch (domErr) {
@@ -83,14 +94,36 @@ async function run() {
       }
     }
 
-    // 2. Zone ID and Cache Purge Attempt
+    // 2. Zone ID, DNS records and Cache Purge Attempt
     try {
       console.log('🧹 [cf-helper] Looking up Zone ID for sellsolar.pk...');
       const zonesRes = await fetch('https://api.cloudflare.com/client/v4/zones?name=sellsolar.pk', { headers });
       const zonesData = await zonesRes.json();
       if (zonesData.success && zonesData.result && zonesData.result.length > 0) {
         const zoneId = zonesData.result[0].id;
-        console.log(`✅ [cf-helper] Found Zone ID: ${zoneId}. Requesting Purge Everything...`);
+        console.log(`✅ [cf-helper] Found Zone ID: ${zoneId}.`);
+        summaryNotes.push(`Zone ID for sellsolar.pk: ${zoneId}`);
+
+        // Inspect DNS records
+        try {
+          const dnsRes = await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records`, { headers });
+          const dnsData = await dnsRes.json();
+          if (dnsData.success && dnsData.result) {
+            const relevantRecords = dnsData.result
+              .filter((r) => r.name.includes('sellsolar.pk'))
+              .map((r) => `${r.type} ${r.name} -> ${r.content} (proxied: ${r.proxied})`);
+            console.log('📡 [cf-helper] DNS records:', relevantRecords);
+            summaryNotes.push(`DNS Records: ${relevantRecords.join(' | ') || 'None found'}`);
+          } else {
+            console.log('📡 [cf-helper] DNS records error:', JSON.stringify(dnsData.errors));
+            summaryNotes.push(`DNS records lookup: ${JSON.stringify(dnsData.errors)}`);
+          }
+        } catch (dnsErr) {
+          console.log('📡 [cf-helper] DNS query exception:', dnsErr.message);
+        }
+
+        // Request Purge Everything
+        console.log(`🧹 [cf-helper] Requesting Purge Everything...`);
         const purgeRes = await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/purge_cache`, {
           method: 'POST',
           headers,
@@ -100,7 +133,7 @@ async function run() {
         console.log('✅ [cf-helper] Purge Everything response:', purgeData.success ? 'SUCCESS' : JSON.stringify(purgeData.errors));
         summaryNotes.push(`Cache Purge for sellsolar.pk: ${purgeData.success ? 'Successfully Triggered' : JSON.stringify(purgeData.errors)}`);
       } else {
-        console.log('ℹ️ [cf-helper] Zone lookup did not return zone ID (token may lack Zone:Read permission).');
+        console.log('ℹ️ [cf-helper] Zone lookup did not return zone ID:', JSON.stringify(zonesData.errors || []));
         summaryNotes.push('Zone ID lookup skipped: API token lacks Zone:Read permission or zone not found.');
       }
     } catch (zoneErr) {

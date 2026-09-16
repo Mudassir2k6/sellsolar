@@ -7,7 +7,6 @@ import {
   Search,
   TrendingDown,
   TrendingUp,
-  Sparkles,
   ArrowRight,
   ShieldCheck,
   Clock,
@@ -305,112 +304,108 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         <div className="absolute -right-20 bottom-0 h-72 w-72 rounded-full bg-secondary-500/20 blur-3xl" />
 
         <div className="container-page relative z-10">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
-            <div className="max-w-3xl flex-1">
-              <div className="mb-3 flex flex-wrap items-center gap-2">
-                <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/15 border border-amber-400/30 px-3.5 py-1 text-xs font-semibold text-amber-300">
-                  <Clock className="h-3.5 w-3.5 text-amber-400" />
-                  Live Market Rates • Islamabad Ready Stock ({TODAY_DATE_STR})
-                </div>
-                <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 border border-emerald-400/30 px-3 py-1 text-xs font-semibold text-emerald-300">
-                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-                  Wholesale Trade Stock Benchmark
-                </div>
+          <div className="max-w-4xl">
+            <div className="mb-3 flex flex-wrap items-center gap-2">
+              <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/15 border border-amber-400/30 px-3.5 py-1 text-xs font-semibold text-amber-300">
+                <Clock className="h-3.5 w-3.5 text-amber-400" />
+                Live Market Rates • Islamabad Ready Stock ({TODAY_DATE_STR})
               </div>
-              <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl text-white">
-                Today's Solar Prices in{' '}
-                <span className="text-amber-400">
-                  Pakistan (PKR)
-                </span>
-              </h1>
-              <p className="mt-3 text-base text-gray-300 sm:text-lg max-w-2xl leading-relaxed">
-                Daily verified trade benchmark prices for Tier-1 Solar Panels (Canadian, Aiko, Jinko, LONGi, JA Solar, Astronergy, Risen, Korean),
-                Hybrid & On-Grid Inverters, and Lithium/Tubular Batteries across Islamabad, Rawalpindi, Lahore, and Karachi.
-              </p>
-
-              {/* Quick Key Benchmarks: Panels, Ready Stock & Lithium Batteries */}
-              <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs font-medium text-gray-300">
-                {/* 1. Solar Panels Avg */}
-                <div
-                  onClick={() => handleSelectCategory('panel')}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSelectCategory('panel')}
-                  className="rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 p-3.5 text-left transition-all hover:border-amber-400/40 cursor-pointer shadow-sm group"
-                  id="hero-stat-panel-avg"
-                >
-                  <div className="text-gray-400 text-xs mb-1">Panel Avg Per Watt</div>
-                  <div className="text-base sm:text-lg font-bold text-amber-400 tracking-tight">
-                    Rs 36.75 – 44.50 / W
-                  </div>
-                </div>
-
-                {/* 2. Popular Ready Stock */}
-                <div
-                  onClick={() => handleSelectCategory('panel')}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSelectCategory('panel')}
-                  className="rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 p-3.5 text-left transition-all hover:border-blue-400/40 cursor-pointer shadow-sm group"
-                  id="hero-stat-inverter-avg"
-                >
-                  <div className="text-gray-400 text-xs mb-1">Popular Ready Stock</div>
-                  <div className="text-xs sm:text-sm font-bold text-white tracking-tight leading-snug">
-                    Canadian 585W / Aiko / Jinko Neo / LONGI X10
-                  </div>
-                </div>
-
-                {/* 3. Lithium Batteries Avg */}
-                <div
-                  onClick={() => handleSelectCategory('battery')}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSelectCategory('battery')}
-                  className="rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 p-3.5 text-left transition-all hover:border-emerald-400/40 cursor-pointer shadow-sm group"
-                  id="hero-stat-battery-avg"
-                >
-                  <div className="text-gray-400 text-xs mb-1">Lithium 5.12kWh Avg</div>
-                  <div className="text-base sm:text-lg font-bold text-emerald-400 tracking-tight">
-                    Rs 240,000 – 275,000
-                  </div>
-                </div>
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 border border-emerald-400/30 px-3 py-1 text-xs font-semibold text-emerald-300">
+                <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+                Wholesale Trade Stock Benchmark
               </div>
             </div>
+            <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl text-white">
+              Today's Solar Prices in{' '}
+              <span className="text-amber-400">
+                Pakistan (PKR)
+              </span>
+            </h1>
+            <p className="mt-3 text-base text-gray-300 sm:text-lg max-w-2xl leading-relaxed">
+              Daily verified trade benchmark prices for Tier-1 Solar Panels (Canadian, Aiko, Jinko, LONGi, JA Solar, Astronergy, Risen, Korean),
+              Hybrid & On-Grid Inverters, and Lithium/Tubular Batteries across Islamabad, Rawalpindi, Lahore, and Karachi.
+            </p>
 
-            {/* Right Card: Planning to Buy or Sell */}
-            <div className="w-full lg:w-80 shrink-0">
-              <div className="rounded-2xl bg-gray-900/80 border border-gray-800 p-5 backdrop-blur-md shadow-xl text-left">
-                <div className="flex items-center gap-2 text-amber-400 font-bold text-sm mb-1.5">
-                  <Sparkles className="h-4 w-4 text-amber-400" />
-                  <span>Planning to Buy or Sell?</span>
+            {/* Quick Key Benchmarks / Category Tabs: Solar Panels, Inverters & Batteries */}
+            <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs font-medium text-gray-300">
+              {/* 1. Solar Panels Tab */}
+              <div
+                onClick={() => handleSelectCategory('panel')}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && handleSelectCategory('panel')}
+                className={`rounded-xl p-3.5 text-left transition-all cursor-pointer shadow-sm group ${
+                  selectedCategory === 'panel'
+                    ? 'bg-amber-500/20 border-2 border-amber-400 text-amber-200 ring-2 ring-amber-400/30'
+                    : 'bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-400/40 text-gray-300'
+                }`}
+                id="hero-stat-panel-avg"
+              >
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-gray-300 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+                    <Sun className="h-4 w-4 text-amber-400" />
+                    Solar Panels
+                  </span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 font-bold">
+                    Per Watt
+                  </span>
                 </div>
-                <p className="text-xs text-gray-300 leading-relaxed">
-                  Find active deals from verified sellers or post your own solar equipment for free.
-                </p>
-                <div className="mt-4 space-y-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (onSelectCategory) {
-                        onSelectCategory('all');
-                      } else if (onNavigate) {
-                        onNavigate('home');
-                      }
-                    }}
-                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold text-xs py-2.5 px-4 transition-colors shadow-sm cursor-pointer"
-                  >
-                    <Search className="h-3.5 w-3.5" />
-                    Search Available Listings
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (onNavigate) onNavigate('post-ad');
-                    }}
-                    className="w-full flex items-center justify-center gap-2 rounded-xl border border-gray-700 bg-gray-800/60 hover:bg-gray-800 text-white font-medium text-xs py-2.5 px-4 transition-colors cursor-pointer"
-                  >
-                    Post an Ad Free
-                  </button>
+                <div className="text-base sm:text-lg font-bold text-amber-400 tracking-tight">
+                  {MARKET_SUMMARY.panelsPerWattAvg || 'Rs 33.00 – 44.50 / W'}
+                </div>
+              </div>
+
+              {/* 2. Solar Inverters Tab */}
+              <div
+                onClick={() => handleSelectCategory('inverter')}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && handleSelectCategory('inverter')}
+                className={`rounded-xl p-3.5 text-left transition-all cursor-pointer shadow-sm group ${
+                  selectedCategory === 'inverter'
+                    ? 'bg-blue-500/20 border-2 border-blue-400 text-blue-200 ring-2 ring-blue-400/30'
+                    : 'bg-white/5 hover:bg-white/10 border border-white/10 hover:border-blue-400/40 text-gray-300'
+                }`}
+                id="hero-stat-inverter-avg"
+              >
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-gray-300 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+                    <Zap className="h-4 w-4 text-blue-400" />
+                    Solar Inverters
+                  </span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-400/20 text-blue-300 font-bold">
+                    Hybrid & On-Grid
+                  </span>
+                </div>
+                <div className="text-base sm:text-lg font-bold text-blue-400 tracking-tight">
+                  {MARKET_SUMMARY.invertersAvg || 'Rs 112,000 – 549,000'}
+                </div>
+              </div>
+
+              {/* 3. Solar Batteries Tab */}
+              <div
+                onClick={() => handleSelectCategory('battery')}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && handleSelectCategory('battery')}
+                className={`rounded-xl p-3.5 text-left transition-all cursor-pointer shadow-sm group ${
+                  selectedCategory === 'battery'
+                    ? 'bg-emerald-500/20 border-2 border-emerald-400 text-emerald-200 ring-2 ring-emerald-400/30'
+                    : 'bg-white/5 hover:bg-white/10 border border-white/10 hover:border-emerald-400/40 text-gray-300'
+                }`}
+                id="hero-stat-battery-avg"
+              >
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-gray-300 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+                    <BatteryCharging className="h-4 w-4 text-emerald-400" />
+                    Solar Batteries
+                  </span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-300 font-bold">
+                    Lithium & Tubular
+                  </span>
+                </div>
+                <div className="text-base sm:text-lg font-bold text-emerald-400 tracking-tight">
+                  {MARKET_SUMMARY.batteriesAvg || 'Rs 32,000 – 265,500'}
                 </div>
               </div>
             </div>

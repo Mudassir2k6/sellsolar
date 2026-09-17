@@ -33,9 +33,28 @@ export default function AuthCallbackPage() {
         // Supabase with detectSessionInUrl: true handles parsing tokens automatically.
         // Retrieve the current session or exchange PKCE code if present.
         const code = searchParams.get('code');
+        const accessToken = hashParams.get('access_token') || searchParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token') || searchParams.get('refresh_token');
+
         let currentSession = null;
 
-        if (code && typeof supabase?.auth?.exchangeCodeForSession === 'function') {
+        // 1. Handle hash tokens (implicit flow)
+        if (accessToken && typeof supabase?.auth?.setSession === 'function') {
+          try {
+            const { data, error: setErr } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken || '',
+            });
+            if (!setErr && data?.session) {
+              currentSession = data.session;
+            }
+          } catch (e) {
+            console.warn('[AuthCallback] setSession error:', e);
+          }
+        }
+
+        // 2. Handle PKCE code exchange
+        if (!currentSession && code && typeof supabase?.auth?.exchangeCodeForSession === 'function') {
           try {
             const { data, error: exchangeErr } = await supabase.auth.exchangeCodeForSession(code);
             if (!exchangeErr && data?.session) {
@@ -46,10 +65,17 @@ export default function AuthCallbackPage() {
           }
         }
 
+        // 3. Check existing session
         if (!currentSession) {
           const { data } = await supabase.auth.getSession();
           currentSession = data?.session;
         }
+
+        const returnPath =
+          (typeof window !== 'undefined' && sessionStorage.getItem('auth_redirect_to')) || '/';
+        try {
+          sessionStorage.removeItem('auth_redirect_to');
+        } catch {}
 
         if (currentSession?.user) {
           if (!active) return;
@@ -69,27 +95,25 @@ export default function AuthCallbackPage() {
               console.warn('[AuthCallback] postMessage error:', postErr);
             }
 
-            // Close popup after a short pause
             setTimeout(() => {
               try {
                 window.close();
               } catch {}
             }, 500);
 
-            // Fallback redirect if popup window cannot close itself
             setTimeout(() => {
               if (typeof window !== 'undefined' && !window.closed) {
-                window.location.replace('/');
+                window.location.replace(returnPath);
               }
-            }, 1200);
+            }, 1000);
           } else {
-            // Full-window redirect flow
+            // Full-window direct redirect
             setTimeout(() => {
-              window.location.replace('/');
-            }, 400);
+              window.location.replace(returnPath);
+            }, 350);
           }
         } else {
-          // Wait up to 2 seconds for onAuthStateChange
+          // Wait up to 3 seconds for onAuthStateChange
           const authListener = supabase.auth.onAuthStateChange((event, session) => {
             if (session?.user && active) {
               setStatus('success');
@@ -110,13 +134,13 @@ export default function AuthCallbackPage() {
                 }, 400);
               } else {
                 setTimeout(() => {
-                  window.location.replace('/');
-                }, 400);
+                  window.location.replace(returnPath);
+                }, 350);
               }
             }
           });
 
-          // Fallback timeout
+          // Fallback check
           setTimeout(async () => {
             if (!active) return;
             const finalCheck = await supabase.auth.getSession();
@@ -132,7 +156,7 @@ export default function AuthCallbackPage() {
                 );
                 window.close();
               } else {
-                window.location.replace('/');
+                window.location.replace(returnPath);
               }
             } else {
               setStatus('error');

@@ -819,6 +819,9 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
     setGoogleBusy(true);
     try {
       const res = await signInWithGoogle();
+      if (res?.redirecting) {
+        return;
+      }
       if (res?.success) {
         showToast({
           title: 'Google Sign-In Successful',

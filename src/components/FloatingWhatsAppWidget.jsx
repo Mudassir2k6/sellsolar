@@ -29,12 +29,16 @@ export default function FloatingWhatsAppWidget() {
         className="flex items-center gap-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-4 rounded-full shadow-xl shadow-emerald-600/30 hover:shadow-emerald-500/40 hover:scale-105 active:scale-95 transition-all duration-300"
         aria-label="Chat with SellSolar on WhatsApp"
       >
-        <span className="relative flex h-3 w-3">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
-        </span>
+        {settings.whatsAppPulse !== false && (
+          <span className="relative flex h-3 w-3">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
+          </span>
+        )}
         <MessageCircle className="h-5 w-5 fill-current" />
-        <span className="text-xs sm:text-sm tracking-wide hidden sm:inline-block">WhatsApp Us</span>
+        <span className="text-xs sm:text-sm tracking-wide hidden sm:inline-block">
+          {settings.whatsAppLabel || 'WhatsApp Us'}
+        </span>
       </a>
     </div>
   );

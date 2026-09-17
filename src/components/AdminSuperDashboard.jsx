@@ -42,6 +42,10 @@ import {
   LogOut,
   DollarSign,
   Building,
+  Globe,
+  Edit3,
+  Plus,
+  X,
 } from 'lucide-react';
 import { useAuth, USER_ROLES, getStoredUsers, saveStoredUsers, DEFAULT_ADMIN_ID, DEFAULT_ADMIN_EMAIL } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -49,6 +53,35 @@ import { useSiteSettings } from '../context/SiteSettingsContext';
 import { getInboxMessages, fetchSharedInboxMessages, createDirectMessage, replyToInboxMessage, markMessageAsRead, deleteInboxMessage } from '../services/inboxService';
 import { getAnalyticsSummary } from '../services/analyticsService';
 import { formatPrice } from '../lib/constants';
+
+export const SYSTEM_PAGES = [
+  { path: '/', title: 'Home & Daily Price Benchmark', category: 'Core', description: 'Main marketplace landing, featured solar systems and daily benchmark rates' },
+  { path: '/prices', title: 'Solar Price Today Pakistan', category: 'Marketplace', description: 'Live solar panel PKR/watt, inverter rates & battery pricing' },
+  { path: '/calculator', title: 'Solar Load Calculator', category: 'Core', description: 'Calculate required system size in kW, panel count, and battery backup' },
+  { path: '/dealers', title: 'Verified Solar Dealers Directory', category: 'Marketplace', description: 'Browse verified solar equipment dealers and distributors across Pakistan' },
+  { path: '/install', title: 'Solar Installation Request', category: 'Services', description: 'Request professional on-site solar installation and assessment' },
+  { path: '/used-solar', title: 'Used Solar Marketplace', category: 'Marketplace', description: 'Buy and sell second-hand solar panels, hybrid inverters and batteries' },
+  { path: '/solar-price', title: 'Live Solar Rates & Benchmark', category: 'Marketplace', description: 'Compare market rates before buying used or new solar hardware' },
+  { path: '/solar-inverter', title: 'Solar Inverters Directory', category: 'Marketplace', description: 'Inverex, Homage, Growatt, GoodWe hybrid & on-grid inverters' },
+  { path: '/solar-batteries', title: 'Solar Batteries & Lithium Price', category: 'Marketplace', description: 'Lithium, tubular and gel solar batteries across Pakistani cities' },
+  { path: '/solar-panels', title: 'Solar Panels Directory', category: 'Marketplace', description: 'Longi, Jinko, JA Solar, Canadian Tier-1 panels' },
+  { path: '/contact', title: 'Contact Us & Support', category: 'Support', description: 'Reach Islamabad headquarters, WhatsApp desk, or email info@sellsolar.pk' },
+  { path: '/about', title: 'About SellSolar', category: 'Company', description: 'Our mission to digitize Pakistan’s clean renewable energy ecosystem' },
+  { path: '/careers', title: 'Careers & Solar Jobs', category: 'Company', description: 'Join the fastest growing clean-tech team in Pakistan' },
+  { path: '/press', title: 'Press & Media Center', category: 'Company', description: 'Latest news, press releases, and media inquiries' },
+  { path: '/blog', title: 'Solar Blog & Net-Metering Guides', category: 'Company', description: 'NEPRA net metering guidelines, solar maintenance and tips' },
+  { path: '/buy-solar', title: 'Buy Solar Guide', category: 'Marketplace', description: 'Beginner and commercial guide to purchasing verified solar panels' },
+  { path: '/sell-solar', title: 'Sell Solar Free in Pakistan', category: 'Marketplace', description: 'How to list pre-owned or stock equipment without commission' },
+  { path: '/how-it-works', title: 'How SellSolar Works', category: 'Marketplace', description: 'Guide for buyers and sellers on how to trade solar equipment safely' },
+  { path: '/pricing', title: 'Pricing & Packages', category: 'Marketplace', description: 'Marketplace seller packages and verified dealer subscription tiers' },
+  { path: '/help', title: 'Help Center & FAQs', category: 'Support', description: 'Frequently asked questions, troubleshooting, and support documentation' },
+  { path: '/safety', title: 'Solar Safety Guidelines', category: 'Support', description: 'Essential electrical safety tips, fake product detection and precautions' },
+  { path: '/report-issue', title: 'Report an Issue', category: 'Support', description: 'Submit scam alerts, copyright notices, or platform bugs' },
+  { path: '/terms', title: 'Terms of Service', category: 'Legal', description: 'Terms and conditions governing the use of SellSolar marketplace' },
+  { path: '/privacy', title: 'Privacy Policy', category: 'Legal', description: 'Information collection, data security, and privacy practices' },
+  { path: '/cookies', title: 'Cookie Policy', category: 'Legal', description: 'Details about cookies and tracking technologies used on SellSolar' },
+  { path: '/disclaimer', title: 'Disclaimer', category: 'Legal', description: 'Marketplace liability disclaimers, price volatility, and third-party links' },
+];
 
 export default function AdminSuperDashboard({
   onBack,
@@ -79,6 +112,27 @@ export default function AdminSuperDashboard({
     subject: '',
     category: 'General Inquiry',
     message: '',
+  });
+
+  // Pages & Content CMS State
+  const [customPages, setCustomPages] = useState([]);
+  const [pageFilter, setPageFilter] = useState('all'); // 'all' | 'core' | 'marketplace' | 'company' | 'support' | 'legal' | 'custom'
+  const [pageSearchQuery, setPageSearchQuery] = useState('');
+  const [editingPage, setEditingPage] = useState(null);
+  const [isAddingPage, setIsAddingPage] = useState(false);
+  const [pageEditForm, setPageEditForm] = useState({
+    title: '',
+    description: '',
+    heroHeading: '',
+    category: 'Core',
+    isPublished: true,
+  });
+  const [newPageForm, setNewPageForm] = useState({
+    path: '',
+    title: '',
+    description: '',
+    heroHeading: '',
+    category: 'Custom',
   });
 
   const [profileForm, setProfileForm] = useState({
@@ -156,6 +210,14 @@ export default function AdminSuperDashboard({
         if (msgs && msgs.length > 0) setInboxMessages(msgs);
       }).catch(() => {});
     }
+
+    // 4. Custom Pages & CMS
+    try {
+      const rawPages = localStorage.getItem('sellsolar_custom_pages');
+      if (rawPages) {
+        setCustomPages(JSON.parse(rawPages));
+      }
+    } catch {}
   };
 
   useEffect(() => {
@@ -317,6 +379,100 @@ export default function AdminSuperDashboard({
     });
   };
 
+  // Pages & Content CMS Handlers
+  const handleOpenEditPage = (page) => {
+    setEditingPage(page);
+    setPageEditForm({
+      title: page.title || '',
+      description: page.description || '',
+      heroHeading: page.heroHeading || page.title || '',
+      category: page.category || 'Core',
+      isPublished: page.isPublished !== false,
+    });
+  };
+
+  const handleSavePageEdit = (e) => {
+    e?.preventDefault();
+    if (!editingPage) return;
+    try {
+      const stored = localStorage.getItem('sellsolar_custom_pages');
+      let currentCustom = stored ? JSON.parse(stored) : [];
+      const existingIdx = currentCustom.findIndex((p) => p.path === editingPage.path);
+      const updatedPage = {
+        ...editingPage,
+        ...pageEditForm,
+        lastUpdated: new Date().toISOString(),
+      };
+      if (existingIdx >= 0) {
+        currentCustom[existingIdx] = updatedPage;
+      } else {
+        currentCustom.push(updatedPage);
+      }
+      localStorage.setItem('sellsolar_custom_pages', JSON.stringify(currentCustom));
+      setCustomPages(currentCustom);
+      setEditingPage(null);
+      showToast({
+        title: 'Page Updated',
+        message: `${updatedPage.title} content updated successfully.`,
+        type: 'success',
+      });
+    } catch (err) {
+      showToast({ title: 'Error', message: err.message, type: 'error' });
+    }
+  };
+
+  const handleCreateCustomPage = (e) => {
+    e?.preventDefault();
+    let cleanPath = (newPageForm.path || '').trim();
+    if (!cleanPath.startsWith('/')) cleanPath = '/' + cleanPath;
+    if (cleanPath.length <= 1) {
+      showToast({ title: 'Invalid Path', message: 'Please enter a valid page slug like /solar-guide', type: 'error' });
+      return;
+    }
+    const newPage = {
+      path: cleanPath,
+      title: newPageForm.title || cleanPath.replace('/', '').toUpperCase(),
+      description: newPageForm.description || '',
+      heroHeading: newPageForm.heroHeading || newPageForm.title,
+      category: newPageForm.category || 'Custom',
+      isPublished: true,
+      isCustom: true,
+      lastUpdated: new Date().toISOString(),
+    };
+    try {
+      const stored = localStorage.getItem('sellsolar_custom_pages');
+      let currentCustom = stored ? JSON.parse(stored) : [];
+      if (currentCustom.some((p) => p.path === cleanPath)) {
+        showToast({ title: 'Duplicate Path', message: 'A page with this URL path already exists.', type: 'error' });
+        return;
+      }
+      currentCustom.push(newPage);
+      localStorage.setItem('sellsolar_custom_pages', JSON.stringify(currentCustom));
+      setCustomPages(currentCustom);
+      setIsAddingPage(false);
+      setNewPageForm({ path: '', title: '', description: '', heroHeading: '', category: 'Custom' });
+      showToast({
+        title: 'Page Created',
+        message: `Custom page "${newPage.title}" created successfully.`,
+        type: 'success',
+      });
+    } catch (err) {
+      showToast({ title: 'Error', message: err.message, type: 'error' });
+    }
+  };
+
+  const handleDeleteCustomPage = (pagePath) => {
+    if (!confirm('Are you sure you want to delete this custom page?')) return;
+    try {
+      const stored = localStorage.getItem('sellsolar_custom_pages');
+      let currentCustom = stored ? JSON.parse(stored) : [];
+      const filtered = currentCustom.filter((p) => p.path !== pagePath);
+      localStorage.setItem('sellsolar_custom_pages', JSON.stringify(filtered));
+      setCustomPages(filtered);
+      showToast({ title: 'Page Deleted', message: 'Custom page deleted.', type: 'info' });
+    } catch {}
+  };
+
   // Toggle Sold for Personal Ad
   const handleToggleSold = (listingId) => {
     const updated = listingsList.map((item) => {
@@ -411,6 +567,45 @@ export default function AdminSuperDashboard({
       (item.city || '').toLowerCase().includes(q)
     );
   });
+
+  // Merged Pages List (System default pages + custom page overrides)
+  const allPagesList = useMemo(() => {
+    const customMap = new Map();
+    (customPages || []).forEach((p) => customMap.set(p.path, p));
+
+    const merged = SYSTEM_PAGES.map((sys) => {
+      if (customMap.has(sys.path)) {
+        return { ...sys, ...customMap.get(sys.path) };
+      }
+      return { ...sys, isPublished: true, lastUpdated: 'Standard Route' };
+    });
+
+    // Add any newly created custom pages not in SYSTEM_PAGES
+    (customPages || []).forEach((cust) => {
+      if (!SYSTEM_PAGES.some((sys) => sys.path === cust.path)) {
+        merged.push({ ...cust, isCustom: true, isPublished: true });
+      }
+    });
+
+    return merged;
+  }, [customPages]);
+
+  // Filtered Pages
+  const filteredPages = useMemo(() => {
+    return allPagesList.filter((p) => {
+      if (pageFilter !== 'all') {
+        if (pageFilter === 'custom' && !p.isCustom) return false;
+        if (pageFilter !== 'custom' && p.category.toLowerCase() !== pageFilter.toLowerCase()) return false;
+      }
+      if (!pageSearchQuery) return true;
+      const q = pageSearchQuery.toLowerCase();
+      return (
+        p.title.toLowerCase().includes(q) ||
+        p.path.toLowerCase().includes(q) ||
+        (p.description && p.description.toLowerCase().includes(q))
+      );
+    });
+  }, [allPagesList, pageFilter, pageSearchQuery]);
 
   const unreadInboxCount = inboxMessages.filter((m) => !m.is_read).length;
 
@@ -598,6 +793,25 @@ export default function AdminSuperDashboard({
                   <ChartColumn className="h-4 w-4" />
                   <span>Analytics & Traffic</span>
                 </div>
+              </button>
+            )}
+
+            {/* TAB 6: PAGES & CONTENT CMS (SUPER ADMIN & ADMIN) */}
+            {(isSuperAdmin || isAdmin) && (
+              <button
+                type="button"
+                onClick={() => setActiveTab('pages')}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+                  activeTab === 'pages'
+                    ? 'bg-amber-500 text-white shadow-sm font-black'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <FileText className="h-4 w-4" />
+                  <span>Pages & CMS</span>
+                </div>
+                <span className="text-[10px] text-gray-400 font-mono">{allPagesList.length}</span>
               </button>
             )}
 
@@ -1328,45 +1542,56 @@ export default function AdminSuperDashboard({
             </div>
           )}
 
-          {/* TAB 3: ANALYTICS & VIEWS */}
+          {/* TAB 3: ANALYTICS & TRAFFIC */}
           {activeTab === 'analytics' && (
             <div className="space-y-6">
-              <div>
-                <h1 className="text-2xl font-black text-gray-900 dark:text-white">Visitor & Product Analytics</h1>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Track website visits, unique sessions, and most viewed solar equipment.
-                </p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-2">
+                    <ChartColumn className="h-6 w-6 text-amber-500" />
+                    Visitor Traffic & Product Views Analytics
+                  </h1>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Real-time metrics for platform visits, route breakdown, device channels, and equipment view counts.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Live Tracking Active
+                  </span>
+                </div>
               </div>
 
-              {/* Analytics Metric Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Metric Cards */}
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="p-5 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-gray-500 uppercase">Total Site Visits</span>
+                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Total Site Visits</span>
                     <Eye className="h-4 w-4 text-amber-500" />
                   </div>
                   <p className="text-3xl font-black text-gray-900 dark:text-white mt-2">
                     {analytics.totalVisits.toLocaleString()}
                   </p>
                   <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 font-semibold">
-                    ↑ Real-time tracking active
+                    ↑ All recorded page views
                   </p>
                 </div>
 
                 <div className="p-5 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-gray-500 uppercase">Today's Visits</span>
+                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Today's Visits</span>
                     <Clock className="h-4 w-4 text-blue-500" />
                   </div>
                   <p className="text-3xl font-black text-gray-900 dark:text-white mt-2">
                     {analytics.todayVisits.toLocaleString()}
                   </p>
-                  <p className="text-[11px] text-gray-400 mt-1 font-semibold">Today's sessions</p>
+                  <p className="text-[11px] text-blue-600 dark:text-blue-400 mt-1 font-semibold">Today's sessions</p>
                 </div>
 
                 <div className="p-5 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-gray-500 uppercase">Unique Visitors</span>
+                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Unique Visitors</span>
                     <Users className="h-4 w-4 text-purple-500" />
                   </div>
                   <p className="text-3xl font-black text-gray-900 dark:text-white mt-2">
@@ -1379,62 +1604,239 @@ export default function AdminSuperDashboard({
 
                 <div className="p-5 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-gray-500 uppercase">Product Views</span>
+                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Product Views</span>
                     <Tag className="h-4 w-4 text-emerald-500" />
                   </div>
                   <p className="text-3xl font-black text-gray-900 dark:text-white mt-2">
                     {analytics.totalProductViews.toLocaleString()}
                   </p>
                   <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 font-semibold">
-                    Listing detail impressions
+                    Listing impressions
                   </p>
                 </div>
               </div>
 
-              {/* Top 10 Most Viewed Products Table */}
-              <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden">
-                <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
-                  <h3 className="text-sm font-black text-gray-900 dark:text-white">
-                    🔥 Top 10 Most Viewed Solar Equipment
-                  </h3>
-                  <span className="text-xs text-gray-400 font-semibold">Live ranking</span>
+              {/* Visitor Traffic Breakdown: Top Pages & Channels */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Top Visited Pages */}
+                <div className="lg:col-span-2 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden shadow-xs">
+                  <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                    <div>
+                      <h3 className="text-sm font-black text-gray-900 dark:text-white">
+                        📍 Top Visited Pages & Routes
+                      </h3>
+                      <p className="text-[11px] text-gray-400">Traffic distribution across SellSolar.pk</p>
+                    </div>
+                    <span className="text-xs font-bold text-amber-600 dark:text-amber-400 font-mono">
+                      {analytics.topVisitedPages?.length || 0} Routes Tracked
+                    </span>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-gray-50 dark:bg-gray-800/50 text-[11px] font-black uppercase text-gray-500 tracking-wider">
+                        <tr>
+                          <th className="p-3">Route Path</th>
+                          <th className="p-3">Visits</th>
+                          <th className="p-3">Traffic Share</th>
+                          <th className="p-3 text-right">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                        {(analytics.topVisitedPages || []).map((page) => (
+                          <tr key={page.path} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
+                            <td className="p-3 font-mono font-bold text-amber-600 dark:text-amber-400">
+                              {page.path}
+                            </td>
+                            <td className="p-3 font-bold text-gray-900 dark:text-white">
+                              {page.count.toLocaleString()}
+                            </td>
+                            <td className="p-3">
+                              <div className="flex items-center gap-2">
+                                <div className="w-24 h-2 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
+                                  <div
+                                    className="h-full bg-amber-500 rounded-full"
+                                    style={{ width: `${Math.min(100, page.percentage * 2)}%` }}
+                                  ></div>
+                                </div>
+                                <span className="text-[11px] font-mono text-gray-500">{page.percentage}%</span>
+                              </div>
+                            </td>
+                            <td className="p-3 text-right">
+                              <a
+                                href={page.path}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-[11px] font-bold text-gray-500 hover:text-amber-600"
+                              >
+                                View ↗
+                              </a>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Traffic Channels & Device Share */}
+                <div className="space-y-6">
+                  {/* Traffic Sources */}
+                  <div className="p-5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xs">
+                    <h3 className="text-sm font-black text-gray-900 dark:text-white mb-3">
+                      🌐 Traffic Acquisition Sources
+                    </h3>
+                    <div className="space-y-3">
+                      {Object.entries(analytics.trafficSources || {}).map(([source, count]) => {
+                        const total = Object.values(analytics.trafficSources || {}).reduce((a, b) => a + b, 0) || 1;
+                        const pct = Math.round((count / total) * 100);
+                        return (
+                          <div key={source}>
+                            <div className="flex items-center justify-between text-xs mb-1">
+                              <span className="font-bold text-gray-700 dark:text-gray-300">{source}</span>
+                              <span className="font-mono text-gray-500">{count.toLocaleString()} ({pct}%)</span>
+                            </div>
+                            <div className="w-full h-2 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
+                              <div className="h-full bg-purple-500 rounded-full" style={{ width: `${pct}%` }}></div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Device Share */}
+                  <div className="p-5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xs">
+                    <h3 className="text-sm font-black text-gray-900 dark:text-white mb-3">
+                      📱 Device Breakdown
+                    </h3>
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                      <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/60">
+                        <p className="text-[10px] text-gray-400 font-bold uppercase">Mobile</p>
+                        <p className="text-lg font-black text-amber-500 mt-0.5">74%</p>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/60">
+                        <p className="text-[10px] text-gray-400 font-bold uppercase">Desktop</p>
+                        <p className="text-lg font-black text-blue-500 mt-0.5">22%</p>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/60">
+                        <p className="text-[10px] text-gray-400 font-bold uppercase">Tablet</p>
+                        <p className="text-lg font-black text-purple-500 mt-0.5">4%</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Product Views & Marketplace Performance Details */}
+              <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden shadow-xs">
+                <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <h3 className="text-sm font-black text-gray-900 dark:text-white flex items-center gap-2">
+                      <Flame className="h-4 w-4 text-rose-500" />
+                      Detailed Equipment Views & Inquiry Performance
+                    </h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                      All products ranked by total visitor views, generated inquiries, and badges.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-1 rounded-full text-[11px] font-black bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">
+                      ⭐ {analytics.totalFeatured} Featured
+                    </span>
+                    <span className="px-2.5 py-1 rounded-full text-[11px] font-black bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300">
+                      🔥 {analytics.totalHotSell} Hot Sell
+                    </span>
+                  </div>
                 </div>
 
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
                     <thead className="bg-gray-50 dark:bg-gray-800/50 text-[11px] font-black uppercase text-gray-500 tracking-wider">
                       <tr>
-                        <th className="p-3">Rank</th>
-                        <th className="p-3">Equipment</th>
-                        <th className="p-3">Brand & Category</th>
-                        <th className="p-3">City</th>
-                        <th className="p-3">Price</th>
-                        <th className="p-3 text-right">Views</th>
+                        <th className="p-3.5">Rank</th>
+                        <th className="p-3.5">Solar Equipment</th>
+                        <th className="p-3.5">Brand & Category</th>
+                        <th className="p-3.5">City</th>
+                        <th className="p-3.5">Price</th>
+                        <th className="p-3.5">Total Views</th>
+                        <th className="p-3.5">Inquiries</th>
+                        <th className="p-3.5">Badges</th>
+                        <th className="p-3.5 text-right">Quick Toggle</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                      {analytics.topViewedProducts.map((item, idx) => (
+                      {(analytics.topViewedProducts || []).map((item, idx) => (
                         <tr key={item.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
-                          <td className="p-3 font-mono font-bold text-gray-400">#{idx + 1}</td>
-                          <td className="p-3">
-                            <div className="flex items-center gap-2">
+                          <td className="p-3.5 font-mono font-bold text-gray-400">#{idx + 1}</td>
+                          <td className="p-3.5">
+                            <div className="flex items-center gap-2.5">
                               {item.image_url ? (
-                                <img src={item.image_url} alt="" className="w-8 h-8 rounded-lg object-cover" />
+                                <img src={item.image_url} alt="" className="w-9 h-9 rounded-xl object-cover shrink-0" />
                               ) : null}
-                              <span className="font-bold text-gray-900 dark:text-white truncate max-w-xs">
-                                {item.title}
-                              </span>
+                              <div className="min-w-0">
+                                <p className="font-bold text-gray-900 dark:text-white truncate max-w-xs">{item.title}</p>
+                                <p className="text-[10px] text-gray-400 capitalize">{item.condition || 'Used'}</p>
+                              </div>
                             </div>
                           </td>
-                          <td className="p-3 text-gray-500">
+                          <td className="p-3.5 text-gray-500">
                             {item.brand} • <span className="capitalize">{item.category}</span>
                           </td>
-                          <td className="p-3 text-gray-500">{item.city}</td>
-                          <td className="p-3 font-bold text-amber-600 dark:text-amber-400">
+                          <td className="p-3.5 text-gray-500">{item.city}</td>
+                          <td className="p-3.5 font-bold text-amber-600 dark:text-amber-400">
                             {formatPrice(item.price)}
                           </td>
-                          <td className="p-3 text-right font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                          <td className="p-3.5 font-mono font-bold text-emerald-600 dark:text-emerald-400">
                             {item.totalViews.toLocaleString()} views
+                          </td>
+                          <td className="p-3.5 font-mono font-bold text-purple-600 dark:text-purple-400">
+                            {item.inquiriesCount || 0} leads
+                          </td>
+                          <td className="p-3.5">
+                            <div className="flex items-center gap-1">
+                              {item.is_featured && (
+                                <span className="px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-black text-[9px]">
+                                  ⭐ FEATURED
+                                </span>
+                              )}
+                              {item.is_hot_sell && (
+                                <span className="px-1.5 py-0.5 rounded bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300 font-black text-[9px]">
+                                  🔥 HOT
+                                </span>
+                              )}
+                              {!item.is_featured && !item.is_hot_sell && (
+                                <span className="text-[10px] text-gray-400">Standard</span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="p-3.5 text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              <button
+                                type="button"
+                                onClick={() => handleToggleFeatured(item.id)}
+                                className={`px-2 py-1 rounded text-[10px] font-bold transition-all ${
+                                  item.is_featured
+                                    ? 'bg-amber-500 text-white'
+                                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 hover:text-amber-600'
+                                }`}
+                                title="Toggle Featured"
+                              >
+                                ⭐ {item.is_featured ? 'Featured' : 'Feature'}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleToggleHotSell(item.id)}
+                                className={`px-2 py-1 rounded text-[10px] font-bold transition-all ${
+                                  item.is_hot_sell
+                                    ? 'bg-rose-500 text-white'
+                                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 hover:text-rose-600'
+                                }`}
+                                title="Toggle Hot Sell"
+                              >
+                                🔥 {item.is_hot_sell ? 'Hot' : 'Hot Sell'}
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -1442,6 +1844,383 @@ export default function AdminSuperDashboard({
                   </table>
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* TAB: PAGES & CONTENT CMS */}
+          {activeTab === 'pages' && (isSuperAdmin || isAdmin) && (
+            <div className="space-y-6">
+              {/* Header & Add Button */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-2">
+                    <FileText className="h-6 w-6 text-amber-500" />
+                    Pages & Content CMS Manager
+                  </h1>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Inspect, customize SEO titles & headings, and create new marketplace or custom content pages.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsAddingPage(true)}
+                    className="btn-primary text-xs px-3.5 py-2 flex items-center gap-1.5"
+                  >
+                    <Plus className="h-4 w-4" />
+                    <span>+ Add Custom Page</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Filters & Search */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1">
+                  {['all', 'core', 'marketplace', 'company', 'support', 'legal', 'custom'].map((cat) => (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => setPageFilter(cat)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-all shrink-0 ${
+                        pageFilter === cat
+                          ? 'bg-amber-500 text-white shadow-xs'
+                          : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="relative w-full sm:w-64">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search pages by name or slug..."
+                    value={pageSearchQuery}
+                    onChange={(e) => setPageSearchQuery(e.target.value)}
+                    className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-amber-500 outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Pages Directory Table */}
+              <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden shadow-xs">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-gray-50 dark:bg-gray-800/50 text-[11px] font-black uppercase text-gray-500 tracking-wider">
+                      <tr>
+                        <th className="p-3.5">Page Title & URL Slug</th>
+                        <th className="p-3.5">Category</th>
+                        <th className="p-3.5">SEO Description & Content</th>
+                        <th className="p-3.5">Status</th>
+                        <th className="p-3.5 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                      {filteredPages.map((page) => (
+                        <tr key={page.path} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
+                          <td className="p-3.5">
+                            <div>
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-bold text-gray-900 dark:text-white">{page.title}</span>
+                                {page.isCustom && (
+                                  <span className="px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 text-[9px] font-bold">
+                                    CUSTOM
+                                  </span>
+                                )}
+                              </div>
+                              <span className="font-mono text-[11px] text-amber-600 dark:text-amber-400">
+                                {page.path}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="p-3.5">
+                            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
+                              {page.category}
+                            </span>
+                          </td>
+                          <td className="p-3.5 text-gray-500 max-w-sm">
+                            <p className="truncate text-xs">{page.description || 'Standard platform route'}</p>
+                            {page.heroHeading && (
+                              <p className="text-[10px] text-gray-400 truncate">Hero: {page.heroHeading}</p>
+                            )}
+                          </td>
+                          <td className="p-3.5">
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              page.isPublished !== false
+                                ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
+                                : 'bg-gray-100 dark:bg-gray-800 text-gray-400'
+                            }`}>
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                              {page.isPublished !== false ? 'Live / Published' : 'Draft'}
+                            </span>
+                          </td>
+                          <td className="p-3.5 text-right">
+                            <div className="flex items-center justify-end gap-1.5">
+                              <a
+                                href={page.path}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                title="Open Live Page"
+                              >
+                                <ExternalLink className="h-3.5 w-3.5" />
+                              </a>
+                              <button
+                                type="button"
+                                onClick={() => handleOpenEditPage(page)}
+                                className="px-2.5 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold text-[11px] flex items-center gap-1 transition-colors"
+                              >
+                                <Edit3 className="h-3 w-3" />
+                                Edit
+                              </button>
+                              {page.isCustom && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteCustomPage(page.path)}
+                                  className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors"
+                                  title="Delete Custom Page"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Edit Page Modal */}
+              {editingPage && (
+                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+                  <div className="w-full max-w-xl bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                    <div className="p-4 sm:p-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                      <div>
+                        <h3 className="font-black text-sm text-gray-900 dark:text-white flex items-center gap-2">
+                          <Edit3 className="h-4 w-4 text-amber-500" />
+                          Edit Page Content: {editingPage.title}
+                        </h3>
+                        <p className="text-[11px] font-mono text-amber-600 dark:text-amber-400 mt-0.5">
+                          {editingPage.path}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setEditingPage(null)}
+                        className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+
+                    <form onSubmit={handleSavePageEdit} className="p-5 space-y-4 text-xs">
+                      <div>
+                        <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                          Page Navigation Title *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={pageEditForm.title}
+                          onChange={(e) => setPageEditForm({ ...pageEditForm, title: e.target.value })}
+                          className="input-field text-xs"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                          Hero Banner Heading
+                        </label>
+                        <input
+                          type="text"
+                          value={pageEditForm.heroHeading}
+                          onChange={(e) => setPageEditForm({ ...pageEditForm, heroHeading: e.target.value })}
+                          className="input-field text-xs"
+                          placeholder="e.g. Find Verified Solar Panels in Pakistan"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                          SEO Meta Description
+                        </label>
+                        <textarea
+                          rows={3}
+                          value={pageEditForm.description}
+                          onChange={(e) => setPageEditForm({ ...pageEditForm, description: e.target.value })}
+                          className="input-field text-xs"
+                          placeholder="Search engine summary..."
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                            Page Category
+                          </label>
+                          <select
+                            value={pageEditForm.category}
+                            onChange={(e) => setPageEditForm({ ...pageEditForm, category: e.target.value })}
+                            className="input-field text-xs"
+                          >
+                            <option value="Core">Core</option>
+                            <option value="Marketplace">Marketplace</option>
+                            <option value="Company">Company</option>
+                            <option value="Support">Support</option>
+                            <option value="Legal">Legal</option>
+                            <option value="Custom">Custom</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                            Status
+                          </label>
+                          <select
+                            value={pageEditForm.isPublished ? 'published' : 'draft'}
+                            onChange={(e) => setPageEditForm({ ...pageEditForm, isPublished: e.target.value === 'published' })}
+                            className="input-field text-xs"
+                          >
+                            <option value="published">Live / Published</option>
+                            <option value="draft">Draft / Hidden</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
+                        <button
+                          type="button"
+                          onClick={() => setEditingPage(null)}
+                          className="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 font-bold"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="btn-primary text-xs px-5 py-2"
+                        >
+                          Save Page Changes
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
+
+              {/* Add Custom Page Modal */}
+              {isAddingPage && (
+                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+                  <div className="w-full max-w-xl bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                    <div className="p-4 sm:p-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                      <h3 className="font-black text-sm text-gray-900 dark:text-white flex items-center gap-2">
+                        <Plus className="h-4 w-4 text-amber-500" />
+                        Create New Custom Page
+                      </h3>
+                      <button
+                        type="button"
+                        onClick={() => setIsAddingPage(false)}
+                        className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+
+                    <form onSubmit={handleCreateCustomPage} className="p-5 space-y-4 text-xs">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                            Page Slug / Route * (e.g. /solar-guide)
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="/my-page"
+                            value={newPageForm.path}
+                            onChange={(e) => setNewPageForm({ ...newPageForm, path: e.target.value })}
+                            className="input-field text-xs font-mono"
+                          />
+                        </div>
+                        <div>
+                          <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                            Page Title *
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="e.g. Net Metering Guide"
+                            value={newPageForm.title}
+                            onChange={(e) => setNewPageForm({ ...newPageForm, title: e.target.value })}
+                            className="input-field text-xs"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                          Hero Heading
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Big heading on top of page..."
+                          value={newPageForm.heroHeading}
+                          onChange={(e) => setNewPageForm({ ...newPageForm, heroHeading: e.target.value })}
+                          className="input-field text-xs"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                          Meta Description
+                        </label>
+                        <textarea
+                          rows={2}
+                          placeholder="Brief description for SEO..."
+                          value={newPageForm.description}
+                          onChange={(e) => setNewPageForm({ ...newPageForm, description: e.target.value })}
+                          className="input-field text-xs"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                          Category
+                        </label>
+                        <select
+                          value={newPageForm.category}
+                          onChange={(e) => setNewPageForm({ ...newPageForm, category: e.target.value })}
+                          className="input-field text-xs"
+                        >
+                          <option value="Custom">Custom Content</option>
+                          <option value="Marketplace">Marketplace Guide</option>
+                          <option value="Support">Support & Help</option>
+                          <option value="Company">Company Information</option>
+                          <option value="Legal">Legal Notice</option>
+                        </select>
+                      </div>
+
+                      <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
+                        <button
+                          type="button"
+                          onClick={() => setIsAddingPage(false)}
+                          className="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 font-bold"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="btn-primary text-xs px-5 py-2"
+                        >
+                          Create Page Live
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -1687,8 +2466,124 @@ export default function AdminSuperDashboard({
               )}
 
               <form onSubmit={handleSaveCmsSettings} className="space-y-6">
-                {/* Section 1: WhatsApp Controller */}
-                <div className="p-6 rounded-2xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/30 dark:bg-emerald-950/20 space-y-4">
+                {/* Section 1: Logo & Visual Media */}
+                <div className="p-6 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 space-y-4 shadow-xs">
+                  <h3 className="text-sm font-black text-gray-900 dark:text-white flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-purple-600" />
+                    Website Logo, Favicon & Visual Identity
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                        Logo Image URL (PNG / SVG / WebP)
+                      </label>
+                      <input
+                        type="url"
+                        value={cmsForm.logoUrl || ''}
+                        onChange={(e) => setCmsForm({ ...cmsForm, logoUrl: e.target.value })}
+                        placeholder="https://example.com/logo.png"
+                        className="input-field text-xs"
+                      />
+                      <p className="text-[10px] text-gray-400 mt-1">Leave blank to use default styled text logo.</p>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                        Logo Preview
+                      </label>
+                      <div className="h-10 px-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-slate-50 dark:bg-gray-800/50 flex items-center justify-center">
+                        {cmsForm.logoUrl ? (
+                          <img src={cmsForm.logoUrl} alt="Logo Preview" className="h-7 max-w-full object-contain" />
+                        ) : (
+                          <span className="text-base font-black tracking-tight text-gray-900 dark:text-white">
+                            Sell<span className="text-amber-500">Solar</span>
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                    <div>
+                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                        Favicon URL
+                      </label>
+                      <input
+                        type="text"
+                        value={cmsForm.faviconUrl || '/favicon.ico'}
+                        onChange={(e) => setCmsForm({ ...cmsForm, faviconUrl: e.target.value })}
+                        className="input-field text-xs font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                        Social Share Preview Image (OG Image)
+                      </label>
+                      <input
+                        type="text"
+                        value={cmsForm.ogImageUrl || '/og-image.jpg'}
+                        onChange={(e) => setCmsForm({ ...cmsForm, ogImageUrl: e.target.value })}
+                        className="input-field text-xs font-mono"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 2: Top Announcement Bar */}
+                <div className="p-6 rounded-2xl border border-amber-200 dark:border-amber-900/50 bg-amber-50/20 dark:bg-amber-950/20 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-sm font-black text-amber-900 dark:text-amber-200 flex items-center gap-2">
+                        <Bell className="h-4 w-4 text-amber-500" />
+                        Top Announcement / Alert Banner
+                      </h3>
+                      <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+                        Displays an announcement notice at the very top of all website pages.
+                      </p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={cmsForm.topBannerEnabled}
+                        onChange={(e) => setCmsForm({ ...cmsForm, topBannerEnabled: e.target.checked })}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                      <span className="ml-2 text-xs font-bold text-gray-700 dark:text-gray-300">
+                        {cmsForm.topBannerEnabled ? 'Active' : 'Hidden'}
+                      </span>
+                    </label>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
+                    <div className="sm:col-span-2">
+                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                        Announcement Notice Text
+                      </label>
+                      <input
+                        type="text"
+                        value={cmsForm.topBannerText || ''}
+                        onChange={(e) => setCmsForm({ ...cmsForm, topBannerText: e.target.value })}
+                        placeholder="Pakistan's #1 Solar Marketplace — Verified Dealers & Daily Price Benchmark"
+                        className="input-field text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                        Target Link (e.g. /prices)
+                      </label>
+                      <input
+                        type="text"
+                        value={cmsForm.topBannerLink || '/prices'}
+                        onChange={(e) => setCmsForm({ ...cmsForm, topBannerLink: e.target.value })}
+                        className="input-field text-xs font-mono"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 3: WhatsApp Controller */}
+                <div className="p-6 rounded-2xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/30 dark:bg-emerald-950/20 space-y-4 shadow-xs">
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="text-sm font-black text-emerald-900 dark:text-emerald-200 flex items-center gap-2">
@@ -1696,7 +2591,7 @@ export default function AdminSuperDashboard({
                         WhatsApp Floating Chat & Contact Settings
                       </h3>
                       <p className="text-xs text-emerald-700 dark:text-emerald-400 mt-0.5">
-                        Controls the floating WhatsApp widget and listing enquiry redirects.
+                        Controls the floating WhatsApp button and listing enquiry redirects across the entire site.
                       </p>
                     </div>
                     {/* Toggle */}
@@ -1709,12 +2604,12 @@ export default function AdminSuperDashboard({
                       />
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                       <span className="ml-2 text-xs font-bold text-gray-700 dark:text-gray-300">
-                        {cmsForm.whatsAppEnabled ? 'Enabled' : 'Disabled'}
+                        {cmsForm.whatsAppEnabled ? 'Active' : 'Disabled'}
                       </span>
                     </label>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
                     <div>
                       <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
                         WhatsApp Phone Number (with Country Code) *
@@ -1724,7 +2619,7 @@ export default function AdminSuperDashboard({
                         value={cmsForm.whatsAppNumber}
                         onChange={(e) => setCmsForm({ ...cmsForm, whatsAppNumber: e.target.value })}
                         placeholder="e.g. 923001234567"
-                        className="input-field text-xs"
+                        className="input-field text-xs font-mono"
                       />
                     </div>
                     <div>
@@ -1739,11 +2634,52 @@ export default function AdminSuperDashboard({
                         className="input-field text-xs"
                       />
                     </div>
+                    <div>
+                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                        Floating Button Label
+                      </label>
+                      <input
+                        type="text"
+                        value={cmsForm.whatsAppLabel || 'WhatsApp Us'}
+                        onChange={(e) => setCmsForm({ ...cmsForm, whatsAppLabel: e.target.value })}
+                        placeholder="WhatsApp Us"
+                        className="input-field text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                        Floating Widget Position
+                      </label>
+                      <select
+                        value={cmsForm.whatsAppPosition || 'bottom-right'}
+                        onChange={(e) => setCmsForm({ ...cmsForm, whatsAppPosition: e.target.value })}
+                        className="input-field text-xs"
+                      >
+                        <option value="bottom-right">Bottom Right Corner</option>
+                        <option value="bottom-left">Bottom Left Corner</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                        Pulse Ping Animation
+                      </label>
+                      <select
+                        value={cmsForm.whatsAppPulse !== false ? 'yes' : 'no'}
+                        onChange={(e) => setCmsForm({ ...cmsForm, whatsAppPulse: e.target.value === 'yes' })}
+                        className="input-field text-xs"
+                      >
+                        <option value="yes">Enabled (Attention Pulse)</option>
+                        <option value="no">Disabled (Static)</option>
+                      </select>
+                    </div>
                   </div>
 
                   <div>
                     <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
-                      Pre-filled WhatsApp Message Template
+                      Pre-filled WhatsApp Greeting Template
                     </label>
                     <input
                       type="text"
@@ -1755,9 +2691,9 @@ export default function AdminSuperDashboard({
                   </div>
                 </div>
 
-                {/* Section 2: Branding & Headings */}
-                <div className="p-6 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 space-y-4">
-                  <h3 className="text-sm font-black text-gray-900 dark:text-white">Brand & Homepage Headings</h3>
+                {/* Section 4: Brand & Headings */}
+                <div className="p-6 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 space-y-4 shadow-xs">
+                  <h3 className="text-sm font-black text-gray-900 dark:text-white">Brand Names & Homepage Headings</h3>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
@@ -1807,13 +2743,38 @@ export default function AdminSuperDashboard({
                       className="input-field text-xs"
                     />
                   </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                    <div>
+                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                        Footer Description
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={cmsForm.footerAboutText || ''}
+                        onChange={(e) => setCmsForm({ ...cmsForm, footerAboutText: e.target.value })}
+                        className="input-field text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                        Copyright Notice
+                      </label>
+                      <input
+                        type="text"
+                        value={cmsForm.copyrightText || ''}
+                        onChange={(e) => setCmsForm({ ...cmsForm, copyrightText: e.target.value })}
+                        className="input-field text-xs"
+                      />
+                    </div>
+                  </div>
                 </div>
 
-                {/* Section 3: Contact Info & Support Email */}
-                <div className="p-6 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 space-y-4">
+                {/* Section 5: Contact Info & Support Email */}
+                <div className="p-6 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 space-y-4 shadow-xs">
                   <h3 className="text-sm font-black text-gray-900 dark:text-white">Contact & Support Desk</h3>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                       <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
                         Official Support Email *
@@ -1823,6 +2784,18 @@ export default function AdminSuperDashboard({
                         value={cmsForm.supportEmail}
                         onChange={(e) => setCmsForm({ ...cmsForm, supportEmail: e.target.value })}
                         placeholder="info@sellsolar.pk"
+                        className="input-field text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                        Sales Inquiry Email
+                      </label>
+                      <input
+                        type="email"
+                        value={cmsForm.salesEmail || 'sales@sellsolar.pk'}
+                        onChange={(e) => setCmsForm({ ...cmsForm, salesEmail: e.target.value })}
+                        placeholder="sales@sellsolar.pk"
                         className="input-field text-xs"
                       />
                     </div>
@@ -1854,11 +2827,11 @@ export default function AdminSuperDashboard({
                   </div>
                 </div>
 
-                {/* Section 4: Social Media Links */}
-                <div className="p-6 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 space-y-4">
-                  <h3 className="text-sm font-black text-gray-900 dark:text-white">Social Media Links</h3>
+                {/* Section 6: Social Media Links */}
+                <div className="p-6 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 space-y-4 shadow-xs">
+                  <h3 className="text-sm font-black text-gray-900 dark:text-white">Social Media Profiles & Channels</h3>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                       <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">Facebook</label>
                       <input
@@ -1910,6 +2883,34 @@ export default function AdminSuperDashboard({
                           setCmsForm({
                             ...cmsForm,
                             socialLinks: { ...(cmsForm.socialLinks || {}), twitter: e.target.value },
+                          })
+                        }
+                        className="input-field text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">LinkedIn</label>
+                      <input
+                        type="url"
+                        value={cmsForm.socialLinks?.linkedin || ''}
+                        onChange={(e) =>
+                          setCmsForm({
+                            ...cmsForm,
+                            socialLinks: { ...(cmsForm.socialLinks || {}), linkedin: e.target.value },
+                          })
+                        }
+                        className="input-field text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">TikTok</label>
+                      <input
+                        type="url"
+                        value={cmsForm.socialLinks?.tiktok || ''}
+                        onChange={(e) =>
+                          setCmsForm({
+                            ...cmsForm,
+                            socialLinks: { ...(cmsForm.socialLinks || {}), tiktok: e.target.value },
                           })
                         }
                         className="input-field text-xs"

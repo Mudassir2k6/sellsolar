@@ -11,8 +11,18 @@ export const DEFAULT_SITE_SETTINGS = {
   heroHeading: 'Buy & Sell Solar Equipment at Live Market Rates',
   heroSubheading: 'Compare verified solar panel, inverter & battery listings across Lahore, Karachi, Islamabad & 30+ cities in Pakistan.',
   logoUrl: '',
+  logoText: 'SellSolar',
   faviconUrl: '/favicon.ico',
   ogImageUrl: '/og-image.jpg',
+
+  // Top Announcement Bar
+  topBannerEnabled: true,
+  topBannerText: "Pakistan's #1 Solar Marketplace — Verified Dealers & Daily Price Benchmark",
+  topBannerLink: '/prices',
+
+  // Footer & Content
+  footerAboutText: "Pakistan's leading online marketplace dedicated exclusively to solar equipment, verified dealer inventories, and live market pricing benchmarks.",
+  copyrightText: '© 2026 SellSolar Pakistan. All rights reserved.',
 
   // Contact Info
   supportEmail: 'info@sellsolar.pk',
@@ -26,6 +36,8 @@ export const DEFAULT_SITE_SETTINGS = {
   whatsAppDisplayNumber: '+92 300 1234567',
   whatsAppDefaultMessage: 'Assalam-o-Alaikum, I am inquiring about solar equipment on SellSolar.pk',
   whatsAppPosition: 'bottom-right', // 'bottom-right' | 'bottom-left'
+  whatsAppLabel: 'WhatsApp Us',
+  whatsAppPulse: true,
 
   // Social Media Links
   socialLinks: {
@@ -35,7 +47,11 @@ export const DEFAULT_SITE_SETTINGS = {
     youtube: 'https://youtube.com/@sellsolarpk',
     linkedin: 'https://linkedin.com/company/sellsolarpk',
     tiktok: 'https://tiktok.com/@sellsolarpk',
+    whatsappCommunity: 'https://chat.whatsapp.com/sellsolarpk',
   },
+
+  // Custom Pages managed from Admin
+  customPages: [],
 };
 
 export const SiteSettingsContext = createContext(null);

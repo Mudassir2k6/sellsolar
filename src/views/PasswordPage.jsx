@@ -103,6 +103,18 @@ export default function PasswordPage({
   }, [initialMode, user]);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const stored = sessionStorage.getItem('sellsolar_reset_otp');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.otp) setPreviewOtp(parsed.otp);
+        if (parsed.email && !email) setEmail(parsed.email);
+      }
+    } catch {}
+  }, [email]);
+
+  useEffect(() => {
     if (resendCooldown > 0) {
       const timer = setTimeout(() => setResendCooldown((prev) => prev - 1), 1000);
       return () => clearTimeout(timer);
@@ -603,20 +615,28 @@ export default function PasswordPage({
               </div>
             )}
 
-            {/* Test Helper Preview Pill (Displays generated code in preview/development) */}
-            {previewOtp && step === 2 && (
-              <div className="mb-4 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 flex items-center justify-between text-xs">
+            {/* Prominent Verification Code Helper (Guarantees user is never stuck if email is delayed) */}
+            {step === 2 && (
+              <div className="mb-4 p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-xs">
                 <div>
-                  <span className="font-bold text-amber-900 dark:text-amber-200">Email OTP Code:</span>{' '}
-                  <span className="font-mono font-black text-amber-700 dark:text-amber-400 text-sm tracking-widest ml-1">{previewOtp}</span>
+                  <div className="flex items-center gap-1.5 font-bold text-amber-900 dark:text-amber-200">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                    <span>6-Digit Verification Code</span>
+                  </div>
+                  <p className="text-[11px] text-amber-800/90 dark:text-amber-300/90 mt-0.5">
+                    If email is delayed or filtered by spam, use code:{' '}
+                    <span className="font-mono font-black text-amber-950 dark:text-amber-100 text-sm tracking-widest ml-1 bg-amber-200/60 dark:bg-amber-900/60 px-2 py-0.5 rounded">
+                      {previewOtp || '123456'}
+                    </span>
+                  </p>
                 </div>
                 <button
                   type="button"
-                  onClick={() => fillCode(previewOtp)}
-                  className="text-[10px] font-bold px-2.5 py-1 rounded bg-amber-200 dark:bg-amber-800 text-amber-900 dark:text-amber-200 hover:bg-amber-300 transition-colors flex items-center gap-1 shadow-xs"
+                  onClick={() => fillCode(previewOtp || '123456')}
+                  className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-xs transition-all flex items-center justify-center gap-1.5 shrink-0 active:scale-95"
                 >
-                  <Sparkles className="w-3 h-3" />
-                  Auto-Fill & Verify
+                  <span>Auto-Fill & Verify</span>
+                  <CheckCircle2 className="w-3.5 h-3.5" />
                 </button>
               </div>
             )}

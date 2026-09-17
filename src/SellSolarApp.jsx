@@ -108,6 +108,7 @@ function Xy({
   const[r,n]=useState(!1),[s,a]=useState(!1),[l,o]=useState(!1),{
     user:c,profile:u,signOut:d
   }=useAuth();
+  const { settings } = useSiteSettings();
   const mobileMenuRef = useRef(null);
   const mobileToggleBtnRef = useRef(null);
   const userDropdownRef = useRef(null);
@@ -185,7 +186,7 @@ function Xy({
   }];
   return jsxs("header",{
     className:`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${r?"bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-md border-b border-gray-200/80 dark:border-gray-800":"bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-200/50 dark:border-gray-800/50"}`,children:[
-      jsx("div",{
+      settings?.topBannerEnabled !== false ? jsx("div",{
         className:"hidden lg:block bg-gray-950 text-gray-300 text-xs py-1.5 border-b border-gray-800",children:jsxs("div",{
           className:"container-page flex items-center justify-between",children:[
             jsxs("div",{
@@ -193,14 +194,14 @@ function Xy({
                 jsxs("span",{
                   className:"flex items-center gap-1.5 text-gray-300 font-medium",children:[
                     jsx(TrendingUp,{ className:"h-3.5 w-3.5 text-primary-400" }),
-                    "Pakistan's #1 Solar Marketplace"
+                    settings?.tagline || "Pakistan's #1 Solar Marketplace"
                   ]
                 }),
                 jsx("span",{ className:"text-gray-700", children:"|" }),
                 jsxs("span",{
                   className:"text-amber-400 font-semibold flex items-center gap-1",children:[
                     jsx(Zap,{ className:"h-3 w-3 fill-amber-400" }),
-                    "Daily Rates: Longi 585W Rs 38/W • Inverex 6kW Rs 210,000"
+                    settings?.topBannerText || "Daily Rates: Longi 585W Rs 38/W • Inverex 6kW Rs 210,000"
                   ]
                 })
               ]
@@ -215,20 +216,35 @@ function Xy({
             })
           ]
         })
-      }),
+      }) : null,
       jsx("div",{
       className:"container-page",children:jsxs("div",{
         className:"flex h-16 items-center justify-between lg:h-18 gap-2 sm:gap-4",children:[
           jsxs("button",{
-            onClick:()=>h("home"),className:"flex items-center gap-2 shrink-0",children:[jsx("div",{
-              className:"flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 shadow-lg shadow-primary-500/30",children:jsx(Sun,{
-                className:"h-5 w-5 text-white",strokeWidth:2.5
-              })
-            }),jsxs("span",{
-              className:"text-xl font-extrabold tracking-tight text-gray-900 dark:text-white",children:["Sell",jsx("span",{
-                className:"text-primary-500",children:"Solar"
-              })]
-            })]
+            onClick:()=>h("home"),className:"flex items-center gap-2 shrink-0",children:[
+              settings?.logoUrl ? (
+                jsx("img",{
+                  src: settings.logoUrl,
+                  alt: settings.siteTitle || "SellSolar",
+                  className: "h-9 max-w-[170px] object-contain"
+                })
+              ) : (
+                jsxs(Fragment,{
+                  children: [
+                    jsx("div",{
+                      className:"flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 shadow-lg shadow-primary-500/30",children:jsx(Sun,{
+                        className:"h-5 w-5 text-white",strokeWidth:2.5
+                      })
+                    }),
+                    jsxs("span",{
+                      className:"text-xl font-extrabold tracking-tight text-gray-900 dark:text-white",children:["Sell",jsx("span",{
+                        className:"text-primary-500",children:"Solar"
+                      })]
+                    })
+                  ]
+                })
+              )
+            ]
           }),
           jsx(GlobalNavbarSearch,{
             onSelectListing:selList,

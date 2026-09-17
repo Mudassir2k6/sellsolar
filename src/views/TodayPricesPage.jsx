@@ -2205,13 +2205,9 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
               <button
                 onClick={() => {
                   if (onSelectCategory) {
-                    onSelectCategory('complete_system');
+                    onSelectCategory({ query: `${calcSystemSizeKw}kW complete system` });
                   } else if (onNavigate) {
                     onNavigate('home');
-                    setTimeout(() => {
-                      const el = document.getElementById('listings');
-                      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }, 100);
                   }
                 }}
                 className="btn-primary w-full mt-4 py-2.5 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-[1.01] active:scale-[0.99]"
@@ -2243,12 +2239,10 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
               <div
                 key={city.name}
                 onClick={() => {
-                  if (onNavigate) {
+                  if (onSelectCategory) {
+                    onSelectCategory({ city: city.name });
+                  } else if (onNavigate) {
                     onNavigate('home');
-                    setTimeout(() => {
-                      const el = document.getElementById('listings');
-                      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }, 100);
                   }
                 }}
                 className="group rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-200/80 hover:shadow-md hover:ring-primary-400 cursor-pointer transition-all flex flex-col justify-between"

@@ -4808,11 +4808,7 @@ function _x({
       id: "main",
       children: jsx(LoadCalculatorPage, {
         onNavigate: o, onSelectCategory: cat => {
-          o("home");
-          setTimeout(() => {
-            const el = document.getElementById("listings");
-            if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-          }, 100);
+          handleGlobalSearchSubmit(typeof cat === 'object' ? cat : { category: cat });
         }
       })
     }), jsx(hx, {
@@ -4827,11 +4823,7 @@ function _x({
       id: "main",
       children: jsx(TodayPricesPage, {
         onNavigate: o, onSelectCategory: cat => {
-          o("home");
-          setTimeout(() => {
-            const el = document.getElementById("listings");
-            if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-          }, 100);
+          handleGlobalSearchSubmit(typeof cat === 'object' ? cat : { category: cat });
         }
       })
     }), jsx(hx, {

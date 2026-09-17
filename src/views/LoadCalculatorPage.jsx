@@ -1179,11 +1179,11 @@ Generated via SellSolar.pk Load Calculator`;
               <div className="mt-6 flex flex-col gap-2.5">
                 <button
                   onClick={() => {
-                    if (onNavigate) onNavigate('home');
-                    setTimeout(() => {
-                      const el = document.getElementById('listings');
-                      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }, 100);
+                    if (onSelectCategory) {
+                      onSelectCategory({ query: `${calculations.recommendedKw}kW` });
+                    } else if (onNavigate) {
+                      onNavigate('home');
+                    }
                   }}
                   className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary-500 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-primary-500/30 hover:bg-primary-600 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >

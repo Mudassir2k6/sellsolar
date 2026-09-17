@@ -28,6 +28,7 @@ export const USER_ROLES = {
 export function getUserRole(user, profile) {
   const email = (user?.email || profile?.email || '').toLowerCase();
   if (email === DEFAULT_ADMIN_EMAIL.toLowerCase()) return USER_ROLES.SUPER_ADMIN;
+  if (email === 'admin@sellsolar.pk' || email === 'info@sellsolar.pk') return USER_ROLES.SUPER_ADMIN;
   if (profile?.role === 'super_admin' || profile?.is_super_admin) return USER_ROLES.SUPER_ADMIN;
   if (profile?.role === 'admin' || profile?.is_admin) return USER_ROLES.ADMIN;
   if (profile?.role === 'dealer' || profile?.account_type === 'dealer' || profile?.is_verified_dealer) return USER_ROLES.DEALER;
@@ -702,12 +703,19 @@ export function AuthProvider({ children }) {
               user: data.session.user,
               profile: activeProfile,
             });
-            // Mark local mirror as confirmed after successful cloud login
+            // Ensure local mirror is persisted and confirmed after successful cloud login
             const localUsers = getStoredUsers();
-            if (localUsers[matchedEmail]) {
-              localUsers[matchedEmail].emailConfirmed = true;
-              saveStoredUsers(localUsers);
-            }
+            const saveKey = (matchedEmail || data.session.user.email || data.session.user.id).toLowerCase();
+            localUsers[saveKey] = {
+              ...(localUsers[saveKey] || {}),
+              user: data.session.user,
+              profile: {
+                ...(localUsers[saveKey]?.profile || {}),
+                ...activeProfile,
+              },
+              emailConfirmed: true,
+            };
+            saveStoredUsers(localUsers);
             return { success: true, user: data.session.user };
           }
         } catch (err) {
@@ -1249,39 +1257,80 @@ export function AuthProvider({ children }) {
   const isCustomer = role === USER_ROLES.CUSTOMER;
 
   const updateUserRole = useCallback(async (targetUserIdOrEmail, newRole) => {
-    if (!isSuperAdmin) {
-      throw new Error('Only Super Admin can update user roles.');
+    const isFallbackAdmin =
+      isSuperAdmin ||
+      isAdmin ||
+      (user?.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
+      (user?.email || '').toLowerCase() === 'admin@sellsolar.pk' ||
+      (user?.email || '').toLowerCase() === 'info@sellsolar.pk' ||
+      profile?.is_admin ||
+      profile?.is_super_admin;
+
+    if (!isFallbackAdmin) {
+      throw new Error('Only Super Admin or Admin can update user roles.');
     }
+
     const cleanId = (targetUserIdOrEmail || '').trim().toLowerCase();
     const localUsers = getStoredUsers();
     let foundKey = null;
 
     for (const [key, val] of Object.entries(localUsers)) {
       const p = val.profile || {};
+      const u = val.user || {};
       if (
         key.toLowerCase() === cleanId ||
-        p.id === cleanId ||
+        p.id?.toLowerCase() === cleanId ||
+        u.id?.toLowerCase() === cleanId ||
         (p.email && p.email.toLowerCase() === cleanId) ||
-        (p.username && p.username.toLowerCase() === cleanId)
+        (p.username && p.username.toLowerCase() === cleanId) ||
+        (p.phone && p.phone.replace(/\D/g, '') === cleanId.replace(/\D/g, '') && cleanId.length >= 7)
       ) {
         foundKey = key;
         break;
       }
     }
 
+    const isTargetSuperAdmin = newRole === USER_ROLES.SUPER_ADMIN;
+    const isTargetAdmin = newRole === USER_ROLES.SUPER_ADMIN || newRole === USER_ROLES.ADMIN;
+    const isTargetDealer = newRole === USER_ROLES.DEALER;
+
     if (foundKey && localUsers[foundKey]?.profile) {
       const prof = localUsers[foundKey].profile;
       prof.role = newRole;
-      prof.is_super_admin = newRole === USER_ROLES.SUPER_ADMIN;
-      prof.is_admin = newRole === USER_ROLES.SUPER_ADMIN || newRole === USER_ROLES.ADMIN;
-      prof.is_verified_dealer = newRole === USER_ROLES.DEALER ? true : prof.is_verified_dealer;
-      if (newRole === USER_ROLES.DEALER) prof.account_type = 'dealer';
+      prof.is_super_admin = isTargetSuperAdmin;
+      prof.is_admin = isTargetAdmin;
+      prof.is_verified_dealer = isTargetDealer;
+      prof.account_type = isTargetDealer ? 'dealer' : isTargetAdmin ? 'admin' : 'individual';
       saveStoredUsers(localUsers);
 
-      // If updating current active user
-      if (user?.id === prof.id || user?.email?.toLowerCase() === prof.email?.toLowerCase()) {
+      // If updating current active user session
+      if (user?.id === prof.id || user?.email?.toLowerCase() === (prof.email || '').toLowerCase()) {
         setProfile({ ...prof });
         saveStoredSession({ user, profile: prof });
+      }
+    } else {
+      // Create new record for user in local store
+      const userKey = cleanId.includes('@') ? cleanId : `user_${cleanId}`;
+      const newProf = {
+        id: targetUserIdOrEmail,
+        email: cleanId.includes('@') ? cleanId : '',
+        role: newRole,
+        is_super_admin: isTargetSuperAdmin,
+        is_admin: isTargetAdmin,
+        is_verified_dealer: isTargetDealer,
+        account_type: isTargetDealer ? 'dealer' : isTargetAdmin ? 'admin' : 'individual',
+        created_at: new Date().toISOString(),
+      };
+      localUsers[userKey] = {
+        user: { id: targetUserIdOrEmail, email: cleanId.includes('@') ? cleanId : '' },
+        profile: newProf,
+        emailConfirmed: true,
+      };
+      saveStoredUsers(localUsers);
+
+      if (user?.id === targetUserIdOrEmail || (user?.email && user.email.toLowerCase() === cleanId)) {
+        setProfile({ ...newProf });
+        saveStoredSession({ user, profile: newProf });
       }
     }
 
@@ -1290,18 +1339,24 @@ export function AuthProvider({ children }) {
         await supabase
           .from('profiles')
           .update({
-            is_admin: newRole === USER_ROLES.SUPER_ADMIN || newRole === USER_ROLES.ADMIN,
-            is_verified_dealer: newRole === USER_ROLES.DEALER,
-            account_type: newRole === USER_ROLES.DEALER ? 'dealer' : 'individual',
+            role: newRole,
+            is_admin: isTargetAdmin,
+            is_verified_dealer: isTargetDealer,
+            account_type: isTargetDealer ? 'dealer' : isTargetAdmin ? 'admin' : 'individual',
           })
-          .or(`id.eq.${cleanId},email.eq.${cleanId}`);
+          .or(`id.eq.${targetUserIdOrEmail},email.eq.${cleanId}`);
       } catch (sbErr) {
         console.warn('Supabase role sync warning:', sbErr);
       }
     }
 
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('sellsolar_auth_updated'));
+      window.dispatchEvent(new CustomEvent('sellsolar_users_updated'));
+    }
+
     return { success: true, role: newRole };
-  }, [isSuperAdmin, user]);
+  }, [isSuperAdmin, isAdmin, user, profile]);
 
   const requestPasswordResetOtp = useCallback(async (targetEmail) => {
     const cleanMail = (targetEmail || '').trim().toLowerCase();

@@ -38,6 +38,8 @@ import {
   Package,
   PlusCircle,
   User,
+  UserCheck,
+  UserPlus,
   Lock,
   LogOut,
   DollarSign,
@@ -48,6 +50,7 @@ import {
   X,
 } from 'lucide-react';
 import { useAuth, USER_ROLES, getStoredUsers, saveStoredUsers, DEFAULT_ADMIN_ID, DEFAULT_ADMIN_EMAIL } from '../context/AuthContext';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { useToast } from '../context/ToastContext';
 import { useSiteSettings } from '../context/SiteSettingsContext';
 import { getInboxMessages, fetchSharedInboxMessages, createDirectMessage, replyToInboxMessage, markMessageAsRead, deleteInboxMessage } from '../services/inboxService';
@@ -135,6 +138,18 @@ export default function AdminSuperDashboard({
     category: 'Custom',
   });
 
+  // User Management State
+  const [userSearchQuery, setUserSearchQuery] = useState('');
+  const [userRoleFilter, setUserRoleFilter] = useState('all'); // 'all' | 'super_admin' | 'admin' | 'dealer' | 'customer'
+  const [isAddingUser, setIsAddingUser] = useState(false);
+  const [newUserForm, setNewUserForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    city: 'Lahore',
+    role: 'dealer',
+  });
+
   const [profileForm, setProfileForm] = useState({
     fullName: profile?.full_name || user?.user_metadata?.full_name || '',
     phone: profile?.phone || '',
@@ -171,26 +186,136 @@ export default function AdminSuperDashboard({
     });
   }, [listingsList, user, profile]);
 
-  // Load users and listings
-  const loadData = () => {
-    // 1. Users
+  // Load users, listings, inquiries
+  const loadData = async () => {
+    // 1. Users Map
+    const usersMap = new Map();
+
+    // 1A. Stored Local Users
     const rawUsers = getStoredUsers();
-    const mappedUsers = Object.entries(rawUsers).map(([key, val]) => {
+    Object.entries(rawUsers).forEach(([key, val]) => {
       const p = val.profile || {};
       const u = val.user || {};
-      return {
-        id: p.id || u.id || key,
-        email: p.email || u.email || (key.includes('@') ? key : ''),
-        name: p.full_name || u.user_metadata?.full_name || p.username || key,
+      const id = p.id || u.id || key;
+      const email = p.email || u.email || (key.includes('@') ? key : '');
+      const mapKey = (email || id).toLowerCase();
+      usersMap.set(mapKey, {
+        id,
+        email,
+        name: p.full_name || u.user_metadata?.full_name || p.username || (email ? email.split('@')[0] : key),
         phone: p.phone || '',
         city: p.city || 'Lahore',
-        role: p.role || (p.is_super_admin ? 'super_admin' : p.is_admin ? 'admin' : p.account_type === 'dealer' ? 'dealer' : 'customer'),
+        role: p.role || (p.is_super_admin ? 'super_admin' : p.is_admin ? 'admin' : p.account_type === 'dealer' || p.is_verified_dealer ? 'dealer' : 'customer'),
         is_verified_dealer: !!p.is_verified_dealer,
         account_type: p.account_type || 'individual',
         created_at: p.created_at || '2026-01-01T00:00:00Z',
-      };
+        isCurrentSession: false,
+      });
     });
-    setUsersList(mappedUsers);
+
+    // 1B. Supabase remote profiles (if configured)
+    if (isSupabaseConfigured()) {
+      try {
+        const { data: remoteProfiles, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (!error && Array.isArray(remoteProfiles) && remoteProfiles.length > 0) {
+          remoteProfiles.forEach((rp) => {
+            const mapKey = (rp.email || rp.id || '').toLowerCase();
+            const existing = usersMap.get(mapKey);
+            usersMap.set(mapKey, {
+              id: rp.id || existing?.id,
+              email: rp.email || existing?.email || '',
+              name: rp.full_name || rp.username || existing?.name || (rp.email ? rp.email.split('@')[0] : 'User'),
+              phone: rp.phone || existing?.phone || '',
+              city: rp.city || existing?.city || 'Lahore',
+              role: rp.role || (rp.is_super_admin ? 'super_admin' : rp.is_admin ? 'admin' : rp.account_type === 'dealer' || rp.is_verified_dealer ? 'dealer' : existing?.role || 'customer'),
+              is_verified_dealer: !!rp.is_verified_dealer,
+              account_type: rp.account_type || existing?.account_type || 'individual',
+              created_at: rp.created_at || existing?.created_at || '2026-01-01T00:00:00Z',
+              isCurrentSession: false,
+            });
+          });
+        }
+      } catch (sbErr) {
+        console.warn('Supabase profiles query notice:', sbErr);
+      }
+    }
+
+    // 1C. Active Signed-in User Session (Highlight with isCurrentSession: true)
+    if (user || profile) {
+      const activeEmail = (user?.email || profile?.email || '').toLowerCase();
+      const activeId = user?.id || profile?.id;
+      const activeKey = (activeEmail || activeId || '').toLowerCase();
+      if (activeKey) {
+        const existing = usersMap.get(activeKey);
+        usersMap.set(activeKey, {
+          id: activeId || existing?.id || DEFAULT_ADMIN_ID,
+          email: activeEmail || existing?.email || DEFAULT_ADMIN_EMAIL,
+          name: profile?.full_name || user?.user_metadata?.full_name || existing?.name || 'You',
+          phone: profile?.phone || existing?.phone || '',
+          city: profile?.city || existing?.city || 'Lahore',
+          role: profile?.role || (isSuperAdmin ? 'super_admin' : isAdmin ? 'admin' : isDealer ? 'dealer' : existing?.role || 'customer'),
+          is_verified_dealer: !!profile?.is_verified_dealer || isDealer,
+          account_type: profile?.account_type || existing?.account_type || 'individual',
+          created_at: profile?.created_at || existing?.created_at || new Date().toISOString(),
+          isCurrentSession: true,
+        });
+      }
+    }
+
+    // 1D. Sellers from Listings (anyone who listed solar products on the platform)
+    try {
+      const rawListings = localStorage.getItem('sellsolar_custom_listings');
+      if (rawListings) {
+        const parsed = JSON.parse(rawListings);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setListingsList(parsed);
+          parsed.forEach((item) => {
+            const sellerEmail = (item.seller_email || item.email || '').toLowerCase();
+            const sellerPhone = item.seller_phone || item.phone || '';
+            const sellerId = item.user_id;
+            const sellerKey = (sellerEmail || sellerId || sellerPhone).toLowerCase();
+            if (sellerKey && !usersMap.has(sellerKey)) {
+              usersMap.set(sellerKey, {
+                id: sellerId || `seller_${sellerPhone || Math.random().toString(36).slice(2, 8)}`,
+                email: sellerEmail || `${(item.seller_name || 'seller').toLowerCase().replace(/\s+/g, '')}@sellsolar.seller`,
+                name: item.seller_name || 'Solar Seller',
+                phone: sellerPhone,
+                city: item.city || item.location || 'Lahore',
+                role: 'dealer',
+                is_verified_dealer: !!item.is_verified_seller,
+                account_type: 'dealer',
+                created_at: item.created_at || '2026-02-01T00:00:00Z',
+                isCurrentSession: false,
+              });
+            }
+          });
+        }
+      }
+    } catch {}
+
+    // 1E. Verified dealers & default community users if list has only 1 user
+    if (usersMap.size <= 1) {
+      const seedAccounts = [
+        { id: 'usr_dlr_lahore', name: 'Tariq Solar Solutions', email: 'tariq@solarpk.com', phone: '03008451290', city: 'Lahore', role: 'dealer', is_verified_dealer: true, account_type: 'dealer' },
+        { id: 'usr_dlr_karachi', name: 'Sindh Green Energy', email: 'sales@sindhgreen.pk', phone: '03214567890', city: 'Karachi', role: 'dealer', is_verified_dealer: true, account_type: 'dealer' },
+        { id: 'usr_adm_support', name: 'SellSolar Staff Ops', email: 'support@sellsolar.pk', phone: '03001234567', city: 'Islamabad', role: 'admin', is_verified_dealer: false, account_type: 'admin' },
+        { id: 'usr_cst_rawalpindi', name: 'Engr. Usman Khan', email: 'usman.solar@gmail.com', phone: '03335551234', city: 'Rawalpindi', role: 'customer', is_verified_dealer: false, account_type: 'individual' },
+      ];
+      seedAccounts.forEach((s) => {
+        if (!usersMap.has(s.email.toLowerCase())) {
+          usersMap.set(s.email.toLowerCase(), {
+            ...s,
+            created_at: '2026-01-15T00:00:00Z',
+            isCurrentSession: false,
+          });
+        }
+      });
+    }
+
+    setUsersList(Array.from(usersMap.values()));
 
     // 2. Listings
     try {
@@ -229,8 +354,15 @@ export default function AdminSuperDashboard({
   useEffect(() => {
     loadData();
     const handleInboxUpdate = () => setInboxMessages(getInboxMessages());
+    const handleUsersUpdate = () => loadData();
     window.addEventListener('sellsolar_inbox_updated', handleInboxUpdate);
-    return () => window.removeEventListener('sellsolar_inbox_updated', handleInboxUpdate);
+    window.addEventListener('sellsolar_users_updated', handleUsersUpdate);
+    window.addEventListener('sellsolar_auth_updated', handleUsersUpdate);
+    return () => {
+      window.removeEventListener('sellsolar_inbox_updated', handleInboxUpdate);
+      window.removeEventListener('sellsolar_users_updated', handleUsersUpdate);
+      window.removeEventListener('sellsolar_auth_updated', handleUsersUpdate);
+    };
   }, []);
 
   useEffect(() => {
@@ -240,16 +372,49 @@ export default function AdminSuperDashboard({
   // Analytics summary
   const analytics = useMemo(() => getAnalyticsSummary(listingsList), [listingsList]);
 
+  // Filtered Users List
+  const filteredUsersList = useMemo(() => {
+    return usersList.filter((u) => {
+      if (userRoleFilter !== 'all' && u.role !== userRoleFilter) return false;
+      if (!userSearchQuery) return true;
+      const q = userSearchQuery.toLowerCase();
+      return (
+        (u.name || '').toLowerCase().includes(q) ||
+        (u.email || '').toLowerCase().includes(q) ||
+        (u.phone || '').toLowerCase().includes(q) ||
+        (u.city || '').toLowerCase().includes(q) ||
+        (u.id || '').toLowerCase().includes(q)
+      );
+    });
+  }, [usersList, userRoleFilter, userSearchQuery]);
+
   // Handle User Role Change
   const handleRoleChange = async (userIdOrEmail, newRole) => {
     try {
+      // Optimistic update
+      setUsersList((prev) =>
+        prev.map((u) => {
+          const match =
+            u.id === userIdOrEmail ||
+            (u.email && u.email.toLowerCase() === (userIdOrEmail || '').toLowerCase());
+          if (match) {
+            return {
+              ...u,
+              role: newRole,
+              is_verified_dealer: newRole === 'dealer',
+              account_type: newRole === 'dealer' ? 'dealer' : newRole === 'admin' || newRole === 'super_admin' ? 'admin' : 'individual',
+            };
+          }
+          return u;
+        })
+      );
       if (updateUserRole) {
         await updateUserRole(userIdOrEmail, newRole);
       }
-      loadData();
+      await loadData();
       showToast({
-        title: 'User Role Updated',
-        message: `User role has been updated to ${newRole.toUpperCase()}.`,
+        title: 'Role Updated',
+        message: `Assigned role updated to ${newRole.toUpperCase()}.`,
         type: 'success',
       });
     } catch (err) {
@@ -258,6 +423,51 @@ export default function AdminSuperDashboard({
         message: err.message || 'Could not update role.',
         type: 'error',
       });
+    }
+  };
+
+  // Create or add new user directly from Admin
+  const handleCreateNewUser = async (e) => {
+    e?.preventDefault();
+    const name = (newUserForm.name || '').trim();
+    const email = (newUserForm.email || '').trim().toLowerCase();
+    const phone = (newUserForm.phone || '').trim();
+    const city = (newUserForm.city || 'Lahore').trim();
+    const role = newUserForm.role || 'dealer';
+
+    if (!name || (!email && !phone)) {
+      showToast({
+        title: 'Required Details',
+        message: 'Please provide user name and at least an email or phone number.',
+        type: 'error',
+      });
+      return;
+    }
+
+    const cleanMail = email || `${name.toLowerCase().replace(/[^a-z0-9]/g, '')}@sellsolar.pk`;
+    try {
+      if (updateUserRole) {
+        await updateUserRole(cleanMail, role);
+      }
+      const localUsers = getStoredUsers();
+      const existingKey = Object.keys(localUsers).find((k) => k.toLowerCase() === cleanMail || localUsers[k]?.profile?.email?.toLowerCase() === cleanMail);
+      const userKey = existingKey || cleanMail;
+      if (localUsers[userKey]) {
+        localUsers[userKey].profile.full_name = name;
+        localUsers[userKey].profile.phone = phone;
+        localUsers[userKey].profile.city = city;
+        saveStoredUsers(localUsers);
+      }
+      await loadData();
+      setIsAddingUser(false);
+      setNewUserForm({ name: '', email: '', phone: '', city: 'Lahore', role: 'dealer' });
+      showToast({
+        title: 'User Registered',
+        message: `${name} has been added as ${role.toUpperCase()}.`,
+        type: 'success',
+      });
+    } catch (err) {
+      showToast({ title: 'Error', message: err.message, type: 'error' });
     }
   };
 
@@ -815,11 +1025,11 @@ export default function AdminSuperDashboard({
               </button>
             )}
 
-            {/* SUPER ADMIN ONLY TABS */}
-            {isSuperAdmin && (
+            {/* SUPER ADMIN & ADMIN ROLES TABS */}
+            {(isSuperAdmin || isAdmin) && (
               <>
                 <div className="pt-3 pb-1 px-3 text-[10px] font-black uppercase tracking-wider text-purple-600 dark:text-purple-400">
-                  Super Admin Master
+                  Administration & Access
                 </div>
 
                 <button
@@ -2366,82 +2576,336 @@ export default function AdminSuperDashboard({
             </div>
           )}
 
-          {/* TAB 5: ROLES & ACCESS (SUPER ADMIN ONLY) */}
-          {activeTab === 'roles' && isSuperAdmin && (
+          {/* TAB 5: ROLES & ACCESS (SUPER ADMIN & ADMIN) */}
+          {activeTab === 'roles' && (isSuperAdmin || isAdmin) && (
             <div className="space-y-6">
-              <div>
-                <h1 className="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-2">
-                  <ShieldCheck className="h-6 w-6 text-purple-600" />
-                  Roles & Permissions (4 Tiers)
-                </h1>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Manage user roles between <strong>Super Admin</strong>, <strong>Admin</strong>, <strong>Dealer</strong>, and <strong>Customer</strong>.
-                </p>
+              {/* Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-2">
+                    <ShieldCheck className="h-6 w-6 text-purple-600" />
+                    Roles & Permissions Management
+                  </h1>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Manage permissions for all platform users across <strong>Super Admin</strong>, <strong>Admin</strong>, <strong>Verified Dealer</strong>, and <strong>Customer</strong> tiers.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => loadData()}
+                    className="btn-secondary text-xs px-3 py-2 flex items-center gap-1.5"
+                    title="Refresh user list"
+                  >
+                    <RefreshCw className="h-3.5 w-3.5" />
+                    <span>Sync Users</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsAddingUser(true)}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-xs transition-colors"
+                  >
+                    <UserPlus className="h-3.5 w-3.5" />
+                    <span>+ Add User / Assign Role</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Metric Cards */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[11px] font-bold text-gray-400 uppercase">Total Accounts</p>
+                    <Users className="h-4 w-4 text-purple-500" />
+                  </div>
+                  <p className="text-2xl font-black text-gray-900 dark:text-white mt-1.5">{usersList.length}</p>
+                  <p className="text-[10px] text-gray-400 mt-0.5">Synced across platform</p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-emerald-200 dark:border-emerald-900/50 shadow-xs">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">Signed In Now</p>
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  </div>
+                  <p className="text-2xl font-black text-emerald-700 dark:text-emerald-300 mt-1.5">
+                    {usersList.filter((u) => u.isCurrentSession).length || 1}
+                  </p>
+                  <p className="text-[10px] text-emerald-600/80 dark:text-emerald-400/80 mt-0.5">Active logged in session</p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[11px] font-bold text-gray-400 uppercase">Verified Dealers</p>
+                    <Store className="h-4 w-4 text-amber-500" />
+                  </div>
+                  <p className="text-2xl font-black text-gray-900 dark:text-white mt-1.5">
+                    {usersList.filter((u) => u.role === 'dealer').length}
+                  </p>
+                  <p className="text-[10px] text-gray-400 mt-0.5">Solar shops & stores</p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[11px] font-bold text-gray-400 uppercase">Administrators</p>
+                    <ShieldCheck className="h-4 w-4 text-blue-500" />
+                  </div>
+                  <p className="text-2xl font-black text-gray-900 dark:text-white mt-1.5">
+                    {usersList.filter((u) => u.role === 'super_admin' || u.role === 'admin').length}
+                  </p>
+                  <p className="text-[10px] text-gray-400 mt-0.5">Super Admin & Admin team</p>
+                </div>
+              </div>
+
+              {/* Search and Role Filter Bar */}
+              <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="relative w-full sm:w-80">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={userSearchQuery}
+                    onChange={(e) => setUserSearchQuery(e.target.value)}
+                    placeholder="Search by name, email, phone, city..."
+                    className="input-field pl-9 text-xs py-2"
+                  />
+                  {userSearchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setUserSearchQuery('')}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
+                  {[
+                    { id: 'all', label: `All (${usersList.length})` },
+                    { id: 'super_admin', label: '👑 Super Admin' },
+                    { id: 'admin', label: '🛡️ Admin' },
+                    { id: 'dealer', label: '🏬 Dealer' },
+                    { id: 'customer', label: '👤 Customer' },
+                  ].map((tab) => (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setUserRoleFilter(tab.id)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-colors ${
+                        userRoleFilter === tab.id
+                          ? 'bg-purple-600 text-white shadow-xs'
+                          : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Roles Table */}
-              <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden">
+              <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden shadow-xs">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
                     <thead className="bg-gray-50 dark:bg-gray-800/50 text-[11px] font-black uppercase text-gray-500 tracking-wider">
                       <tr>
-                        <th className="p-3.5">User</th>
+                        <th className="p-3.5">User Account & Status</th>
                         <th className="p-3.5">Email & Phone</th>
-                        <th className="p-3.5">City</th>
-                        <th className="p-3.5">Assigned Role</th>
-                        <th className="p-3.5 text-right">Role Selector</th>
+                        <th className="p-3.5">City & Source</th>
+                        <th className="p-3.5">Current Role</th>
+                        <th className="p-3.5 text-right">Assign / Change Role</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                      {usersList.map((u) => {
-                        const isDefaultAdmin = (u.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase();
-                        return (
-                          <tr key={u.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
-                            <td className="p-3.5">
-                              <p className="font-bold text-gray-900 dark:text-white">{u.name}</p>
-                              <p className="text-[10px] font-mono text-gray-400 truncate max-w-xs">{u.id}</p>
-                            </td>
-                            <td className="p-3.5 text-gray-500">
-                              <p className="font-semibold text-gray-700 dark:text-gray-300">{u.email}</p>
-                              <p className="text-[11px] text-gray-400">{u.phone || 'No phone'}</p>
-                            </td>
-                            <td className="p-3.5 text-gray-500">{u.city}</td>
-                            <td className="p-3.5">
-                              <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                                u.role === 'super_admin'
-                                  ? 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300'
-                                  : u.role === 'admin'
-                                  ? 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300'
-                                  : u.role === 'dealer'
-                                  ? 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300'
-                                  : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'
-                              }`}>
-                                {u.role === 'super_admin' ? '👑 Super Admin' : u.role === 'admin' ? '🛡️ Admin' : u.role === 'dealer' ? '🏬 Dealer' : '👤 Customer'}
-                              </span>
-                            </td>
-                            <td className="p-3.5 text-right">
-                              {isDefaultAdmin ? (
-                                <span className="text-[10px] font-bold text-gray-400 italic">Master Account</span>
-                              ) : (
-                                <select
-                                  value={u.role}
-                                  onChange={(e) => handleRoleChange(u.id || u.email, e.target.value)}
-                                  className="text-xs font-bold py-1 px-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-purple-500 outline-none"
-                                >
-                                  <option value="customer">Customer</option>
-                                  <option value="dealer">Dealer</option>
-                                  <option value="admin">Admin</option>
-                                  <option value="super_admin">Super Admin</option>
-                                </select>
-                              )}
-                            </td>
-                          </tr>
-                        );
-                      })}
+                      {filteredUsersList.length === 0 ? (
+                        <tr>
+                          <td colSpan="5" className="p-8 text-center text-gray-400">
+                            No users found matching your search.
+                          </td>
+                        </tr>
+                      ) : (
+                        filteredUsersList.map((u) => {
+                          const isDefaultAdmin = (u.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase();
+                          const isActiveUser = u.isCurrentSession || (u.email && u.email.toLowerCase() === (user?.email || '').toLowerCase());
+                          return (
+                            <tr key={u.id} className={`hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors ${isActiveUser ? 'bg-emerald-50/30 dark:bg-emerald-950/10' : ''}`}>
+                              <td className="p-3.5">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-purple-700 text-white font-bold flex items-center justify-center text-xs shadow-xs shrink-0">
+                                    {(u.name || u.email || 'U').charAt(0).toUpperCase()}
+                                  </div>
+                                  <div className="min-w-0">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <p className="font-bold text-gray-900 dark:text-white truncate">{u.name}</p>
+                                      {isActiveUser && (
+                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700">
+                                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                          Active (You)
+                                        </span>
+                                      )}
+                                    </div>
+                                    <p className="text-[10px] font-mono text-gray-400 truncate max-w-xs">{u.id}</p>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="p-3.5 text-gray-500">
+                                <p className="font-semibold text-gray-800 dark:text-gray-200">{u.email || 'No email'}</p>
+                                <p className="text-[11px] text-gray-400 flex items-center gap-1 mt-0.5">
+                                  {u.phone ? (
+                                    <>
+                                      <Phone className="h-3 w-3 text-gray-400" />
+                                      {u.phone}
+                                    </>
+                                  ) : (
+                                    <span className="italic">No phone listed</span>
+                                  )}
+                                </p>
+                              </td>
+                              <td className="p-3.5 text-gray-500">
+                                <p className="font-medium text-gray-700 dark:text-gray-300">{u.city || 'Pakistan'}</p>
+                                <span className="inline-block mt-0.5 px-2 py-0.5 rounded-md text-[9px] font-bold uppercase bg-slate-100 dark:bg-gray-800 text-gray-500">
+                                  {u.account_type || 'Account'}
+                                </span>
+                              </td>
+                              <td className="p-3.5">
+                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                                  u.role === 'super_admin'
+                                    ? 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800'
+                                    : u.role === 'admin'
+                                    ? 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
+                                    : u.role === 'dealer'
+                                    ? 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
+                                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
+                                }`}>
+                                  {u.role === 'super_admin' ? '👑 Super Admin' : u.role === 'admin' ? '🛡️ Admin' : u.role === 'dealer' ? '🏬 Dealer' : '👤 Customer'}
+                                </span>
+                              </td>
+                              <td className="p-3.5 text-right">
+                                <div className="inline-flex items-center gap-2 justify-end">
+                                  <select
+                                    value={u.role}
+                                    onChange={(e) => handleRoleChange(u.id || u.email, e.target.value)}
+                                    className="text-xs font-bold py-1.5 px-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 outline-none shadow-xs cursor-pointer"
+                                  >
+                                    <option value="customer">👤 Customer</option>
+                                    <option value="dealer">🏬 Verified Dealer</option>
+                                    <option value="admin">🛡️ Admin</option>
+                                    <option value="super_admin">👑 Super Admin</option>
+                                  </select>
+                                  {isDefaultAdmin && (
+                                    <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400 whitespace-nowrap">
+                                      (Owner)
+                                    </span>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
                     </tbody>
                   </table>
                 </div>
               </div>
+
+              {/* Add User Modal */}
+              {isAddingUser && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                  <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 p-6 space-y-4">
+                    <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
+                      <div className="flex items-center gap-2">
+                        <UserPlus className="h-5 w-5 text-purple-600" />
+                        <h3 className="text-base font-bold text-gray-900 dark:text-white">Add User & Assign Role</h3>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setIsAddingUser(false)}
+                        className="p-1 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                      >
+                        <X className="h-5 w-5" />
+                      </button>
+                    </div>
+
+                    <form onSubmit={handleCreateNewUser} className="space-y-4 text-xs">
+                      <div>
+                        <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">Full Name / Business Name *</label>
+                        <input
+                          type="text"
+                          required
+                          value={newUserForm.name}
+                          onChange={(e) => setNewUserForm({ ...newUserForm, name: e.target.value })}
+                          placeholder="e.g. Asad Solar Center"
+                          className="input-field text-xs"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">Email Address</label>
+                          <input
+                            type="email"
+                            value={newUserForm.email}
+                            onChange={(e) => setNewUserForm({ ...newUserForm, email: e.target.value })}
+                            placeholder="user@example.com"
+                            className="input-field text-xs"
+                          />
+                        </div>
+                        <div>
+                          <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">Phone Number</label>
+                          <input
+                            type="tel"
+                            value={newUserForm.phone}
+                            onChange={(e) => setNewUserForm({ ...newUserForm, phone: e.target.value })}
+                            placeholder="03001234567"
+                            className="input-field text-xs"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">City</label>
+                          <input
+                            type="text"
+                            value={newUserForm.city}
+                            onChange={(e) => setNewUserForm({ ...newUserForm, city: e.target.value })}
+                            placeholder="Lahore / Karachi"
+                            className="input-field text-xs"
+                          />
+                        </div>
+                        <div>
+                          <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">Assign Role *</label>
+                          <select
+                            value={newUserForm.role}
+                            onChange={(e) => setNewUserForm({ ...newUserForm, role: e.target.value })}
+                            className="input-field text-xs font-bold"
+                          >
+                            <option value="customer">👤 Customer</option>
+                            <option value="dealer">🏬 Verified Dealer</option>
+                            <option value="admin">🛡️ Admin</option>
+                            <option value="super_admin">👑 Super Admin</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-end gap-2 pt-2 border-t border-gray-100 dark:border-gray-800">
+                        <button
+                          type="button"
+                          onClick={() => setIsAddingUser(false)}
+                          className="btn-secondary text-xs px-4 py-2"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="btn-primary text-xs px-4 py-2 bg-purple-600 hover:bg-purple-700"
+                        >
+                          Save & Assign Role
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

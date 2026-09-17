@@ -122,6 +122,12 @@ export const PAGE_SEO = {
     path: '/admin-dashboard',
     robots: NOINDEX,
   },
+  inbox: {
+    title: 'Inbox & Inquiries | SellSolar',
+    description: 'SellSolar message inbox and customer inquiry desk.',
+    path: '/inbox',
+    robots: NOINDEX,
+  },
   password: {
     title: 'Change Password | SellSolar',
     description: 'Update or reset your SellSolar account password.',
@@ -305,6 +311,7 @@ export function parseLocation(pathname = '/', hash = '') {
     '/dashboard': 'dashboard',
     '/admin': 'admin',
     '/admin-dashboard': 'admin-dashboard',
+    '/inbox': 'inbox',
     '/password': 'password',
     '/forgot-password': 'forgot-password',
     '/reset-password': 'reset-password',

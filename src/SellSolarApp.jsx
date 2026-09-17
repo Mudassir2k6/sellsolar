@@ -16,6 +16,7 @@ import FloatingPostAdButton from './components/FloatingPostAdButton';
 import CompanyMarketplacePage from './views/CompanyMarketplacePage';
 import KeywordLandingPage, { KEYWORD_LANDING_KEYS } from './views/KeywordLandingPage';
 import { applyPageSeo, parseLocation, pageToPath } from './lib/seo';
+import { getInboxMessages } from './services/inboxService';
 import {
   ArrowLeft,
   ArrowRight,
@@ -156,6 +157,19 @@ function Xy({
     };
   },[l]);
 
+  const [unreadInboxCount, setUnreadInboxCount] = useState(0);
+  useEffect(() => {
+    const updateCount = () => {
+      try {
+        const msgs = getInboxMessages();
+        setUnreadInboxCount(msgs.filter(m => !m.is_read).length);
+      } catch {}
+    };
+    updateCount();
+    window.addEventListener('sellsolar_inbox_updated', updateCount);
+    return () => window.removeEventListener('sellsolar_inbox_updated', updateCount);
+  }, []);
+
   const h=j=>{
     t(j),a(!1),o(!1)
   },p=async()=>{
@@ -285,6 +299,17 @@ function Xy({
               className:"shrink-0"
             }),c?jsxs(Fragment,{
             children:[jsxs("button",{
+              onClick:()=>h("inbox"),
+              className:"relative p-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors shrink-0",
+              title:"Inbox & Inquiries",
+              children:[
+                jsx(MessageSquare,{ className:"h-4 w-4 text-purple-500" }),
+                unreadInboxCount > 0 && jsx("span",{
+                  className:"absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-black text-white",
+                  children:unreadInboxCount
+                })
+              ]
+            }),jsxs("button",{
               onClick:()=>h("post-ad"),className:"btn-primary hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm shadow-xs",children:[jsx(CirclePlus,{
                 className:"h-4 w-4"
               }),"Post an Ad"]
@@ -311,6 +336,17 @@ function Xy({
                   onClick:()=>h("dashboard"),className:"flex w-full items-center gap-2 px-4 py-2.5 text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx(LayoutDashboard,{
                     className:"h-4 w-4 text-amber-500"
                   }), (u?.is_super_admin || u?.role === 'super_admin' || c?.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase()) ? "👑 Super Admin Dashboard" : (u?.is_admin || u?.role === 'admin') ? "🛡️ Admin Dashboard" : (u?.role === 'dealer' || u?.is_dealer) ? "🏪 Dealer Dashboard" : "📊 My Dashboard"]
+                }),jsxs("button",{
+                  onClick:()=>h("inbox"),className:"flex w-full items-center justify-between px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[
+                    jsxs("div",{
+                      className:"flex items-center gap-2",children:[jsx(MessageSquare,{
+                        className:"h-4 w-4 text-purple-500"
+                      }),"Inbox & Inquiries"]
+                    }),
+                    unreadInboxCount > 0 && jsx("span",{
+                      className:"px-1.5 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white",children:unreadInboxCount
+                    })
+                  ]
                 }),jsxs("button",{
                   onClick:()=>h("password"),className:"flex w-full items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx(Lock,{
                     className:"h-4 w-4 text-gray-400"
@@ -386,6 +422,17 @@ function Xy({
                 onClick:()=>h("dashboard"),className:"flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx(LayoutDashboard,{
                   className:"h-4 w-4 text-amber-500"
                 }),(u?.is_super_admin || u?.role === 'super_admin' || c?.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase()) ? "👑 Super Admin Dashboard" : (u?.is_admin || u?.role === 'admin') ? "🛡️ Admin Dashboard" : (u?.role === 'dealer' || u?.is_dealer) ? "🏪 Dealer Dashboard" : "📊 My Dashboard"]
+              }),jsxs("button",{
+                onClick:()=>h("inbox"),className:"flex items-center justify-between rounded-lg px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[
+                  jsxs("div",{
+                    className:"flex items-center gap-2",children:[jsx(MessageSquare,{
+                      className:"h-4 w-4 text-purple-500"
+                    }),"Inbox & Inquiries"]
+                  }),
+                  unreadInboxCount > 0 && jsx("span",{
+                    className:"px-1.5 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white",children:unreadInboxCount
+                  })
+                ]
               }),jsxs("button",{
                 onClick:()=>h("password"),className:"flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx(Lock,{
                   className:"h-4 w-4 text-gray-400"
@@ -4901,13 +4948,14 @@ function _x({
     onBack: () => o("home"), onPosted: () => o("home")
   }) : jsx(Bn, {
     onSuccess: () => o("post-ad"), onBack: () => o("home"), onForgotPassword: () => o("forgot-password")
-  }) : n === "admin" || n === "admin-dashboard" || n === "dashboard" ? (!t) ? jsx(Bn, {
+  }) : n === "admin" || n === "admin-dashboard" || n === "dashboard" || n === "inbox" ? (!t) ? jsx(Bn, {
     onSuccess: () => o(n), onBack: () => o("home"), onForgotPassword: () => o("forgot-password")
   }) : jsx(AdminSuperDashboard, {
     onBack: () => o("home"),
     onNavigateToListing: u,
     onPostAd: c,
-    onChangePassword: () => o("password")
+    onChangePassword: () => o("password"),
+    initialTab: n === "inbox" ? "inbox" : "dashboard"
   }) : n === "listing-detail" && a ? jsx(jx, {
     listingId: a, onBack: () => o("home")
   }) : n === "not-found" ? jsxs("div", {

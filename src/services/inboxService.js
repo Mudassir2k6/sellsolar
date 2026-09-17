@@ -164,11 +164,109 @@ export function markMessageAsRead(messageId) {
   return updated;
 }
 
+export async function fetchSharedInboxMessages() {
+  const local = getInboxMessages();
+  if (!isSupabaseConfigured()) return local;
+
+  try {
+    const { data, error } = await supabase
+      .from('enquiries')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(50);
+
+    if (error || !Array.isArray(data) || data.length === 0) {
+      return local;
+    }
+
+    const localIds = new Set(local.map((m) => m.id));
+    const converted = data
+      .filter((row) => !localIds.has(row.id) && !localIds.has(`sb-${row.id}`))
+      .map((row) => ({
+        id: `sb-${row.id}`,
+        ticketNumber: `SLR-${(row.id || '').slice(0, 6).toUpperCase() || '786012'}`,
+        senderName: row.name || 'Website Visitor',
+        senderEmail: row.email || (row.contact_phone ? `${row.contact_phone}@customer.pk` : 'inquiry@sellsolar.pk'),
+        senderPhone: row.contact_phone || '',
+        subject: row.subject || (row.message ? row.message.slice(0, 40) + '...' : 'Customer Inquiry'),
+        message: row.message || 'No message content provided.',
+        category: 'General Inquiry',
+        recipientEmail: 'info@sellsolar.pk',
+        status: row.is_read ? 'read' : 'unread',
+        is_read: !!row.is_read,
+        replies: [],
+        createdAt: row.created_at || new Date().toISOString(),
+      }));
+
+    if (converted.length > 0) {
+      const merged = [...converted, ...local];
+      saveInboxMessages(merged);
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('sellsolar_inbox_updated'));
+      }
+      return merged;
+    }
+    return local;
+  } catch (err) {
+    console.warn('Supabase fetchSharedInboxMessages notice:', err);
+    return local;
+  }
+}
+
+export async function createDirectMessage({
+  senderName = 'Super Admin',
+  senderEmail = 'info@sellsolar.pk',
+  recipientEmail,
+  subject,
+  message,
+  category = 'Outbound Communication',
+}) {
+  const cleanRecipient = (recipientEmail || '').trim();
+  const cleanSubject = (subject || 'Message from SellSolar.pk').trim();
+  const cleanMsg = (message || '').trim();
+
+  if (!cleanRecipient) throw new Error('Recipient email is required.');
+  if (!cleanMsg) throw new Error('Message body cannot be empty.');
+
+  const ticketNumber = `SLR-${Math.floor(100000 + Math.random() * 900000)}`;
+  const newMsg = {
+    id: `msg-${Date.now()}`,
+    ticketNumber,
+    senderName,
+    senderEmail,
+    senderPhone: '',
+    subject: cleanSubject,
+    message: cleanMsg,
+    category,
+    recipientEmail: cleanRecipient,
+    status: 'replied',
+    is_read: true,
+    replies: [
+      {
+        id: `rep-${Date.now()}`,
+        sender: senderName,
+        text: cleanMsg,
+        createdAt: new Date().toISOString(),
+      },
+    ],
+    createdAt: new Date().toISOString(),
+  };
+
+  const current = getInboxMessages();
+  const updated = [newMsg, ...current];
+  saveInboxMessages(updated);
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('sellsolar_inbox_updated'));
+  }
+  return { success: true, ticketNumber, message: newMsg };
+}
+
 export function replyToInboxMessage(messageId, replyText, adminName = 'Super Admin') {
   const cleanReply = (replyText || '').trim();
   if (!cleanReply) throw new Error('Reply message cannot be empty.');
 
   const current = getInboxMessages();
+  const target = current.find((m) => m.id === messageId);
   const replyObj = {
     id: `rep-${Date.now()}`,
     sender: adminName,
@@ -192,7 +290,14 @@ export function replyToInboxMessage(messageId, replyText, adminName = 'Super Adm
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new Event('sellsolar_inbox_updated'));
   }
-  return { success: true, reply: replyObj };
+
+  const mailtoLink = target?.senderEmail
+    ? `mailto:${encodeURIComponent(target.senderEmail)}?subject=${encodeURIComponent(
+        `Re: [${target.ticketNumber}] ${target.subject}`
+      )}&body=${encodeURIComponent(`Dear ${target.senderName || 'Valued User'},\n\n${cleanReply}\n\nBest regards,\nSellSolar Support Team\ninfo@sellsolar.pk`)}`
+    : null;
+
+  return { success: true, reply: replyObj, mailtoLink };
 }
 
 export function deleteInboxMessage(messageId) {

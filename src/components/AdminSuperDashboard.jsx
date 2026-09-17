@@ -46,7 +46,7 @@ import {
 import { useAuth, USER_ROLES, getStoredUsers, saveStoredUsers, DEFAULT_ADMIN_ID, DEFAULT_ADMIN_EMAIL } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { useSiteSettings } from '../context/SiteSettingsContext';
-import { getInboxMessages, replyToInboxMessage, markMessageAsRead, deleteInboxMessage } from '../services/inboxService';
+import { getInboxMessages, fetchSharedInboxMessages, createDirectMessage, replyToInboxMessage, markMessageAsRead, deleteInboxMessage } from '../services/inboxService';
 import { getAnalyticsSummary } from '../services/analyticsService';
 import { formatPrice } from '../lib/constants';
 
@@ -55,12 +55,13 @@ export default function AdminSuperDashboard({
   onNavigateToListing,
   onPostAd,
   onChangePassword,
+  initialTab = 'dashboard',
 }) {
   const { user, profile, isSuperAdmin, isAdmin, isDealer, isCustomer, updateUserRole, updateProfile, signOut } = useAuth();
   const { showToast } = useToast();
   const { settings, updateSiteSettings } = useSiteSettings();
 
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [usersList, setUsersList] = useState([]);
   const [listingsList, setListingsList] = useState([]);
   const [inboxMessages, setInboxMessages] = useState([]);
@@ -72,6 +73,13 @@ export default function AdminSuperDashboard({
   const [searchQuery, setSearchQuery] = useState('');
   const [cmsForm, setCmsForm] = useState({ ...settings });
   const [cmsSaved, setCmsSaved] = useState(false);
+  const [isComposing, setIsComposing] = useState(false);
+  const [composeForm, setComposeForm] = useState({
+    recipientEmail: '',
+    subject: '',
+    category: 'General Inquiry',
+    message: '',
+  });
 
   const [profileForm, setProfileForm] = useState({
     fullName: profile?.full_name || user?.user_metadata?.full_name || '',
@@ -143,7 +151,18 @@ export default function AdminSuperDashboard({
 
     // 3. Inbox
     setInboxMessages(getInboxMessages());
+    if (typeof window !== 'undefined') {
+      fetchSharedInboxMessages().then((msgs) => {
+        if (msgs && msgs.length > 0) setInboxMessages(msgs);
+      }).catch(() => {});
+    }
   };
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
 
   useEffect(() => {
     loadData();
@@ -249,7 +268,35 @@ export default function AdminSuperDashboard({
       setSelectedMessage(refreshed);
       showToast({
         title: 'Reply Sent',
-        message: `Your response has been dispatched to ${selectedMessage.senderEmail}.`,
+        message: `Response saved & dispatched to ${selectedMessage.senderEmail}.`,
+        type: 'success',
+      });
+    } catch (err) {
+      showToast({ title: 'Error', message: err.message, type: 'error' });
+    }
+  };
+
+  // Send Composed Message
+  const handleSendCompose = async (e) => {
+    e?.preventDefault();
+    if (!composeForm.recipientEmail.trim() || !composeForm.message.trim()) return;
+    try {
+      const res = await createDirectMessage({
+        senderName: profile?.full_name || user?.user_metadata?.full_name || (isSuperAdmin ? 'Super Admin' : 'User'),
+        senderEmail: user?.email || 'info@sellsolar.pk',
+        recipientEmail: composeForm.recipientEmail,
+        subject: composeForm.subject,
+        message: composeForm.message,
+        category: composeForm.category,
+      });
+      setIsComposing(false);
+      setComposeForm({ recipientEmail: '', subject: '', category: 'General Inquiry', message: '' });
+      setInboxMessages(getInboxMessages());
+      const newlyCreated = getInboxMessages().find((m) => m.ticketNumber === res.ticketNumber);
+      if (newlyCreated) setSelectedMessage(newlyCreated);
+      showToast({
+        title: 'Message Sent',
+        message: `Inquiry ticket [${res.ticketNumber}] dispatched successfully.`,
         type: 'success',
       });
     } catch (err) {
@@ -937,8 +984,19 @@ export default function AdminSuperDashboard({
                   </p>
                 </div>
 
-                {/* Filters */}
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsComposing(true);
+                      setSelectedMessage(null);
+                    }}
+                    className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 transition-all"
+                  >
+                    <PlusCircle className="h-3.5 w-3.5" />
+                    <span>Compose Message</span>
+                  </button>
+
                   <button
                     type="button"
                     onClick={() => setInboxFilter('all')}
@@ -977,8 +1035,8 @@ export default function AdminSuperDashboard({
 
               {/* Message Layout: List + Detail */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                {/* Message List */}
-                <div className="lg:col-span-5 space-y-2">
+                {/* Message List (hidden on mobile if a message is selected or composing) */}
+                <div className={`lg:col-span-5 space-y-2 ${(selectedMessage || isComposing) ? 'hidden lg:block' : 'block'}`}>
                   {filteredInbox.length === 0 ? (
                     <div className="p-8 text-center rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-xs text-gray-400">
                       No messages found in this category.
@@ -990,6 +1048,7 @@ export default function AdminSuperDashboard({
                         <div
                           key={msg.id}
                           onClick={() => {
+                            setIsComposing(false);
                             setSelectedMessage(msg);
                             markMessageAsRead(msg.id);
                           }}
@@ -1033,10 +1092,127 @@ export default function AdminSuperDashboard({
                   )}
                 </div>
 
-                {/* Message Detail & Reply Composer */}
-                <div className="lg:col-span-7">
-                  {selectedMessage ? (
+                {/* Message Detail / Composer Panel */}
+                <div className={`lg:col-span-7 ${(!selectedMessage && !isComposing) ? 'hidden lg:block' : 'block'}`}>
+                  {isComposing ? (
                     <div className="p-6 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 space-y-4">
+                      <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setIsComposing(false)}
+                            className="p-1.5 -ml-1.5 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 lg:hidden"
+                          >
+                            <ArrowLeft className="h-4 w-4" />
+                          </button>
+                          <h3 className="text-base font-black text-gray-900 dark:text-white flex items-center gap-2">
+                            <Mail className="h-4 w-4 text-amber-500" />
+                            Compose New Message
+                          </h3>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setIsComposing(false)}
+                          className="text-xs font-bold text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+
+                      <form onSubmit={handleSendCompose} className="space-y-3.5 text-xs">
+                        <div>
+                          <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                            Recipient Email *
+                          </label>
+                          <input
+                            type="email"
+                            required
+                            placeholder="e.g. customer@example.com or info@sellsolar.pk"
+                            value={composeForm.recipientEmail}
+                            onChange={(e) => setComposeForm({ ...composeForm, recipientEmail: e.target.value })}
+                            className="w-full p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-900 focus:ring-2 focus:ring-amber-500 outline-none"
+                          />
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
+                            <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                              Subject *
+                            </label>
+                            <input
+                              type="text"
+                              required
+                              placeholder="e.g. Turnkey 10kW Solar Quotation"
+                              value={composeForm.subject}
+                              onChange={(e) => setComposeForm({ ...composeForm, subject: e.target.value })}
+                              className="w-full p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-900 focus:ring-2 focus:ring-amber-500 outline-none"
+                            />
+                          </div>
+                          <div>
+                            <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                              Category
+                            </label>
+                            <select
+                              value={composeForm.category}
+                              onChange={(e) => setComposeForm({ ...composeForm, category: e.target.value })}
+                              className="w-full p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-900 focus:ring-2 focus:ring-amber-500 outline-none"
+                            >
+                              <option value="General Inquiry">General Inquiry</option>
+                              <option value="Dealer Verification">Dealer Verification</option>
+                              <option value="Product Inquiry">Product Inquiry</option>
+                              <option value="Customer Support">Customer Support</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                            Message Body *
+                          </label>
+                          <textarea
+                            rows={5}
+                            required
+                            placeholder="Write your message here..."
+                            value={composeForm.message}
+                            onChange={(e) => setComposeForm({ ...composeForm, message: e.target.value })}
+                            className="w-full p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-900 focus:ring-2 focus:ring-amber-500 outline-none"
+                          />
+                        </div>
+                        <div className="flex items-center justify-between pt-2">
+                          <span className="text-[11px] text-gray-400">
+                            Sender: <strong>{user?.email || 'info@sellsolar.pk'}</strong>
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setIsComposing(false)}
+                              className="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 font-bold"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              type="submit"
+                              className="btn-primary text-xs px-4 py-2 flex items-center gap-1.5"
+                            >
+                              <Send className="h-3.5 w-3.5" />
+                              Send Message
+                            </button>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  ) : selectedMessage ? (
+                    <div className="p-6 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 space-y-4">
+                      {/* Mobile back button */}
+                      <div className="flex items-center justify-between lg:hidden pb-2 border-b border-gray-100 dark:border-gray-800">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedMessage(null)}
+                          className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400"
+                        >
+                          <ArrowLeft className="h-3.5 w-3.5" />
+                          Back to all messages
+                        </button>
+                      </div>
+
                       <div className="flex items-start justify-between border-b border-gray-100 dark:border-gray-800 pb-4">
                         <div>
                           <div className="flex items-center gap-2">
@@ -1108,25 +1284,43 @@ export default function AdminSuperDashboard({
                           placeholder="Type your official response to this inquiry..."
                           className="w-full p-3 text-xs sm:text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-900 focus:ring-2 focus:ring-amber-500 outline-none"
                         />
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
                           <span className="text-[11px] text-gray-400">
                             Reply will be sent from <strong>info@sellsolar.pk</strong>
                           </span>
-                          <button
-                            type="submit"
-                            disabled={!replyText.trim()}
-                            className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 transition-all"
-                          >
-                            <Send className="h-3.5 w-3.5" />
-                            Dispatch Reply
-                          </button>
+                          <div className="flex items-center gap-2">
+                            {selectedMessage.senderEmail && (
+                              <a
+                                href={`mailto:${encodeURIComponent(selectedMessage.senderEmail)}?subject=${encodeURIComponent(
+                                  `Re: [${selectedMessage.ticketNumber}] ${selectedMessage.subject || 'SellSolar Inquiry'}`
+                                )}&body=${encodeURIComponent(
+                                  `Dear ${selectedMessage.senderName || 'Valued User'},\n\n${replyText || ''}\n\nBest regards,\nSellSolar Support Team\ninfo@sellsolar.pk`
+                                )}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold text-xs flex items-center gap-1.5 transition-all"
+                                title="Open draft in your email app"
+                              >
+                                <Mail className="h-3.5 w-3.5 text-amber-500" />
+                                <span className="hidden sm:inline">Send via</span> Email App
+                              </a>
+                            )}
+                            <button
+                              type="submit"
+                              disabled={!replyText.trim()}
+                              className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 transition-all"
+                            >
+                              <Send className="h-3.5 w-3.5" />
+                              Dispatch Reply
+                            </button>
+                          </div>
                         </div>
                       </form>
                     </div>
                   ) : (
                     <div className="h-full min-h-[300px] flex flex-col items-center justify-center p-8 text-center rounded-2xl border border-dashed border-gray-200 dark:border-gray-800 text-xs text-gray-400">
                       <Mail className="h-8 w-8 text-gray-300 dark:text-gray-700 mb-2" />
-                      Select an inquiry from the list on the left to read and reply.
+                      Select an inquiry from the list on the left to read and reply, or click Compose Message.
                     </div>
                   )}
                 </div>

@@ -308,9 +308,9 @@ function Xy({
                     className:"mt-1 inline-block rounded-full bg-primary-100 dark:bg-primary-950/60 px-2 py-0.5 text-xs font-semibold text-primary-700 dark:text-primary-300",children:u.is_verified_dealer?"Verified Dealer":"Dealer"
                   })]
                 }),jsxs("button",{
-                  onClick:()=>h("dashboard"),className:"flex w-full items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx(LayoutDashboard,{
-                    className:"h-4 w-4 text-gray-400"
-                  }),"My Dashboard"]
+                  onClick:()=>h("dashboard"),className:"flex w-full items-center gap-2 px-4 py-2.5 text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx(LayoutDashboard,{
+                    className:"h-4 w-4 text-amber-500"
+                  }), (u?.is_super_admin || u?.role === 'super_admin' || c?.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase()) ? "👑 Super Admin Dashboard" : (u?.is_admin || u?.role === 'admin') ? "🛡️ Admin Dashboard" : (u?.role === 'dealer' || u?.is_dealer) ? "🏪 Dealer Dashboard" : "📊 My Dashboard"]
                 }),jsxs("button",{
                   onClick:()=>h("password"),className:"flex w-full items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx(Lock,{
                     className:"h-4 w-4 text-gray-400"
@@ -323,10 +323,6 @@ function Xy({
                   onClick:()=>h("dealers"),className:"flex w-full items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx(Store,{
                     className:"h-4 w-4 text-gray-400"
                   }),"View Dealers"]
-                }),(u?.is_admin || u?.is_super_admin || u?.role === 'super_admin' || u?.role === 'admin' || c?.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase())&&jsxs("button",{
-                  onClick:()=>h("admin-dashboard"),className:"flex w-full items-center gap-2 px-4 py-2.5 text-sm font-bold text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/40",children:[jsx(ShieldCheck,{
-                    className:"h-4 w-4"
-                  }),(u?.is_super_admin || u?.role === 'super_admin' || c?.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase()) ? "👑 Super Admin Suite" : "🛡️ Admin Dashboard"]
                 }),jsxs("button",{
                   onClick:p,className:"flex w-full items-center gap-2 border-t border-gray-100 dark:border-gray-800 px-4 py-2.5 text-sm font-medium text-error-600 dark:text-error-400 hover:bg-error-50 dark:hover:bg-error-950/40",children:[jsx(LogOut,{
                     className:"h-4 w-4"
@@ -387,21 +383,17 @@ function Xy({
               })]
             },j.label)),c?jsxs(Fragment,{
               children:[jsxs("button",{
-                onClick:()=>h("dashboard"),className:"flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx(LayoutDashboard,{
-                  className:"h-4 w-4"
-                }),"My Dashboard"]
+                onClick:()=>h("dashboard"),className:"flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx(LayoutDashboard,{
+                  className:"h-4 w-4 text-amber-500"
+                }),(u?.is_super_admin || u?.role === 'super_admin' || c?.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase()) ? "👑 Super Admin Dashboard" : (u?.is_admin || u?.role === 'admin') ? "🛡️ Admin Dashboard" : (u?.role === 'dealer' || u?.is_dealer) ? "🏪 Dealer Dashboard" : "📊 My Dashboard"]
               }),jsxs("button",{
                 onClick:()=>h("password"),className:"flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx(Lock,{
-                  className:"h-4 w-4"
+                  className:"h-4 w-4 text-gray-400"
                 }),"Change Password"]
               }),jsxs("button",{
                 onClick:()=>h("post-ad"),className:"flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx(CirclePlus,{
-                  className:"h-4 w-4"
+                  className:"h-4 w-4 text-gray-400"
                 }),"Post Ad"]
-              }),(u==null?void 0:u.is_admin)&&jsxs("button",{
-                onClick:()=>h("admin-dashboard"),className:"flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-error-600 dark:text-error-400 hover:bg-error-50 dark:hover:bg-error-950/40",children:[jsx(ShieldCheck,{
-                  className:"h-4 w-4"
-                }),"Admin Dashboard"]
               }),jsxs("button",{
                 onClick:p,className:"flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-error-600 dark:text-error-400 hover:bg-error-50 dark:hover:bg-error-950/40",children:[jsx(LogOut,{
                   className:"h-4 w-4"
@@ -4833,7 +4825,7 @@ function _x({
   }) : n === "reset-password" ? jsx(PasswordPage, {
     initialMode: "reset", onSuccess: () => o("home"), onBack: () => o("home")
   }) : n === "login" ? jsx(Bn, {
-    onSuccess: () => o("home"), onBack: () => o("home")
+    onSuccess: () => o("home"), onBack: () => o("home"), onForgotPassword: () => o("forgot-password")
   }) : n === "dealers" ? jsxs("div", {
     className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
       onNavigate: d => {
@@ -4908,15 +4900,14 @@ function _x({
   }) : n === "post-ad" ? t ? jsx(yx, {
     onBack: () => o("home"), onPosted: () => o("home")
   }) : jsx(Bn, {
-    onSuccess: () => o("post-ad"), onBack: () => o("home")
-  }) : n === "admin" || n === "admin-dashboard" ? (!t || !(e != null && (e.is_admin || e.is_super_admin || e.role === 'super_admin' || e.role === 'admin' || t.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase()))) ? jsx(Bn, {
-    onSuccess: () => o("admin-dashboard"), onBack: () => o("home")
+    onSuccess: () => o("post-ad"), onBack: () => o("home"), onForgotPassword: () => o("forgot-password")
+  }) : n === "admin" || n === "admin-dashboard" || n === "dashboard" ? (!t) ? jsx(Bn, {
+    onSuccess: () => o(n), onBack: () => o("home"), onForgotPassword: () => o("forgot-password")
   }) : jsx(AdminSuperDashboard, {
-    onBack: () => o("home"), onNavigateToListing: u
-  }) : n === "dashboard" ? t ? jsx(wx, {
-    onBack: () => o("home")
-  }) : jsx(Bn, {
-    onSuccess: () => o("dashboard"), onBack: () => o("home")
+    onBack: () => o("home"),
+    onNavigateToListing: u,
+    onPostAd: c,
+    onChangePassword: () => o("password")
   }) : n === "listing-detail" && a ? jsx(jx, {
     listingId: a, onBack: () => o("home")
   }) : n === "not-found" ? jsxs("div", {

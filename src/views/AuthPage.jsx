@@ -257,7 +257,7 @@ function getPasswordStrength(pass) {
   return { score: 3, text: 'Strong password', color: 'bg-secondary-500', width: 'w-full' };
 }
 
-export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
+export default function AuthPage({ onSuccess, onBack, onForgotPassword, initialView = 'login' }) {
   const { signIn, signInWithGoogle, signUp, resendConfirmationEmail, updatePassword, refreshProfile, completePasswordRecovery } = useAuth();
   const { showToast } = useToast();
   const [view, setView] = useState(initialView);
@@ -1458,7 +1458,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                     {view === 'login' && (
                       <button
                         type="button"
-                        onClick={() => go('reset')}
+                        onClick={() => (onForgotPassword ? onForgotPassword() : go('forgot'))}
                         className="text-xs font-semibold text-amber-600 dark:text-amber-400 hover:underline"
                       >
                         Forgot password?
@@ -1579,17 +1579,7 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
                 </div>
               )}
 
-              {view === 'login' && (
-                <div className="flex justify-end">
-                  <button
-                    type="button"
-                    onClick={() => go('forgot')}
-                    className="text-sm font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-400"
-                  >
-                    Forgot password?
-                  </button>
-                </div>
-              )}
+
 
               {view === 'signup' && (
                 <>

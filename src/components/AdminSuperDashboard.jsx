@@ -35,6 +35,13 @@ import {
   CheckCircle2,
   CircleAlert,
   SlidersHorizontal,
+  Package,
+  PlusCircle,
+  User,
+  Lock,
+  LogOut,
+  DollarSign,
+  Building,
 } from 'lucide-react';
 import { useAuth, USER_ROLES, getStoredUsers, saveStoredUsers, DEFAULT_ADMIN_ID, DEFAULT_ADMIN_EMAIL } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -43,8 +50,13 @@ import { getInboxMessages, replyToInboxMessage, markMessageAsRead, deleteInboxMe
 import { getAnalyticsSummary } from '../services/analyticsService';
 import { formatPrice } from '../lib/constants';
 
-export default function AdminSuperDashboard({ onBack, onNavigateToListing }) {
-  const { user, profile, isSuperAdmin, isAdmin, updateUserRole } = useAuth();
+export default function AdminSuperDashboard({
+  onBack,
+  onNavigateToListing,
+  onPostAd,
+  onChangePassword,
+}) {
+  const { user, profile, isSuperAdmin, isAdmin, isDealer, isCustomer, updateUserRole, updateProfile, signOut } = useAuth();
   const { showToast } = useToast();
   const { settings, updateSiteSettings } = useSiteSettings();
 
@@ -56,9 +68,46 @@ export default function AdminSuperDashboard({ onBack, onNavigateToListing }) {
   const [replyText, setReplyText] = useState('');
   const [inboxFilter, setInboxFilter] = useState('all'); // 'all' | 'unread' | 'replied'
   const [productFilter, setProductFilter] = useState('all'); // 'all' | 'featured' | 'hot_sell' | 'pending' | 'approved'
+  const [myAdsFilter, setMyAdsFilter] = useState('all'); // 'all' | 'active' | 'sold'
   const [searchQuery, setSearchQuery] = useState('');
   const [cmsForm, setCmsForm] = useState({ ...settings });
   const [cmsSaved, setCmsSaved] = useState(false);
+
+  const [profileForm, setProfileForm] = useState({
+    fullName: profile?.full_name || user?.user_metadata?.full_name || '',
+    phone: profile?.phone || '',
+    city: profile?.city || 'Lahore',
+    businessName: profile?.business_name || '',
+    showroomAddress: profile?.showroom_address || '',
+  });
+
+  useEffect(() => {
+    if (profile || user) {
+      setProfileForm({
+        fullName: profile?.full_name || user?.user_metadata?.full_name || '',
+        phone: profile?.phone || '',
+        city: profile?.city || 'Lahore',
+        businessName: profile?.business_name || '',
+        showroomAddress: profile?.showroom_address || '',
+      });
+    }
+  }, [profile, user]);
+
+  // Compute user's personal ads
+  const myAds = useMemo(() => {
+    if (!user) return [];
+    const uEmail = user.email?.toLowerCase();
+    const pName = profile?.full_name?.toLowerCase();
+    const pPhone = profile?.phone;
+    return listingsList.filter((item) => {
+      return (
+        item.user_id === user.id ||
+        (uEmail && (item.seller_email?.toLowerCase() === uEmail || item.email?.toLowerCase() === uEmail)) ||
+        (pName && item.seller_name?.toLowerCase() === pName) ||
+        (pPhone && item.seller_phone === pPhone)
+      );
+    });
+  }, [listingsList, user, profile]);
 
   // Load users and listings
   const loadData = () => {
@@ -221,6 +270,68 @@ export default function AdminSuperDashboard({ onBack, onNavigateToListing }) {
     });
   };
 
+  // Toggle Sold for Personal Ad
+  const handleToggleSold = (listingId) => {
+    const updated = listingsList.map((item) => {
+      if (item.id === listingId) {
+        const isSoldNow = !item.is_sold;
+        return { ...item, is_sold: isSoldNow, status: isSoldNow ? 'sold' : 'approved' };
+      }
+      return item;
+    });
+    setListingsList(updated);
+    try {
+      localStorage.setItem('sellsolar_custom_listings', JSON.stringify(updated));
+    } catch {}
+    showToast({
+      title: 'Status Updated',
+      message: 'Product sold status has been updated.',
+      type: 'success',
+    });
+  };
+
+  // Delete Personal Ad
+  const handleDeleteMyAd = (listingId) => {
+    if (!confirm('Are you sure you want to remove this solar ad?')) return;
+    const updated = listingsList.filter((item) => item.id !== listingId);
+    setListingsList(updated);
+    try {
+      localStorage.setItem('sellsolar_custom_listings', JSON.stringify(updated));
+    } catch {}
+    showToast({
+      title: 'Ad Removed',
+      message: 'Your listing has been removed from SellSolar.',
+      type: 'info',
+    });
+  };
+
+  // Save Profile Info
+  const handleSaveProfile = async (e) => {
+    e?.preventDefault();
+    try {
+      if (updateProfile) {
+        await updateProfile({
+          full_name: profileForm.fullName,
+          phone: profileForm.phone,
+          city: profileForm.city,
+          business_name: profileForm.businessName,
+          showroom_address: profileForm.showroomAddress,
+        });
+      }
+      showToast({
+        title: 'Profile Updated',
+        message: 'Your personal information and contact details have been updated.',
+        type: 'success',
+      });
+    } catch (err) {
+      showToast({
+        title: 'Update Failed',
+        message: err.message || 'Could not update profile.',
+        type: 'error',
+      });
+    }
+  };
+
   // Filtered Inbox Messages
   const filteredInbox = inboxMessages.filter((msg) => {
     if (inboxFilter === 'unread') return !msg.is_read;
@@ -258,7 +369,7 @@ export default function AdminSuperDashboard({ onBack, onNavigateToListing }) {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex flex-col">
-      {/* Top Admin Header */}
+      {/* Top Header Navigation */}
       <header className="sticky top-0 z-30 border-b border-gray-200 dark:border-gray-800 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md px-4 sm:px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button
@@ -274,37 +385,81 @@ export default function AdminSuperDashboard({ onBack, onNavigateToListing }) {
               <span className="text-base sm:text-lg font-black tracking-tight text-gray-900 dark:text-white">
                 Sell<span className="text-amber-500">Solar</span>
               </span>
-              <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
                 isSuperAdmin
                   ? 'bg-purple-100 dark:bg-purple-950/70 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800'
-                  : 'bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
+                  : isAdmin
+                  ? 'bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
+                  : isDealer
+                  ? 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                  : 'bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
               }`}>
-                {isSuperAdmin ? '👑 Super Admin' : '🛡️ Admin'}
+                {isSuperAdmin
+                  ? '👑 Super Admin Dashboard'
+                  : isAdmin
+                  ? '🛡️ Admin Dashboard'
+                  : isDealer
+                  ? '🏬 Verified Dealer Dashboard'
+                  : '👤 My Dashboard'}
               </span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="hidden sm:block text-right">
+        <div className="flex items-center gap-2 sm:gap-3">
+          {onPostAd && (
+            <button
+              type="button"
+              onClick={onPostAd}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-xs transition-colors"
+            >
+              <PlusCircle className="h-3.5 w-3.5" />
+              <span>Post Ad</span>
+            </button>
+          )}
+
+          <div className="hidden md:block text-right">
             <p className="text-xs font-bold text-gray-900 dark:text-white">{user?.email || DEFAULT_ADMIN_EMAIL}</p>
-            <p className="text-[10px] text-gray-400 capitalize">{isSuperAdmin ? 'Super Administrator' : 'Administrator'}</p>
+            <p className="text-[10px] text-gray-400 capitalize">
+              {isSuperAdmin
+                ? 'Super Administrator'
+                : isAdmin
+                ? 'Administrator'
+                : isDealer
+                ? 'Solar Dealer Store'
+                : 'Verified User'}
+            </p>
           </div>
+
           <button
             type="button"
             onClick={onBack}
-            className="btn-secondary text-xs px-3 py-1.5"
+            className="btn-secondary text-xs px-2.5 sm:px-3 py-1.5"
           >
-            View Site ↗
+            Marketplace ↗
           </button>
         </div>
       </header>
 
-      {/* Main Admin Body */}
+      {/* Main Unified Dashboard Body */}
       <div className="flex-1 flex flex-col md:flex-row">
         {/* Navigation Sidebar */}
-        <aside className="w-full md:w-64 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shrink-0">
+        <aside className="w-full md:w-64 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shrink-0 flex flex-col justify-between">
           <nav className="space-y-1">
+            {/* User card in sidebar */}
+            <div className="mb-4 p-3 rounded-2xl bg-slate-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-800 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 text-white font-black flex items-center justify-center text-sm shadow-xs">
+                {(profile?.full_name || user?.email || 'U').charAt(0).toUpperCase()}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-bold text-gray-900 dark:text-white truncate">
+                  {profile?.full_name || user?.user_metadata?.full_name || 'My Account'}
+                </p>
+                <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
+              </div>
+            </div>
+
+            {/* TAB 1: OVERVIEW */}
             <button
               type="button"
               onClick={() => setActiveTab('dashboard')}
@@ -316,10 +471,51 @@ export default function AdminSuperDashboard({ onBack, onNavigateToListing }) {
             >
               <div className="flex items-center gap-2.5">
                 <LayoutDashboard className="h-4 w-4" />
-                <span>Dashboard</span>
+                <span>Overview</span>
               </div>
             </button>
 
+            {/* TAB 2: MY ADS & INVENTORY */}
+            <button
+              type="button"
+              onClick={() => setActiveTab('my-ads')}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+                activeTab === 'my-ads'
+                  ? 'bg-amber-500 text-white shadow-sm font-black'
+                  : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Package className="h-4 w-4" />
+                <span>My Solar Ads</span>
+              </div>
+              <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+                activeTab === 'my-ads' ? 'bg-amber-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
+              }`}>
+                {myAds.length}
+              </span>
+            </button>
+
+            {/* TAB 3: PRODUCTS & MODERATION (SUPER ADMIN & ADMIN ONLY) */}
+            {(isSuperAdmin || isAdmin) && (
+              <button
+                type="button"
+                onClick={() => setActiveTab('products')}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+                  activeTab === 'products'
+                    ? 'bg-amber-500 text-white shadow-sm font-black'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Tag className="h-4 w-4" />
+                  <span>Marketplace Moderation</span>
+                </div>
+                <span className="text-[10px] text-gray-400 font-mono">{listingsList.length}</span>
+              </button>
+            )}
+
+            {/* TAB 4: INBOX & INQUIRIES */}
             <button
               type="button"
               onClick={() => setActiveTab('inbox')}
@@ -331,7 +527,7 @@ export default function AdminSuperDashboard({ onBack, onNavigateToListing }) {
             >
               <div className="flex items-center gap-2.5">
                 <MessageSquare className="h-4 w-4" />
-                <span>Inbox (info@sellsolar)</span>
+                <span>Inbox {isSuperAdmin ? '(info@sellsolar)' : 'Messages'}</span>
               </div>
               {unreadInboxCount > 0 && (
                 <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-rose-500 text-white font-black">
@@ -340,42 +536,29 @@ export default function AdminSuperDashboard({ onBack, onNavigateToListing }) {
               )}
             </button>
 
-            <button
-              type="button"
-              onClick={() => setActiveTab('analytics')}
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                activeTab === 'analytics'
-                  ? 'bg-amber-500 text-white shadow-sm font-black'
-                  : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-              }`}
-            >
-              <div className="flex items-center gap-2.5">
-                <ChartColumn className="h-4 w-4" />
-                <span>Analytics & Views</span>
-              </div>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab('products')}
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                activeTab === 'products'
-                  ? 'bg-amber-500 text-white shadow-sm font-black'
-                  : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-              }`}
-            >
-              <div className="flex items-center gap-2.5">
-                <Tag className="h-4 w-4" />
-                <span>Products & Moderation</span>
-              </div>
-              <span className="text-[10px] text-gray-400 font-mono">{listingsList.length}</span>
-            </button>
+            {/* TAB 5: ANALYTICS & TRAFFIC */}
+            {(isSuperAdmin || isAdmin) && (
+              <button
+                type="button"
+                onClick={() => setActiveTab('analytics')}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+                  activeTab === 'analytics'
+                    ? 'bg-amber-500 text-white shadow-sm font-black'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <ChartColumn className="h-4 w-4" />
+                  <span>Analytics & Traffic</span>
+                </div>
+              </button>
+            )}
 
             {/* SUPER ADMIN ONLY TABS */}
             {isSuperAdmin && (
               <>
                 <div className="pt-3 pb-1 px-3 text-[10px] font-black uppercase tracking-wider text-purple-600 dark:text-purple-400">
-                  Super Admin Controls
+                  Super Admin Master
                 </div>
 
                 <button
@@ -389,7 +572,7 @@ export default function AdminSuperDashboard({ onBack, onNavigateToListing }) {
                 >
                   <div className="flex items-center gap-2.5">
                     <ShieldCheck className="h-4 w-4 text-purple-500" />
-                    <span>Roles & Access</span>
+                    <span>Roles & Permissions</span>
                   </div>
                   <span className="text-[10px] text-gray-400 font-mono">{usersList.length}</span>
                 </button>
@@ -410,53 +593,184 @@ export default function AdminSuperDashboard({ onBack, onNavigateToListing }) {
                 </button>
               </>
             )}
+
+            {/* TAB: MY PROFILE & SECURITY */}
+            <div className="pt-3 pb-1 px-3 text-[10px] font-black uppercase tracking-wider text-gray-400">
+              Personal Account
+            </div>
+            <button
+              type="button"
+              onClick={() => setActiveTab('profile')}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+                activeTab === 'profile'
+                  ? 'bg-amber-500 text-white shadow-sm font-black'
+                  : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <User className="h-4 w-4" />
+                <span>My Profile & Security</span>
+              </div>
+            </button>
           </nav>
+
+          {/* Sidebar Footer */}
+          <div className="pt-4 mt-4 border-t border-gray-100 dark:border-gray-800 space-y-2">
+            {onPostAd && (
+              <button
+                type="button"
+                onClick={onPostAd}
+                className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs font-bold shadow-sm hover:from-amber-600 hover:to-amber-700 transition-all"
+              >
+                <PlusCircle className="h-4 w-4" />
+                <span>Post New Solar Ad</span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => signOut?.()}
+              className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              <span>Sign Out</span>
+            </button>
+          </div>
         </aside>
 
         {/* Content Area */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
-          {/* TAB 1: DASHBOARD */}
+          {/* TAB 1: DASHBOARD / OVERVIEW */}
           {activeTab === 'dashboard' && (
             <div className="space-y-6">
-              <div>
-                <h1 className="text-2xl font-black text-gray-900 dark:text-white">Admin Command Center</h1>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Live platform metrics, rapid approvals, and site-wide notifications.
-                </p>
+              {/* Role-aware Welcome Banner */}
+              <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-amber-500/10 via-purple-500/5 to-transparent border border-amber-200/60 dark:border-amber-900/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider">
+                      Welcome back,
+                    </span>
+                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                      isSuperAdmin
+                        ? 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300 border border-purple-200 dark:border-purple-800'
+                        : isAdmin
+                        ? 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
+                        : isDealer
+                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                        : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
+                    }`}>
+                      {isSuperAdmin
+                        ? '👑 Super Admin Master'
+                        : isAdmin
+                        ? '🛡️ Administrator'
+                        : isDealer
+                        ? '🏬 Verified Dealer'
+                        : '👤 Registered Seller'}
+                    </span>
+                  </div>
+                  <h1 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white mt-1">
+                    {profile?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'SellSolar User'}
+                  </h1>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    {isSuperAdmin
+                      ? 'You have master control over website CMS, user roles, inbox, and marketplace equipment.'
+                      : isDealer
+                      ? 'Manage your commercial solar inventory, monitor buyer inquiries, and update showroom profile.'
+                      : 'Manage your active solar listings, monitor ad views, and check customer inquiries.'}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  {onPostAd && (
+                    <button
+                      type="button"
+                      onClick={onPostAd}
+                      className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-md shadow-amber-500/20 flex items-center gap-1.5 transition-all"
+                    >
+                      <PlusCircle className="h-4 w-4" />
+                      <span>Post Solar Ad</span>
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('my-ads')}
+                    className="btn-secondary text-xs px-3.5 py-2.5 font-bold"
+                  >
+                    My Ads ({myAds.length})
+                  </button>
+                </div>
               </div>
 
-              {/* KPI Cards */}
+              {/* KPI Cards: Platform KPIs (if Super Admin/Admin) or Personal KPIs (if Dealer/Customer) */}
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-                <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
-                  <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Total Users</p>
-                  <p className="text-2xl font-black text-gray-900 dark:text-white mt-1">{usersList.length}</p>
-                </div>
-                <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
-                  <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Dealers</p>
-                  <p className="text-2xl font-black text-primary-600 dark:text-primary-400 mt-1">
-                    {usersList.filter((u) => u.role === 'dealer' || u.is_verified_dealer).length}
-                  </p>
-                </div>
-                <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
-                  <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Total Listings</p>
-                  <p className="text-2xl font-black text-gray-900 dark:text-white mt-1">{listingsList.length}</p>
-                </div>
-                <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
-                  <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Featured</p>
-                  <p className="text-2xl font-black text-amber-500 mt-1">
-                    {listingsList.filter((l) => l.is_featured).length}
-                  </p>
-                </div>
-                <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
-                  <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Hot Sell</p>
-                  <p className="text-2xl font-black text-rose-500 mt-1">
-                    {listingsList.filter((l) => l.is_hot_sell).length}
-                  </p>
-                </div>
-                <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
-                  <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Inbox Unread</p>
-                  <p className="text-2xl font-black text-purple-600 dark:text-purple-400 mt-1">{unreadInboxCount}</p>
-                </div>
+                {isSuperAdmin || isAdmin ? (
+                  <>
+                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
+                      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Total Users</p>
+                      <p className="text-2xl font-black text-gray-900 dark:text-white mt-1">{usersList.length}</p>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
+                      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Dealers</p>
+                      <p className="text-2xl font-black text-primary-600 dark:text-primary-400 mt-1">
+                        {usersList.filter((u) => u.role === 'dealer' || u.is_verified_dealer).length}
+                      </p>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
+                      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Market Listings</p>
+                      <p className="text-2xl font-black text-gray-900 dark:text-white mt-1">{listingsList.length}</p>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
+                      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">My Active Ads</p>
+                      <p className="text-2xl font-black text-amber-500 mt-1">{myAds.length}</p>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
+                      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Hot Sell Badges</p>
+                      <p className="text-2xl font-black text-rose-500 mt-1">
+                        {listingsList.filter((l) => l.is_hot_sell).length}
+                      </p>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
+                      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Inbox Unread</p>
+                      <p className="text-2xl font-black text-purple-600 dark:text-purple-400 mt-1">{unreadInboxCount}</p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
+                      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">My Total Ads</p>
+                      <p className="text-2xl font-black text-gray-900 dark:text-white mt-1">{myAds.length}</p>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
+                      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Active Listings</p>
+                      <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">
+                        {myAds.filter((a) => !a.is_sold && a.status !== 'sold').length}
+                      </p>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
+                      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Sold Products</p>
+                      <p className="text-2xl font-black text-gray-600 dark:text-gray-300 mt-1">
+                        {myAds.filter((a) => a.is_sold || a.status === 'sold').length}
+                      </p>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
+                      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Views on My Ads</p>
+                      <p className="text-2xl font-black text-amber-500 mt-1">
+                        {myAds.reduce((acc, curr) => acc + (curr.views || 0), 0)}
+                      </p>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
+                      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Account Role</p>
+                      <p className="text-base font-black text-primary-600 capitalize mt-2">
+                        {isDealer ? 'Dealer' : 'Seller'}
+                      </p>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
+                      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Inquiries</p>
+                      <p className="text-2xl font-black text-purple-600 dark:text-purple-400 mt-1">
+                        {unreadInboxCount}
+                      </p>
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* Quick Actions */}
@@ -465,10 +779,12 @@ export default function AdminSuperDashboard({ onBack, onNavigateToListing }) {
                   <div>
                     <h3 className="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-2">
                       <MessageSquare className="h-4 w-4 text-amber-500" />
-                      Inquiries Desk
+                      Inquiries & Messages
                     </h3>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Check incoming contact messages to info@sellsolar.pk and reply directly.
+                      {isSuperAdmin
+                        ? 'Check incoming contact messages to info@sellsolar.pk and reply directly.'
+                        : 'Check inquiries from buyers interested in your solar equipment.'}
                     </p>
                   </div>
                   <button
@@ -483,23 +799,23 @@ export default function AdminSuperDashboard({ onBack, onNavigateToListing }) {
                 <div className="p-5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex flex-col justify-between">
                   <div>
                     <h3 className="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-2">
-                      <Flame className="h-4 w-4 text-rose-500" />
-                      Featured & Hot Sell
+                      <Package className="h-4 w-4 text-amber-500" />
+                      My Solar Equipment
                     </h3>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Tag solar panels and inverters with high demand badges for the homepage.
+                      You currently have {myAds.length} solar listings on the SellSolar marketplace.
                     </p>
                   </div>
                   <button
                     type="button"
-                    onClick={() => setActiveTab('products')}
+                    onClick={() => setActiveTab('my-ads')}
                     className="mt-4 btn-secondary text-xs w-full py-2"
                   >
-                    Manage Equipment Badges
+                    Manage My Ads ({myAds.length})
                   </button>
                 </div>
 
-                {isSuperAdmin && (
+                {isSuperAdmin ? (
                   <div className="p-5 rounded-2xl border border-purple-200 dark:border-purple-900/60 bg-purple-50/50 dark:bg-purple-950/20 flex flex-col justify-between">
                     <div>
                       <h3 className="font-bold text-sm text-purple-900 dark:text-purple-200 flex items-center gap-2">
@@ -517,6 +833,90 @@ export default function AdminSuperDashboard({ onBack, onNavigateToListing }) {
                     >
                       Configure Site Settings
                     </button>
+                  </div>
+                ) : (
+                  <div className="p-5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex flex-col justify-between">
+                    <div>
+                      <h3 className="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-2">
+                        <User className="h-4 w-4 text-emerald-500" />
+                        Profile & Security
+                      </h3>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        Update your contact number, city, and change your account password.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('profile')}
+                      className="mt-4 btn-secondary text-xs w-full py-2"
+                    >
+                      View Profile Settings
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* My Recent Listings on Overview */}
+              <div className="p-6 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xs space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-black text-base text-gray-900 dark:text-white flex items-center gap-2">
+                      <Package className="h-4 w-4 text-amber-500" />
+                      My Recent Solar Ads
+                    </h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                      Your recently listed solar equipment on SellSolar.pk
+                    </p>
+                  </div>
+                  {onPostAd && (
+                    <button
+                      type="button"
+                      onClick={onPostAd}
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline"
+                    >
+                      <PlusCircle className="h-3.5 w-3.5" />
+                      <span>Post New Ad</span>
+                    </button>
+                  )}
+                </div>
+
+                {myAds.length === 0 ? (
+                  <div className="py-8 text-center border border-dashed border-gray-200 dark:border-gray-800 rounded-xl">
+                    <Package className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                    <p className="text-xs font-bold text-gray-700 dark:text-gray-300">You haven't posted any ads yet</p>
+                    <p className="text-[11px] text-gray-400 mt-0.5">Sell your used or new solar panels, inverters and batteries.</p>
+                    {onPostAd && (
+                      <button
+                        type="button"
+                        onClick={onPostAd}
+                        className="mt-3 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold"
+                      >
+                        + Post Free Ad
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {myAds.slice(0, 3).map((ad) => (
+                      <div
+                        key={ad.id}
+                        className="p-3 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/40 flex items-center justify-between gap-3"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-bold text-gray-900 dark:text-white truncate">{ad.title}</p>
+                          <p className="text-xs font-black text-amber-600 dark:text-amber-400 mt-0.5">{formatPrice(ad.price)}</p>
+                        </div>
+                        <span
+                          className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                            ad.is_sold || ad.status === 'sold'
+                              ? 'bg-gray-200 text-gray-700'
+                              : 'bg-emerald-100 text-emerald-800'
+                          }`}
+                        >
+                          {ad.is_sold || ad.status === 'sold' ? 'Sold' : 'Active'}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
@@ -1335,6 +1735,333 @@ export default function AdminSuperDashboard({ onBack, onNavigateToListing }) {
                   </button>
                 </div>
               </form>
+            </div>
+          )}
+
+          {/* TAB: MY SOLAR ADS */}
+          {activeTab === 'my-ads' && (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-2">
+                    <Package className="h-6 w-6 text-amber-500" />
+                    My Solar Ads
+                  </h1>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Manage your personal equipment listings, mark items as sold, or post new solar hardware.
+                  </p>
+                </div>
+                {onPostAd && (
+                  <button
+                    type="button"
+                    onClick={onPostAd}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-md shadow-amber-500/20 transition-all"
+                  >
+                    <PlusCircle className="h-4 w-4" />
+                    <span>Post New Solar Ad</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Filter Pills */}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setMyAdsFilter('all')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                    myAdsFilter === 'all'
+                      ? 'bg-amber-500 text-white'
+                      : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
+                  }`}
+                >
+                  All ({myAds.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMyAdsFilter('active')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                    myAdsFilter === 'active'
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
+                  }`}
+                >
+                  Active ({myAds.filter((a) => !a.is_sold && a.status !== 'sold').length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMyAdsFilter('sold')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                    myAdsFilter === 'sold'
+                      ? 'bg-gray-700 text-white'
+                      : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
+                  }`}
+                >
+                  Sold ({myAds.filter((a) => a.is_sold || a.status === 'sold').length})
+                </button>
+              </div>
+
+              {/* My Ads Grid */}
+              {myAds.length === 0 ? (
+                <div className="text-center py-16 px-4 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+                  <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-500 flex items-center justify-center mb-3">
+                    <Package className="w-7 h-7" />
+                  </div>
+                  <h3 className="text-base font-black text-gray-900 dark:text-white">No Ads Posted Yet</h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 max-w-sm mx-auto">
+                    You haven't listed any solar panels, inverters, or batteries yet. Start selling across Pakistan for free!
+                  </p>
+                  {onPostAd && (
+                    <button
+                      type="button"
+                      onClick={onPostAd}
+                      className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs"
+                    >
+                      <PlusCircle className="h-4 w-4" />
+                      <span>Post Your First Ad Now</span>
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {myAds
+                    .filter((ad) => {
+                      if (myAdsFilter === 'active') return !ad.is_sold && ad.status !== 'sold';
+                      if (myAdsFilter === 'sold') return !!ad.is_sold || ad.status === 'sold';
+                      return true;
+                    })
+                    .map((ad) => (
+                      <div
+                        key={ad.id}
+                        className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 flex flex-col justify-between shadow-xs hover:border-amber-400/50 transition-all"
+                      >
+                        <div>
+                          <div className="flex items-start gap-3 mb-3">
+                            <div className="w-16 h-16 rounded-xl bg-gray-100 dark:bg-gray-800 shrink-0 overflow-hidden flex items-center justify-center">
+                              {ad.image_url ? (
+                                <img src={ad.image_url} alt={ad.title} className="w-full h-full object-cover" />
+                              ) : (
+                                <Package className="w-6 h-6 text-gray-400" />
+                              )}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span
+                                  className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                                    ad.is_sold || ad.status === 'sold'
+                                      ? 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                                      : 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300'
+                                  }`}
+                                >
+                                  {ad.is_sold || ad.status === 'sold' ? 'Sold' : 'Active'}
+                                </span>
+                                {ad.is_featured && (
+                                  <span className="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300">
+                                    ⭐ Featured
+                                  </span>
+                                )}
+                                {ad.is_hot_sell && (
+                                  <span className="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300">
+                                    🔥 Hot Sell
+                                  </span>
+                                )}
+                              </div>
+                              <h4 className="font-bold text-sm text-gray-900 dark:text-white mt-1 line-clamp-1">
+                                {ad.title}
+                              </h4>
+                              <p className="text-xs font-black text-amber-600 dark:text-amber-400 mt-0.5">
+                                {formatPrice(ad.price)}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-100 dark:border-gray-800">
+                            <span>{ad.city || 'Pakistan'}</span>
+                            <span className="flex items-center gap-1">
+                              <Eye className="w-3.5 h-3.5" />
+                              {ad.views || 0} views
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between gap-2 pt-3 mt-3 border-t border-gray-100 dark:border-gray-800">
+                          <button
+                            type="button"
+                            onClick={() => handleToggleSold(ad.id)}
+                            className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-colors ${
+                              ad.is_sold || ad.status === 'sold'
+                                ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950/50 dark:text-emerald-300'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300'
+                            }`}
+                          >
+                            {ad.is_sold || ad.status === 'sold' ? 'Mark Available' : 'Mark as Sold'}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => onNavigateToListing?.(ad.id)}
+                            className="p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                            title="View on marketplace"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteMyAd(ad.id)}
+                            className="p-1.5 rounded-lg border border-rose-200 dark:border-rose-900 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors"
+                            title="Delete Ad"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB: MY PROFILE & SECURITY */}
+          {activeTab === 'profile' && (
+            <div className="space-y-6 max-w-2xl">
+              <div>
+                <h1 className="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-2">
+                  <User className="h-6 w-6 text-amber-500" />
+                  My Profile & Security
+                </h1>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Manage your personal account details, dealer store information, and security credentials.
+                </p>
+              </div>
+
+              <form onSubmit={handleSaveProfile} className="space-y-5">
+                <div className="p-6 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 space-y-4 shadow-xs">
+                  <h3 className="text-sm font-black text-gray-900 dark:text-white flex items-center gap-2">
+                    <User className="h-4 w-4 text-amber-500" />
+                    Account Information
+                  </h3>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                        Full Name / Seller Name
+                      </label>
+                      <input
+                        type="text"
+                        value={profileForm.fullName}
+                        onChange={(e) => setProfileForm({ ...profileForm, fullName: e.target.value })}
+                        className="input-field text-xs"
+                        placeholder="e.g. Mudassir Solar"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                        Registered Email
+                      </label>
+                      <input
+                        type="email"
+                        disabled
+                        value={user?.email || DEFAULT_ADMIN_EMAIL}
+                        className="input-field text-xs opacity-60 bg-gray-100 dark:bg-gray-800 cursor-not-allowed"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                        Phone / WhatsApp Number
+                      </label>
+                      <input
+                        type="tel"
+                        value={profileForm.phone}
+                        onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
+                        className="input-field text-xs"
+                        placeholder="e.g. 03001234567"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                        City
+                      </label>
+                      <input
+                        type="text"
+                        value={profileForm.city}
+                        onChange={(e) => setProfileForm({ ...profileForm, city: e.target.value })}
+                        className="input-field text-xs"
+                        placeholder="e.g. Lahore"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Dealer Store Details */}
+                  {(isDealer || isSuperAdmin) && (
+                    <div className="pt-4 border-t border-gray-100 dark:border-gray-800 space-y-4">
+                      <h4 className="text-xs font-black uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                        <Store className="h-4 w-4" />
+                        Commercial Dealer Store Info
+                      </h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                            Solar Business / Shop Name
+                          </label>
+                          <input
+                            type="text"
+                            value={profileForm.businessName}
+                            onChange={(e) => setProfileForm({ ...profileForm, businessName: e.target.value })}
+                            className="input-field text-xs"
+                            placeholder="e.g. Solar City Electronics"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                            Showroom / Warehouse Address
+                          </label>
+                          <input
+                            type="text"
+                            value={profileForm.showroomAddress}
+                            onChange={(e) => setProfileForm({ ...profileForm, showroomAddress: e.target.value })}
+                            className="input-field text-xs"
+                            placeholder="e.g. Main Hall Road, Lahore"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex justify-end pt-2">
+                    <button
+                      type="submit"
+                      className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-xs transition-colors"
+                    >
+                      Save Profile Changes
+                    </button>
+                  </div>
+                </div>
+              </form>
+
+              {/* Password & Security Card */}
+              <div className="p-6 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xs flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-black text-gray-900 dark:text-white flex items-center gap-2">
+                    <Lock className="h-4 w-4 text-amber-500" />
+                    Password & Security
+                  </h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Update your account login password or reset via 6-digit email OTP.
+                  </p>
+                </div>
+                {onChangePassword && (
+                  <button
+                    type="button"
+                    onClick={onChangePassword}
+                    className="btn-secondary text-xs px-4 py-2 font-bold shrink-0"
+                  >
+                    Change Password
+                  </button>
+                )}
+              </div>
             </div>
           )}
         </main>

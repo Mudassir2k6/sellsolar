@@ -91,6 +91,7 @@ import { getEquipmentFallbackImage } from './utils/solarImages';
 import ThemeRadioToggle from './components/ThemeRadioToggle';
 import WarrantySelector, { formatWarrantyShort, formatWarrantyLong } from './components/WarrantySelector';
 import InstallationRequestPage from './views/InstallationRequestPage';
+import DealersPage from './views/DealersPage';
 import ListingPhotoUploader from './components/ListingPhotoUploader';
 import { listingImages, uploadListingPhotos } from './lib/images';
 import GlobalNavbarSearch from './components/GlobalNavbarSearch';
@@ -159,6 +160,8 @@ function Xy({
     label:"Today's Rates",page:"prices",highlight:true
   },{
     label:"Load Calculator",page:"calculator",isCalc:true
+  },{
+    label:"Verified Dealers",page:"dealers"
   },{
     label:"Request Complete Installation",page:"install",isInstall:true
   }];
@@ -1467,6 +1470,7 @@ const ux={
     { label: "Blog", page: "blog" }
   ],
   Marketplace:[
+    { label: "Verified Dealers", page: "dealers" },
     { label: "Buy Solar", page: "buy-solar" },
     { label: "Sell Solar", page: "sell-solar" },
     { label: "Used Solar", page: "used-solar" },
@@ -4795,8 +4799,19 @@ function _x({
     initialMode: "reset", onSuccess: () => o("home"), onBack: () => o("home")
   }) : n === "login" ? jsx(Bn, {
     onSuccess: () => o("home"), onBack: () => o("home")
-  }) : n === "dealers" ? jsx(mx, {
-    onBack: () => o("home")
+  }) : n === "dealers" ? jsxs("div", {
+    className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
+      onNavigate: d => {
+        d === "post-ad" ? c() : d === "admin" || d === "admin-dashboard" ? t && (e != null && e.is_admin) ? o("admin-dashboard") : o("login") : d === "password" || d === "change-password" ? o("password") : o(d === "dashboard" ? t ? "dashboard" : "login" : d)
+      }, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
+    }), jsx("main", {
+      id: "main",
+      children: jsx(DealersPage, {
+        onNavigate: o, onBack: () => o("home"), hasOuterNavbar: true
+      })
+    }), jsx(hx, {
+      onPostAd: c, onNavigate: o
+    })]
   }) : n === "install" || n === "installation" || n === "request-installation" ? jsx(InstallationRequestPage, {
     onBack: () => o("home")
   }) : n === "calculator" || n === "load-calculator" ? jsxs("div", {

@@ -455,6 +455,7 @@ export function AuthProvider({ children }) {
                 business_name: cleanBusinessName,
                 business_address: cleanBusinessAddress,
                 visiting_card_url: visitingCard,
+                registration_source: 'self_registered',
               },
             },
           });
@@ -502,6 +503,7 @@ export function AuthProvider({ children }) {
         visiting_card_url: visitingCard,
         is_admin: isAdm,
         is_verified_dealer: false,
+        registration_source: 'self_registered',
         created_at: new Date().toISOString(),
       };
 

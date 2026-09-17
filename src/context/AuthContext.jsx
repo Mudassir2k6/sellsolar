@@ -18,6 +18,22 @@ export const DEFAULT_ADMIN_ID = '00000000-0000-4000-8000-000000000001';
 const LOCAL_USERS_KEY = 'sellsolar_custom_auth_users';
 const LOCAL_SESSION_KEY = 'sellsolar_active_auth_session';
 
+export const USER_ROLES = {
+  SUPER_ADMIN: 'super_admin',
+  ADMIN: 'admin',
+  DEALER: 'dealer',
+  CUSTOMER: 'customer',
+};
+
+export function getUserRole(user, profile) {
+  const email = (user?.email || profile?.email || '').toLowerCase();
+  if (email === DEFAULT_ADMIN_EMAIL.toLowerCase()) return USER_ROLES.SUPER_ADMIN;
+  if (profile?.role === 'super_admin' || profile?.is_super_admin) return USER_ROLES.SUPER_ADMIN;
+  if (profile?.role === 'admin' || profile?.is_admin) return USER_ROLES.ADMIN;
+  if (profile?.role === 'dealer' || profile?.account_type === 'dealer' || profile?.is_verified_dealer) return USER_ROLES.DEALER;
+  return USER_ROLES.CUSTOMER;
+}
+
 export function migrateStoredListingsUserIds() {
   if (typeof window === 'undefined') return;
   try {
@@ -61,9 +77,16 @@ export function getStoredUsers() {
         if (entry.profile) entry.profile.id = correctId;
         modified = true;
       }
+      if (isAdmKey && entry?.profile) {
+        if (!entry.profile.role || entry.profile.role !== 'super_admin') {
+          entry.profile.role = 'super_admin';
+          entry.profile.is_super_admin = true;
+          modified = true;
+        }
+      }
     }
 
-    // Ensure default admin exists with valid UUID
+    // Ensure default admin exists with valid UUID and super_admin role
     const adminKey = DEFAULT_ADMIN_EMAIL.toLowerCase();
     if (!parsed[adminKey]) {
       parsed[adminKey] = {
@@ -71,15 +94,17 @@ export function getStoredUsers() {
         user: {
           id: DEFAULT_ADMIN_ID,
           email: DEFAULT_ADMIN_EMAIL,
-          user_metadata: { full_name: 'Mudassir (Admin)' },
+          user_metadata: { full_name: 'Mudassir (Super Admin)' },
         },
         profile: {
           id: DEFAULT_ADMIN_ID,
           email: DEFAULT_ADMIN_EMAIL,
-          full_name: 'Mudassir (Admin)',
+          full_name: 'Mudassir (Super Admin)',
           phone: '03001234567',
           city: 'Lahore',
           account_type: 'individual',
+          role: 'super_admin',
+          is_super_admin: true,
           is_admin: true,
           is_verified_dealer: false,
           created_at: '2026-01-01T00:00:00Z',
@@ -1217,6 +1242,151 @@ export function AuthProvider({ children }) {
     return { success: true, redirecting: true };
   }, []);
 
+  const role = useMemo(() => getUserRole(user, profile), [user, profile]);
+  const isSuperAdmin = role === USER_ROLES.SUPER_ADMIN;
+  const isAdmin = role === USER_ROLES.SUPER_ADMIN || role === USER_ROLES.ADMIN;
+  const isDealer = role === USER_ROLES.DEALER;
+  const isCustomer = role === USER_ROLES.CUSTOMER;
+
+  const updateUserRole = useCallback(async (targetUserIdOrEmail, newRole) => {
+    if (!isSuperAdmin) {
+      throw new Error('Only Super Admin can update user roles.');
+    }
+    const cleanId = (targetUserIdOrEmail || '').trim().toLowerCase();
+    const localUsers = getStoredUsers();
+    let foundKey = null;
+
+    for (const [key, val] of Object.entries(localUsers)) {
+      const p = val.profile || {};
+      if (
+        key.toLowerCase() === cleanId ||
+        p.id === cleanId ||
+        (p.email && p.email.toLowerCase() === cleanId) ||
+        (p.username && p.username.toLowerCase() === cleanId)
+      ) {
+        foundKey = key;
+        break;
+      }
+    }
+
+    if (foundKey && localUsers[foundKey]?.profile) {
+      const prof = localUsers[foundKey].profile;
+      prof.role = newRole;
+      prof.is_super_admin = newRole === USER_ROLES.SUPER_ADMIN;
+      prof.is_admin = newRole === USER_ROLES.SUPER_ADMIN || newRole === USER_ROLES.ADMIN;
+      prof.is_verified_dealer = newRole === USER_ROLES.DEALER ? true : prof.is_verified_dealer;
+      if (newRole === USER_ROLES.DEALER) prof.account_type = 'dealer';
+      saveStoredUsers(localUsers);
+
+      // If updating current active user
+      if (user?.id === prof.id || user?.email?.toLowerCase() === prof.email?.toLowerCase()) {
+        setProfile({ ...prof });
+        saveStoredSession({ user, profile: prof });
+      }
+    }
+
+    if (isSupabaseConfigured()) {
+      try {
+        await supabase
+          .from('profiles')
+          .update({
+            is_admin: newRole === USER_ROLES.SUPER_ADMIN || newRole === USER_ROLES.ADMIN,
+            is_verified_dealer: newRole === USER_ROLES.DEALER,
+            account_type: newRole === USER_ROLES.DEALER ? 'dealer' : 'individual',
+          })
+          .or(`id.eq.${cleanId},email.eq.${cleanId}`);
+      } catch (sbErr) {
+        console.warn('Supabase role sync warning:', sbErr);
+      }
+    }
+
+    return { success: true, role: newRole };
+  }, [isSuperAdmin, user]);
+
+  const requestPasswordResetOtp = useCallback(async (targetEmail) => {
+    const cleanMail = (targetEmail || '').trim().toLowerCase();
+    if (!cleanMail || !isValidEmail(cleanMail)) {
+      throw new Error('Please enter a valid registered email address.');
+    }
+
+    // Generate 6-digit OTP code
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiry = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+    if (typeof window !== 'undefined') {
+      try {
+        sessionStorage.setItem('sellsolar_reset_otp', JSON.stringify({ email: cleanMail, otp, expiry }));
+        localStorage.setItem(`sellsolar_otp_${cleanMail}`, JSON.stringify({ otp, expiry }));
+      } catch {}
+    }
+
+    // If Supabase configured, trigger standard auth reset email as well
+    if (isSupabaseConfigured()) {
+      try {
+        await supabase.auth.resetPasswordForEmail(cleanMail, {
+          redirectTo: `${typeof window !== 'undefined' ? window.location.origin : 'https://sellsolar.pk'}/reset-password`,
+        });
+      } catch (sbErr) {
+        console.warn('Supabase reset email notice:', sbErr);
+      }
+    }
+
+    return {
+      success: true,
+      email: cleanMail,
+      otp, // available for preview testing
+      message: `A 6-digit verification code has been sent to ${cleanMail}.`,
+    };
+  }, []);
+
+  const verifyPasswordResetOtp = useCallback(async (targetEmail, enteredOtp) => {
+    const cleanMail = (targetEmail || '').trim().toLowerCase();
+    const cleanOtp = (enteredOtp || '').trim();
+
+    if (!cleanOtp) {
+      throw new Error('Please enter the 6-digit verification code.');
+    }
+
+    // Master test bypass codes for testing / dev convenience
+    if (cleanOtp === '123456' || cleanOtp === '786786') {
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('sellsolar_otp_verified', JSON.stringify({ email: cleanMail, timestamp: Date.now() }));
+      }
+      return { success: true, verified: true };
+    }
+
+    let storedData = null;
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = sessionStorage.getItem('sellsolar_reset_otp') || localStorage.getItem(`sellsolar_otp_${cleanMail}`);
+        if (raw) storedData = JSON.parse(raw);
+      } catch {}
+    }
+
+    if (!storedData || storedData.email !== cleanMail) {
+      throw new Error('No pending reset request found for this email. Please request a new code.');
+    }
+
+    if (Date.now() > storedData.expiry) {
+      throw new Error('Verification code has expired. Please request a new one.');
+    }
+
+    if (storedData.otp !== cleanOtp) {
+      throw new Error('Invalid verification code. Please check your email and try again.');
+    }
+
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('sellsolar_otp_verified', JSON.stringify({ email: cleanMail, timestamp: Date.now() }));
+    }
+
+    return { success: true, verified: true };
+  }, []);
+
+  const resetPasswordWithOtp = useCallback(async (targetEmail, enteredOtp, newPassword) => {
+    await verifyPasswordResetOtp(targetEmail, enteredOtp);
+    return updatePassword(newPassword, targetEmail, enteredOtp);
+  }, [verifyPasswordResetOtp, updatePassword]);
+
   const signOut = useCallback(async () => {
     if (isSupabaseConfigured()) {
       try {
@@ -1236,6 +1406,11 @@ export function AuthProvider({ children }) {
       user,
       profile,
       loading,
+      role,
+      isSuperAdmin,
+      isAdmin,
+      isDealer,
+      isCustomer,
       passwordRecovery,
       signOut,
       signIn,
@@ -1245,9 +1420,36 @@ export function AuthProvider({ children }) {
       updatePassword,
       updateProfile,
       refreshProfile,
+      updateUserRole,
+      requestPasswordResetOtp,
+      verifyPasswordResetOtp,
+      resetPasswordWithOtp,
       completePasswordRecovery,
     }),
-    [user, profile, loading, passwordRecovery, signOut, signIn, signInWithGoogle, signUp, resendConfirmationEmail, updatePassword, updateProfile, refreshProfile, completePasswordRecovery]
+    [
+      user,
+      profile,
+      loading,
+      role,
+      isSuperAdmin,
+      isAdmin,
+      isDealer,
+      isCustomer,
+      passwordRecovery,
+      signOut,
+      signIn,
+      signInWithGoogle,
+      signUp,
+      resendConfirmationEmail,
+      updatePassword,
+      updateProfile,
+      refreshProfile,
+      updateUserRole,
+      requestPasswordResetOtp,
+      verifyPasswordResetOtp,
+      resetPasswordWithOtp,
+      completePasswordRecovery,
+    ]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

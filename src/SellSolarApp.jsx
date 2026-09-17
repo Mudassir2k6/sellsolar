@@ -95,6 +95,10 @@ import DealersPage from './views/DealersPage';
 import ListingPhotoUploader from './components/ListingPhotoUploader';
 import { listingImages, uploadListingPhotos } from './lib/images';
 import GlobalNavbarSearch from './components/GlobalNavbarSearch';
+import { SiteSettingsProvider, useSiteSettings } from './context/SiteSettingsContext';
+import FloatingWhatsAppWidget from './components/FloatingWhatsAppWidget';
+import AdminSuperDashboard from './components/AdminSuperDashboard';
+import { recordPageView, recordProductView } from './services/analyticsService';
 
 function Xy({
   onNavigate:t,currentPage:e,onSelectListing:selList,onSearchSubmit:searchSub
@@ -319,10 +323,10 @@ function Xy({
                   onClick:()=>h("dealers"),className:"flex w-full items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx(Store,{
                     className:"h-4 w-4 text-gray-400"
                   }),"View Dealers"]
-                }),(u==null?void 0:u.is_admin)&&jsxs("button",{
-                  onClick:()=>h("admin-dashboard"),className:"flex w-full items-center gap-2 px-4 py-2.5 text-sm font-medium text-error-600 dark:text-error-400 hover:bg-error-50 dark:hover:bg-error-950/40",children:[jsx(ShieldCheck,{
+                }),(u?.is_admin || u?.is_super_admin || u?.role === 'super_admin' || u?.role === 'admin' || c?.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase())&&jsxs("button",{
+                  onClick:()=>h("admin-dashboard"),className:"flex w-full items-center gap-2 px-4 py-2.5 text-sm font-bold text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/40",children:[jsx(ShieldCheck,{
                     className:"h-4 w-4"
-                  }),"Admin Dashboard"]
+                  }),(u?.is_super_admin || u?.role === 'super_admin' || c?.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase()) ? "👑 Super Admin Suite" : "🛡️ Admin Dashboard"]
                 }),jsxs("button",{
                   onClick:p,className:"flex w-full items-center gap-2 border-t border-gray-100 dark:border-gray-800 px-4 py-2.5 text-sm font-medium text-error-600 dark:text-error-400 hover:bg-error-50 dark:hover:bg-error-950/40",children:[jsx(LogOut,{
                     className:"h-4 w-4"
@@ -1208,12 +1212,16 @@ function ax({
             s.currentTarget.src = getEquipmentFallbackImage(t.category, t.title);
           }
         }),jsxs("div",{
-          className:"absolute left-2.5 top-2.5 flex gap-1.5",children:[jsx("span",{
-            className:`rounded px-2 py-0.5 text-[11px] font-bold shadow-2xs ${r?"bg-warning-500 text-white":"bg-secondary-500 text-white"}`,children:r?"Used":"New"
-          }),t.featured&&jsxs("span",{
-            className:"flex items-center gap-1 rounded bg-primary-500 px-2 py-0.5 text-[11px] font-bold text-white shadow-2xs",children:[jsx(Tag,{
-              className:"h-3 w-3"
+          className:"absolute left-2.5 top-2.5 flex gap-1.5 flex-wrap items-center",children:[jsx("span",{
+            className:`rounded px-2 py-0.5 text-[10px] font-black uppercase shadow-2xs ${r?"bg-warning-500 text-white":"bg-secondary-500 text-white"}`,children:r?"Used":"New"
+          }),(t.featured || t.is_featured)&&jsxs("span",{
+            className:"flex items-center gap-1 rounded bg-amber-500 px-2 py-0.5 text-[10px] font-black uppercase text-white shadow-2xs",children:[jsx(Star,{
+              className:"h-2.5 w-2.5 fill-current"
             }),"Featured"]
+          }),(t.is_hot_sell)&&jsxs("span",{
+            className:"flex items-center gap-1 rounded bg-rose-500 px-2 py-0.5 text-[10px] font-black uppercase text-white shadow-2xs",children:[jsx(Flame,{
+              className:"h-2.5 w-2.5 fill-current"
+            }),"Hot Sell"]
           })]
         }),jsxs("div",{
           className:"absolute right-2.5 top-2.5 flex items-center gap-1 rounded bg-black/50 px-2 py-0.5 text-[11px] font-medium text-white backdrop-blur-sm",children:[jsx(Eye,{
@@ -4754,6 +4762,7 @@ function _x({
 
   useEffect(() => {
     applyPageSeo(n, { listingId: a });
+    recordPageView(typeof window !== 'undefined' ? window.location.pathname : '/');
   }, [n, a]);
 
   useEffect(() => {
@@ -4787,6 +4796,7 @@ function _x({
 
   const u = d => {
     l(d);
+    recordProductView(d);
     s("listing-detail");
     try {
       const newPath = pageToPath("listing-detail", d);
@@ -4899,14 +4909,10 @@ function _x({
     onBack: () => o("home"), onPosted: () => o("home")
   }) : jsx(Bn, {
     onSuccess: () => o("post-ad"), onBack: () => o("home")
-  }) : n === "admin" ? !t || !(e != null && e.is_admin) ? jsx(Bn, {
-    onSuccess: () => o("admin"), onBack: () => o("home")
-  }) : jsx(xx, {
-    onBack: () => o("home")
-  }) : n === "admin-dashboard" ? !t || !(e != null && e.is_admin) ? jsx(Bn, {
+  }) : n === "admin" || n === "admin-dashboard" ? (!t || !(e != null && (e.is_admin || e.is_super_admin || e.role === 'super_admin' || e.role === 'admin' || t.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase()))) ? jsx(Bn, {
     onSuccess: () => o("admin-dashboard"), onBack: () => o("home")
-  }) : jsx(vx, {
-    onBack: () => o("home")
+  }) : jsx(AdminSuperDashboard, {
+    onBack: () => o("home"), onNavigateToListing: u
   }) : n === "dashboard" ? t ? jsx(wx, {
     onBack: () => o("home")
   }) : jsx(Bn, {
@@ -5097,7 +5103,8 @@ function _x({
   }) : jsxs("div", {
     className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
       onNavigate: d => {
-        d === "post-ad" ? c() : d === "admin" || d === "admin-dashboard" ? t && (e != null && e.is_admin) ? o("admin-dashboard") : o("login") : d === "password" || d === "change-password" ? o("password") : o(d === "dashboard" ? t ? "dashboard" : "login" : d)
+        const isAdm = t && (e?.is_admin || e?.is_super_admin || e?.role === 'super_admin' || e?.role === 'admin' || t.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase());
+        d === "post-ad" ? c() : d === "admin" || d === "admin-dashboard" ? isAdm ? o("admin-dashboard") : o("login") : d === "password" || d === "change-password" ? o("password") : o(d === "dashboard" ? t ? "dashboard" : "login" : d)
       }, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
     }), jsx("main", {
       id: "main",
@@ -5111,11 +5118,14 @@ function _x({
 
   const showFloatingPostBtn = !r && !pr && n !== "post-ad" && n !== "login" && n !== "password" && n !== "forgot-password" && n !== "reset-password";
 
-  return jsxs(Fragment, {
-    children: [
-      pageContent,
-      showFloatingPostBtn ? jsx(FloatingPostAdButton, { onPostAd: c }) : null
-    ]
+  return jsx(SiteSettingsProvider, {
+    children: jsxs(Fragment, {
+      children: [
+        pageContent,
+        showFloatingPostBtn ? jsx(FloatingPostAdButton, { onPostAd: c }) : null,
+        jsx(FloatingWhatsAppWidget, {})
+      ]
+    })
   });
 }
 

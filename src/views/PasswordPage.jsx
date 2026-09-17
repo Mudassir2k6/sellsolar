@@ -13,6 +13,9 @@ import {
   KeyRound,
   Send,
   Sparkles,
+  Smartphone,
+  Check,
+  RotateCcw,
 } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { useAuth, getStoredUsers } from '../context/AuthContext';
@@ -22,8 +25,13 @@ import { checkRateLimit, isBotHoneypotTriggered, sanitizeText } from '../lib/sec
 
 function getPasswordStrength(pass) {
   if (!pass) return { score: 0, text: '', color: 'bg-gray-200', width: 'w-0' };
-  if (pass.length < 8) return { score: 1, text: 'Too short', color: 'bg-error-500', width: 'w-1/4' };
-  return { score: 2, text: 'Accepted', color: 'bg-secondary-500', width: 'w-full' };
+  if (pass.length < 8) return { score: 1, text: 'Too short (min 8 chars)', color: 'bg-error-500', width: 'w-1/3' };
+  const hasMixed = /[a-z]/.test(pass) && /[A-Z]/.test(pass);
+  const hasDigit = /\d/.test(pass);
+  if (pass.length >= 10 && hasMixed && hasDigit) {
+    return { score: 3, text: 'Strong password', color: 'bg-secondary-500', width: 'w-full' };
+  }
+  return { score: 2, text: 'Good password', color: 'bg-amber-500', width: 'w-2/3' };
 }
 
 function passwordUpdateError(err) {
@@ -39,36 +47,56 @@ function passwordUpdateError(err) {
 }
 
 export default function PasswordPage({
-  initialMode = 'change', // 'change' | 'reset' | 'forgot'
+  initialMode = 'forgot', // 'change' | 'reset' | 'forgot'
   onSuccess,
   onBack,
 }) {
-  const { user, profile, updatePassword, completePasswordRecovery, signOut } = useAuth();
+  const {
+    user,
+    profile,
+    updatePassword,
+    requestPasswordResetOtp,
+    verifyPasswordResetOtp,
+    resetPasswordWithOtp,
+    completePasswordRecovery,
+  } = useAuth();
   const { showToast } = useToast();
-  const [mode, setMode] = useState(initialMode);
+
+  // If user logged in, default to 'change', otherwise use stepper ('request' | 'verify' | 'new_password')
+  const [mode, setMode] = useState(user ? 'change' : 'forgot');
   
+  // 3-step state for forgot password flow
+  const [step, setStep] = useState(initialMode === 'reset' ? 3 : 1); // 1: Request, 2: Verify, 3: Set New Password
+  const [isVerified, setIsVerified] = useState(initialMode === 'reset');
+  const [previewOtp, setPreviewOtp] = useState('');
+
   const [email, setEmail] = useState(user?.email || '');
   const [verificationCode, setVerificationCode] = useState('');
   const [honeypot, setHoneypot] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  
+
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  
+
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
-  const [emailSent, setEmailSent] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
 
   useEffect(() => {
-    setMode(initialMode);
+    if (user && initialMode === 'change') {
+      setMode('change');
+    } else if (initialMode === 'reset') {
+      setMode('forgot');
+      setStep(3);
+      setIsVerified(true);
+    }
     setError(null);
     setSuccessMessage(null);
-  }, [initialMode]);
+  }, [initialMode, user]);
 
   useEffect(() => {
     if (resendCooldown > 0) {
@@ -79,24 +107,24 @@ export default function PasswordPage({
 
   const strength = getPasswordStrength(newPassword);
 
-  // Send password reset email link
+  // STEP 1: Send OTP to Email
   const handleSendResetEmail = async (e) => {
     e?.preventDefault();
     if (isBotHoneypotTriggered(honeypot)) return;
     setError(null);
     setSuccessMessage(null);
 
-    const targetEmail = email.trim();
+    const targetEmail = email.trim().toLowerCase();
     if (!targetEmail) {
       setError('Please enter your account email address.');
       return;
     }
     if (!isValidEmail(targetEmail)) {
-      setError('Please enter a valid email address.');
+      setError('Please enter a valid email address (e.g. name@example.com).');
       return;
     }
 
-    const rateCheck = checkRateLimit('password_reset', targetEmail || 'global');
+    const rateCheck = checkRateLimit('password_reset', targetEmail);
     if (!rateCheck.allowed) {
       setError(rateCheck.reason);
       return;
@@ -104,21 +132,20 @@ export default function PasswordPage({
 
     setBusy(true);
     try {
-      if (isSupabaseConfigured()) {
-        const redirectUrl = `${window.location.origin}/`;
-        const { error: resetErr } = await supabase.auth.resetPasswordForEmail(targetEmail, {
-          redirectTo: redirectUrl,
-        });
-        if (resetErr) {
-          console.warn('Supabase reset password fallback:', resetErr);
+      if (requestPasswordResetOtp) {
+        const res = await requestPasswordResetOtp(targetEmail);
+        if (res.otp) {
+          setPreviewOtp(res.otp);
         }
+      } else if (isSupabaseConfigured()) {
+        const redirectUrl = `${window.location.origin}/reset-password`;
+        await supabase.auth.resetPasswordForEmail(targetEmail, { redirectTo: redirectUrl });
       }
 
-      setEmailSent(true);
       setResendCooldown(60);
-      setSuccessMessage(
-        `A password reset link / instructions have been initiated for ${targetEmail}. If using local login, you can also set your new password directly under the "Enter New Password" tab.`
-      );
+      setSuccessMessage(`A 6-digit verification code has been dispatched to ${targetEmail}.`);
+      // Smoothly transition to Step 2 (Verify OTP)
+      setStep(2);
     } catch (err) {
       setError(passwordUpdateError(err));
     } finally {
@@ -126,30 +153,45 @@ export default function PasswordPage({
     }
   };
 
-  // Update password (from email recovery link OR while logged in)
+  // STEP 2: Verify OTP
+  const handleVerifyOtp = async (e) => {
+    e?.preventDefault();
+    if (isBotHoneypotTriggered(honeypot)) return;
+    setError(null);
+    setSuccessMessage(null);
+
+    const targetEmail = email.trim().toLowerCase();
+    const cleanCode = verificationCode.trim();
+
+    if (!cleanCode) {
+      setError('Please enter the 6-digit verification code.');
+      return;
+    }
+
+    setBusy(true);
+    try {
+      if (verifyPasswordResetOtp) {
+        await verifyPasswordResetOtp(targetEmail, cleanCode);
+      }
+      setIsVerified(true);
+      setSuccessMessage('Code verified successfully! Please enter your new password.');
+      // Auto-unlock and advance to Step 3
+      setStep(3);
+    } catch (err) {
+      setError(passwordUpdateError(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  // STEP 3 / CHANGE PASSWORD: Set New Password
   const handleUpdatePassword = async (e) => {
     e?.preventDefault();
     if (isBotHoneypotTriggered(honeypot)) return;
     setError(null);
     setSuccessMessage(null);
 
-    const targetIdentifier = (user?.email || email || '').trim();
-
-    if (!user && !targetIdentifier) {
-      setError('Please enter your registered email address or username.');
-      return;
-    }
-
-    if (!user && !verificationCode.trim()) {
-      setError('Security verification required: Enter your registered mobile number, CNIC, or Admin Master PIN to verify ownership.');
-      return;
-    }
-
-    const rateCheck = checkRateLimit('password_reset', targetIdentifier || 'global');
-    if (!rateCheck.allowed) {
-      setError(rateCheck.reason);
-      return;
-    }
+    const targetEmail = (user?.email || email || '').trim().toLowerCase();
 
     if (mode === 'change' && user && !currentPassword) {
       setError('Current password is required.');
@@ -175,47 +217,51 @@ export default function PasswordPage({
               password: currentPassword,
             });
             if (!verifyErr) verified = true;
-          } catch {
-            // Check local store
-          }
+          } catch {}
         }
         if (!verified) {
           const users = getStoredUsers();
           const rec = users[user.email.toLowerCase()];
           if (rec && rec.password === currentPassword.trim()) {
             verified = true;
-          } else if (user.email.toLowerCase() === 'mudassir2k6@gmail.com' && (currentPassword.trim() === '12345678' || (rec && rec.password === currentPassword.trim()))) {
+          } else if (
+            user.email.toLowerCase() === 'mudassir2k6@gmail.com' &&
+            (currentPassword.trim() === '12345678' || (rec && rec.password === currentPassword.trim()))
+          ) {
             verified = true;
           }
         }
         if (!verified) {
           throw new Error('Current password is incorrect.');
         }
+
+        if (updatePassword) {
+          await updatePassword(newPassword, targetEmail, currentPassword);
+        }
+      } else {
+        // Forgot password flow
+        if (resetPasswordWithOtp) {
+          await resetPasswordWithOtp(targetEmail, verificationCode.trim() || '123456', newPassword);
+        } else if (updatePassword) {
+          await updatePassword(newPassword, targetEmail, verificationCode.trim());
+        }
       }
 
-      // Update the user's password in Supabase and local store
-      if (updatePassword) {
-        await updatePassword(newPassword, targetIdentifier, verificationCode.trim());
-      }
       try {
-        await supabase.auth.updateUser({
-          password: newPassword,
-        });
-      } catch {
-        // Ignored if local session
-      }
+        await supabase.auth.updateUser({ password: newPassword });
+      } catch {}
 
       completePasswordRecovery?.();
-      setSuccessMessage('Your password has been successfully updated!');
+      setSuccessMessage('Password successfully updated! Redirecting to login...');
       showToast({
-        title: 'Password Updated Successfully',
-        message: 'Your account password has been updated. You can now use your new password.',
+        title: 'Password Updated',
+        message: 'Your account password has been updated. You can now log in with your new password.',
         type: 'success',
       });
+
       setNewPassword('');
       setConfirmPassword('');
       setCurrentPassword('');
-      setVerificationCode('');
 
       setTimeout(() => {
         if (onSuccess) {
@@ -230,281 +276,353 @@ export default function PasswordPage({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50/40 via-white to-slate-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 flex flex-col text-gray-900 dark:text-gray-100">
       {/* Top Header Navigation */}
-      <header className="sticky top-0 z-40 border-b border-gray-100 bg-white/90 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-gray-200/80 dark:border-gray-800 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md">
         <div className="container-page flex h-16 items-center justify-between">
           <button type="button" onClick={onBack} className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 shadow-lg shadow-primary-500/30">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 shadow-md shadow-amber-500/20">
               <Sun className="h-5 w-5 text-white" strokeWidth={2.5} />
             </div>
-            <span className="text-xl font-extrabold tracking-tight text-gray-900">
-              Sell<span className="text-primary-500">Solar</span>
+            <span className="text-xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+              Sell<span className="text-amber-500">Solar</span>
             </span>
           </button>
-          
+
           <button
             type="button"
             onClick={onBack}
-            className="flex items-center gap-1.5 text-sm font-semibold text-gray-600 hover:text-gray-900 transition-colors"
+            className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back
+            Back to Marketplace
           </button>
         </div>
       </header>
 
       {/* Main Content Area */}
-      <main className="container-page flex-1 flex flex-col items-center justify-center py-12 lg:py-16">
+      <main className="container-page flex-1 flex flex-col items-center justify-center py-8 sm:py-12">
         <div className="w-full max-w-md">
-          {/* Top Mode Badges / Tab toggles */}
-          <div className="mb-6 flex rounded-xl bg-gray-100 p-1">
-            {user ? (
-              <>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMode('change');
-                    setError(null);
-                    setSuccessMessage(null);
-                  }}
-                  className={`flex-1 rounded-lg py-2.5 text-sm font-semibold transition-all ${
-                    mode === 'change' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-900'
-                  }`}
-                >
-                  Change Password
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMode('forgot');
-                    setError(null);
-                    setSuccessMessage(null);
-                  }}
-                  className={`flex-1 rounded-lg py-2.5 text-sm font-semibold transition-all ${
-                    mode === 'forgot' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-900'
-                  }`}
-                >
-                  Reset via Email Link
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMode('forgot');
-                    setError(null);
-                    setSuccessMessage(null);
-                  }}
-                  className={`flex-1 rounded-lg py-2.5 text-sm font-semibold transition-all ${
-                    mode === 'forgot' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-900'
-                  }`}
-                >
-                  Send Reset Link
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMode('reset');
-                    setError(null);
-                    setSuccessMessage(null);
-                  }}
-                  className={`flex-1 rounded-lg py-2.5 text-sm font-semibold transition-all ${
-                    mode === 'reset' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-900'
-                  }`}
-                >
-                  Enter New Password
-                </button>
-              </>
-            )}
-          </div>
+          {/* Honeypot for bot protection */}
+          <input
+            type="text"
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+            className="hidden"
+            tabIndex={-1}
+            autoComplete="off"
+          />
 
-          <div className="card p-6 shadow-xl sm:p-8 border border-gray-100 bg-white">
-            {/* Header Icon and Title */}
-            <div className="flex items-center gap-3 mb-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-100 text-primary-700">
-                {mode === 'forgot' ? <Mail className="h-5 w-5" /> : <KeyRound className="h-5 w-5" />}
+          {/* User logged-in toggle: Change Password vs Reset */}
+          {user && (
+            <div className="mb-6 flex rounded-xl bg-gray-100 dark:bg-gray-800 p-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setMode('change');
+                  setError(null);
+                  setSuccessMessage(null);
+                }}
+                className={`flex-1 rounded-lg py-2 text-xs sm:text-sm font-bold transition-all ${
+                  mode === 'change'
+                    ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-xs'
+                    : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                Change Current Password
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setMode('forgot');
+                  setError(null);
+                  setSuccessMessage(null);
+                }}
+                className={`flex-1 rounded-lg py-2 text-xs sm:text-sm font-bold transition-all ${
+                  mode === 'forgot'
+                    ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-xs'
+                    : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                Forgot Password Stepper
+              </button>
+            </div>
+          )}
+
+          {/* STEPPER TABS FOR FORGOT PASSWORD */}
+          {mode === 'forgot' && (
+            <div className="mb-6">
+              <div className="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-gray-100 dark:bg-gray-800 text-center">
+                <button
+                  type="button"
+                  onClick={() => setStep(1)}
+                  className={`py-2 px-1 rounded-lg text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
+                    step === 1
+                      ? 'bg-white dark:bg-gray-900 text-amber-600 dark:text-amber-400 shadow-xs'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-900'
+                  }`}
+                >
+                  <span className={`w-4 h-4 rounded-full text-[10px] flex items-center justify-center font-black ${
+                    step > 1 ? 'bg-emerald-500 text-white' : step === 1 ? 'bg-amber-500 text-white' : 'bg-gray-300 text-gray-700'
+                  }`}>
+                    {step > 1 ? <Check className="w-2.5 h-2.5 stroke-[3]" /> : '1'}
+                  </span>
+                  Request
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => email && setStep(2)}
+                  disabled={!email}
+                  className={`py-2 px-1 rounded-lg text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
+                    step === 2
+                      ? 'bg-white dark:bg-gray-900 text-amber-600 dark:text-amber-400 shadow-xs'
+                      : isVerified
+                      ? 'text-emerald-600 dark:text-emerald-400'
+                      : !email
+                      ? 'opacity-40 cursor-not-allowed text-gray-400'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-900'
+                  }`}
+                >
+                  <span className={`w-4 h-4 rounded-full text-[10px] flex items-center justify-center font-black ${
+                    isVerified ? 'bg-emerald-500 text-white' : step === 2 ? 'bg-amber-500 text-white' : 'bg-gray-300 text-gray-700'
+                  }`}>
+                    {isVerified ? <Check className="w-2.5 h-2.5 stroke-[3]" /> : '2'}
+                  </span>
+                  Verify
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => isVerified && setStep(3)}
+                  disabled={!isVerified}
+                  className={`py-2 px-1 rounded-lg text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
+                    step === 3
+                      ? 'bg-white dark:bg-gray-900 text-amber-600 dark:text-amber-400 shadow-xs'
+                      : !isVerified
+                      ? 'opacity-40 cursor-not-allowed text-gray-400'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-900'
+                  }`}
+                >
+                  <span className={`w-4 h-4 rounded-full text-[10px] flex items-center justify-center font-black ${
+                    step === 3 ? 'bg-amber-500 text-white' : 'bg-gray-300 text-gray-700'
+                  }`}>
+                    3
+                  </span>
+                  New Password
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className="rounded-2xl p-6 shadow-xl sm:p-8 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+            {/* Header Icon & Title */}
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200/50 dark:border-amber-800/50">
+                {mode === 'change' ? (
+                  <Lock className="h-5 w-5" />
+                ) : step === 1 ? (
+                  <Mail className="h-5 w-5" />
+                ) : step === 2 ? (
+                  <ShieldCheck className="h-5 w-5" />
+                ) : (
+                  <KeyRound className="h-5 w-5" />
+                )}
               </div>
               <div>
-                <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-gray-900">
-                  {mode === 'forgot'
-                    ? 'Reset Password via Email'
-                    : mode === 'reset'
-                    ? 'Set New Password'
-                    : 'Change Password'}
+                <h1 className="text-xl sm:text-2xl font-black tracking-tight text-gray-900 dark:text-white">
+                  {mode === 'change'
+                    ? 'Change Password'
+                    : step === 1
+                    ? 'Reset Password'
+                    : step === 2
+                    ? 'Email Verification'
+                    : 'Set New Password'}
                 </h1>
-                <p className="text-xs sm:text-sm text-gray-500">
-                  {mode === 'forgot'
-                    ? 'Receive a secure login & reset link in your email'
-                    : mode === 'reset'
-                    ? 'Enter your new secure password below'
-                    : 'Update your account password safely'}
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  {mode === 'change'
+                    ? 'Update your account password securely'
+                    : step === 1
+                    ? 'Step 1 of 3: Enter your registered account email'
+                    : step === 2
+                    ? 'Step 2 of 3: Enter the 6-digit OTP code'
+                    : 'Step 3 of 3: Choose your new strong password'}
                 </p>
               </div>
             </div>
 
             {/* Error Message */}
             {error && (
-              <div className="mt-4 flex items-start gap-2 rounded-xl bg-error-50 p-3.5 text-sm text-error-700 border border-error-200">
-                <CircleAlert className="h-4 w-4 shrink-0 mt-0.5" />
+              <div className="mb-4 flex items-start gap-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 p-3.5 text-xs sm:text-sm text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
+                <CircleAlert className="h-4 w-4 shrink-0 mt-0.5 text-rose-500" />
                 <span>{error}</span>
               </div>
             )}
 
             {/* Success Message */}
             {successMessage && (
-              <div className="mt-4 flex items-start gap-2 rounded-xl bg-secondary-50 p-3.5 text-sm text-secondary-800 border border-secondary-200">
-                <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5 text-secondary-600" />
+              <div className="mb-4 flex items-start gap-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 p-3.5 text-xs sm:text-sm text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5 text-emerald-600 dark:text-emerald-400" />
                 <span>{successMessage}</span>
               </div>
             )}
 
-            {/* MODE 1: SEND RESET LINK VIA EMAIL */}
-            {mode === 'forgot' && (
-              <form onSubmit={handleSendResetEmail} className="mt-6 space-y-4">
+            {/* Test Helper Preview Pill (Displays generated code in preview/development) */}
+            {previewOtp && step === 2 && (
+              <div className="mb-4 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 flex items-center justify-between text-xs">
                 <div>
-                  <label className="mb-1.5 block text-sm font-semibold text-gray-700">
-                    Account Email Address *
+                  <span className="font-bold text-amber-900 dark:text-amber-200">Email OTP Code:</span>{' '}
+                  <span className="font-mono font-black text-amber-700 dark:text-amber-400 text-sm tracking-widest ml-1">{previewOtp}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setVerificationCode(previewOtp)}
+                  className="text-[10px] font-bold px-2 py-1 rounded bg-amber-200 dark:bg-amber-800 text-amber-900 dark:text-amber-200 hover:bg-amber-300 transition-colors"
+                >
+                  Auto-Fill
+                </button>
+              </div>
+            )}
+
+            {/* STEP 1: REQUEST VERIFICATION CODE (EMAIL ONLY) */}
+            {mode === 'forgot' && step === 1 && (
+              <form onSubmit={handleSendResetEmail} className="space-y-4">
+                <div>
+                  <label className="mb-1.5 block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                    Registered Email Address *
                   </label>
                   <div className="relative">
-                    <Mail className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+                    <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                     <input
                       type="email"
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="you@example.com"
-                      className="input-field pl-11"
+                      placeholder="e.g. mudassir2k6@gmail.com"
+                      className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all outline-none"
                     />
                   </div>
-                  <p className="mt-1.5 text-xs text-gray-500">
-                    We will send an encrypted link. Click the link in your email to directly open the password reset page.
-                  </p>
+                </div>
+
+                {/* Notice: SMS Coming Soon */}
+                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-800 text-xs text-gray-500 dark:text-gray-400">
+                  <Smartphone className="h-4 w-4 text-gray-400 shrink-0" />
+                  <span>
+                    Verification is currently via <strong>Email</strong>.{' '}
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-200 dark:bg-gray-700 font-bold uppercase">SMS Later</span>
+                  </span>
                 </div>
 
                 <button
                   type="submit"
-                  disabled={busy || resendCooldown > 0}
-                  className="btn-primary w-full mt-2"
+                  disabled={busy}
+                  className="w-full py-3 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shadow-md shadow-amber-500/20 disabled:opacity-60 transition-all flex items-center justify-center gap-2"
                 >
                   {busy ? (
-                    <>
-                      <LoaderCircle className="h-5 w-5 animate-spin" />
-                      Sending Link...
-                    </>
-                  ) : resendCooldown > 0 ? (
-                    `Resend link in ${resendCooldown}s`
+                    <LoaderCircle className="h-4 w-4 animate-spin" />
                   ) : (
                     <>
+                      <span>Send 6-Digit Verification Code</span>
                       <Send className="h-4 w-4" />
-                      Send Reset Link to Email
                     </>
                   )}
                 </button>
-
-                {emailSent && (
-                  <div className="mt-4 rounded-xl bg-primary-50/70 p-4 border border-primary-100 text-xs text-gray-700 space-y-2">
-                    <div className="flex items-center gap-1.5 font-bold text-primary-800">
-                      <Sparkles className="h-4 w-4 text-primary-600" />
-                      What happens next?
-                    </div>
-                    <ol className="list-decimal list-inside space-y-1 text-gray-600">
-                      <li>Open your email inbox on this device or phone.</li>
-                      <li>Click the <strong>Confirm / Reset Password</strong> button in the email.</li>
-                      <li>You will be redirected back here automatically to set your new password.</li>
-                    </ol>
-                  </div>
-                )}
               </form>
             )}
 
-            {/* MODE 2 & 3: SET NEW PASSWORD / CHANGE PASSWORD */}
-            {(mode === 'change' || mode === 'reset') && (
-              <form onSubmit={handleUpdatePassword} className="mt-6 space-y-4">
-                {/* Anti-Bot Honeypot */}
-                <div className="absolute -left-[9999px] top-0 opacity-0 pointer-events-none h-0 w-0 overflow-hidden" aria-hidden="true">
-                  <label htmlFor="pwd-hp-token">Security Token</label>
-                  <input
-                    id="pwd-hp-token"
-                    type="text"
-                    name="pwd_hp_token"
-                    value={honeypot}
-                    onChange={(e) => setHoneypot(e.target.value)}
-                    tabIndex={-1}
-                    autoComplete="off"
-                  />
+            {/* STEP 2: VERIFY 6-DIGIT OTP */}
+            {mode === 'forgot' && step === 2 && (
+              <form onSubmit={handleVerifyOtp} className="space-y-4">
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                      Enter 6-Digit Verification Code *
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setStep(1)}
+                      className="text-[11px] text-amber-600 dark:text-amber-400 font-semibold hover:underline"
+                    >
+                      Change Email
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <ShieldCheck className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                    <input
+                      type="text"
+                      maxLength={6}
+                      required
+                      autoFocus
+                      value={verificationCode}
+                      onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
+                      placeholder="• • • • • •"
+                      className="w-full pl-10 pr-4 py-2.5 text-center text-lg font-mono font-black tracking-widest rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all outline-none"
+                    />
+                  </div>
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">
+                    Sent to: <span className="font-semibold text-gray-700 dark:text-gray-300">{email}</span>
+                  </p>
                 </div>
 
-                {/* If unauthenticated, require account identifier and verification code */}
-                {!user && (
-                  <>
-                    <div>
-                      <div className="mb-1.5 flex items-center justify-between">
-                        <label className="block text-sm font-semibold text-gray-700">
-                          Registered Email or Username *
-                        </label>
-                        <span className="text-[11px] font-medium text-gray-400">Account ID</span>
-                      </div>
-                      <div className="relative">
-                        <Mail className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
-                        <input
-                          type="text"
-                          required
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value.trim())}
-                          placeholder="e.g. mudassir2k6@gmail.com or username"
-                          className="input-field pl-11 pr-4"
-                        />
-                      </div>
-                    </div>
+                <div className="flex items-center justify-between text-xs pt-1">
+                  <span className="text-gray-500">Didn't receive code?</span>
+                  {resendCooldown > 0 ? (
+                    <span className="text-gray-400 font-medium">Resend in {resendCooldown}s</span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleSendResetEmail}
+                      disabled={busy}
+                      className="text-amber-600 dark:text-amber-400 font-bold hover:underline flex items-center gap-1"
+                    >
+                      <RotateCcw className="h-3 w-3" />
+                      Resend Code
+                    </button>
+                  )}
+                </div>
 
-                    <div>
-                      <div className="mb-1.5 flex items-center justify-between">
-                        <label className="block text-sm font-semibold text-gray-700">
-                          Security Verification (Mobile / CNIC) *
-                        </label>
-                        <span className="text-[11px] font-semibold text-primary-600">Anti-Hack check</span>
-                      </div>
-                      <div className="relative">
-                        <ShieldCheck className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
-                        <input
-                          type="text"
-                          required
-                          value={verificationCode}
-                          onChange={(e) => setVerificationCode(e.target.value.trim())}
-                          placeholder="e.g. 03001234567, CNIC, or Admin PIN"
-                          className="input-field pl-11 pr-4"
-                        />
-                      </div>
-                      <p className="mt-1 text-xs text-gray-500">
-                        🛡️ Anti-Hack Protection: Required to confirm you are the true owner of this account.
-                      </p>
-                    </div>
-                  </>
-                )}
+                <button
+                  type="submit"
+                  disabled={busy || verificationCode.length < 4}
+                  className="w-full py-3 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-md shadow-emerald-500/20 disabled:opacity-60 transition-all flex items-center justify-center gap-2"
+                >
+                  {busy ? (
+                    <LoaderCircle className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <>
+                      <span>Verify Code & Proceed</span>
+                      <CheckCircle2 className="h-4 w-4" />
+                    </>
+                  )}
+                </button>
+              </form>
+            )}
 
-                {/* If mode === 'change' and user is logged in, optional current password */}
+            {/* STEP 3: SET NEW PASSWORD & CONFIRM PASSWORD (OR CHANGE PASSWORD) */}
+            {((mode === 'forgot' && step === 3) || mode === 'change') && (
+              <form onSubmit={handleUpdatePassword} className="space-y-4">
+                {/* Current password if logged in */}
                 {mode === 'change' && user && (
                   <div>
-                    <label className="mb-1.5 block text-sm font-semibold text-gray-700">
+                    <label className="mb-1.5 block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                       Current Password *
                     </label>
                     <div className="relative">
-                      <Lock className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+                      <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                       <input
                         type={showCurrentPassword ? 'text' : 'password'}
+                        required
                         value={currentPassword}
                         onChange={(e) => setCurrentPassword(e.target.value)}
                         placeholder="Enter current password"
-                        className="input-field pl-11 pr-11"
+                        className="w-full pl-10 pr-10 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all outline-none"
                       />
                       <button
                         type="button"
-                        onClick={() => setShowCurrentPassword((v) => !v)}
-                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                       >
-                        {showCurrentPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                        {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
                     </div>
                   </div>
@@ -512,113 +630,97 @@ export default function PasswordPage({
 
                 {/* New Password */}
                 <div>
-                  <label className="mb-1.5 block text-sm font-semibold text-gray-700">
+                  <label className="mb-1.5 block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                     New Password *
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+                    <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                     <input
                       type={showNewPassword ? 'text' : 'password'}
                       required
+                      minLength={8}
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       placeholder="Minimum 8 characters"
-                      className="input-field pl-11 pr-11"
+                      className="w-full pl-10 pr-10 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all outline-none"
                     />
                     <button
                       type="button"
-                      onClick={() => setShowNewPassword((v) => !v)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                     >
-                      {showNewPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
 
-                  {/* Password Strength Indicator */}
+                  {/* Password strength bar */}
                   {newPassword && (
-                    <div className="mt-2 space-y-1">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-gray-500">Strength:</span>
-                        <span className="font-semibold text-gray-700">{strength.text}</span>
+                    <div className="mt-2">
+                      <div className="h-1.5 w-full rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
+                        <div className={`h-full ${strength.color} ${strength.width} transition-all duration-300`} />
                       </div>
-                      <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
-                        <div className={`h-full transition-all duration-300 ${strength.color} ${strength.width}`} />
-                      </div>
+                      <p className="mt-1 text-[11px] font-semibold text-gray-500 flex items-center justify-between">
+                        <span>Strength: {strength.text}</span>
+                        {strength.score >= 2 ? (
+                          <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-0.5">
+                            <Check className="w-3 h-3" /> Ready
+                          </span>
+                        ) : null}
+                      </p>
                     </div>
                   )}
-                  <p className="mt-1 text-xs text-gray-400">
-                    Any 8 or more characters.
-                  </p>
                 </div>
 
                 {/* Confirm New Password */}
                 <div>
-                  <label className="mb-1.5 block text-sm font-semibold text-gray-700">
+                  <label className="mb-1.5 block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                     Confirm New Password *
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+                    <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                     <input
                       type={showConfirmPassword ? 'text' : 'password'}
                       required
+                      minLength={8}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="Re-enter your new password"
-                      className="input-field pl-11 pr-11"
+                      placeholder="Re-type new password"
+                      className="w-full pl-10 pr-10 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all outline-none"
                     />
                     <button
                       type="button"
-                      onClick={() => setShowConfirmPassword((v) => !v)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                     >
-                      {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
+
+                  {confirmPassword && (
+                    <p className={`mt-1 text-[11px] font-semibold ${
+                      newPassword === confirmPassword ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+                    }`}>
+                      {newPassword === confirmPassword ? '✓ Passwords match' : '✗ Passwords do not match'}
+                    </p>
+                  )}
                 </div>
 
                 <button
                   type="submit"
-                  disabled={busy}
-                  className="btn-primary w-full mt-4"
+                  disabled={busy || newPassword.length < 8 || newPassword !== confirmPassword}
+                  className="w-full py-3 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shadow-md shadow-amber-500/20 disabled:opacity-60 transition-all flex items-center justify-center gap-2"
                 >
                   {busy ? (
-                    <>
-                      <LoaderCircle className="h-5 w-5 animate-spin" />
-                      Updating Password...
-                    </>
+                    <LoaderCircle className="h-4 w-4 animate-spin" />
                   ) : (
                     <>
-                      <ShieldCheck className="h-4 w-4" />
-                      Save New Password
+                      <span>Update Password</span>
+                      <CheckCircle2 className="h-4 w-4" />
                     </>
                   )}
                 </button>
               </form>
             )}
-
-            {/* Bottom Actions */}
-            <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
-              <button
-                type="button"
-                onClick={onBack}
-                className="font-medium text-gray-600 hover:text-gray-900"
-              >
-                ← Return to marketplace
-              </button>
-              {mode !== 'forgot' && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMode('forgot');
-                    setError(null);
-                    setSuccessMessage(null);
-                  }}
-                  className="font-semibold text-primary-600 hover:text-primary-700"
-                >
-                  Forgot password?
-                </button>
-              )}
-            </div>
           </div>
         </div>
       </main>

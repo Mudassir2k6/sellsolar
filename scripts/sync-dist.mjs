@@ -23,4 +23,12 @@ for (const specialFile of ['_headers', '_redirects']) {
   }
 }
 
+// Ensure auth/callback works with both trailing and non-trailing slash
+const authCallbackHtml = path.join(distDir, 'auth', 'callback.html');
+const authCallbackDir = path.join(distDir, 'auth', 'callback');
+if (fs.existsSync(authCallbackHtml)) {
+  fs.mkdirSync(authCallbackDir, { recursive: true });
+  fs.copyFileSync(authCallbackHtml, path.join(authCallbackDir, 'index.html'));
+}
+
 console.log('[deploy] Synced out/ → dist/ for Cloudflare/Netlify publish compatibility.');

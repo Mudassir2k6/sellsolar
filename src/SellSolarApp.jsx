@@ -435,7 +435,7 @@ function Xy({
   value:"used",label:"Used"
 }];
 function nx({
-  filters:t,onFilterChange:e,onSearch:r,onReset:n,onNavigatePrices:np,onNavigateCalculator:nc
+  filters:t,onFilterChange:e,onSearch:r,onReset:n,onNavigatePrices:np,onNavigateCalculator:nc,onNavigateDealers:nd
 }){
   // Live dynamic ticking animated counters for hero metrics
   const [counts, setCounts] = useState({
@@ -545,7 +545,7 @@ function nx({
                 className:"mx-auto mt-3 max-w-2xl text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed",
                 children:"Search 500+ verified used and new solar panels, inverters and batteries across Pakistan at live market rates."
               }),
-              (nc||np)&&jsxs("div",{
+              (nc||np||nd)&&jsxs("div",{
                 className:"mt-4 flex flex-wrap items-center justify-center gap-2.5",children:[
                   np?jsxs("button",{
                     onClick:np,className:"inline-flex items-center gap-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/60 px-3.5 py-1.5 text-xs font-bold text-amber-800 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/60 transition-all shadow-2xs",children:[
@@ -558,6 +558,13 @@ function nx({
                     onClick:nc,className:"inline-flex items-center gap-1.5 rounded-lg bg-primary-50 dark:bg-primary-950/40 border border-primary-200/80 dark:border-primary-800/60 px-3.5 py-1.5 text-xs font-bold text-primary-800 dark:text-primary-300 hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-all shadow-2xs",children:[
                       jsx(Calculator,{ className:"h-3.5 w-3.5 text-primary-600 dark:text-primary-400" }),
                       "Load Calculator (kW Sizing)",
+                      jsx(ArrowRight,{ className:"h-3 w-3" })
+                    ]
+                  }):null,
+                  nd?jsxs("button",{
+                    onClick:nd,className:"inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/60 px-3.5 py-1.5 text-xs font-bold text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-all shadow-2xs",children:[
+                      jsx(Store,{ className:"h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" }),
+                      "Verified Dealers (80+)",
                       jsx(ArrowRight,{ className:"h-3 w-3" })
                     ]
                   }):null
@@ -4612,20 +4619,15 @@ function _x({
 
   return jsxs(Fragment,{
     children:[jsx(nx,{
-      filters:e,onFilterChange:y,onSearch:w,onReset:j,onNavigatePrices:nav?()=>nav("prices"):void 0,onNavigateCalculator:nav?()=>nav("calculator"):void 0
+      filters:e,onFilterChange:y,onSearch:w,onReset:j,onNavigatePrices:nav?()=>nav("prices"):void 0,onNavigateCalculator:nav?()=>nav("calculator"):void 0,onNavigateDealers:nav?()=>nav("dealers"):void 0
+    }),jsx(lx,{
+      listings:n,loading:a,error:o,totalCount:u,onSelectListing:t,onResetFilters:j,onNavigate:nav,currentCondition:e.condition,onConditionChange:(newCond)=>{
+        y("condition", newCond);
+        p(cnt => cnt + 1);
+      }
     }),jsx(PakWheelsSellCards,{
       onPostAd:()=>nav?nav("post-ad"):void 0,
       onInstall:()=>nav?nav("installation"):void 0
-    }),jsx(ix,{
-      onSelectCategory:C,
-      onSelectCity:(cityName)=>{
-        y("city", cityName);
-        setTimeout(w, 50);
-      },
-      onSelectBrand:(brandName)=>{
-        y("brand", brandName);
-        setTimeout(w, 50);
-      }
     }),nav?jsx("div",{
       className:"container-page my-3.5 sm:my-4",children:jsxs("div",{
         className:"rounded-2xl bg-gradient-to-r from-gray-900 via-gray-850 to-primary-950 p-4 sm:p-5 text-white shadow-md border border-gray-800 transition-all",children:[
@@ -4687,10 +4689,15 @@ function _x({
           }) : null
         ]
       })
-    }):null,jsx(lx,{
-      listings:n,loading:a,error:o,totalCount:u,onSelectListing:t,onResetFilters:j,onNavigate:nav,currentCondition:e.condition,onConditionChange:(newCond)=>{
-        y("condition", newCond);
-        p(cnt => cnt + 1);
+    }):null,jsx(ix,{
+      onSelectCategory:C,
+      onSelectCity:(cityName)=>{
+        y("city", cityName);
+        setTimeout(w, 50);
+      },
+      onSelectBrand:(brandName)=>{
+        y("brand", brandName);
+        setTimeout(w, 50);
       }
     }),jsx(cx,{})]
   })

@@ -5,20 +5,19 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
   Cache-Control: public, max-age=0, must-revalidate
-  CDN-Cache-Control: no-store
-  Cloudflare-CDN-Cache-Control: no-store
+  CDN-Cache-Control: max-age=600, stale-while-revalidate=86400
+  Cloudflare-CDN-Cache-Control: max-age=600, stale-while-revalidate=86400
   X-SellSolar-Framework: nextjs
-
-/
-  Cache-Control: public, max-age=0, must-revalidate
-  CDN-Cache-Control: no-store
-  Cloudflare-CDN-Cache-Control: no-store
-  X-SellSolar-Framework: nextjs
-
-/index.html
-  Cache-Control: public, max-age=0, must-revalidate
-  CDN-Cache-Control: no-store
-  Cloudflare-CDN-Cache-Control: no-store
 
 /_next/static/*
   Cache-Control: public, max-age=31536000, immutable
+
+/_next/static/media/*
+  Cache-Control: public, max-age=31536000, immutable
+  Access-Control-Allow-Origin: *
+
+/favicon*
+  Cache-Control: public, max-age=86400
+
+/og-image*
+  Cache-Control: public, max-age=86400

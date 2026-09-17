@@ -5,6 +5,9 @@ import '@/index.css';
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
   display: 'swap',
+  preload: true,
+  fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+  adjustFontFallback: true,
   variable: '--font-plus-jakarta',
 });
 
@@ -107,6 +110,10 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en-PK" dir="ltr" className={plusJakarta.variable} suppressHydrationWarning>
+      <head>
+        <link rel="preconnect" href="https://zgfycrnmivfybbclflwf.supabase.co" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://zgfycrnmivfybbclflwf.supabase.co" />
+      </head>
       <body className="font-sans antialiased" suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>

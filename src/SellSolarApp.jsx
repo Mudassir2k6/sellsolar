@@ -887,7 +887,7 @@ function ix({
   onSelectCity:onCity,
   onSelectBrand:onBrand
 }){
-  const [activeBrowseTab, setActiveBrowseTab] = useState("category");
+  const [activeBrowseTab, setActiveBrowseTab] = useState("city");
   const [categoryViewMode, setCategoryViewMode] = useState("table"); // "table" by default, or "grid"
 
   const browseCities = [
@@ -1465,70 +1465,21 @@ const ox=[{
 }];
 
 function cx(){
-  return jsxs(Fragment,{
-    children:[
-      jsx("section",{
-        id:"how-it-works",className:"bg-gray-50/70 dark:bg-gray-900/60 py-5 sm:py-6 border-b border-gray-200/60 dark:border-gray-800 transition-colors",children:jsxs("div",{
-          className:"container-page",children:[
-            jsxs("div",{
-              className:"flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 border-b border-gray-200 dark:border-gray-800 pb-2 mb-3.5",children:[
-                jsxs("div",{
-                  children:[
-                    jsx("h2",{
-                      className:"text-lg sm:text-xl font-bold tracking-tight text-gray-900 dark:text-white",children:"Why SellSolar Pakistan"
-                    }),
-                    jsx("p",{
-                      className:"mt-0.5 text-xs text-gray-500 dark:text-gray-400",children:"Pakistan's trusted marketplace for solar panels, inverters & turnkey installation"
-                    })
-                  ]
-                })
-              ]
-            }),
-            jsx("div",{
-              className:"grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3",children:ox.map(t=>{
-                const e=t.icon;
-                return jsxs("div",{
-                  className:"card p-4 sm:p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:bg-gray-900 border border-gray-200/90 dark:border-gray-800 shadow-2xs",children:[
-                    jsx("div",{
-                      className:`mb-3 flex h-10 w-10 items-center justify-center rounded-lg ${t.bg}`,children:jsx(e,{
-                        className:`h-5 w-5 ${t.color}`,strokeWidth:2
-                      })
-                    }),
-                    jsx("h3",{
-                      className:"text-sm sm:text-base font-bold text-gray-900 dark:text-white",children:t.title
-                    }),
-                    jsx("p",{
-                      className:"mt-1 text-xs leading-relaxed text-gray-500 dark:text-gray-400",children:t.desc
-                    })
-                  ]
-                },t.title)
-              })
-            })
-          ]
-        })
-      }),
-      jsx("section",{
-        className:"bg-white dark:bg-gray-950 py-5 sm:py-6 border-b border-gray-200/60 dark:border-gray-800",
-        children:jsxs("div",{
-          className:"container-page max-w-4xl",
-          children:[
-            jsx("h2",{
-              className:"text-lg sm:text-xl font-bold tracking-tight text-gray-900 dark:text-white",
-              children:"Sell and buy used solar equipment across Pakistan"
-            }),
-            jsx("p",{
-              className:"mt-3 text-sm leading-relaxed text-gray-600 dark:text-gray-300",
-              children:"Looking for used solar panels, second-hand inverters or lithium batteries? SellSolar is Pakistan’s marketplace to sell and buy used and new solar equipment with transparent PKR pricing. Filter by Used condition, compare verified sellers in Lahore, Karachi, Islamabad, Rawalpindi, Faisalabad and Multan, then contact them directly on WhatsApp."
-            }),
-            jsx("p",{
-              className:"mt-3 text-sm leading-relaxed text-gray-600 dark:text-gray-300",
-              children:"Post a free ad to sell used solar panels, hybrid inverters, batteries or complete systems. Shoppers can also check today’s per-watt rates and use the free load calculator before buying a 3kW, 5kW, 10kW or 15kW setup from Longi, Jinko, Inverex, Knox, Homage and more."
-            })
-          ]
-        })
+  return jsx("section", {
+    className: "bg-gray-50/80 dark:bg-gray-900/60 py-4 border-b border-gray-200/60 dark:border-gray-800 transition-colors",
+    children: jsx("div", {
+      className: "container-page",
+      children: jsxs("div", {
+        className: "flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-xs font-semibold text-gray-600 dark:text-gray-300",
+        children: [
+          jsxs("div", { className: "flex items-center gap-1.5", children: [jsx(ShieldCheck, { className: "h-4 w-4 text-emerald-500" }), "100% CNIC Verified Sellers"] }),
+          jsxs("div", { className: "flex items-center gap-1.5", children: [jsx(TrendingUp, { className: "h-4 w-4 text-primary-500" }), "Daily Live Wholesale Rates"] }),
+          jsxs("div", { className: "flex items-center gap-1.5", children: [jsx(Zap, { className: "h-4 w-4 text-amber-500" }), "Net-Metering License Support"] }),
+          jsxs("div", { className: "flex items-center gap-1.5", children: [jsx(Users, { className: "h-4 w-4 text-primary-500" }), "10,000+ Active Solar Buyers"] })
+        ]
       })
-    ]
-  })
+    })
+  });
 }const FOOTER_PAGES_KEYS = [
   "about", "careers", "press", "blog",
   "buy-solar", "sell-solar", "how-it-works", "pricing",

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-17T08:12:31.226Z",
+  "timestamp": "2026-09-17T08:23:31.407Z",
   "baseUrl": "https://sellsolar.pk",
   "total": 59,
   "passed": 59,
@@ -8,7 +8,7 @@
     {
       "path": "/",
       "status": 200,
-      "duration": 246,
+      "duration": 252,
       "title": "Solar Price, Used Solar &amp; Inverters Pakistan | SellSolar",
       "hasJsonLd": true,
       "location": "",
@@ -17,7 +17,7 @@
     {
       "path": "/prices",
       "status": 200,
-      "duration": 406,
+      "duration": 373,
       "title": "Solar Price Today Pakistan | Panels Inverters Batteries",
       "hasJsonLd": true,
       "location": "",
@@ -26,7 +26,7 @@
     {
       "path": "/today-prices",
       "status": 301,
-      "duration": 31,
+      "duration": 25,
       "title": "",
       "hasJsonLd": false,
       "location": "/prices",
@@ -35,7 +35,7 @@
     {
       "path": "/calculator",
       "status": 200,
-      "duration": 337,
+      "duration": 569,
       "title": "Solar Load Calculator Pakistan | System Size kW",
       "hasJsonLd": true,
       "location": "",
@@ -44,7 +44,7 @@
     {
       "path": "/load-calculator",
       "status": 301,
-      "duration": 29,
+      "duration": 16,
       "title": "",
       "hasJsonLd": false,
       "location": "/calculator",
@@ -53,7 +53,7 @@
     {
       "path": "/dealers",
       "status": 200,
-      "duration": 772,
+      "duration": 386,
       "title": "Verified Solar Dealers Pakistan | SellSolar",
       "hasJsonLd": true,
       "location": "",
@@ -62,7 +62,7 @@
     {
       "path": "/install",
       "status": 200,
-      "duration": 484,
+      "duration": 399,
       "title": "Solar Installation Request | SellSolar",
       "hasJsonLd": true,
       "location": "",
@@ -71,7 +71,7 @@
     {
       "path": "/installation",
       "status": 301,
-      "duration": 25,
+      "duration": 22,
       "title": "",
       "hasJsonLd": false,
       "location": "/install",
@@ -80,7 +80,7 @@
     {
       "path": "/request-installation",
       "status": 301,
-      "duration": 31,
+      "duration": 33,
       "title": "",
       "hasJsonLd": false,
       "location": "/install",
@@ -89,7 +89,7 @@
     {
       "path": "/login",
       "status": 200,
-      "duration": 434,
+      "duration": 354,
       "title": "Login or Create Account | SellSolar",
       "hasJsonLd": true,
       "location": "",
@@ -98,7 +98,7 @@
     {
       "path": "/post-ad",
       "status": 200,
-      "duration": 375,
+      "duration": 396,
       "title": "Post a Solar Ad | SellSolar",
       "hasJsonLd": true,
       "location": "",
@@ -107,7 +107,7 @@
     {
       "path": "/dashboard",
       "status": 200,
-      "duration": 412,
+      "duration": 563,
       "title": "My Dashboard | SellSolar",
       "hasJsonLd": true,
       "location": "",
@@ -116,7 +116,7 @@
     {
       "path": "/admin",
       "status": 200,
-      "duration": 302,
+      "duration": 268,
       "title": "Admin | SellSolar",
       "hasJsonLd": true,
       "location": "",
@@ -125,7 +125,7 @@
     {
       "path": "/admin-dashboard",
       "status": 200,
-      "duration": 376,
+      "duration": 925,
       "title": "Admin Dashboard | SellSolar",
       "hasJsonLd": true,
       "location": "",
@@ -134,7 +134,7 @@
     {
       "path": "/password",
       "status": 200,
-      "duration": 457,
+      "duration": 267,
       "title": "Change Password | SellSolar",
       "hasJsonLd": true,
       "location": "",
@@ -143,7 +143,7 @@
     {
       "path": "/forgot-password",
       "status": 200,
-      "duration": 262,
+      "duration": 487,
       "title": "Reset Password | SellSolar",
       "hasJsonLd": true,
       "location": "",
@@ -152,7 +152,7 @@
     {
       "path": "/reset-password",
       "status": 200,
-      "duration": 457,
+      "duration": 342,
       "title": "Set New Password | SellSolar",
       "hasJsonLd": true,
       "location": "",
@@ -161,7 +161,7 @@
     {
       "path": "/change-password",
       "status": 301,
-      "duration": 23,
+      "duration": 22,
       "title": "",
       "hasJsonLd": false,
       "location": "/password",
@@ -170,7 +170,7 @@
     {
       "path": "/about",
       "status": 200,
-      "duration": 280,
+      "duration": 575,
       "title": "About Us | SellSolar Pakistan",
       "hasJsonLd": true,
       "location": "",
@@ -179,7 +179,7 @@
     {
       "path": "/about-us",
       "status": 301,
-      "duration": 45,
+      "duration": 22,
       "title": "",
       "hasJsonLd": false,
       "location": "/about",
@@ -188,7 +188,7 @@
     {
       "path": "/careers",
       "status": 200,
-      "duration": 262,
+      "duration": 297,
       "title": "Careers at SellSolar | Solar Jobs PK",
       "hasJsonLd": true,
       "location": "",
@@ -197,7 +197,7 @@
     {
       "path": "/press",
       "status": 200,
-      "duration": 263,
+      "duration": 625,
       "title": "Press &amp; Media | SellSolar Pakistan",
       "hasJsonLd": true,
       "location": "",
@@ -206,7 +206,7 @@
     {
       "path": "/blog",
       "status": 200,
-      "duration": 479,
+      "duration": 392,
       "title": "Solar Blog &amp; Net Metering Guides | SellSolar",
       "hasJsonLd": true,
       "location": "",
@@ -215,7 +215,7 @@
     {
       "path": "/buy-solar",
       "status": 200,
-      "duration": 573,
+      "duration": 714,
       "title": "Buy Used &amp; New Solar Pakistan | Panels Inverters Batteries",
       "hasJsonLd": true,
       "location": "",
@@ -224,7 +224,7 @@
     {
       "path": "/sell-solar",
       "status": 200,
-      "duration": 307,
+      "duration": 304,
       "title": "Sell Used Solar Free in Pakistan | SellSolar",
       "hasJsonLd": true,
       "location": "",
@@ -233,7 +233,7 @@
     {
       "path": "/used-solar",
       "status": 200,
-      "duration": 459,
+      "duration": 406,
       "title": "Used Solar for Sale Pakistan | Panels Inverters Batteries",
       "hasJsonLd": true,
       "location": "",
@@ -242,7 +242,7 @@
     {
       "path": "/solar-price",
       "status": 200,
-      "duration": 484,
+      "duration": 645,
       "title": "Solar Price Pakistan Today | Panel Inverter Battery Rates",
       "hasJsonLd": true,
       "location": "",
@@ -251,7 +251,7 @@
     {
       "path": "/solar-inverter",
       "status": 200,
-      "duration": 279,
+      "duration": 311,
       "title": "Solar Inverter Price &amp; Used Inverters Pakistan",
       "hasJsonLd": true,
       "location": "",
@@ -260,7 +260,7 @@
     {
       "path": "/solar-batteries",
       "status": 200,
-      "duration": 320,
+      "duration": 270,
       "title": "Solar Batteries &amp; Lithium Battery Price Pakistan",
       "hasJsonLd": true,
       "location": "",
@@ -269,7 +269,7 @@
     {
       "path": "/solar-panels",
       "status": 200,
-      "duration": 485,
+      "duration": 266,
       "title": "Solar Panels for Sale Pakistan | Used &amp; New Modules",
       "hasJsonLd": true,
       "location": "",
@@ -278,7 +278,7 @@
     {
       "path": "/how-it-works",
       "status": 200,
-      "duration": 485,
+      "duration": 338,
       "title": "How It Works | SellSolar Pakistan",
       "hasJsonLd": true,
       "location": "",
@@ -287,7 +287,7 @@
     {
       "path": "/pricing",
       "status": 200,
-      "duration": 316,
+      "duration": 304,
       "title": "Pricing &amp; Packages | SellSolar",
       "hasJsonLd": true,
       "location": "",
@@ -296,7 +296,7 @@
     {
       "path": "/help",
       "status": 200,
-      "duration": 434,
+      "duration": 460,
       "title": "Help Center &amp; FAQs | SellSolar",
       "hasJsonLd": true,
       "location": "",
@@ -305,7 +305,7 @@
     {
       "path": "/help-center",
       "status": 301,
-      "duration": 26,
+      "duration": 20,
       "title": "",
       "hasJsonLd": false,
       "location": "/help",
@@ -314,7 +314,7 @@
     {
       "path": "/contact",
       "status": 200,
-      "duration": 362,
+      "duration": 325,
       "title": "Contact Us | SellSolar Pakistan",
       "hasJsonLd": true,
       "location": "",
@@ -323,7 +323,7 @@
     {
       "path": "/contact-us",
       "status": 301,
-      "duration": 24,
+      "duration": 30,
       "title": "",
       "hasJsonLd": false,
       "location": "/contact",
@@ -332,7 +332,7 @@
     {
       "path": "/safety",
       "status": 200,
-      "duration": 365,
+      "duration": 374,
       "title": "Solar Safety Tips | SellSolar Pakistan",
       "hasJsonLd": true,
       "location": "",
@@ -341,7 +341,7 @@
     {
       "path": "/safety-tips",
       "status": 301,
-      "duration": 19,
+      "duration": 20,
       "title": "",
       "hasJsonLd": false,
       "location": "/safety",
@@ -350,7 +350,7 @@
     {
       "path": "/report-issue",
       "status": 200,
-      "duration": 273,
+      "duration": 264,
       "title": "Report an Issue | SellSolar Pakistan",
       "hasJsonLd": true,
       "location": "",
@@ -359,7 +359,7 @@
     {
       "path": "/report",
       "status": 301,
-      "duration": 16,
+      "duration": 37,
       "title": "",
       "hasJsonLd": false,
       "location": "/report-issue",
@@ -368,7 +368,7 @@
     {
       "path": "/terms",
       "status": 200,
-      "duration": 398,
+      "duration": 300,
       "title": "Terms of Service | SellSolar",
       "hasJsonLd": true,
       "location": "",
@@ -377,7 +377,7 @@
     {
       "path": "/terms-of-service",
       "status": 301,
-      "duration": 11,
+      "duration": 21,
       "title": "",
       "hasJsonLd": false,
       "location": "/terms",
@@ -386,7 +386,7 @@
     {
       "path": "/privacy",
       "status": 200,
-      "duration": 287,
+      "duration": 320,
       "title": "Privacy Policy | SellSolar Pakistan",
       "hasJsonLd": true,
       "location": "",
@@ -395,7 +395,7 @@
     {
       "path": "/privacy-policy",
       "status": 301,
-      "duration": 15,
+      "duration": 28,
       "title": "",
       "hasJsonLd": false,
       "location": "/privacy",
@@ -404,7 +404,7 @@
     {
       "path": "/cookies",
       "status": 200,
-      "duration": 570,
+      "duration": 449,
       "title": "Cookie Policy | SellSolar Pakistan",
       "hasJsonLd": true,
       "location": "",
@@ -413,7 +413,7 @@
     {
       "path": "/cookie-policy",
       "status": 301,
-      "duration": 99,
+      "duration": 46,
       "title": "",
       "hasJsonLd": false,
       "location": "/cookies",
@@ -422,7 +422,7 @@
     {
       "path": "/disclaimer",
       "status": 200,
-      "duration": 459,
+      "duration": 270,
       "title": "Disclaimer | SellSolar Pakistan",
       "hasJsonLd": true,
       "location": "",
@@ -431,7 +431,7 @@
     {
       "path": "/robots.txt",
       "status": 200,
-      "duration": 20,
+      "duration": 37,
       "title": "",
       "hasJsonLd": false,
       "location": "",
@@ -440,7 +440,7 @@
     {
       "path": "/sitemap.xml",
       "status": 200,
-      "duration": 19,
+      "duration": 24,
       "title": "",
       "hasJsonLd": false,
       "location": "",
@@ -449,7 +449,7 @@
     {
       "path": "/site.webmanifest",
       "status": 200,
-      "duration": 20,
+      "duration": 33,
       "title": "",
       "hasJsonLd": false,
       "location": "",
@@ -458,7 +458,7 @@
     {
       "path": "/og-image.jpg",
       "status": 200,
-      "duration": 25,
+      "duration": 35,
       "title": "",
       "hasJsonLd": false,
       "location": "",
@@ -467,7 +467,7 @@
     {
       "path": "/favicon.ico",
       "status": 200,
-      "duration": 20,
+      "duration": 33,
       "title": "",
       "hasJsonLd": false,
       "location": "",
@@ -476,16 +476,16 @@
     {
       "path": "/favicon.svg",
       "status": 200,
-      "duration": 50,
+      "duration": 66,
       "title": "",
       "hasJsonLd": false,
       "location": "",
       "ok": true
     },
     {
-      "path": "/_next/static/css/46cfcd82545cc522.css",
+      "path": "/_next/static/css/37b882f4ffd21ca2.css",
       "status": 200,
-      "duration": 25,
+      "duration": 38,
       "title": "",
       "hasJsonLd": false,
       "location": "",
@@ -494,14 +494,14 @@
     {
       "path": "/_next/static/media/636a5ac981f94f8b-s.p.woff2",
       "status": 200,
-      "duration": 41,
+      "duration": 25,
       "title": "",
       "hasJsonLd": false,
       "location": "",
       "ok": true
     },
     {
-      "path": "/_next/static/chunks/webpack-144a972bc67e30cc.js",
+      "path": "/_next/static/chunks/webpack-a5aff9ba0d11e450.js",
       "status": 200,
       "duration": 31,
       "title": "",
@@ -512,7 +512,7 @@
     {
       "path": "/favicon-32x32.png",
       "status": 200,
-      "duration": 39,
+      "duration": 59,
       "title": "",
       "hasJsonLd": false,
       "location": "",
@@ -521,7 +521,7 @@
     {
       "path": "/favicon-16x16.png",
       "status": 200,
-      "duration": 25,
+      "duration": 29,
       "title": "",
       "hasJsonLd": false,
       "location": "",
@@ -530,7 +530,7 @@
     {
       "path": "/apple-touch-icon.png",
       "status": 200,
-      "duration": 33,
+      "duration": 31,
       "title": "",
       "hasJsonLd": false,
       "location": "",

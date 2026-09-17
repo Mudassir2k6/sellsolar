@@ -42,6 +42,26 @@
     @apply rounded-xl bg-white shadow-sm border border-gray-200/90 dark:bg-gray-900 dark:border-gray-800 dark:shadow-none;
   }
 
+  .card-interactive {
+    @apply card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-primary-400/80 dark:hover:border-primary-500/60;
+  }
+
+  .glass-panel {
+    @apply bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border border-gray-200/80 dark:border-gray-800 shadow-sm;
+  }
+
+  .badge-primary {
+    @apply inline-flex items-center gap-1.5 rounded-full bg-primary-50 dark:bg-primary-950/60 border border-primary-200/80 dark:border-primary-800/60 px-3 py-1 text-xs font-bold text-primary-700 dark:text-primary-300;
+  }
+
+  .badge-amber {
+    @apply inline-flex items-center gap-1.5 rounded-full bg-amber-50 dark:bg-amber-950/60 border border-amber-200/80 dark:border-amber-800/60 px-3 py-1 text-xs font-bold text-amber-800 dark:text-amber-300;
+  }
+
+  .badge-emerald {
+    @apply inline-flex items-center gap-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60 px-3 py-1 text-xs font-bold text-emerald-800 dark:text-emerald-300;
+  }
+
   .input-field {
     @apply w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-all duration-150 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-primary-500 dark:focus:ring-primary-950;
   }

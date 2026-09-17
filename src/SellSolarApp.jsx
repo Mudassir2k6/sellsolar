@@ -437,6 +437,8 @@ function Xy({
 function nx({
   filters:t,onFilterChange:e,onSearch:r,onReset:n,onNavigatePrices:np,onNavigateCalculator:nc,onNavigateDealers:nd
 }){
+  const [moreFiltersOpen, setMoreFiltersOpen] = useState(() => Boolean(t.brand || t.condition || t.minPrice || t.maxPrice));
+  const activeExtraFiltersCount = [t.brand, t.condition, t.minPrice, t.maxPrice].filter(Boolean).length;
   // Live dynamic ticking animated counters for hero metrics
   const [counts, setCounts] = useState({
     listings: 512,
@@ -589,47 +591,79 @@ function nx({
                   })
                 }),
                 jsxs("div",{
-                  className:"p-3.5 sm:p-5",children:[
+                  className:"p-3 sm:p-4",children:[
                     jsxs("div",{
-                      className:"relative mb-3.5",children:[
-                        jsx(Search,{ className:"absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" }),
-                        jsx("input",{
-                          type:"text",
-                          placeholder:"Search by title, brand, or model (e.g. Longi Hi-MO 6, Inverex Nitrox 6kW, Narada 48V)...",
-                          value:t.query,
-                          onChange:s=>e("query",s.target.value),
-                          onKeyDown:s=>s.key==="Enter"&&r(),
-                          className:"w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 py-2.5 pl-10 pr-4 text-xs sm:text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-all focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100 dark:focus:ring-primary-950"
-                        })
-                      ]
-                    }),
-                    jsxs("div",{
-                      className:"grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-4 mb-3.5",children:[
+                      className:"flex flex-col sm:flex-row gap-2 items-stretch",children:[
                         jsxs("div",{
-                          children:[
-                            jsx("label",{ className:"mb-1 block text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400", children:"Category" }),
-                            jsx("select",{
-                              value:t.category,onChange:s=>e("category",s.target.value),className:"select-field text-xs",children:Zy.map(s=>jsx("option",{
-                                value:s.value,children:s.value?s.label:"All Categories"
-                              },s.value||"all"))
+                          className:"relative flex-1",children:[
+                            jsx(Search,{ className:"absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" }),
+                            jsx("input",{
+                              type:"text",
+                              placeholder:"Search solar panels, inverters, batteries (e.g. Longi 585W, Inverex 6kW)...",
+                              value:t.query,
+                              onChange:s=>e("query",s.target.value),
+                              onKeyDown:s=>s.key==="Enter"&&r(),
+                              className:"w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 py-2.5 pl-10 pr-4 text-xs sm:text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-all focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100 dark:focus:ring-primary-950"
                             })
                           ]
                         }),
                         jsxs("div",{
-                          children:[
-                            jsx("label",{ className:"mb-1 block text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400", children:"City" }),
+                          className:"relative sm:w-44 shrink-0",children:[
+                            jsx(MapPin,{ className:"absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400 pointer-events-none" }),
                             jsx("select",{
-                              value:t.city,onChange:s=>e("city",s.target.value),className:"select-field text-xs",children:ex.map(s=>jsx("option",{
-                                value:s,children:s||"All Cities"
+                              value:t.city,
+                              onChange:s=>e("city",s.target.value),
+                              className:"w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 py-2.5 pl-8 pr-7 text-xs sm:text-sm text-gray-900 dark:text-gray-100 transition-all focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100 dark:focus:ring-primary-950 font-medium",
+                              children:ex.map(s=>jsx("option",{
+                                value:s,children:s||"All Pakistan"
                               },s||"all-cities"))
                             })
                           ]
                         }),
+                        jsxs("button",{
+                          onClick:r,
+                          className:"btn-primary px-5 py-2.5 text-xs sm:text-sm font-bold shrink-0 shadow-xs flex items-center justify-center gap-1.5",children:[
+                            jsx(Search,{ className:"h-4 w-4" }),
+                            "Search"
+                          ]
+                        })
+                      ]
+                    }),
+                    jsxs("div",{
+                      className:"mt-2.5 flex items-center justify-between gap-2 pt-2 border-t border-gray-100 dark:border-gray-800 text-xs",children:[
+                        jsxs("button",{
+                          type:"button",
+                          onClick:()=>setMoreFiltersOpen(prev=>!prev),
+                          className:`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors font-medium ${
+                            moreFiltersOpen || activeExtraFiltersCount > 0
+                              ? "bg-primary-50 dark:bg-primary-950/60 text-primary-700 dark:text-primary-300 border border-primary-200/80 dark:border-primary-800/60"
+                              : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                          }`,
+                          children:[
+                            jsx(SlidersHorizontal,{ className:"h-3.5 w-3.5" }),
+                            "Filters (Brand, Condition, Price)",
+                            activeExtraFiltersCount > 0 && jsx("span",{
+                              className:"ml-1 rounded-full bg-primary-500 text-white px-1.5 py-0.2 text-[10px] font-bold",
+                              children:activeExtraFiltersCount
+                            }),
+                            jsx(ChevronDown,{ className:`h-3 w-3 transition-transform ${moreFiltersOpen?"rotate-180":""}` })
+                          ]
+                        }),
+                        (activeExtraFiltersCount > 0 || t.city || t.query || t.category) && jsx("button",{
+                          type:"button",
+                          onClick:n,
+                          className:"text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 font-medium transition-colors text-[11px]",
+                          children:"Clear Filters"
+                        })
+                      ]
+                    }),
+                    moreFiltersOpen && jsxs("div",{
+                      className:"mt-3 pt-3 border-t border-gray-100 dark:border-gray-800 grid grid-cols-2 sm:grid-cols-4 gap-2.5 animate-fadeIn",children:[
                         jsxs("div",{
                           children:[
-                            jsx("label",{ className:"mb-1 block text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400", children:"Brand" }),
+                            jsx("label",{ className:"mb-1 block text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400", children:"Brand" }),
                             jsx("select",{
-                              value:t.brand,onChange:s=>e("brand",s.target.value),className:"select-field text-xs",children:tx.map(s=>jsx("option",{
+                              value:t.brand,onChange:s=>e("brand",s.target.value),className:"select-field text-xs py-2",children:tx.map(s=>jsx("option",{
                                 value:s,children:s||"All Brands"
                               },s||"all-brands"))
                             })
@@ -637,38 +671,26 @@ function nx({
                         }),
                         jsxs("div",{
                           children:[
-                            jsx("label",{ className:"mb-1 block text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400", children:"Condition" }),
+                            jsx("label",{ className:"mb-1 block text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400", children:"Condition" }),
                             jsx("select",{
-                              value:t.condition,onChange:s=>e("condition",s.target.value),className:"select-field text-xs",children:rx.map(s=>jsx("option",{
+                              value:t.condition,onChange:s=>e("condition",s.target.value),className:"select-field text-xs py-2",children:rx.map(s=>jsx("option",{
                                 value:s.value,children:s.label
                               },s.value||"any-cond"))
                             })
                           ]
-                        })
-                      ]
-                    }),
-                    jsxs("div",{
-                      className:"flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3 pt-1 border-t border-gray-100 dark:border-gray-800",children:[
-                        jsxs("div",{
-                          className:"flex items-center gap-2 w-full sm:w-auto",children:[
-                            jsx("input",{
-                              type:"number",placeholder:"Min PKR",value:t.minPrice,onChange:s=>e("minPrice",s.target.value),className:"input-field text-xs w-1/2 sm:w-28"
-                            }),
-                            jsx("span",{ className:"text-gray-400 text-xs", children:"to" }),
-                            jsx("input",{
-                              type:"number",placeholder:"Max PKR",value:t.maxPrice,onChange:s=>e("maxPrice",s.target.value),className:"input-field text-xs w-1/2 sm:w-28"
-                            })
-                          ]
                         }),
                         jsxs("div",{
-                          className:"flex items-center gap-2 flex-1 justify-end",children:[
-                            jsx("button",{
-                              onClick:n,className:"btn-ghost text-xs px-3.5 py-2.5",children:"Reset"
-                            }),
-                            jsxs("button",{
-                              onClick:r,className:"btn-primary flex-1 sm:flex-none px-6 py-2.5 text-xs sm:text-sm font-bold shadow-xs",children:[
-                                jsx(Search,{ className:"h-4 w-4" }),
-                                "Search Solar Listings"
+                          className:"col-span-2 sm:col-span-2",children:[
+                            jsx("label",{ className:"mb-1 block text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400", children:"Price Range (PKR)" }),
+                            jsxs("div",{
+                              className:"flex items-center gap-1.5",children:[
+                                jsx("input",{
+                                  type:"number",placeholder:"Min PKR",value:t.minPrice,onChange:s=>e("minPrice",s.target.value),className:"input-field text-xs py-2"
+                                }),
+                                jsx("span",{ className:"text-gray-400 text-xs", children:"-" }),
+                                jsx("input",{
+                                  type:"number",placeholder:"Max PKR",value:t.maxPrice,onChange:s=>e("maxPrice",s.target.value),className:"input-field text-xs py-2"
+                                })
                               ]
                             })
                           ]
@@ -678,7 +700,7 @@ function nx({
                   ]
                 }),
                 jsxs("div",{
-                  className:"border-t border-gray-200/70 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-850/50 px-4 py-2.5 text-xs flex flex-wrap items-center gap-1.5",children:[
+                  className:"border-t border-gray-200/70 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-850/50 px-3.5 py-2 text-xs flex flex-wrap items-center gap-1.5",children:[
                     jsx("span",{ className:"font-bold text-gray-500 dark:text-gray-400 text-[11px] mr-1", children:"Popular:" }),
                     popularSearches.map(term=>jsx("button",{
                       type:"button",onClick:()=>handlePopularClick(term),className:"rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2 py-0.5 text-[11px] font-medium text-gray-700 dark:text-gray-300 hover:border-primary-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors shadow-2xs",children:term
@@ -698,7 +720,7 @@ function nx({
             },{
               value: counts.buyers >= 1000 ? `${(counts.buyers / 1000).toFixed(1)}K+` : `${counts.buyers}+`, label: "Monthly Buyers"
             }].map(s=>jsxs("div",{
-              className:"card p-2.5 sm:p-3 text-center border border-gray-200/80 dark:border-gray-800 dark:bg-gray-900 shadow-2xs transition-all duration-300 hover:border-primary-400 dark:hover:border-primary-600",children:[
+              className:"card-interactive p-2.5 sm:p-3 text-center border border-gray-200/80 dark:border-gray-800 dark:bg-gray-900 shadow-2xs transition-all duration-300 hover:border-primary-400 dark:hover:border-primary-600",children:[
                 jsx("div",{ className:"text-lg sm:text-xl font-extrabold text-gray-900 dark:text-white font-mono tracking-tight", children:s.value }),
                 jsx("div",{ className:"mt-0.5 text-xs font-semibold text-gray-500 dark:text-gray-400", children:s.label })
               ]
@@ -710,37 +732,37 @@ function nx({
   });
 }function PakWheelsSellCards({ onPostAd, onInstall }) {
   return jsx("section", {
-    className: "bg-white dark:bg-gray-950 py-4 sm:py-5 border-b border-gray-200/70 dark:border-gray-800 transition-colors",
+    className: "bg-white dark:bg-gray-950 py-5 sm:py-6 border-b border-gray-200/70 dark:border-gray-800 transition-colors",
     children: jsx("div", {
       className: "container-page max-w-6xl",
       children: jsxs("div", {
-        className: "grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4",
+        className: "grid grid-cols-1 md:grid-cols-2 gap-4",
         children: [
           jsxs("div", {
-            className: "card p-4 sm:p-5 border border-gray-200/90 dark:border-gray-800 hover:border-primary-400 dark:hover:border-primary-600 transition-all flex flex-col justify-between group dark:bg-gray-900 shadow-2xs",
+            className: "card-interactive p-5 border border-gray-200/90 dark:border-gray-800 bg-gradient-to-br from-white via-primary-50/20 to-transparent dark:from-gray-900 dark:via-primary-950/15 dark:to-gray-900 transition-all flex flex-col justify-between group shadow-sm",
             children: [
               jsxs("div", {
                 children: [
                   jsxs("div", {
-                    className: "flex items-center justify-between mb-2",
+                    className: "flex items-center justify-between mb-2.5",
                     children: [
                       jsx("span", {
-                        className: "rounded bg-primary-50 dark:bg-primary-950/60 text-primary-700 dark:text-primary-300 px-2 py-0.5 text-xs font-bold border border-primary-200/60 dark:border-primary-800/60",
+                        className: "badge-primary",
                         children: "Post Solar Ad"
                       }),
                       jsx(Sun, { className: "h-4 w-4 text-primary-500" })
                     ]
                   }),
                   jsx("h3", {
-                    className: "text-base sm:text-lg font-bold text-gray-900 dark:text-white",
+                    className: "text-base sm:text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors",
                     children: "Sell Your Solar Equipment on SellSolar"
                   }),
                   jsx("p", {
-                    className: "mt-1 text-xs text-gray-500 dark:text-gray-400 leading-relaxed",
+                    className: "mt-1.5 text-xs text-gray-500 dark:text-gray-400 leading-relaxed",
                     children: "Post your solar panels, inverters, batteries or complete setups and connect directly with genuine buyers across Pakistan."
                   }),
                   jsxs("ul", {
-                    className: "mt-2.5 space-y-1.5 text-xs text-gray-600 dark:text-gray-300",
+                    className: "mt-3 space-y-1.5 text-xs text-gray-600 dark:text-gray-300",
                     children: [
                       jsxs("li", {
                         className: "flex items-center gap-2",
@@ -768,10 +790,10 @@ function nx({
                 ]
               }),
               jsx("div", {
-                className: "mt-4 pt-3 border-t border-gray-100 dark:border-gray-800",
+                className: "mt-4 pt-3.5 border-t border-gray-100 dark:border-gray-800",
                 children: jsxs("button", {
                   onClick: onPostAd,
-                  className: "btn-primary w-full sm:w-auto px-5 py-2 text-xs font-bold shadow-xs",
+                  className: "btn-primary w-full sm:w-auto px-5 py-2.5 text-xs font-bold shadow-xs",
                   children: [
                     jsx(CirclePlus, { className: "h-3.5 w-3.5" }),
                     "Post an Ad — Free"
@@ -781,30 +803,30 @@ function nx({
             ]
           }),
           jsxs("div", {
-            className: "card p-4 sm:p-5 border border-gray-200/90 dark:border-gray-800 hover:border-secondary-400 dark:hover:border-secondary-600 transition-all flex flex-col justify-between group dark:bg-gray-900 shadow-2xs",
+            className: "card-interactive p-5 border border-gray-200/90 dark:border-gray-800 bg-gradient-to-br from-white via-secondary-50/20 to-transparent dark:from-gray-900 dark:via-secondary-950/15 dark:to-gray-900 transition-all flex flex-col justify-between group shadow-sm",
             children: [
               jsxs("div", {
                 children: [
                   jsxs("div", {
-                    className: "flex items-center justify-between mb-2",
+                    className: "flex items-center justify-between mb-2.5",
                     children: [
                       jsx("span", {
-                        className: "rounded bg-secondary-50 dark:bg-secondary-950/60 text-secondary-700 dark:text-secondary-300 px-2 py-0.5 text-xs font-bold border border-secondary-200/60 dark:border-secondary-800/60",
+                        className: "badge-emerald",
                         children: "EPC & Net-Metering"
                       }),
                       jsx(Wrench, { className: "h-4 w-4 text-secondary-500" })
                     ]
                   }),
                   jsx("h3", {
-                    className: "text-base sm:text-lg font-bold text-gray-900 dark:text-white",
+                    className: "text-base sm:text-lg font-bold text-gray-900 dark:text-white group-hover:text-secondary-600 dark:group-hover:text-secondary-400 transition-colors",
                     children: "SellSolar Turnkey Installation Service"
                   }),
                   jsx("p", {
-                    className: "mt-1 text-xs text-gray-500 dark:text-gray-400 leading-relaxed",
+                    className: "mt-1.5 text-xs text-gray-500 dark:text-gray-400 leading-relaxed",
                     children: "Get complete on-grid, hybrid or off-grid solar systems engineered, installed and net-metered with Tier-1 warranty equipment."
                   }),
                   jsxs("ul", {
-                    className: "mt-2.5 space-y-1.5 text-xs text-gray-600 dark:text-gray-300",
+                    className: "mt-3 space-y-1.5 text-xs text-gray-600 dark:text-gray-300",
                     children: [
                       jsxs("li", {
                         className: "flex items-center gap-2",
@@ -832,10 +854,10 @@ function nx({
                 ]
               }),
               jsx("div", {
-                className: "mt-5 pt-3.5 border-t border-gray-100 dark:border-gray-800",
+                className: "mt-4 pt-3.5 border-t border-gray-100 dark:border-gray-800",
                 children: jsxs("button", {
                   onClick: onInstall,
-                  className: "btn bg-secondary-600 hover:bg-secondary-700 text-white w-full sm:w-auto px-5 py-2 text-xs font-bold shadow-xs",
+                  className: "btn bg-secondary-600 hover:bg-secondary-700 text-white w-full sm:w-auto px-5 py-2.5 text-xs font-bold shadow-xs",
                   children: [
                     jsx(Wrench, { className: "h-3.5 w-3.5" }),
                     "Request Installation"
@@ -1263,6 +1285,12 @@ function ax({
 function lx({
   listings:t,loading:e,error:r,totalCount:n,onSelectListing:s,onResetFilters:rf,onNavigate:nav,currentCondition,onConditionChange
 }){
+  const [visibleCount, setVisibleCount] = useState(12);
+
+  useEffect(() => {
+    setVisibleCount(12);
+  }, [t.length, currentCondition]);
+
   return jsx("section",{
     id:"listings",className:"bg-white dark:bg-gray-950 py-5 sm:py-6 border-b border-gray-200/60 dark:border-gray-800 transition-colors",children:jsxs("div",{
       className:"container-page",children:[
@@ -1373,10 +1401,49 @@ function lx({
               className:"h-3.5 w-3.5"
             }),"Clear All Filters"]
           })]
-        }):jsx("div",{
-          className:"grid grid-cols-1 gap-3.5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4",children:t.map(a=>jsx(ax,{
-            listing:a,onClick:()=>s(a.id),onNavigate:nav
-          },a.id))
+        }):jsxs("div",{
+          children:[
+            jsx("div",{
+              className:"grid grid-cols-1 gap-3.5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4",children:t.slice(0, visibleCount).map(a=>jsx(ax,{
+                listing:a,onClick:()=>s(a.id),onNavigate:nav
+              },a.id))
+            }),
+            t.length > 12 && jsxs("div",{
+              className:"mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 border-t border-gray-100 dark:border-gray-800",
+              children:[
+                visibleCount < t.length ? jsxs("button",{
+                  type:"button",
+                  onClick:()=>setVisibleCount(prev=>Math.min(prev+12, t.length)),
+                  className:"btn bg-white dark:bg-gray-850 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-300 dark:border-gray-700 px-6 py-2.5 text-xs sm:text-sm font-bold shadow-xs hover:border-primary-500 transition-all flex items-center gap-2",
+                  children:[
+                    `Load More Equipment (${t.length - visibleCount} more)`,
+                    jsx(ChevronDown,{ className:"h-4 w-4 text-primary-500" })
+                  ]
+                }) : null,
+                visibleCount < t.length ? jsxs("button",{
+                  type:"button",
+                  onClick:()=>setVisibleCount(t.length),
+                  className:"btn-primary px-6 py-2.5 text-xs sm:text-sm font-bold shadow-xs flex items-center gap-2",
+                  children:[
+                    `View All ${n || t.length} Listings`,
+                    jsx(ArrowRight,{ className:"h-4 w-4" })
+                  ]
+                }) : jsxs("button",{
+                  type:"button",
+                  onClick:()=>{
+                    setVisibleCount(12);
+                    const el = document.getElementById("listings");
+                    el && el.scrollIntoView({ behavior: "smooth", block: "start" });
+                  },
+                  className:"btn-ghost text-xs px-5 py-2 flex items-center gap-1.5",
+                  children:[
+                    "Show Less (First 12)",
+                    jsx(ChevronDown,{ className:"h-3.5 w-3.5 rotate-180" })
+                  ]
+                })
+              ]
+            })
+          ]
         })
       ]
     })

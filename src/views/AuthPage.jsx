@@ -1451,9 +1451,20 @@ export default function AuthPage({ onSuccess, onBack, initialView = 'login' }) {
 
               {(view === 'login' || view === 'signup' || view === 'reset') && (
                 <div>
-                  <label className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    {view === 'reset' ? 'New password *' : 'Password *'}
-                  </label>
+                  <div className="mb-1.5 flex items-center justify-between">
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      {view === 'reset' ? 'New password *' : 'Password *'}
+                    </label>
+                    {view === 'login' && (
+                      <button
+                        type="button"
+                        onClick={() => go('reset')}
+                        className="text-xs font-semibold text-amber-600 dark:text-amber-400 hover:underline"
+                      >
+                        Forgot password?
+                      </button>
+                    )}
+                  </div>
                   <div className="relative">
                     <Lock
                       className={`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${

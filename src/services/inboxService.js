@@ -130,7 +130,7 @@ export async function sendContactMessage({
   // 2. Sync with Supabase if configured
   if (isSupabaseConfigured()) {
     try {
-      await supabase.from('enquiries').insert({
+      const { error: insErr } = await supabase.from('enquiries').insert({
         name: cleanName,
         email: cleanEmail,
         contact_phone: phone || null,
@@ -142,6 +142,16 @@ export async function sendContactMessage({
         is_read: false,
         created_at: new Date().toISOString(),
       });
+
+      if (insErr && insErr.code === 'PGRST204') {
+        // Fallback for database schema without name/email columns
+        await supabase.from('enquiries').insert({
+          contact_phone: phone || null,
+          message: `[Ticket: ${ticketNumber}] Sender: ${cleanName} (${cleanEmail}) | Subject: ${subject}\n\n${cleanMessage}`,
+          is_read: false,
+          created_at: new Date().toISOString(),
+        });
+      }
     } catch (err) {
       console.warn('Supabase enquiry insert warning:', err?.message);
     }

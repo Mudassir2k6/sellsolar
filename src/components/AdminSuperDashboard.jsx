@@ -104,6 +104,7 @@ export default function AdminSuperDashboard({
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [replyText, setReplyText] = useState('');
   const [inboxFilter, setInboxFilter] = useState('all'); // 'all' | 'unread' | 'replied'
+  const [syncingInbox, setSyncingInbox] = useState(false);
   const [productFilter, setProductFilter] = useState('all'); // 'all' | 'featured' | 'hot_sell' | 'pending' | 'approved'
   const [myAdsFilter, setMyAdsFilter] = useState('all'); // 'all' | 'active' | 'sold'
   const [searchQuery, setSearchQuery] = useState('');
@@ -1409,6 +1410,35 @@ export default function AdminSuperDashboard({
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
+                  <a
+                    href="https://mail.google.com/mail/u/0/#search/info%40sellsolar.pk"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 transition-all"
+                    title="Open incoming emails forwarded to mudassir2k6@gmail.com"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" />
+                    <span>Open in Gmail</span>
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setSyncingInbox(true);
+                      try {
+                        const msgs = await fetchSharedInboxMessages();
+                        if (msgs && msgs.length > 0) setInboxMessages(msgs);
+                        showToast?.('Inbox synchronized successfully', 'success');
+                      } catch {}
+                      setSyncingInbox(false);
+                    }}
+                    disabled={syncingInbox}
+                    className="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold text-xs shadow-xs flex items-center gap-1.5 transition-all"
+                  >
+                    <RefreshCw className={`h-3.5 w-3.5 ${syncingInbox ? 'animate-spin text-amber-500' : ''}`} />
+                    <span>{syncingInbox ? 'Syncing...' : 'Sync'}</span>
+                  </button>
+
                   <button
                     type="button"
                     onClick={() => {
@@ -1455,6 +1485,29 @@ export default function AdminSuperDashboard({
                     Replied ({inboxMessages.filter((m) => m.status === 'replied').length})
                   </button>
                 </div>
+              </div>
+
+              {/* Email Routing Info Banner */}
+              <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div className="flex items-start sm:items-center gap-2.5">
+                  <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5 sm:mt-0" />
+                  <div>
+                    <span className="font-bold text-amber-900 dark:text-amber-200">Email Routing Active:</span>{' '}
+                    <span className="text-amber-800/90 dark:text-amber-300/90">
+                      Direct emails sent to <strong>info@sellsolar.pk</strong> route straight to your Gmail (<strong>mudassir2k6@gmail.com</strong>).
+                      Website contact inquiries and dealer partnership applications appear in the list below.
+                    </span>
+                  </div>
+                </div>
+                <a
+                  href="https://mail.google.com/mail/u/0/#search/info%40sellsolar.pk"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shrink-0 shadow-xs transition-all active:scale-95"
+                >
+                  <span>Open Gmail Inbox</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
               </div>
 
               {/* Message Layout: List + Detail */}

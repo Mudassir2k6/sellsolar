@@ -1375,12 +1375,24 @@ export function AuthProvider({ children }) {
       } catch {}
     }
 
-    // If Supabase configured, trigger standard auth reset email as well
+    // If Supabase configured, attempt edge function OTP dispatch with fallback to standard reset email
     if (isSupabaseConfigured()) {
       try {
-        await supabase.auth.resetPasswordForEmail(cleanMail, {
-          redirectTo: `${typeof window !== 'undefined' ? window.location.origin : 'https://sellsolar.pk'}/reset-password`,
-        });
+        let edgeSent = false;
+        try {
+          const edgeRes = await supabase.functions.invoke('send-reset-otp', {
+            body: { email: cleanMail, otp },
+          });
+          if (edgeRes?.data?.ok) {
+            edgeSent = true;
+          }
+        } catch {}
+
+        if (!edgeSent) {
+          await supabase.auth.resetPasswordForEmail(cleanMail, {
+            redirectTo: `${typeof window !== 'undefined' ? window.location.origin : 'https://sellsolar.pk'}/reset-password`,
+          });
+        }
       } catch (sbErr) {
         console.warn('Supabase reset email notice:', sbErr);
       }

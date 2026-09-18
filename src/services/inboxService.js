@@ -136,11 +136,31 @@ export async function sendContactMessage({
         contact_phone: phone || null,
         subject: subject,
         message: cleanMessage,
+        category: category || 'General Inquiry',
+        recipient_email: recipientEmail || 'info@sellsolar.pk',
+        status: 'unread',
         is_read: false,
         created_at: new Date().toISOString(),
       });
     } catch (err) {
       console.warn('Supabase enquiry insert warning:', err?.message);
+    }
+
+    // 3. Dispatch admin email alert to info@sellsolar.pk and admin mail
+    try {
+      await supabase.functions.invoke('notify-admin-inquiry', {
+        body: {
+          name: cleanName,
+          email: cleanEmail,
+          phone,
+          subject,
+          message: cleanMessage,
+          recipientEmail,
+          ticketNumber,
+        },
+      });
+    } catch (fnErr) {
+      console.warn('Inquiry notification edge function notice:', fnErr?.message);
     }
   }
 
@@ -190,11 +210,11 @@ export async function fetchSharedInboxMessages() {
         senderPhone: row.contact_phone || '',
         subject: row.subject || (row.message ? row.message.slice(0, 40) + '...' : 'Customer Inquiry'),
         message: row.message || 'No message content provided.',
-        category: 'General Inquiry',
-        recipientEmail: 'info@sellsolar.pk',
-        status: row.is_read ? 'read' : 'unread',
+        category: row.category || 'General Inquiry',
+        recipientEmail: row.recipient_email || 'info@sellsolar.pk',
+        status: row.status || (row.is_read ? 'read' : 'unread'),
         is_read: !!row.is_read,
-        replies: [],
+        replies: Array.isArray(row.replies) ? row.replies : [],
         createdAt: row.created_at || new Date().toISOString(),
       }));
 

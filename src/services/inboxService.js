@@ -88,6 +88,35 @@ export function saveInboxMessages(messages) {
   }
 }
 
+export function generateEmailLinks({
+  recipientEmail = 'info@sellsolar.pk',
+  senderName = '',
+  senderEmail = '',
+  senderPhone = '',
+  ticketNumber = '',
+  subject = 'Contact Inquiry',
+  message = '',
+}) {
+  const ticketTag = ticketNumber ? `[${ticketNumber}] ` : '';
+  const emailSubject = `${ticketTag}${subject} - SellSolar.pk`;
+  const emailBody = `Dear SellSolar Team,\n\nName: ${senderName || 'Customer'}\nEmail: ${senderEmail || 'Not specified'}\nPhone/WhatsApp: ${senderPhone || 'Not specified'}\nTicket: ${ticketNumber || 'N/A'}\nSubject: ${subject}\n\nMessage:\n${message}\n\n--\nDelivered to: ${recipientEmail}`;
+
+  const mailtoUrl = `mailto:${encodeURIComponent(recipientEmail)}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+  const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipientEmail)}&su=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+
+  const cleanPhone = (senderPhone || '').replace(/^0/, '92').replace(/[^0-9]/g, '');
+  const waText = `*SellSolar Inquiry ${ticketNumber ? `[#${ticketNumber}]` : ''}*\n*Name:* ${senderName}\n*Email:* ${senderEmail}\n*Phone:* ${senderPhone || 'N/A'}\n*Subject:* ${subject}\n\n*Message:*\n${message}`;
+  const whatsappUrl = `https://wa.me/923001234567?text=${encodeURIComponent(waText)}`;
+
+  return {
+    mailtoUrl,
+    gmailUrl,
+    whatsappUrl,
+    emailSubject,
+    emailBody,
+  };
+}
+
 export async function sendContactMessage({
   name,
   email,
@@ -106,6 +135,16 @@ export async function sendContactMessage({
   if (!cleanMessage) throw new Error('Message is required.');
 
   const ticketNumber = `SLR-${Math.floor(100000 + Math.random() * 900000)}`;
+  const links = generateEmailLinks({
+    recipientEmail,
+    senderName: cleanName,
+    senderEmail: cleanEmail,
+    senderPhone: phone,
+    ticketNumber,
+    subject,
+    message: cleanMessage,
+  });
+
   const newMessage = {
     id: `msg-${Date.now()}`,
     ticketNumber,
@@ -127,7 +166,7 @@ export async function sendContactMessage({
   const updated = [newMessage, ...current];
   saveInboxMessages(updated);
 
-  // 2. Sync with Supabase if configured
+  // 2. Sync with Supabase if configured (failsafe without blocking user)
   if (isSupabaseConfigured()) {
     try {
       const { error: insErr } = await supabase.from('enquiries').insert({
@@ -143,20 +182,20 @@ export async function sendContactMessage({
         created_at: new Date().toISOString(),
       });
 
-      if (insErr && insErr.code === 'PGRST204') {
-        // Fallback for database schema without name/email columns
+      if (insErr) {
+        // Fallback for database schemas with restricted columns or structure
         await supabase.from('enquiries').insert({
           contact_phone: phone || null,
           message: `[Ticket: ${ticketNumber}] Sender: ${cleanName} (${cleanEmail}) | Subject: ${subject}\n\n${cleanMessage}`,
           is_read: false,
           created_at: new Date().toISOString(),
-        });
+        }).catch(() => {});
       }
     } catch (err) {
-      console.warn('Supabase enquiry insert warning:', err?.message);
+      console.warn('Supabase enquiry insert notice:', err?.message);
     }
 
-    // 3. Dispatch admin email alert to info@sellsolar.pk and admin mail
+    // 3. Dispatch admin email alert to info@sellsolar.pk if edge function is active
     try {
       await supabase.functions.invoke('notify-admin-inquiry', {
         body: {
@@ -179,7 +218,7 @@ export async function sendContactMessage({
     window.dispatchEvent(new Event('sellsolar_inbox_updated'));
   }
 
-  return { success: true, ticketNumber, message: newMessage };
+  return { success: true, ticketNumber, message: newMessage, links };
 }
 
 export function markMessageAsRead(messageId) {

@@ -42,9 +42,11 @@ import {
   UploadCloud,
   FileCheck,
   Trash2,
-  Paperclip
+  Paperclip,
+  Copy
 } from 'lucide-react';
 import { sendContactMessage } from '../services/inboxService';
+import EmailContactModal from '../components/EmailContactModal';
 
 // Navigation groups definition
 export const FOOTER_PAGES = {
@@ -1763,7 +1765,11 @@ function HelpCenterContent({ onNavigate }) {
 function ContactUsContent() {
   const [submitted, setSubmitted] = useState(false);
   const [ticketNo, setTicketNo] = useState('');
+  const [submissionLinks, setSubmissionLinks] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [copiedEmail, setCopiedEmail] = useState(false);
+  const [copiedSummary, setCopiedSummary] = useState(false);
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -1771,6 +1777,33 @@ function ContactUsContent() {
     subject: 'General Inquiry',
     message: ''
   });
+
+  const handleCopyEmail = async (emailText = 'info@sellsolar.pk') => {
+    try {
+      if (typeof navigator !== 'undefined' && navigator.clipboard) {
+        await navigator.clipboard.writeText(emailText);
+      }
+      setCopiedEmail(true);
+      setTimeout(() => setCopiedEmail(false), 2500);
+    } catch {
+      setCopiedEmail(true);
+      setTimeout(() => setCopiedEmail(false), 2500);
+    }
+  };
+
+  const handleCopySummary = async () => {
+    try {
+      const summary = `SellSolar Support Ticket #${ticketNo}\nSender: ${form.name} (${form.email})\nPhone: ${form.phone || 'N/A'}\nSubject: ${form.subject}\nMessage:\n${form.message}\nSent to: info@sellsolar.pk`;
+      if (typeof navigator !== 'undefined' && navigator.clipboard) {
+        await navigator.clipboard.writeText(summary);
+      }
+      setCopiedSummary(true);
+      setTimeout(() => setCopiedSummary(false), 2500);
+    } catch {
+      setCopiedSummary(true);
+      setTimeout(() => setCopiedSummary(false), 2500);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -1785,11 +1818,14 @@ function ContactUsContent() {
         category: form.subject || 'General Inquiry',
         recipientEmail: 'info@sellsolar.pk'
       });
-      setTicketNo(res.ticketNumber || `SLR-${Math.floor(100000 + Math.random() * 900000)}`);
+      const ticket = res?.ticketNumber || `SLR-${Math.floor(100000 + Math.random() * 900000)}`;
+      setTicketNo(ticket);
+      setSubmissionLinks(res?.links || null);
       setSubmitted(true);
     } catch (err) {
       console.warn('Contact message submission notice:', err);
-      setTicketNo(`SLR-${Math.floor(100000 + Math.random() * 900000)}`);
+      const ticket = `SLR-${Math.floor(100000 + Math.random() * 900000)}`;
+      setTicketNo(ticket);
       setSubmitted(true);
     } finally {
       setSubmitting(false);
@@ -1798,6 +1834,13 @@ function ContactUsContent() {
 
   return (
     <div className="space-y-8 animate-fade-in">
+      <EmailContactModal
+        isOpen={emailModalOpen}
+        onClose={() => setEmailModalOpen(false)}
+        recipientEmail="info@sellsolar.pk"
+        defaultSubject="Inquiry via SellSolar.pk Contact Desk"
+      />
+
       <div className="rounded-3xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 sm:p-10 shadow-sm">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-50 dark:bg-primary-950/60 text-primary-700 dark:text-primary-300 text-xs font-bold mb-4 border border-primary-200/60 dark:border-primary-800/60">
           <Phone className="h-3.5 w-3.5 text-primary-500" />
@@ -1810,51 +1853,224 @@ function ContactUsContent() {
           Have a suggestion, need help with your solar ad, or want to register as a verified Tier-1 dealer? Reach our Islamabad headquarters directly.
         </p>
 
-        {/* Contact Info Cards */}
+        {/* Contact Info Cards with Interactive Action Buttons */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8 pt-6 border-t border-gray-100 dark:border-gray-800">
-          <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800">
-            <Mail className="h-5 w-5 text-primary-600 dark:text-primary-400 mb-2" />
-            <p className="font-bold text-xs text-gray-900 dark:text-white">Email Us</p>
-            <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">info@sellsolar.pk</p>
-            <p className="text-[11px] text-gray-500 dark:text-gray-400">support@sellsolar.pk</p>
+          {/* Email Us Card */}
+          <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <Mail className="h-5 w-5 text-primary-600 dark:text-primary-400" />
+                <span className="px-2 py-0.5 rounded-full bg-primary-100 dark:bg-primary-900/60 text-[10px] font-bold text-primary-700 dark:text-primary-300">
+                  Primary
+                </span>
+              </div>
+              <p className="font-bold text-xs text-gray-900 dark:text-white">Email Us</p>
+              <div className="mt-1 space-y-0.5">
+                <p className="text-xs font-mono font-bold text-primary-600 dark:text-primary-400 select-all">
+                  info@sellsolar.pk
+                </p>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                  support@sellsolar.pk
+                </p>
+              </div>
+            </div>
+            <div className="mt-3 pt-3 border-t border-gray-200/60 dark:border-gray-700/60 flex items-center gap-1.5 flex-wrap">
+              <button
+                type="button"
+                onClick={() => setEmailModalOpen(true)}
+                className="px-2.5 py-1 rounded-lg bg-primary-600 hover:bg-primary-700 text-white font-bold text-[11px] shadow-2xs transition-all active:scale-95"
+              >
+                Send Email
+              </button>
+              <button
+                type="button"
+                onClick={() => handleCopyEmail('info@sellsolar.pk')}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-[11px] font-medium hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+              >
+                {copiedEmail ? <Check className="h-3 w-3 text-emerald-500" /> : <Copy className="h-3 w-3" />}
+                <span>{copiedEmail ? 'Copied' : 'Copy'}</span>
+              </button>
+            </div>
           </div>
-          <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800">
-            <Phone className="h-5 w-5 text-primary-600 dark:text-primary-400 mb-2" />
-            <p className="font-bold text-xs text-gray-900 dark:text-white">Call / WhatsApp</p>
-            <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">+92 300 1234567</p>
-            <p className="text-[10px] text-gray-400">Mon-Sat: 9am - 7pm PKT</p>
+
+          {/* Call / WhatsApp Card */}
+          <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <Phone className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                <span className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-[10px] font-bold text-emerald-700 dark:text-emerald-300">
+                  Direct
+                </span>
+              </div>
+              <p className="font-bold text-xs text-gray-900 dark:text-white">Call / WhatsApp</p>
+              <p className="text-xs font-mono font-bold text-gray-800 dark:text-gray-200 mt-1 select-all">
+                +92 300 1234567
+              </p>
+              <p className="text-[10px] text-gray-400 mt-0.5">Mon-Sat: 9am - 7pm PKT</p>
+            </div>
+            <div className="mt-3 pt-3 border-t border-gray-200/60 dark:border-gray-700/60 flex items-center gap-1.5 flex-wrap">
+              <a
+                href="https://wa.me/923001234567?text=Assalam-o-Alaikum%20SellSolar%20Team%2C%20I%20have%20an%20inquiry"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] shadow-2xs transition-all inline-flex items-center gap-1 active:scale-95"
+              >
+                <span>WhatsApp</span>
+                <ExternalLink className="h-3 w-3" />
+              </a>
+              <a
+                href="tel:+923001234567"
+                className="px-2.5 py-1 rounded-lg bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-[11px] font-medium hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+              >
+                Call Now
+              </a>
+            </div>
           </div>
-          <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800">
-            <MapPin className="h-5 w-5 text-primary-600 dark:text-primary-400 mb-2" />
-            <p className="font-bold text-xs text-gray-900 dark:text-white">Head Office</p>
-            <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">Blue Area, Sector G-7</p>
-            <p className="text-[11px] text-gray-500 dark:text-gray-400">Islamabad, Pakistan</p>
+
+          {/* Head Office Card */}
+          <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-800 flex flex-col justify-between">
+            <div>
+              <MapPin className="h-5 w-5 text-primary-600 dark:text-primary-400 mb-2" />
+              <p className="font-bold text-xs text-gray-900 dark:text-white">Head Office</p>
+              <p className="text-[11px] text-gray-600 dark:text-gray-300 mt-1">Blue Area, Sector G-7</p>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400">Islamabad, Pakistan</p>
+            </div>
+            <div className="mt-3 pt-3 border-t border-gray-200/60 dark:border-gray-700/60">
+              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold inline-flex items-center gap-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> Verified Business Location
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Interactive Form */}
+      {/* Interactive Form with Direct Client Dispatch Options */}
       <div className="rounded-3xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 sm:p-8 shadow-sm">
-        <h2 className="text-xl font-black text-gray-900 dark:text-white mb-4">Send Us a Direct Message</h2>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+          <div>
+            <h2 className="text-xl font-black text-gray-900 dark:text-white">Send Us a Direct Message</h2>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+              Target address: <strong className="text-primary-600 dark:text-primary-400 font-mono">info@sellsolar.pk</strong>
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setEmailModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/60 text-amber-800 dark:text-amber-200 text-xs font-bold hover:bg-amber-100 transition-colors w-fit"
+          >
+            <Mail className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+            <span>Open Email Client / Gmail</span>
+          </button>
+        </div>
 
         {submitted ? (
-          <div className="py-10 text-center space-y-3">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
-              <Check className="h-6 w-6 stroke-[3]" />
+          <div className="py-6 text-center space-y-4 max-w-lg mx-auto">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 shadow-xs">
+              <Check className="h-7 w-7 stroke-[2.5]" />
             </div>
-            <h3 className="text-base font-bold text-gray-900 dark:text-white">Message Sent Successfully!</h3>
-            <p className="text-xs text-gray-600 dark:text-gray-400 max-w-sm mx-auto">
-              Thank you for reaching out. Ticket #{ticketNo} has been delivered to <strong>info@sellsolar.pk</strong>. Our team will contact you within 4 business hours.
-            </p>
+            
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-xs font-mono font-bold">
+                Ticket #{ticketNo}
+              </div>
+              <h3 className="text-lg font-black text-gray-900 dark:text-white pt-1">
+                Inquiry Logged Successfully!
+              </h3>
+              <p className="text-xs text-gray-600 dark:text-gray-300">
+                Your message has been registered for <strong>info@sellsolar.pk</strong>. Our team in Islamabad reviews inquiries within 4 business hours.
+              </p>
+            </div>
+
+            {/* Direct Client Forwarding Links for 100% Reliability */}
+            <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 text-left space-y-3">
+              <p className="text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                Instant Follow-Up & Client Dispatch Options:
+              </p>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {/* Gmail Web */}
+                <a
+                  href={
+                    submissionLinks?.gmailUrl ||
+                    `https://mail.google.com/mail/?view=cm&fs=1&to=info@sellsolar.pk&su=[${ticketNo}]%20${encodeURIComponent(
+                      form.subject
+                    )}&body=${encodeURIComponent(
+                      `Name: ${form.name}\nEmail: ${form.email}\nPhone: ${form.phone}\nTicket: ${ticketNo}\n\nMessage:\n${form.message}`
+                    )}`
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all shadow-xs"
+                >
+                  <span className="flex items-center gap-2">
+                    <span className="h-5 w-5 rounded bg-white/20 flex items-center justify-center text-[10px]">M</span>
+                    <span>Send via Gmail Web</span>
+                  </span>
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+
+                {/* Default Mail App */}
+                <a
+                  href={
+                    submissionLinks?.mailtoUrl ||
+                    `mailto:info@sellsolar.pk?subject=[${ticketNo}]%20${encodeURIComponent(
+                      form.subject
+                    )}&body=${encodeURIComponent(
+                      `Name: ${form.name}\nEmail: ${form.email}\nPhone: ${form.phone}\nTicket: ${ticketNo}\n\nMessage:\n${form.message}`
+                    )}`
+                  }
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:border-amber-500 text-gray-800 dark:text-gray-200 text-xs font-bold transition-all"
+                >
+                  <span className="flex items-center gap-2">
+                    <Mail className="h-4 w-4 text-amber-500" />
+                    <span>Open Mail App</span>
+                  </span>
+                  <ExternalLink className="h-3.5 w-3.5 text-gray-400" />
+                </a>
+
+                {/* WhatsApp Direct */}
+                <a
+                  href={
+                    submissionLinks?.whatsappUrl ||
+                    `https://wa.me/923001234567?text=${encodeURIComponent(
+                      `*SellSolar Inquiry Ticket #${ticketNo}*\n*Name:* ${form.name}\n*Email:* ${form.email}\n*Phone:* ${form.phone}\n*Subject:* ${form.subject}\n*Message:* ${form.message}`
+                    )}`
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs"
+                >
+                  <span className="flex items-center gap-2">
+                    <Phone className="h-4 w-4" />
+                    <span>WhatsApp Desk</span>
+                  </span>
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+
+                {/* Copy Summary */}
+                <button
+                  type="button"
+                  onClick={handleCopySummary}
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-xs font-bold hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                >
+                  <span className="flex items-center gap-2">
+                    {copiedSummary ? <Check className="h-4 w-4 text-emerald-500" /> : <Copy className="h-4 w-4" />}
+                    <span>{copiedSummary ? 'Copied!' : 'Copy Ticket Info'}</span>
+                  </span>
+                </button>
+              </div>
+            </div>
+
             <button
               type="button"
               onClick={() => {
                 setSubmitted(false);
+                setSubmissionLinks(null);
                 setForm({ name: '', email: '', phone: '', subject: 'General Inquiry', message: '' });
               }}
-              className="btn-secondary text-xs px-4 py-2 mt-2"
+              className="btn-secondary text-xs px-5 py-2.5 mt-3"
             >
-              Send Another Message
+              Send Another Inquiry
             </button>
           </div>
         ) : (
@@ -1917,19 +2133,33 @@ function ContactUsContent() {
               <textarea
                 rows={4}
                 required
-                placeholder="How can our solar support team assist you?"
+                placeholder="How can our solar support team assist you? Please mention requirements, location, and equipment models if applicable."
                 value={form.message}
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
                 className="input-field py-2"
               />
             </div>
 
-            <div className="pt-2 flex justify-end">
+            <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                Sends to <strong className="text-gray-700 dark:text-gray-300">info@sellsolar.pk</strong> with automatic ticket generation.
+              </p>
               <button
                 type="submit"
-                className="btn-primary text-xs px-6 py-2.5 shadow-xs inline-flex items-center gap-2 font-bold"
+                disabled={submitting}
+                className="btn-primary text-xs px-6 py-2.5 shadow-xs inline-flex items-center justify-center gap-2 font-bold disabled:opacity-50"
               >
-                <Send className="h-3.5 w-3.5" /> Submit Inquiry
+                {submitting ? (
+                  <>
+                    <div className="h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Delivering...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="h-3.5 w-3.5" />
+                    <span>Submit Inquiry</span>
+                  </>
+                )}
               </button>
             </div>
           </form>

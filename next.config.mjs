@@ -4,12 +4,15 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {import('next').NextConfig} */
+const isProd = process.env.NODE_ENV === 'production';
+
 const nextConfig = {
-  // Static export for Cloudflare Pages / Netlify static hosting
-  output: 'export',
+  // Static export for production build (Cloudflare Pages / Netlify / dist/ sync)
+  ...(isProd ? { output: 'export' } : {}),
   images: {
     unoptimized: true,
   },
+  transpilePackages: ['lucide-react'],
   reactStrictMode: true,
   trailingSlash: false,
   outputFileTracingRoot: __dirname,

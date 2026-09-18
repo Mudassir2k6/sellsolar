@@ -12,14 +12,25 @@ export function ToastProvider({ children }) {
     setToast(null);
   }, []);
 
-  const showToast = useCallback(({ title, message, type = 'success', duration = 4500 }) => {
-    setToast({
-      id: Date.now(),
-      title: title || (type === 'success' ? 'Success' : type === 'error' ? 'Error' : 'Notice'),
-      message,
-      type,
-      duration,
-    });
+  const showToast = useCallback((arg1, arg2, arg3) => {
+    if (typeof arg1 === 'string') {
+      setToast({
+        id: Date.now(),
+        title: arg3 || (arg2 === 'success' ? 'Success' : arg2 === 'error' ? 'Error' : 'Notice'),
+        message: arg1,
+        type: arg2 || 'success',
+        duration: 4500,
+      });
+    } else if (arg1 && typeof arg1 === 'object') {
+      const { title, message, type = 'success', duration = 4500 } = arg1;
+      setToast({
+        id: Date.now(),
+        title: title || (type === 'success' ? 'Success' : type === 'error' ? 'Error' : 'Notice'),
+        message: message || '',
+        type,
+        duration,
+      });
+    }
   }, []);
 
   useEffect(() => {

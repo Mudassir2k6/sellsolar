@@ -1,0 +1,61 @@
+[
+  {
+    "id": "msg-001",
+    "ticketNumber": "SLR-482910",
+    "senderName": "Muhammad Hamza",
+    "senderEmail": "hamza.solar@gmail.com",
+    "senderPhone": "03214567890",
+    "subject": "Quotation inquiry for 10kW On-Grid System (Islamabad)",
+    "message": "Assalam-o-Alaikum, I am looking to install a 10kW Longi Hi-MO 6 on-grid solar system with a Solis inverter in Sector F-10, Islamabad. Please let me know the estimated net-metering timeline and total turnkey cost.",
+    "category": "General Inquiry",
+    "recipientEmail": "info@sellsolar.pk",
+    "status": "unread",
+    "is_read": false,
+    "replies": [],
+    "createdAt": "2026-09-17T20:00:00.000Z"
+  },
+  {
+    "id": "msg-002",
+    "ticketNumber": "SLR-319082",
+    "senderName": "Zubair Energy Solutions",
+    "senderEmail": "sales@zubairenergy.pk",
+    "senderPhone": "03009876543",
+    "subject": "Verified Dealer Partnership Application",
+    "message": "We are certified tier-1 distributors of Growatt and Huawei inverters based in Lahore. We want to be listed in your Verified Solar Dealers directory.",
+    "category": "Dealer Verification",
+    "recipientEmail": "info@sellsolar.pk",
+    "status": "read",
+    "is_read": true,
+    "replies": [
+      {
+        "id": "rep-001",
+        "sender": "Super Admin",
+        "text": "Thank you for reaching out, Zubair. Our onboarding team has received your registration request. Please send your NTN certificate and distributor authorization letter.",
+        "createdAt": "2026-09-16T18:00:00.000Z"
+      }
+    ],
+    "createdAt": "2026-09-15T10:00:00.000Z"
+  },
+  {
+    "id": "msg-003",
+    "ticketNumber": "SLR-194823",
+    "senderName": "Ahmed Raza",
+    "senderEmail": "ahmed.raza99@yahoo.com",
+    "senderPhone": "03335551234",
+    "subject": "Inquiry about Longi 585W Bifacial Panel Listing",
+    "message": "Hi, I want to purchase 24 pieces of the Longi 585W bifacial solar panels. Is warranty claimable directly in Rawalpindi?",
+    "category": "Product Inquiry",
+    "recipientEmail": "info@sellsolar.pk",
+    "status": "replied",
+    "is_read": true,
+    "replies": [
+      {
+        "id": "rep-002",
+        "sender": "Support Desk",
+        "text": "Yes Ahmed, official company warranty is valid across Pakistan through authorized service centers.",
+        "createdAt": "2026-09-17T11:00:00.000Z"
+      }
+    ],
+    "createdAt": "2026-09-17T05:00:00.000Z"
+  }
+]

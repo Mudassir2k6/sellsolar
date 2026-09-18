@@ -51,6 +51,8 @@ const STATIC_SLUGS = [
   ['disclaimer'],
 ];
 
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return STATIC_SLUGS.map((slug) => ({ slug }));
 }

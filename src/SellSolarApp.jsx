@@ -15,6 +15,7 @@ import SolarLoadCalculator from './components/SolarLoadCalculator';
 import FloatingPostAdButton from './components/FloatingPostAdButton';
 import CompanyMarketplacePage from './views/CompanyMarketplacePage';
 import KeywordLandingPage, { KEYWORD_LANDING_KEYS } from './views/KeywordLandingPage';
+import EmailContactModal from './components/EmailContactModal';
 import { applyPageSeo, parseLocation, pageToPath } from './lib/seo';
 import { getInboxMessages } from './services/inboxService';
 import {
@@ -106,8 +107,9 @@ function Xy({
 }){
   var w;
   const[r,n]=useState(!1),[s,a]=useState(!1),[l,o]=useState(!1),{
-    user:c,profile:u,signOut:d
+    user:c,profile:u,signOut:d,isSuperAdmin:isSuperAdm,isAdmin:isAdmRole
   }=useAuth();
+  const isUserAdmin = Boolean(c && (isSuperAdm || isAdmRole || u?.is_admin || u?.is_super_admin || u?.role === 'super_admin' || u?.role === 'admin' || c?.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase()));
   const { settings } = useSiteSettings();
   const mobileMenuRef = useRef(null);
   const mobileToggleBtnRef = useRef(null);
@@ -315,17 +317,6 @@ function Xy({
               className:"shrink-0"
             }),c?jsxs(Fragment,{
             children:[jsxs("button",{
-              onClick:()=>h("inbox"),
-              className:"relative p-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors shrink-0",
-              title:"Inbox & Inquiries",
-              children:[
-                jsx(MessageSquare,{ className:"h-4 w-4 text-purple-500" }),
-                unreadInboxCount > 0 && jsx("span",{
-                  className:"absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-black text-white",
-                  children:unreadInboxCount
-                })
-              ]
-            }),jsxs("button",{
               onClick:()=>h("post-ad"),className:"btn-primary hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm shadow-xs",children:[jsx(CirclePlus,{
                 className:"h-4 w-4"
               }),"Post an Ad"]
@@ -352,12 +343,12 @@ function Xy({
                   onClick:()=>h("dashboard"),className:"flex w-full items-center gap-2 px-4 py-2.5 text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx(LayoutDashboard,{
                     className:"h-4 w-4 text-amber-500"
                   }), (u?.is_super_admin || u?.role === 'super_admin' || c?.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase()) ? "👑 Super Admin Dashboard" : (u?.is_admin || u?.role === 'admin') ? "🛡️ Admin Dashboard" : (u?.role === 'dealer' || u?.is_dealer) ? "🏪 Dealer Dashboard" : "📊 My Dashboard"]
-                }),jsxs("button",{
-                  onClick:()=>h("inbox"),className:"flex w-full items-center justify-between px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[
+                }),isUserAdmin && jsxs("button",{
+                  onClick:()=>h("inbox"),className:"flex w-full items-center justify-between px-4 py-2.5 text-sm font-medium text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950/40",children:[
                     jsxs("div",{
                       className:"flex items-center gap-2",children:[jsx(MessageSquare,{
                         className:"h-4 w-4 text-purple-500"
-                      }),"Inbox & Inquiries"]
+                      }),"Admin Inquiries & Inbox"]
                     }),
                     unreadInboxCount > 0 && jsx("span",{
                       className:"px-1.5 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white",children:unreadInboxCount
@@ -438,12 +429,12 @@ function Xy({
                 onClick:()=>h("dashboard"),className:"flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx(LayoutDashboard,{
                   className:"h-4 w-4 text-amber-500"
                 }),(u?.is_super_admin || u?.role === 'super_admin' || c?.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase()) ? "👑 Super Admin Dashboard" : (u?.is_admin || u?.role === 'admin') ? "🛡️ Admin Dashboard" : (u?.role === 'dealer' || u?.is_dealer) ? "🏪 Dealer Dashboard" : "📊 My Dashboard"]
-              }),jsxs("button",{
-                onClick:()=>h("inbox"),className:"flex items-center justify-between rounded-lg px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[
+              }),isUserAdmin && jsxs("button",{
+                onClick:()=>h("inbox"),className:"flex items-center justify-between rounded-lg px-4 py-3 text-sm font-semibold text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950/40",children:[
                   jsxs("div",{
                     className:"flex items-center gap-2",children:[jsx(MessageSquare,{
                       className:"h-4 w-4 text-purple-500"
-                    }),"Inbox & Inquiries"]
+                    }),"Admin Inquiries & Inbox"]
                   }),
                   unreadInboxCount > 0 && jsx("span",{
                     className:"px-1.5 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white",children:unreadInboxCount
@@ -1586,8 +1577,23 @@ function hx({
   onPostAd:t,
   onNavigate:navigate
 }){
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
+
   return jsxs("footer",{
-    id:"contact",className:"bg-gray-900 text-gray-400",children:[jsx("div",{
+    id:"contact",className:"bg-gray-900 text-gray-400",children:[
+      jsx(EmailContactModal, {
+        isOpen: emailModalOpen,
+        onClose: () => setEmailModalOpen(false),
+        recipientEmail: "info@sellsolar.pk",
+        defaultSubject: "Inquiry via SellSolar.pk",
+        onNavigateToContactForm: () => {
+          if (navigate) {
+            navigate("contact");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }
+        }
+      }),
+      jsx("div",{
       className:"border-b border-gray-800",children:jsx("div",{
         className:"container-page py-6 sm:py-8",children:jsxs("div",{
           className:"flex flex-col items-center justify-between gap-4 rounded-2xl bg-gradient-to-r from-primary-500 to-primary-600 p-5 sm:p-6 text-center lg:flex-row lg:text-left",children:[jsxs("div",{
@@ -1617,9 +1623,13 @@ function hx({
           }),jsx("p",{
             className:"mt-4 max-w-xs text-sm leading-relaxed",children:"Pakistan's #1 marketplace for solar panels, inverters, batteries, and complete solar systems. Buy and sell with confidence."
           }),jsxs("div",{
-            className:"mt-6 space-y-2 text-sm",children:[jsxs("a",{
-              href:"mailto:info@sellsolar.pk",className:"flex items-center gap-2 hover:text-white",children:[jsx(Mail,{
-                className:"h-4 w-4"
+            className:"mt-6 space-y-2 text-sm",children:[jsxs("button",{
+              type:"button",
+              onClick:()=>setEmailModalOpen(true),
+              className:"flex items-center gap-2 hover:text-white transition-colors cursor-pointer text-left group",
+              title:"Click to email info@sellsolar.pk",
+              children:[jsx(Mail,{
+                className:"h-4 w-4 text-primary-400 group-hover:scale-110 transition-transform"
               }),"info@sellsolar.pk"]
             }),jsxs("p",{
               className:"flex items-center gap-2",children:[jsx(MapPin,{
@@ -1652,11 +1662,16 @@ function hx({
           className:"text-sm",children:"© 2026 SellSolar. All rights reserved."
         }),jsx("div",{
           className:"flex gap-3",children:[
-            { href: "mailto:info@sellsolar.pk", label: "Email SellSolar", Icon: Mail },
+            { href: "mailto:info@sellsolar.pk", label: "Email SellSolar (info@sellsolar.pk)", Icon: Mail, isEmail: true },
             { href: "/contact", label: "Contact SellSolar", Icon: MapPin, page: "contact" },
-          ].map(({ href, label, Icon, page }) => jsx("a", {
+          ].map(({ href, label, Icon, page, isEmail }) => jsx("a", {
             href,
             onClick: (ev) => {
+              if (isEmail) {
+                ev.preventDefault();
+                setEmailModalOpen(true);
+                return;
+              }
               if (page && navigate) {
                 ev.preventDefault();
                 navigate(page);
@@ -4784,8 +4799,9 @@ function _x({
   })
 }export default function App({ initialPathname, initialSlug }){
   const {
-    user: t, profile: e, loading: r, passwordRecovery: pr
+    user: t, profile: e, loading: r, passwordRecovery: pr, isSuperAdmin, isAdmin
   } = useAuth();
+  const isUserAdmin = Boolean(t && (isSuperAdmin || isAdmin || e?.is_admin || e?.is_super_admin || e?.role === 'super_admin' || e?.role === 'admin' || t?.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase()));
   
   const getInitialLocation = () => {
     if (typeof window !== 'undefined') {
@@ -4849,6 +4865,34 @@ function _x({
     o(t ? "post-ad" : "login");
   };
 
+  const handleNavigate = d => {
+    if (d === "post-ad") {
+      c();
+    } else if (d === "admin" || d === "admin-dashboard") {
+      if (!t) {
+        o("login");
+      } else if (isUserAdmin) {
+        o("admin-dashboard");
+      } else {
+        o("dashboard");
+      }
+    } else if (d === "dashboard") {
+      o(t ? "dashboard" : "login");
+    } else if (d === "inbox") {
+      if (!t) {
+        o("login");
+      } else if (isUserAdmin) {
+        o("inbox");
+      } else {
+        o("dashboard");
+      }
+    } else if (d === "password" || d === "change-password") {
+      o("password");
+    } else {
+      o(d);
+    }
+  };
+
   const u = d => {
     l(d);
     recordProductView(d);
@@ -4891,74 +4935,64 @@ function _x({
     onSuccess: () => o("home"), onBack: () => o("home"), onForgotPassword: () => o("forgot-password")
   }) : n === "dealers" ? jsxs("div", {
     className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
-      onNavigate: d => {
-        d === "post-ad" ? c() : d === "admin" || d === "admin-dashboard" ? t && (e != null && e.is_admin) ? o("admin-dashboard") : o("login") : d === "password" || d === "change-password" ? o("password") : o(d === "dashboard" ? t ? "dashboard" : "login" : d)
-      }, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
+      onNavigate: handleNavigate, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
     }), jsx("main", {
       id: "main",
       children: jsx(DealersPage, {
-        onNavigate: o, onBack: () => o("home"), hasOuterNavbar: true
+        onNavigate: handleNavigate, onBack: () => o("home"), hasOuterNavbar: true
       })
     }), jsx(hx, {
-      onPostAd: c, onNavigate: o
+      onPostAd: c, onNavigate: handleNavigate
     })]
   }) : n === "install" || n === "installation" || n === "request-installation" ? jsx(InstallationRequestPage, {
     onBack: () => o("home")
   }) : n === "calculator" || n === "load-calculator" ? jsxs("div", {
     className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
-      onNavigate: d => {
-        d === "post-ad" ? c() : d === "admin" || d === "admin-dashboard" ? t && (e != null && e.is_admin) ? o("admin-dashboard") : o("login") : d === "password" || d === "change-password" ? o("password") : o(d === "dashboard" ? t ? "dashboard" : "login" : d)
-      }, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
+      onNavigate: handleNavigate, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
     }), jsx("main", {
       id: "main",
       children: jsx(LoadCalculatorPage, {
-        onNavigate: o, onSelectCategory: cat => {
+        onNavigate: handleNavigate, onSelectCategory: cat => {
           handleGlobalSearchSubmit(typeof cat === 'object' ? cat : { category: cat });
         }
       })
     }), jsx(hx, {
-      onPostAd: c, onNavigate: o
+      onPostAd: c, onNavigate: handleNavigate
     })]
   }) : n === "prices" || n === "today-prices" ? jsxs("div", {
     className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
-      onNavigate: d => {
-        d === "post-ad" ? c() : d === "admin" || d === "admin-dashboard" ? t && (e != null && e.is_admin) ? o("admin-dashboard") : o("login") : d === "password" || d === "change-password" ? o("password") : o(d === "dashboard" ? t ? "dashboard" : "login" : d)
-      }, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
+      onNavigate: handleNavigate, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
     }), jsx("main", {
       id: "main",
       children: jsx(TodayPricesPage, {
-        onNavigate: o, onSelectCategory: cat => {
+        onNavigate: handleNavigate, onSelectCategory: cat => {
           handleGlobalSearchSubmit(typeof cat === 'object' ? cat : { category: cat });
         }
       })
     }), jsx(hx, {
-      onPostAd: c, onNavigate: o
+      onPostAd: c, onNavigate: handleNavigate
     })]
   }) : KEYWORD_LANDING_KEYS.includes(n) ? jsxs("div", {
     className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
-      onNavigate: d => {
-        d === "post-ad" ? c() : d === "admin" || d === "admin-dashboard" ? t && (e != null && e.is_admin) ? o("admin-dashboard") : o("login") : d === "password" || d === "change-password" ? o("password") : o(d === "dashboard" ? t ? "dashboard" : "login" : d)
-      }, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
+      onNavigate: handleNavigate, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
     }), jsx("main", {
       id: "main",
       children: jsx(KeywordLandingPage, {
-        pageKey: n, onNavigate: o
+        pageKey: n, onNavigate: handleNavigate
       })
     }), jsx(hx, {
-      onPostAd: c, onNavigate: o
+      onPostAd: c, onNavigate: handleNavigate
     })]
   }) : FOOTER_PAGES_KEYS.includes(n) ? jsxs("div", {
     className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
-      onNavigate: d => {
-        d === "post-ad" ? c() : d === "admin" || d === "admin-dashboard" ? t && (e != null && e.is_admin) ? o("admin-dashboard") : o("login") : d === "password" || d === "change-password" ? o("password") : o(d === "dashboard" ? t ? "dashboard" : "login" : d)
-      }, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
+      onNavigate: handleNavigate, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
     }), jsx("main", {
       id: "main",
       children: jsx(CompanyMarketplacePage, {
-        page: n, onNavigate: o, onPostAd: c
+        page: n, onNavigate: handleNavigate, onPostAd: c
       })
     }), jsx(hx, {
-      onPostAd: c, onNavigate: o
+      onPostAd: c, onNavigate: handleNavigate
     })]
   }) : n === "post-ad" ? t ? jsx(yx, {
     onBack: () => o("home"), onPosted: () => o("home")
@@ -4978,16 +5012,14 @@ function _x({
     className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100",
     children: [
       jsx(Xy, {
-        onNavigate: d => {
-          d === "post-ad" ? c() : o(d === "dashboard" ? (t ? "dashboard" : "login") : d)
-        },
+        onNavigate: handleNavigate,
         currentPage: "home",
         onSelectListing: u,
         onSearchSubmit: handleGlobalSearchSubmit
       }),
       jsx("main", {
         id: "main",
-        className: "container-page py-12 sm:py-16 text-center max-w-4xl mx-auto px-4",
+        className: "container-page pt-24 sm:pt-28 pb-12 sm:pb-16 text-center max-w-4xl mx-auto px-4",
         children: jsxs("div", {
           className: "flex flex-col items-center",
           children: [
@@ -5157,17 +5189,14 @@ function _x({
     ]
   }) : jsxs("div", {
     className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
-      onNavigate: d => {
-        const isAdm = t && (e?.is_admin || e?.is_super_admin || e?.role === 'super_admin' || e?.role === 'admin' || t.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase());
-        d === "post-ad" ? c() : d === "admin" || d === "admin-dashboard" ? isAdm ? o("admin-dashboard") : o("login") : d === "password" || d === "change-password" ? o("password") : o(d === "dashboard" ? t ? "dashboard" : "login" : d)
-      }, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
+      onNavigate: handleNavigate, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
     }), jsx("main", {
       id: "main",
       children: jsx(_x, {
-        onSelectListing: u, onNavigate: o, initialFilters: searchFilters
+        onSelectListing: u, onNavigate: handleNavigate, initialFilters: searchFilters
       })
     }), jsx(hx, {
-      onPostAd: c, onNavigate: o
+      onPostAd: c, onNavigate: handleNavigate
     })]
   });
 

@@ -16,6 +16,8 @@ create table if not exists public.profiles (
   visiting_card_url text,
   is_verified_dealer boolean not null default false,
   is_admin boolean not null default false,
+  registration_source text not null default 'self_registered',
+  registered_by text not null default 'dealer_self',
   created_at timestamptz not null default now()
 );
 

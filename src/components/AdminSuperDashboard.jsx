@@ -980,7 +980,7 @@ export default function AdminSuperDashboard({
             >
               <div className="flex items-center gap-2.5">
                 <MessageSquare className="h-4 w-4" />
-                <span>Inbox {isSuperAdmin ? '(info@sellsolar)' : 'Messages'}</span>
+                <span>Inbox {(isSuperAdmin || isAdmin) ? '(info@sellsolar.pk)' : 'Messages'}</span>
               </div>
               {unreadInboxCount > 0 && (
                 <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-rose-500 text-white font-black">
@@ -1488,26 +1488,38 @@ export default function AdminSuperDashboard({
               </div>
 
               {/* Email Routing Info Banner */}
-              <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 flex flex-col lg:flex-row lg:items-center justify-between gap-3 text-xs">
                 <div className="flex items-start sm:items-center gap-2.5">
                   <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5 sm:mt-0" />
                   <div>
-                    <span className="font-bold text-amber-900 dark:text-amber-200">Email Routing Active:</span>{' '}
+                    <span className="font-bold text-amber-900 dark:text-amber-200">Email Routing to Gmail:</span>{' '}
                     <span className="text-amber-800/90 dark:text-amber-300/90">
-                      Direct emails sent to <strong>info@sellsolar.pk</strong> route straight to your Gmail (<strong>mudassir2k6@gmail.com</strong>).
-                      Website contact inquiries and dealer partnership applications appear in the list below.
+                      Emails sent to <strong>info@sellsolar.pk</strong> route straight to your Gmail (<strong>mudassir2k6@gmail.com</strong>).
+                      Website contact inquiries and messages also log in real time below.
                     </span>
                   </div>
                 </div>
-                <a
-                  href="https://mail.google.com/mail/u/0/#search/info%40sellsolar.pk"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shrink-0 shadow-xs transition-all active:scale-95"
-                >
-                  <span>Open Gmail Inbox</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
+                <div className="flex items-center gap-2 flex-wrap shrink-0">
+                  <a
+                    href="https://mail.google.com/mail/?view=cm&fs=1&to=info@sellsolar.pk&su=Test%20Message%20to%20info@sellsolar.pk&body=This%20is%20a%20test%20message%20to%20verify%20email%20delivery%20to%20SellSolar%20support."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-gray-800 border border-amber-300 dark:border-amber-700 hover:bg-amber-100 text-amber-900 dark:text-amber-200 font-bold text-xs shadow-2xs transition-all active:scale-95"
+                    title="Send a test email to verify routing"
+                  >
+                    <Mail className="w-3.5 h-3.5 text-amber-600" />
+                    <span>Send Test Email</span>
+                  </a>
+                  <a
+                    href="https://mail.google.com/mail/u/0/#search/info%40sellsolar.pk"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-xs transition-all active:scale-95"
+                  >
+                    <span>Open Gmail Inbox</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
               </div>
 
               {/* Message Layout: List + Detail */}
@@ -1765,22 +1777,40 @@ export default function AdminSuperDashboard({
                           <span className="text-[11px] text-gray-400">
                             Reply will be sent from <strong>info@sellsolar.pk</strong>
                           </span>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             {selectedMessage.senderEmail && (
-                              <a
-                                href={`mailto:${encodeURIComponent(selectedMessage.senderEmail)}?subject=${encodeURIComponent(
-                                  `Re: [${selectedMessage.ticketNumber}] ${selectedMessage.subject || 'SellSolar Inquiry'}`
-                                )}&body=${encodeURIComponent(
-                                  `Dear ${selectedMessage.senderName || 'Valued User'},\n\n${replyText || ''}\n\nBest regards,\nSellSolar Support Team\ninfo@sellsolar.pk`
-                                )}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold text-xs flex items-center gap-1.5 transition-all"
-                                title="Open draft in your email app"
-                              >
-                                <Mail className="h-3.5 w-3.5 text-amber-500" />
-                                <span className="hidden sm:inline">Send via</span> Email App
-                              </a>
+                              <>
+                                <a
+                                  href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(
+                                    selectedMessage.senderEmail
+                                  )}&su=${encodeURIComponent(
+                                    `Re: [${selectedMessage.ticketNumber}] ${selectedMessage.subject || 'SellSolar Inquiry'}`
+                                  )}&body=${encodeURIComponent(
+                                    `Dear ${selectedMessage.senderName || 'Valued User'},\n\n${replyText || ''}\n\nBest regards,\nSellSolar Support Team\ninfo@sellsolar.pk`
+                                  )}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="px-3 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-all active:scale-95"
+                                  title="Open reply draft in Gmail web"
+                                >
+                                  <span className="h-3.5 w-3.5 rounded bg-white/20 flex items-center justify-center text-[9px] font-black">M</span>
+                                  <span>Reply in Gmail</span>
+                                </a>
+                                <a
+                                  href={`mailto:${encodeURIComponent(selectedMessage.senderEmail)}?subject=${encodeURIComponent(
+                                    `Re: [${selectedMessage.ticketNumber}] ${selectedMessage.subject || 'SellSolar Inquiry'}`
+                                  )}&body=${encodeURIComponent(
+                                    `Dear ${selectedMessage.senderName || 'Valued User'},\n\n${replyText || ''}\n\nBest regards,\nSellSolar Support Team\ninfo@sellsolar.pk`
+                                  )}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold text-xs flex items-center gap-1.5 transition-all"
+                                  title="Open draft in default email app"
+                                >
+                                  <Mail className="h-3.5 w-3.5 text-amber-500" />
+                                  <span className="hidden sm:inline">Mail App</span>
+                                </a>
+                              </>
                             )}
                             <button
                               type="submit"

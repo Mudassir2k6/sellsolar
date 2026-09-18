@@ -134,7 +134,7 @@ export default function DealersPage({ onNavigate, onBack, hasOuterNavbar = false
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
+    <div className={`min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors ${hasOuterNavbar ? 'pt-20 sm:pt-24 lg:pt-28' : ''}`}>
       {/* Optional Standalone Header if no outer navbar */}
       {!hasOuterNavbar && (
         <header className="sticky top-0 z-40 border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md">

@@ -83,7 +83,7 @@ export default function KeywordLandingPage({ pageKey, onNavigate }) {
   const Icon = data.icon;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 pt-20 sm:pt-24 lg:pt-28">
       <main className="container-page py-12 lg:py-16">
         <div className="mx-auto max-w-3xl">
           <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-500 text-white shadow-lg shadow-primary-500/30">

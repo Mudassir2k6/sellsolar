@@ -7,9 +7,9 @@
   },
   "scripts": {
     "dev": "next dev -p 3000 -H 0.0.0.0",
-    "build": "next build && node scripts/sync-dist.mjs",
+    "build": "NODE_ENV=production next build && node scripts/sync-dist.mjs",
     "start": "next start -p 3000",
-    "lint": "next build",
+    "lint": "NODE_ENV=production next build",
     "update-prices": "node scripts/update-today-prices.js",
     "schedule-prices": "node scripts/daily-price-scheduler.js"
   },

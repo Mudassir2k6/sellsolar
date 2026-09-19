@@ -487,6 +487,8 @@ function Xy({
 function nx({
   filters:t,onFilterChange:e,onSearch:r,onReset:n,onNavigatePrices:np,onNavigateCalculator:nc,onNavigateDealers:nd
 }){
+  const { settings } = useSiteSettings();
+  const heroCms = settings?.homePageCms?.hero;
   const [moreFiltersOpen, setMoreFiltersOpen] = useState(() => Boolean(t.brand || t.condition || t.minPrice || t.maxPrice));
   const activeExtraFiltersCount = [t.brand, t.condition, t.minPrice, t.maxPrice].filter(Boolean).length;
   // Live dynamic ticking animated counters for hero metrics
@@ -586,16 +588,16 @@ function nx({
               jsxs("div",{
                 className:"mb-3 inline-flex items-center gap-2 rounded-full bg-primary-50 dark:bg-primary-950/60 border border-primary-200/80 dark:border-primary-800/60 px-3.5 py-1 text-xs font-bold text-primary-700 dark:text-primary-300 shadow-2xs",children:[
                   jsx(TrendingUp,{ className:"h-3.5 w-3.5 text-primary-600 dark:text-primary-400" }),
-                  "Pakistan's #1 Solar Marketplace"
+                  heroCms?.badgeText || "Pakistan's #1 Solar Marketplace"
                 ]
               }),
               jsx("h1",{
                 className:"text-balance text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white leading-tight",
-                children:"Sell & Buy Used Solar Panels in Pakistan"
+                children: heroCms?.heading || "Sell & Buy Used Solar Panels in Pakistan"
               }),
               jsx("p",{
                 className:"mx-auto mt-3 max-w-2xl text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed",
-                children:"Search 500+ verified used and new solar panels, inverters and batteries across Pakistan at live market rates."
+                children: heroCms?.subheading || "Search 500+ verified used and new solar panels, inverters and batteries across Pakistan at live market rates."
               }),
               (nc||np||nd)&&jsxs("div",{
                 className:"mt-4 flex flex-wrap items-center justify-center gap-2.5",children:[
@@ -780,143 +782,108 @@ function nx({
       })
     ]
   });
-}function PakWheelsSellCards({ onPostAd, onInstall }) {
+}function PakWheelsSellCards({ onPostAd, onInstall, onNavigate }) {
+  const { settings } = useSiteSettings();
+  const rawCards = settings?.homePageCms?.cards || [];
+  const cards = rawCards.filter((c) => c.enabled !== false);
+
+  if (cards.length === 0) return null;
+
+  const getBadgeClass = (color) => {
+    switch (color) {
+      case 'emerald':
+        return 'badge-emerald';
+      case 'blue':
+        return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300';
+      case 'purple':
+        return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300';
+      default:
+        return 'badge-primary';
+    }
+  };
+
+  const handleCardClick = (link) => {
+    if ((link === 'post-ad' || !link) && onPostAd) return onPostAd();
+    if ((link === 'installation' || link === 'install') && onInstall) return onInstall();
+    if (onNavigate) return onNavigate(link);
+    if (typeof window !== 'undefined' && link) {
+      if (link.startsWith('http')) {
+        window.open(link, '_blank');
+      } else {
+        window.location.href = link.startsWith('/') ? link : `/${link}`;
+      }
+    }
+  };
+
   return jsx("section", {
     className: "bg-white dark:bg-gray-950 py-5 sm:py-6 border-b border-gray-200/70 dark:border-gray-800 transition-colors",
     children: jsx("div", {
       className: "container-page max-w-6xl",
-      children: jsxs("div", {
-        className: "grid grid-cols-1 md:grid-cols-2 gap-4",
-        children: [
+      children: jsx("div", {
+        className: `grid grid-cols-1 ${cards.length >= 3 ? 'md:grid-cols-2 lg:grid-cols-3' : 'md:grid-cols-2'} gap-4`,
+        children: cards.map((card) => (
           jsxs("div", {
-            className: "card-interactive p-5 border border-gray-200/90 dark:border-gray-800 bg-gradient-to-br from-white via-primary-50/20 to-transparent dark:from-gray-900 dark:via-primary-950/15 dark:to-gray-900 transition-all flex flex-col justify-between group shadow-sm",
+            key: card.id || card.title,
+            className: "card-interactive p-5 border border-gray-200/90 dark:border-gray-800 bg-gradient-to-br from-white via-primary-50/10 to-transparent dark:from-gray-900 dark:via-primary-950/10 dark:to-gray-900 transition-all flex flex-col justify-between group shadow-sm rounded-2xl overflow-hidden",
             children: [
               jsxs("div", {
                 children: [
+                  card.imageUrl ? jsx("div", {
+                    className: "w-full h-36 sm:h-40 rounded-xl overflow-hidden mb-3 border border-gray-100 dark:border-gray-800 bg-gray-100 dark:bg-gray-800",
+                    children: jsx("img", {
+                      src: card.imageUrl,
+                      alt: card.title || 'Solar Equipment',
+                      className: "w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    })
+                  }) : null,
                   jsxs("div", {
                     className: "flex items-center justify-between mb-2.5",
                     children: [
                       jsx("span", {
-                        className: "badge-primary",
-                        children: "Post Solar Ad"
+                        className: getBadgeClass(card.badgeColor),
+                        children: card.badge || "Featured"
                       }),
                       jsx(Sun, { className: "h-4 w-4 text-primary-500" })
                     ]
                   }),
                   jsx("h3", {
                     className: "text-base sm:text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors",
-                    children: "Sell Your Solar Equipment on SellSolar"
+                    children: card.title
                   }),
-                  jsx("p", {
+                  card.description ? jsx("p", {
                     className: "mt-1.5 text-xs text-gray-500 dark:text-gray-400 leading-relaxed",
-                    children: "Post your solar panels, inverters, batteries or complete setups and connect directly with genuine buyers across Pakistan."
-                  }),
-                  jsxs("ul", {
+                    children: card.description
+                  }) : null,
+                  Array.isArray(card.points) && card.points.length > 0 ? jsx("ul", {
                     className: "mt-3 space-y-1.5 text-xs text-gray-600 dark:text-gray-300",
-                    children: [
+                    children: card.points.map((pt, idx) => (
                       jsxs("li", {
+                        key: idx,
                         className: "flex items-center gap-2",
                         children: [
                           jsx(ShieldCheck, { className: "h-3.5 w-3.5 text-emerald-500 shrink-0" }),
-                          "Post your ad in 30 seconds for FREE"
-                        ]
-                      }),
-                      jsxs("li", {
-                        className: "flex items-center gap-2",
-                        children: [
-                          jsx(MessageCircle, { className: "h-3.5 w-3.5 text-emerald-500 shrink-0" }),
-                          "Direct inquiries via WhatsApp and phone calls"
-                        ]
-                      }),
-                      jsxs("li", {
-                        className: "flex items-center gap-2",
-                        children: [
-                          jsx(TrendingUp, { className: "h-3.5 w-3.5 text-emerald-500 shrink-0" }),
-                          "10,000+ monthly active solar buyers"
+                          pt
                         ]
                       })
-                    ]
-                  })
+                    ))
+                  }) : null
                 ]
               }),
               jsx("div", {
                 className: "mt-4 pt-3.5 border-t border-gray-100 dark:border-gray-800",
                 children: jsxs("button", {
-                  onClick: onPostAd,
-                  className: "btn-primary w-full sm:w-auto px-5 py-2.5 text-xs font-bold shadow-xs",
+                  type: "button",
+                  onClick: () => handleCardClick(card.ctaLink || 'post-ad'),
+                  className: "btn-primary w-full sm:w-auto px-5 py-2.5 text-xs font-bold shadow-xs flex items-center justify-center gap-1.5",
                   children: [
                     jsx(CirclePlus, { className: "h-3.5 w-3.5" }),
-                    "Post an Ad — Free"
-                  ]
-                })
-              })
-            ]
-          }),
-          jsxs("div", {
-            className: "card-interactive p-5 border border-gray-200/90 dark:border-gray-800 bg-gradient-to-br from-white via-secondary-50/20 to-transparent dark:from-gray-900 dark:via-secondary-950/15 dark:to-gray-900 transition-all flex flex-col justify-between group shadow-sm",
-            children: [
-              jsxs("div", {
-                children: [
-                  jsxs("div", {
-                    className: "flex items-center justify-between mb-2.5",
-                    children: [
-                      jsx("span", {
-                        className: "badge-emerald",
-                        children: "EPC & Net-Metering"
-                      }),
-                      jsx(Wrench, { className: "h-4 w-4 text-secondary-500" })
-                    ]
-                  }),
-                  jsx("h3", {
-                    className: "text-base sm:text-lg font-bold text-gray-900 dark:text-white group-hover:text-secondary-600 dark:group-hover:text-secondary-400 transition-colors",
-                    children: "SellSolar Turnkey Installation Service"
-                  }),
-                  jsx("p", {
-                    className: "mt-1.5 text-xs text-gray-500 dark:text-gray-400 leading-relaxed",
-                    children: "Get complete on-grid, hybrid or off-grid solar systems engineered, installed and net-metered with Tier-1 warranty equipment."
-                  }),
-                  jsxs("ul", {
-                    className: "mt-3 space-y-1.5 text-xs text-gray-600 dark:text-gray-300",
-                    children: [
-                      jsxs("li", {
-                        className: "flex items-center gap-2",
-                        children: [
-                          jsx(ShieldCheck, { className: "h-3.5 w-3.5 text-emerald-500 shrink-0" }),
-                          "Tier-1 25-yr warranty panels & hybrid inverters"
-                        ]
-                      }),
-                      jsxs("li", {
-                        className: "flex items-center gap-2",
-                        children: [
-                          jsx(Zap, { className: "h-3.5 w-3.5 text-amber-500 shrink-0" }),
-                          "WAPDA / K-Electric Net-Metering license processing"
-                        ]
-                      }),
-                      jsxs("li", {
-                        className: "flex items-center gap-2",
-                        children: [
-                          jsx(Calculator, { className: "h-3.5 w-3.5 text-primary-500 shrink-0" }),
-                          "Free rooftop engineering survey & kW sizing"
-                        ]
-                      })
-                    ]
-                  })
-                ]
-              }),
-              jsx("div", {
-                className: "mt-4 pt-3.5 border-t border-gray-100 dark:border-gray-800",
-                children: jsxs("button", {
-                  onClick: onInstall,
-                  className: "btn bg-secondary-600 hover:bg-secondary-700 text-white w-full sm:w-auto px-5 py-2.5 text-xs font-bold shadow-xs",
-                  children: [
-                    jsx(Wrench, { className: "h-3.5 w-3.5" }),
-                    "Request Installation"
+                    card.ctaText || "Post an Ad — Free"
                   ]
                 })
               })
             ]
           })
-        ]
+        ))
       })
     })
   });
@@ -4637,6 +4604,8 @@ function yx({
 function _x({
   onSelectListing:t,onNavigate:nav,initialFilters
 }){
+  const { settings } = useSiteSettings();
+  const calcBanner = settings?.homePageCms?.calculatorBanner;
   const[calcOpen, setCalcOpen]=useState(false);
   const[e,r]=useState(()=>initialFilters?{...Vu,...initialFilters}:Vu),[n,s]=useState([]),[a,l]=useState(!0),[o,c]=useState(null),[u,d]=useState(0),[h,p]=useState(0),y=useCallback((g,m)=>{
     r(v=>({
@@ -4724,7 +4693,7 @@ function _x({
     }),jsx(PakWheelsSellCards,{
       onPostAd:()=>nav?nav("post-ad"):void 0,
       onInstall:()=>nav?nav("installation"):void 0
-    }),nav?jsx("div",{
+    }),nav && calcBanner?.enabled !== false ? jsx("div",{
       className:"container-page my-3.5 sm:my-4",children:jsxs("div",{
         className:"rounded-2xl bg-gradient-to-r from-gray-900 via-gray-850 to-primary-950 p-4 sm:p-5 text-white shadow-md border border-gray-800 transition-all",children:[
           jsxs("div",{
@@ -4738,11 +4707,11 @@ function _x({
                   children:[jsxs("div",{
                     className:"inline-flex items-center gap-1.5 rounded-full bg-primary-500/20 border border-primary-400/30 px-2.5 py-0.5 text-xs font-bold text-primary-300 mb-1",children:[jsx(Zap,{
                       className:"h-3 w-3 fill-primary-400 text-primary-400"
-                    }),"Instant System Sizing Tool"]
+                    }), calcBanner?.badge || "Instant System Sizing Tool"]
                   }),jsx("h3",{
-                    className:"text-base sm:text-lg font-bold text-white tracking-tight",children:"Calculate Your Solar Load in 30 Seconds"
+                    className:"text-base sm:text-lg font-bold text-white tracking-tight",children: calcBanner?.title || "Calculate Your Solar Load in 30 Seconds"
                   }),jsx("p",{
-                    className:"mt-0.5 text-xs text-gray-300 max-w-xl",children:"Enter your Fans, LED Bulbs, Inverter ACs, Water Pumps, Iron & Fridge. Find your required kW system size, panel count, and battery backup."
+                    className:"mt-0.5 text-xs text-gray-300 max-w-xl",children: calcBanner?.description || "Enter your Fans, LED Bulbs, Inverter ACs, Water Pumps, Iron & Fridge. Find your required kW system size, panel count, and battery backup."
                   })]
                 })]
               }),
@@ -4758,7 +4727,7 @@ function _x({
                     }`,
                     children:[
                       jsx(Calculator,{ className:"h-4 w-4" }),
-                      calcOpen ? "Hide Calculator" : "Calculate Here (Instant kW)"
+                      calcOpen ? "Hide Calculator" : (calcBanner?.calculateButtonText || "Calculate Here (Instant kW)")
                     ]
                   }),
                   jsxs("button",{
@@ -4766,7 +4735,7 @@ function _x({
                     onClick:()=>nav("calculator"),
                     className:"inline-flex items-center gap-1.5 rounded-lg border border-gray-700 bg-gray-800/80 hover:bg-gray-800 px-4 py-2.5 text-xs sm:text-sm font-bold text-gray-200 transition-all",
                     children:[
-                      "Full Page",
+                      calcBanner?.fullPageButtonText || "Full Page",
                       jsx(ArrowRight,{ className:"h-3.5 w-3.5" })
                     ]
                   })

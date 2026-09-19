@@ -52,6 +52,74 @@ export const DEFAULT_SITE_SETTINGS = {
 
   // Custom Pages managed from Admin
   customPages: [],
+
+  // Dynamic Visual CMS content for Home Page (Cards, Hero, Text, Images)
+  homePageCms: {
+    hero: {
+      badgeText: "⚡ Pakistan's #1 Solar Directory",
+      heading: 'Buy & Sell Solar Equipment at Live Market Rates',
+      subheading: 'Compare verified solar panel, inverter & battery listings across Lahore, Karachi, Islamabad & 30+ cities in Pakistan.',
+      searchPlaceholder: 'Search panels, inverters, batteries or cities (e.g. Longi, Solis, Lahore)...',
+      primaryCtaText: 'Post a Free Ad',
+      primaryCtaLink: 'post-ad',
+      secondaryCtaText: "Today's Solar Rates",
+      secondaryCtaLink: 'prices',
+      heroImageUrl: '',
+    },
+    cards: [
+      {
+        id: 'card-sell-solar',
+        badge: 'Post Solar Ad',
+        badgeColor: 'amber',
+        icon: 'Sun',
+        title: 'Sell Your Solar Equipment on SellSolar',
+        description: 'Post your solar panels, inverters, batteries or complete setups and connect directly with genuine buyers across Pakistan.',
+        points: [
+          'Post your ad in 30 seconds for FREE',
+          'Direct inquiries via WhatsApp and phone calls',
+          '10,000+ monthly active solar buyers'
+        ],
+        ctaText: 'Post an Ad — Free',
+        ctaLink: 'post-ad',
+        imageUrl: 'https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=600&q=80',
+        enabled: true,
+      },
+      {
+        id: 'card-turnkey-install',
+        badge: 'EPC & Net-Metering',
+        badgeColor: 'emerald',
+        icon: 'Wrench',
+        title: 'SellSolar Turnkey Installation Service',
+        description: 'Get complete on-grid, hybrid or off-grid solar systems engineered, installed and net-metered with Tier-1 warranty equipment.',
+        points: [
+          'Tier-1 25-yr warranty panels & hybrid inverters',
+          'WAPDA / K-Electric Net-Metering license processing',
+          'Free rooftop engineering survey & kW sizing'
+        ],
+        ctaText: 'Request Installation',
+        ctaLink: 'installation',
+        imageUrl: 'https://images.unsplash.com/photo-1508873696983-2df5293cb32f?auto=format&fit=crop&w=600&q=80',
+        enabled: true,
+      }
+    ],
+    calculatorBanner: {
+      enabled: true,
+      badge: 'Instant System Sizing Tool',
+      title: 'Calculate Your Solar Load in 30 Seconds',
+      description: 'Enter your Fans, LED Bulbs, Inverter ACs, Water Pumps, Iron & Fridge. Find your required kW system size, panel count, and battery backup.',
+      calculateButtonText: 'Calculate Here (Instant kW)',
+      fullPageButtonText: 'Full Page'
+    },
+    trustMetrics: [
+      { id: 'm1', label: 'Verified Dealers', value: '250+', icon: 'ShieldCheck' },
+      { id: 'm2', label: 'Daily Benchmarks', value: '100% Live', icon: 'TrendingUp' },
+      { id: 'm3', label: 'Equipment Listed', value: '1,500+', icon: 'Sun' },
+      { id: 'm4', label: 'Cities Covered', value: '35+ Cities', icon: 'MapPin' },
+    ]
+  },
+
+  // Per-page visual custom content overrides
+  pagesCmsMap: {}
 };
 
 export const SiteSettingsContext = createContext(null);
@@ -60,22 +128,45 @@ export function SiteSettingsProvider({ children }) {
   const [settings, setSettings] = useState(DEFAULT_SITE_SETTINGS);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      const raw = localStorage.getItem(SITE_SETTINGS_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        setSettings((prev) => ({
-          ...prev,
-          ...parsed,
-          socialLinks: {
-            ...prev.socialLinks,
-            ...(parsed.socialLinks || {}),
-          },
-        }));
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = localStorage.getItem(SITE_SETTINGS_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          setSettings((prev) => ({
+            ...prev,
+            ...parsed,
+            socialLinks: {
+              ...prev.socialLinks,
+              ...(parsed.socialLinks || {}),
+            },
+            homePageCms: {
+              ...prev.homePageCms,
+              ...(parsed.homePageCms || {}),
+              hero: {
+                ...prev.homePageCms.hero,
+                ...(parsed.homePageCms?.hero || {}),
+              },
+              cards: Array.isArray(parsed.homePageCms?.cards) && parsed.homePageCms.cards.length > 0
+                ? parsed.homePageCms.cards
+                : prev.homePageCms.cards,
+              calculatorBanner: {
+                ...prev.homePageCms.calculatorBanner,
+                ...(parsed.homePageCms?.calculatorBanner || {}),
+              },
+              trustMetrics: Array.isArray(parsed.homePageCms?.trustMetrics) && parsed.homePageCms.trustMetrics.length > 0
+                ? parsed.homePageCms.trustMetrics
+                : prev.homePageCms.trustMetrics,
+            },
+            pagesCmsMap: {
+              ...prev.pagesCmsMap,
+              ...(parsed.pagesCmsMap || {}),
+            }
+          }));
+        }
+      } catch (e) {
+        console.warn('Error reading site settings:', e);
       }
-    } catch (e) {
-      console.warn('Error reading site settings:', e);
     }
   }, []);
 
@@ -88,6 +179,28 @@ export function SiteSettingsProvider({ children }) {
           ...prev.socialLinks,
           ...(newPartialSettings.socialLinks || {}),
         },
+        homePageCms: newPartialSettings.homePageCms ? {
+          ...prev.homePageCms,
+          ...newPartialSettings.homePageCms,
+          hero: {
+            ...prev.homePageCms.hero,
+            ...(newPartialSettings.homePageCms?.hero || {}),
+          },
+          cards: Array.isArray(newPartialSettings.homePageCms?.cards)
+            ? newPartialSettings.homePageCms.cards
+            : prev.homePageCms.cards,
+          calculatorBanner: {
+            ...prev.homePageCms.calculatorBanner,
+            ...(newPartialSettings.homePageCms?.calculatorBanner || {}),
+          },
+          trustMetrics: Array.isArray(newPartialSettings.homePageCms?.trustMetrics)
+            ? newPartialSettings.homePageCms.trustMetrics
+            : prev.homePageCms.trustMetrics,
+        } : prev.homePageCms,
+        pagesCmsMap: newPartialSettings.pagesCmsMap ? {
+          ...prev.pagesCmsMap,
+          ...newPartialSettings.pagesCmsMap,
+        } : prev.pagesCmsMap,
       };
 
       if (typeof window !== 'undefined') {
@@ -102,6 +215,12 @@ export function SiteSettingsProvider({ children }) {
       return updated;
     });
   }, []);
+
+  const updateHomePageCms = useCallback((partialHomeCms) => {
+    updateSiteSettings({
+      homePageCms: partialHomeCms
+    });
+  }, [updateSiteSettings]);
 
   const resetToDefaultSettings = useCallback(() => {
     setSettings(DEFAULT_SITE_SETTINGS);
@@ -120,6 +239,7 @@ export function SiteSettingsProvider({ children }) {
       value={{
         settings,
         updateSiteSettings,
+        updateHomePageCms,
         resetToDefaultSettings,
       }}
     >
@@ -135,6 +255,7 @@ export function useSiteSettings() {
     return {
       settings: DEFAULT_SITE_SETTINGS,
       updateSiteSettings: () => {},
+      updateHomePageCms: () => {},
       resetToDefaultSettings: () => {},
     };
   }

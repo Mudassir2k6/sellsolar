@@ -48,14 +48,27 @@ import {
   Edit3,
   Plus,
   X,
+  Image,
+  Layers,
+  Sun,
+  Wrench,
+  Calculator,
+  Zap,
 } from 'lucide-react';
 import { useAuth, USER_ROLES, getStoredUsers, saveStoredUsers, DEFAULT_ADMIN_ID, DEFAULT_ADMIN_EMAIL } from '../context/AuthContext';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { useToast } from '../context/ToastContext';
-import { useSiteSettings } from '../context/SiteSettingsContext';
+import { useSiteSettings, DEFAULT_SITE_SETTINGS } from '../context/SiteSettingsContext';
 import { getInboxMessages, fetchSharedInboxMessages, createDirectMessage, replyToInboxMessage, markMessageAsRead, deleteInboxMessage } from '../services/inboxService';
 import { getAnalyticsSummary } from '../services/analyticsService';
 import { formatPrice } from '../lib/constants';
+
+const SOLAR_PRESET_IMAGES = [
+  { label: 'Solar Field', url: 'https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=600&q=80' },
+  { label: 'Rooftop Setup', url: 'https://images.unsplash.com/photo-1508873696983-2df5293cb32f?auto=format&fit=crop&w=600&q=80' },
+  { label: 'Inverters', url: 'https://images.unsplash.com/photo-1613665813446-82a78c468a1d?auto=format&fit=crop&w=600&q=80' },
+  { label: 'Green Energy', url: 'https://images.unsplash.com/photo-1497440001374-f26997328c1b?auto=format&fit=crop&w=600&q=80' },
+];
 
 export const SYSTEM_PAGES = [
   { path: '/', title: 'Home & Daily Price Benchmark', category: 'Core', description: 'Main marketplace landing, featured solar systems and daily benchmark rates' },
@@ -95,7 +108,7 @@ export default function AdminSuperDashboard({
 }) {
   const { user, profile, isSuperAdmin, isAdmin, isDealer, isCustomer, updateUserRole, updateProfile, signOut } = useAuth();
   const { showToast } = useToast();
-  const { settings, updateSiteSettings } = useSiteSettings();
+  const { settings, updateSiteSettings, updateHomePageCms } = useSiteSettings();
 
   const [activeTab, setActiveTab] = useState(initialTab);
   const [usersList, setUsersList] = useState([]);
@@ -123,6 +136,7 @@ export default function AdminSuperDashboard({
   const [pageFilter, setPageFilter] = useState('all'); // 'all' | 'core' | 'marketplace' | 'company' | 'support' | 'legal' | 'custom'
   const [pageSearchQuery, setPageSearchQuery] = useState('');
   const [editingPage, setEditingPage] = useState(null);
+  const [pageEditTab, setPageEditTab] = useState('cards'); // 'cards' | 'hero' | 'calculator' | 'seo'
   const [isAddingPage, setIsAddingPage] = useState(false);
   const [pageEditForm, setPageEditForm] = useState({
     title: '',
@@ -130,6 +144,7 @@ export default function AdminSuperDashboard({
     heroHeading: '',
     category: 'Core',
     isPublished: true,
+    homeCms: null,
   });
   const [newPageForm, setNewPageForm] = useState({
     path: '',
@@ -593,25 +608,175 @@ export default function AdminSuperDashboard({
   // Pages & Content CMS Handlers
   const handleOpenEditPage = (page) => {
     setEditingPage(page);
+    const isHome = page.path === '/';
+    setPageEditTab(isHome ? 'cards' : 'seo');
     setPageEditForm({
       title: page.title || '',
       description: page.description || '',
       heroHeading: page.heroHeading || page.title || '',
       category: page.category || 'Core',
       isPublished: page.isPublished !== false,
+      homeCms: isHome
+        ? JSON.parse(
+            JSON.stringify(
+              settings?.homePageCms || {
+                hero: {
+                  badgeText: "⚡ Pakistan's #1 Solar Directory",
+                  heading: 'Buy & Sell Solar Equipment at Live Market Rates',
+                  subheading: 'Compare verified solar panel, inverter & battery listings across Lahore, Karachi, Islamabad & 30+ cities in Pakistan.',
+                  searchPlaceholder: 'Search panels, inverters, batteries or cities (e.g. Longi, Solis, Lahore)...',
+                  primaryCtaText: 'Post a Free Ad',
+                  primaryCtaLink: 'post-ad',
+                  secondaryCtaText: "Today's Solar Rates",
+                  secondaryCtaLink: 'prices',
+                  heroImageUrl: '',
+                },
+                cards: [],
+                calculatorBanner: {
+                  enabled: true,
+                  badge: 'Instant System Sizing Tool',
+                  title: 'Calculate Your Solar Load in 30 Seconds',
+                  description: 'Enter your Fans, LED Bulbs, Inverter ACs, Water Pumps, Iron & Fridge. Find your required kW system size, panel count, and battery backup.',
+                  calculateButtonText: 'Calculate Here (Instant kW)',
+                  fullPageButtonText: 'Full Page',
+                },
+              }
+            )
+          )
+        : null,
     });
+  };
+
+  const handleAddHomeCard = () => {
+    const newCard = {
+      id: `card-${Date.now()}`,
+      badge: 'Featured Option',
+      badgeColor: 'amber',
+      icon: 'Sun',
+      title: 'Solar Power Solution',
+      description: 'High efficiency solar setup with Tier-1 warranty equipment.',
+      points: [
+        'Complete installation and warranty support',
+        'Direct dealer pricing & technical consultation',
+        'Verified equipment with guaranteed generation',
+      ],
+      ctaText: 'Post an Ad — Free',
+      ctaLink: 'post-ad',
+      imageUrl: 'https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=600&q=80',
+      enabled: true,
+    };
+    setPageEditForm((prev) => ({
+      ...prev,
+      homeCms: {
+        ...prev.homeCms,
+        cards: [...(prev.homeCms?.cards || []), newCard],
+      },
+    }));
+  };
+
+  const handleUpdateHomeCard = (idx, field, value) => {
+    setPageEditForm((prev) => {
+      const updatedCards = [...(prev.homeCms?.cards || [])];
+      if (updatedCards[idx]) {
+        updatedCards[idx] = { ...updatedCards[idx], [field]: value };
+      }
+      return {
+        ...prev,
+        homeCms: {
+          ...prev.homeCms,
+          cards: updatedCards,
+        },
+      };
+    });
+  };
+
+  const handleRemoveHomeCard = (idx) => {
+    setPageEditForm((prev) => {
+      const updatedCards = [...(prev.homeCms?.cards || [])].filter((_, i) => i !== idx);
+      return {
+        ...prev,
+        homeCms: {
+          ...prev.homeCms,
+          cards: updatedCards,
+        },
+      };
+    });
+  };
+
+  const handleAddCardPoint = (cardIdx) => {
+    setPageEditForm((prev) => {
+      const updatedCards = [...(prev.homeCms?.cards || [])];
+      if (updatedCards[cardIdx]) {
+        const points = [...(updatedCards[cardIdx].points || []), 'New verified benefit or warranty feature'];
+        updatedCards[cardIdx] = { ...updatedCards[cardIdx], points };
+      }
+      return {
+        ...prev,
+        homeCms: { ...prev.homeCms, cards: updatedCards },
+      };
+    });
+  };
+
+  const handleUpdateCardPoint = (cardIdx, pointIdx, val) => {
+    setPageEditForm((prev) => {
+      const updatedCards = [...(prev.homeCms?.cards || [])];
+      if (updatedCards[cardIdx]) {
+        const points = [...(updatedCards[cardIdx].points || [])];
+        points[pointIdx] = val;
+        updatedCards[cardIdx] = { ...updatedCards[cardIdx], points };
+      }
+      return {
+        ...prev,
+        homeCms: { ...prev.homeCms, cards: updatedCards },
+      };
+    });
+  };
+
+  const handleRemoveCardPoint = (cardIdx, pointIdx) => {
+    setPageEditForm((prev) => {
+      const updatedCards = [...(prev.homeCms?.cards || [])];
+      if (updatedCards[cardIdx]) {
+        const points = (updatedCards[cardIdx].points || []).filter((_, i) => i !== pointIdx);
+        updatedCards[cardIdx] = { ...updatedCards[cardIdx], points };
+      }
+      return {
+        ...prev,
+        homeCms: { ...prev.homeCms, cards: updatedCards },
+      };
+    });
+  };
+
+  const handleResetHomeCms = () => {
+    if (window.confirm('Reset Homepage CMS cards and hero to platform defaults?')) {
+      setPageEditForm((prev) => ({
+        ...prev,
+        homeCms: JSON.parse(JSON.stringify(DEFAULT_SITE_SETTINGS.homePageCms)),
+      }));
+      showToast({
+        title: 'Defaults Restored',
+        message: 'Platform default cards and hero text restored in editor. Click "Save Page Changes" to apply.',
+        type: 'info',
+      });
+    }
   };
 
   const handleSavePageEdit = (e) => {
     e?.preventDefault();
     if (!editingPage) return;
     try {
+      if (editingPage.path === '/' && pageEditForm.homeCms) {
+        updateHomePageCms(pageEditForm.homeCms);
+      }
       const stored = localStorage.getItem('sellsolar_custom_pages');
       let currentCustom = stored ? JSON.parse(stored) : [];
       const existingIdx = currentCustom.findIndex((p) => p.path === editingPage.path);
       const updatedPage = {
         ...editingPage,
-        ...pageEditForm,
+        title: pageEditForm.title,
+        description: pageEditForm.description,
+        heroHeading: pageEditForm.heroHeading,
+        category: pageEditForm.category,
+        isPublished: pageEditForm.isPublished,
         lastUpdated: new Date().toISOString(),
       };
       if (existingIdx >= 0) {
@@ -624,7 +789,7 @@ export default function AdminSuperDashboard({
       setEditingPage(null);
       showToast({
         title: 'Page Updated',
-        message: `${updatedPage.title} content updated successfully.`,
+        message: `${updatedPage.title} content and CMS cards updated successfully.`,
         type: 'success',
       });
     } catch (err) {
@@ -2290,114 +2455,757 @@ export default function AdminSuperDashboard({
 
               {/* Edit Page Modal */}
               {editingPage && (
-                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-                  <div className="w-full max-w-xl bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                    <div className="p-4 sm:p-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+                  <div className={`w-full ${editingPage.path === '/' ? 'max-w-4xl' : 'max-w-xl'} max-h-[92vh] flex flex-col bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-auto`}>
+                    {/* Header */}
+                    <div className="p-4 sm:p-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0 bg-gray-50/50 dark:bg-gray-800/30">
                       <div>
-                        <h3 className="font-black text-sm text-gray-900 dark:text-white flex items-center gap-2">
+                        <h3 className="font-black text-sm sm:text-base text-gray-900 dark:text-white flex items-center gap-2">
                           <Edit3 className="h-4 w-4 text-amber-500" />
                           Edit Page Content: {editingPage.title}
                         </h3>
-                        <p className="text-[11px] font-mono text-amber-600 dark:text-amber-400 mt-0.5">
-                          {editingPage.path}
-                        </p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="text-[11px] font-mono text-amber-600 dark:text-amber-400">
+                            {editingPage.path}
+                          </span>
+                          {editingPage.path === '/' && (
+                            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                              VISUAL CMS ACTIVE
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <button
                         type="button"
                         onClick={() => setEditingPage(null)}
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                        className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                       >
                         <X className="h-4 w-4" />
                       </button>
                     </div>
 
-                    <form onSubmit={handleSavePageEdit} className="p-5 space-y-4 text-xs">
-                      <div>
-                        <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
-                          Page Navigation Title *
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={pageEditForm.title}
-                          onChange={(e) => setPageEditForm({ ...pageEditForm, title: e.target.value })}
-                          className="input-field text-xs"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
-                          Hero Banner Heading
-                        </label>
-                        <input
-                          type="text"
-                          value={pageEditForm.heroHeading}
-                          onChange={(e) => setPageEditForm({ ...pageEditForm, heroHeading: e.target.value })}
-                          className="input-field text-xs"
-                          placeholder="e.g. Find Verified Solar Panels in Pakistan"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
-                          SEO Meta Description
-                        </label>
-                        <textarea
-                          rows={3}
-                          value={pageEditForm.description}
-                          onChange={(e) => setPageEditForm({ ...pageEditForm, description: e.target.value })}
-                          className="input-field text-xs"
-                          placeholder="Search engine summary..."
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
-                            Page Category
-                          </label>
-                          <select
-                            value={pageEditForm.category}
-                            onChange={(e) => setPageEditForm({ ...pageEditForm, category: e.target.value })}
-                            className="input-field text-xs"
-                          >
-                            <option value="Core">Core</option>
-                            <option value="Marketplace">Marketplace</option>
-                            <option value="Company">Company</option>
-                            <option value="Support">Support</option>
-                            <option value="Legal">Legal</option>
-                            <option value="Custom">Custom</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
-                            Status
-                          </label>
-                          <select
-                            value={pageEditForm.isPublished ? 'published' : 'draft'}
-                            onChange={(e) => setPageEditForm({ ...pageEditForm, isPublished: e.target.value === 'published' })}
-                            className="input-field text-xs"
-                          >
-                            <option value="published">Live / Published</option>
-                            <option value="draft">Draft / Hidden</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
+                    {/* Sub-tabs if home page */}
+                    {editingPage.path === '/' && (
+                      <div className="flex items-center gap-1.5 px-4 sm:px-5 py-2.5 border-b border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/50 overflow-x-auto shrink-0">
                         <button
                           type="button"
-                          onClick={() => setEditingPage(null)}
-                          className="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 font-bold"
+                          onClick={() => setPageEditTab('cards')}
+                          className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all whitespace-nowrap ${
+                            pageEditTab === 'cards'
+                              ? 'bg-amber-500 text-white shadow-xs'
+                              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200/60 dark:hover:bg-gray-700/60'
+                          }`}
                         >
-                          Cancel
+                          <Layers className="h-3.5 w-3.5" />
+                          Cards & Features ({pageEditForm.homeCms?.cards?.length || 0})
                         </button>
                         <button
-                          type="submit"
-                          className="btn-primary text-xs px-5 py-2"
+                          type="button"
+                          onClick={() => setPageEditTab('hero')}
+                          className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all whitespace-nowrap ${
+                            pageEditTab === 'hero'
+                              ? 'bg-amber-500 text-white shadow-xs'
+                              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200/60 dark:hover:bg-gray-700/60'
+                          }`}
                         >
-                          Save Page Changes
+                          <Sun className="h-3.5 w-3.5" />
+                          Hero Banner
                         </button>
+                        <button
+                          type="button"
+                          onClick={() => setPageEditTab('calculator')}
+                          className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all whitespace-nowrap ${
+                            pageEditTab === 'calculator'
+                              ? 'bg-amber-500 text-white shadow-xs'
+                              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200/60 dark:hover:bg-gray-700/60'
+                          }`}
+                        >
+                          <Calculator className="h-3.5 w-3.5" />
+                          Load Calculator Banner
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setPageEditTab('seo')}
+                          className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all whitespace-nowrap ${
+                            pageEditTab === 'seo'
+                              ? 'bg-amber-500 text-white shadow-xs'
+                              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200/60 dark:hover:bg-gray-700/60'
+                          }`}
+                        >
+                          <Globe className="h-3.5 w-3.5" />
+                          SEO & Page Info
+                        </button>
+                      </div>
+                    )}
+
+                    <form onSubmit={handleSavePageEdit} className="flex flex-col flex-1 overflow-hidden">
+                      <div className="p-4 sm:p-5 space-y-4 text-xs overflow-y-auto flex-1">
+                        {/* TAB 1: CARDS & FEATURES (Home Page) */}
+                        {editingPage.path === '/' && pageEditTab === 'cards' && (
+                          <div className="space-y-4">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3.5 rounded-xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40">
+                              <div>
+                                <h4 className="font-black text-xs text-amber-950 dark:text-amber-300">
+                                  Homepage Promotional & Action Cards
+                                </h4>
+                                <p className="text-[11px] text-amber-800/80 dark:text-amber-400/80 mt-0.5">
+                                  Add, edit, remove, or customize cards with custom titles, images, badges, bullet points, and CTA actions.
+                                </p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={handleAddHomeCard}
+                                className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs shrink-0 self-start sm:self-center transition-colors"
+                              >
+                                <Plus className="h-3.5 w-3.5" />
+                                Add New Card
+                              </button>
+                            </div>
+
+                            {(!pageEditForm.homeCms?.cards || pageEditForm.homeCms.cards.length === 0) ? (
+                              <div className="text-center py-10 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-2xl p-6">
+                                <Layers className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                                <p className="font-bold text-gray-700 dark:text-gray-300 text-sm">No Cards Configured</p>
+                                <p className="text-gray-400 text-xs mt-1">Click "+ Add New Card" above to add your first interactive card to the homepage.</p>
+                                <button
+                                  type="button"
+                                  onClick={handleAddHomeCard}
+                                  className="mt-3.5 px-4 py-2 rounded-xl bg-amber-500 text-white font-bold text-xs inline-flex items-center gap-1.5 shadow-xs"
+                                >
+                                  <Plus className="h-3.5 w-3.5" />
+                                  Add First Card
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="space-y-4">
+                                {pageEditForm.homeCms.cards.map((card, cardIdx) => (
+                                  <div
+                                    key={card.id || cardIdx}
+                                    className={`rounded-2xl border transition-all p-4 space-y-3.5 ${
+                                      card.enabled !== false
+                                        ? 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xs'
+                                        : 'border-gray-200/50 dark:border-gray-800/50 bg-gray-50/50 dark:bg-gray-900/40 opacity-70'
+                                    }`}
+                                  >
+                                    {/* Card header */}
+                                    <div className="flex items-center justify-between pb-2.5 border-b border-gray-100 dark:border-gray-800">
+                                      <div className="flex items-center gap-2">
+                                        <span className="w-5 h-5 rounded-full bg-gray-100 dark:bg-gray-800 font-bold text-[10px] flex items-center justify-center text-gray-600 dark:text-gray-400">
+                                          {cardIdx + 1}
+                                        </span>
+                                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                                          card.badgeColor === 'emerald'
+                                            ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
+                                            : card.badgeColor === 'blue'
+                                            ? 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300'
+                                            : card.badgeColor === 'purple'
+                                            ? 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300'
+                                            : 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300'
+                                        }`}>
+                                          {card.badge || 'Featured'}
+                                        </span>
+                                        <span className="font-bold text-gray-900 dark:text-white truncate max-w-xs">
+                                          {card.title || 'Untitled Card'}
+                                        </span>
+                                      </div>
+                                      <div className="flex items-center gap-2">
+                                        <button
+                                          type="button"
+                                          onClick={() => handleUpdateHomeCard(cardIdx, 'enabled', card.enabled === false)}
+                                          className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-colors ${
+                                            card.enabled !== false
+                                              ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
+                                              : 'bg-gray-100 dark:bg-gray-800 text-gray-400'
+                                          }`}
+                                        >
+                                          {card.enabled !== false ? '● Live on Page' : '○ Hidden'}
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => handleRemoveHomeCard(cardIdx)}
+                                          className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors"
+                                          title="Delete Card"
+                                        >
+                                          <Trash2 className="h-3.5 w-3.5" />
+                                        </button>
+                                      </div>
+                                    </div>
+
+                                    {/* Image Section with Preview and Presets */}
+                                    <div className="space-y-1.5">
+                                      <label className="font-bold text-gray-700 dark:text-gray-300 block">
+                                        Card Image URL & Preview
+                                      </label>
+                                      <div className="flex flex-col sm:flex-row items-start gap-3">
+                                        <div className="w-28 h-20 shrink-0 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                                          {card.imageUrl ? (
+                                            <img
+                                              src={card.imageUrl}
+                                              alt={card.title}
+                                              className="w-full h-full object-cover"
+                                              onError={(e) => {
+                                                e.target.style.display = 'none';
+                                              }}
+                                            />
+                                          ) : (
+                                            <Image className="h-6 w-6 text-gray-400" />
+                                          )}
+                                        </div>
+                                        <div className="flex-1 w-full space-y-1.5">
+                                          <input
+                                            type="url"
+                                            value={card.imageUrl || ''}
+                                            onChange={(e) => handleUpdateHomeCard(cardIdx, 'imageUrl', e.target.value)}
+                                            className="input-field text-xs"
+                                            placeholder="Paste image URL (e.g. https://images.unsplash.com/...)"
+                                          />
+                                          <div className="flex items-center gap-1.5 flex-wrap">
+                                            <span className="text-[10px] text-gray-400">Quick Presets:</span>
+                                            {SOLAR_PRESET_IMAGES.map((preset) => (
+                                              <button
+                                                key={preset.label}
+                                                type="button"
+                                                onClick={() => handleUpdateHomeCard(cardIdx, 'imageUrl', preset.url)}
+                                                className="px-2 py-0.5 rounded text-[10px] bg-gray-100 dark:bg-gray-800 hover:bg-amber-100 dark:hover:bg-amber-950/40 text-gray-700 dark:text-gray-300 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
+                                              >
+                                                {preset.label}
+                                              </button>
+                                            ))}
+                                            {card.imageUrl && (
+                                              <button
+                                                type="button"
+                                                onClick={() => handleUpdateHomeCard(cardIdx, 'imageUrl', '')}
+                                                className="px-2 py-0.5 rounded text-[10px] text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/50"
+                                              >
+                                                Remove Image
+                                              </button>
+                                            )}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    {/* Titles and Badges */}
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                      <div className="sm:col-span-2">
+                                        <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                                          Card Title *
+                                        </label>
+                                        <input
+                                          type="text"
+                                          required
+                                          value={card.title || ''}
+                                          onChange={(e) => handleUpdateHomeCard(cardIdx, 'title', e.target.value)}
+                                          className="input-field text-xs"
+                                          placeholder="e.g. Sell Your Solar Equipment on SellSolar"
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                                          Badge Color
+                                        </label>
+                                        <select
+                                          value={card.badgeColor || 'amber'}
+                                          onChange={(e) => handleUpdateHomeCard(cardIdx, 'badgeColor', e.target.value)}
+                                          className="input-field text-xs"
+                                        >
+                                          <option value="amber">Amber / Yellow</option>
+                                          <option value="emerald">Emerald / Green</option>
+                                          <option value="blue">Blue</option>
+                                          <option value="purple">Purple</option>
+                                        </select>
+                                      </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                      <div>
+                                        <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                                          Badge Pill Text
+                                        </label>
+                                        <input
+                                          type="text"
+                                          value={card.badge || ''}
+                                          onChange={(e) => handleUpdateHomeCard(cardIdx, 'badge', e.target.value)}
+                                          className="input-field text-xs"
+                                          placeholder="e.g. Post Solar Ad"
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                                          CTA Button Label
+                                        </label>
+                                        <input
+                                          type="text"
+                                          value={card.ctaText || ''}
+                                          onChange={(e) => handleUpdateHomeCard(cardIdx, 'ctaText', e.target.value)}
+                                          className="input-field text-xs"
+                                          placeholder="e.g. Post an Ad — Free"
+                                        />
+                                      </div>
+                                    </div>
+
+                                    {/* Description */}
+                                    <div>
+                                      <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                                        Card Description
+                                      </label>
+                                      <textarea
+                                        rows={2}
+                                        value={card.description || ''}
+                                        onChange={(e) => handleUpdateHomeCard(cardIdx, 'description', e.target.value)}
+                                        className="input-field text-xs"
+                                        placeholder="Brief explanation of this service or offering..."
+                                      />
+                                    </div>
+
+                                    {/* Bullet Points */}
+                                    <div>
+                                      <div className="flex items-center justify-between mb-1.5">
+                                        <label className="font-bold text-gray-700 dark:text-gray-300">
+                                          Feature Bullet Points ({card.points?.length || 0})
+                                        </label>
+                                        <button
+                                          type="button"
+                                          onClick={() => handleAddCardPoint(cardIdx)}
+                                          className="text-[11px] font-bold text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1"
+                                        >
+                                          <Plus className="h-3 w-3" />
+                                          Add Bullet Point
+                                        </button>
+                                      </div>
+                                      <div className="space-y-1.5">
+                                        {(card.points || []).map((pt, ptIdx) => (
+                                          <div key={ptIdx} className="flex items-center gap-2">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                                            <input
+                                              type="text"
+                                              value={pt}
+                                              onChange={(e) => handleUpdateCardPoint(cardIdx, ptIdx, e.target.value)}
+                                              className="input-field text-xs flex-1"
+                                              placeholder="e.g. 10,000+ monthly active solar buyers"
+                                            />
+                                            <button
+                                              type="button"
+                                              onClick={() => handleRemoveCardPoint(cardIdx, ptIdx)}
+                                              className="p-1 text-gray-400 hover:text-rose-500 transition-colors"
+                                              title="Delete point"
+                                            >
+                                              <X className="h-3.5 w-3.5" />
+                                            </button>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+
+                                    {/* Action Link Target */}
+                                    <div>
+                                      <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                                        CTA Button Action Link
+                                      </label>
+                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                        <select
+                                          value={['post-ad', 'installation', 'calculator', 'prices', 'dealers', 'used-solar'].includes(card.ctaLink) ? card.ctaLink : 'custom'}
+                                          onChange={(e) => {
+                                            const val = e.target.value;
+                                            if (val !== 'custom') {
+                                              handleUpdateHomeCard(cardIdx, 'ctaLink', val);
+                                            }
+                                          }}
+                                          className="input-field text-xs"
+                                        >
+                                          <option value="post-ad">Post Free Ad Modal (/post-ad)</option>
+                                          <option value="installation">Turnkey Installation Modal (/installation)</option>
+                                          <option value="calculator">Load Calculator (/calculator)</option>
+                                          <option value="prices">Daily Benchmark Rates (/prices)</option>
+                                          <option value="dealers">Verified Solar Dealers (/dealers)</option>
+                                          <option value="used-solar">Used Solar Market (/used-solar)</option>
+                                          <option value="custom">Custom URL Path</option>
+                                        </select>
+                                        <input
+                                          type="text"
+                                          value={card.ctaLink || ''}
+                                          onChange={(e) => handleUpdateHomeCard(cardIdx, 'ctaLink', e.target.value)}
+                                          className="input-field text-xs font-mono"
+                                          placeholder="e.g. post-ad or /custom-route"
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* TAB 2: HERO BANNER & SEARCH (Home Page) */}
+                        {editingPage.path === '/' && pageEditTab === 'hero' && (
+                          <div className="space-y-4">
+                            <div className="p-3.5 rounded-xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40">
+                              <h4 className="font-black text-xs text-amber-950 dark:text-amber-300">
+                                Homepage Hero Section & Search
+                              </h4>
+                              <p className="text-[11px] text-amber-800/80 dark:text-amber-400/80 mt-0.5">
+                                Customize the main welcome banner text, headline, search bar placeholder, and promotional badge.
+                              </p>
+                            </div>
+
+                            <div>
+                              <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                                Hero Pill Badge Text
+                              </label>
+                              <input
+                                type="text"
+                                value={pageEditForm.homeCms?.hero?.badgeText || ''}
+                                onChange={(e) =>
+                                  setPageEditForm((prev) => ({
+                                    ...prev,
+                                    homeCms: {
+                                      ...prev.homeCms,
+                                      hero: { ...prev.homeCms?.hero, badgeText: e.target.value },
+                                    },
+                                  }))
+                                }
+                                className="input-field text-xs"
+                                placeholder="e.g. ⚡ Pakistan's #1 Solar Directory"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                                Main Hero Heading *
+                              </label>
+                              <input
+                                type="text"
+                                required
+                                value={pageEditForm.homeCms?.hero?.heading || ''}
+                                onChange={(e) =>
+                                  setPageEditForm((prev) => ({
+                                    ...prev,
+                                    homeCms: {
+                                      ...prev.homeCms,
+                                      hero: { ...prev.homeCms?.hero, heading: e.target.value },
+                                    },
+                                  }))
+                                }
+                                className="input-field text-xs"
+                                placeholder="e.g. Buy & Sell Solar Equipment at Live Market Rates"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                                Hero Subheading
+                              </label>
+                              <textarea
+                                rows={3}
+                                value={pageEditForm.homeCms?.hero?.subheading || ''}
+                                onChange={(e) =>
+                                  setPageEditForm((prev) => ({
+                                    ...prev,
+                                    homeCms: {
+                                      ...prev.homeCms,
+                                      hero: { ...prev.homeCms?.hero, subheading: e.target.value },
+                                    },
+                                  }))
+                                }
+                                className="input-field text-xs"
+                                placeholder="e.g. Compare verified solar panel, inverter & battery listings..."
+                              />
+                            </div>
+
+                            <div>
+                              <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                                Search Input Placeholder
+                              </label>
+                              <input
+                                type="text"
+                                value={pageEditForm.homeCms?.hero?.searchPlaceholder || ''}
+                                onChange={(e) =>
+                                  setPageEditForm((prev) => ({
+                                    ...prev,
+                                    homeCms: {
+                                      ...prev.homeCms,
+                                      hero: { ...prev.homeCms?.hero, searchPlaceholder: e.target.value },
+                                    },
+                                  }))
+                                }
+                                className="input-field text-xs"
+                                placeholder="e.g. Search panels, inverters, batteries or cities..."
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        {/* TAB 3: LOAD CALCULATOR BANNER (Home Page) */}
+                        {editingPage.path === '/' && pageEditTab === 'calculator' && (
+                          <div className="space-y-4">
+                            <div className="p-3.5 rounded-xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40">
+                              <h4 className="font-black text-xs text-amber-950 dark:text-amber-300">
+                                Homepage Solar Load Calculator Banner
+                              </h4>
+                              <p className="text-[11px] text-amber-800/80 dark:text-amber-400/80 mt-0.5">
+                                Configure the inline 30-second solar sizing calculator banner displayed on the homepage.
+                              </p>
+                            </div>
+
+                            <label className="flex items-center gap-2.5 p-3 rounded-xl border border-gray-200 dark:border-gray-800 cursor-pointer bg-gray-50/50 dark:bg-gray-800/30">
+                              <input
+                                type="checkbox"
+                                checked={pageEditForm.homeCms?.calculatorBanner?.enabled !== false}
+                                onChange={(e) =>
+                                  setPageEditForm((prev) => ({
+                                    ...prev,
+                                    homeCms: {
+                                      ...prev.homeCms,
+                                      calculatorBanner: {
+                                        ...prev.homeCms?.calculatorBanner,
+                                        enabled: e.target.checked,
+                                      },
+                                    },
+                                  }))
+                                }
+                                className="rounded text-amber-500 focus:ring-amber-500 h-4 w-4"
+                              />
+                              <div>
+                                <span className="font-bold text-gray-900 dark:text-white block">
+                                  Enable Calculator Banner on Homepage
+                                </span>
+                                <span className="text-[11px] text-gray-500">
+                                  When enabled, visitors can calculate system kW sizing directly on the homepage.
+                                </span>
+                              </div>
+                            </label>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              <div>
+                                <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                                  Banner Pill Badge
+                                </label>
+                                <input
+                                  type="text"
+                                  value={pageEditForm.homeCms?.calculatorBanner?.badge || ''}
+                                  onChange={(e) =>
+                                    setPageEditForm((prev) => ({
+                                      ...prev,
+                                      homeCms: {
+                                        ...prev.homeCms,
+                                        calculatorBanner: {
+                                          ...prev.homeCms?.calculatorBanner,
+                                          badge: e.target.value,
+                                        },
+                                      },
+                                    }))
+                                  }
+                                  className="input-field text-xs"
+                                  placeholder="e.g. Instant System Sizing Tool"
+                                />
+                              </div>
+                              <div>
+                                <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                                  Banner Title
+                                </label>
+                                <input
+                                  type="text"
+                                  value={pageEditForm.homeCms?.calculatorBanner?.title || ''}
+                                  onChange={(e) =>
+                                    setPageEditForm((prev) => ({
+                                      ...prev,
+                                      homeCms: {
+                                        ...prev.homeCms,
+                                        calculatorBanner: {
+                                          ...prev.homeCms?.calculatorBanner,
+                                          title: e.target.value,
+                                        },
+                                      },
+                                    }))
+                                  }
+                                  className="input-field text-xs"
+                                  placeholder="e.g. Calculate Your Solar Load in 30 Seconds"
+                                />
+                              </div>
+                            </div>
+
+                            <div>
+                              <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                                Banner Description
+                              </label>
+                              <textarea
+                                rows={2}
+                                value={pageEditForm.homeCms?.calculatorBanner?.description || ''}
+                                onChange={(e) =>
+                                  setPageEditForm((prev) => ({
+                                    ...prev,
+                                    homeCms: {
+                                      ...prev.homeCms,
+                                      calculatorBanner: {
+                                        ...prev.homeCms?.calculatorBanner,
+                                        description: e.target.value,
+                                      },
+                                    },
+                                  }))
+                                }
+                                className="input-field text-xs"
+                                placeholder="e.g. Enter your Fans, LED Bulbs, Inverter ACs..."
+                              />
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              <div>
+                                <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                                  Instant Button Text
+                                </label>
+                                <input
+                                  type="text"
+                                  value={pageEditForm.homeCms?.calculatorBanner?.calculateButtonText || ''}
+                                  onChange={(e) =>
+                                    setPageEditForm((prev) => ({
+                                      ...prev,
+                                      homeCms: {
+                                        ...prev.homeCms,
+                                        calculatorBanner: {
+                                          ...prev.homeCms?.calculatorBanner,
+                                          calculateButtonText: e.target.value,
+                                        },
+                                      },
+                                    }))
+                                  }
+                                  className="input-field text-xs"
+                                  placeholder="e.g. Calculate Here (Instant kW)"
+                                />
+                              </div>
+                              <div>
+                                <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                                  Full Page Button Text
+                                </label>
+                                <input
+                                  type="text"
+                                  value={pageEditForm.homeCms?.calculatorBanner?.fullPageButtonText || ''}
+                                  onChange={(e) =>
+                                    setPageEditForm((prev) => ({
+                                      ...prev,
+                                      homeCms: {
+                                        ...prev.homeCms,
+                                        calculatorBanner: {
+                                          ...prev.homeCms?.calculatorBanner,
+                                          fullPageButtonText: e.target.value,
+                                        },
+                                      },
+                                    }))
+                                  }
+                                  className="input-field text-xs"
+                                  placeholder="e.g. Full Page"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* TAB 4: SEO & PAGE INFO (Home Page or Any Page) */}
+                        {(editingPage.path !== '/' || pageEditTab === 'seo') && (
+                          <div className="space-y-4">
+                            <div>
+                              <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                                Page Navigation Title *
+                              </label>
+                              <input
+                                type="text"
+                                required
+                                value={pageEditForm.title}
+                                onChange={(e) => setPageEditForm({ ...pageEditForm, title: e.target.value })}
+                                className="input-field text-xs"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                                Hero Banner Heading
+                              </label>
+                              <input
+                                type="text"
+                                value={pageEditForm.heroHeading}
+                                onChange={(e) => setPageEditForm({ ...pageEditForm, heroHeading: e.target.value })}
+                                className="input-field text-xs"
+                                placeholder="e.g. Find Verified Solar Panels in Pakistan"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                                SEO Meta Description
+                              </label>
+                              <textarea
+                                rows={3}
+                                value={pageEditForm.description}
+                                onChange={(e) => setPageEditForm({ ...pageEditForm, description: e.target.value })}
+                                className="input-field text-xs"
+                                placeholder="Search engine summary..."
+                              />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                                  Page Category
+                                </label>
+                                <select
+                                  value={pageEditForm.category}
+                                  onChange={(e) => setPageEditForm({ ...pageEditForm, category: e.target.value })}
+                                  className="input-field text-xs"
+                                >
+                                  <option value="Core">Core</option>
+                                  <option value="Marketplace">Marketplace</option>
+                                  <option value="Company">Company</option>
+                                  <option value="Support">Support</option>
+                                  <option value="Legal">Legal</option>
+                                  <option value="Custom">Custom</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                                  Status
+                                </label>
+                                <select
+                                  value={pageEditForm.isPublished ? 'published' : 'draft'}
+                                  onChange={(e) => setPageEditForm({ ...pageEditForm, isPublished: e.target.value === 'published' })}
+                                  className="input-field text-xs"
+                                >
+                                  <option value="published">Live / Published</option>
+                                  <option value="draft">Draft / Hidden</option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Modal Footer */}
+                      <div className="flex items-center justify-between gap-2 p-4 sm:p-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30 shrink-0">
+                        <div>
+                          {editingPage.path === '/' && (
+                            <button
+                              type="button"
+                              onClick={handleResetHomeCms}
+                              className="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 font-bold text-xs transition-colors"
+                            >
+                              Reset to Defaults
+                            </button>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setEditingPage(null)}
+                            className="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 font-bold text-xs"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            className="btn-primary text-xs px-5 py-2"
+                          >
+                            Save Page Changes
+                          </button>
+                        </div>
                       </div>
                     </form>
                   </div>

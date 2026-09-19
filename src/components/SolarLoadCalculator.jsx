@@ -959,6 +959,18 @@ Calculated at SellSolar.pk`;
 
             {/* Actions: Browse Matching Panels & Share */}
             <div className="mt-5 space-y-2">
+              {onNavigate && (
+                <button
+                  type="button"
+                  onClick={() => onNavigate('install')}
+                  className="w-full py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-xs sm:text-sm font-extrabold text-white shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.98]"
+                >
+                  <ShieldCheck className="h-4 w-4" />
+                  <span>Request Free Turnkey {sizing.recommendedKw || '5'}kW Installation</span>
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              )}
+
               <button
                 type="button"
                 onClick={() => {
@@ -968,7 +980,7 @@ Calculated at SellSolar.pk`;
                     onNavigate('home');
                   }
                 }}
-                className="w-full btn-primary py-3 text-xs sm:text-sm font-bold shadow-sm flex items-center justify-center gap-2"
+                className="w-full btn-primary py-2.5 text-xs sm:text-sm font-bold shadow-sm flex items-center justify-center gap-2"
               >
                 <span>Find Matching {sizing.recommendedKw || '5'} kW Solar Systems</span>
                 <ArrowRight className="h-4 w-4" />

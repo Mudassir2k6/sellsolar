@@ -1177,6 +1177,17 @@ Generated via SellSolar.pk Load Calculator`;
 
               {/* Marketplace Action CTA */}
               <div className="mt-6 flex flex-col gap-2.5">
+                {onNavigate && (
+                  <button
+                    onClick={() => onNavigate('install')}
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 py-3.5 text-xs sm:text-sm font-extrabold text-white shadow-lg shadow-emerald-600/25 transition-all hover:scale-[1.01] active:scale-[0.98]"
+                  >
+                    <ShieldCheck className="h-4 w-4" />
+                    <span>Request Free Turnkey {calculations.recommendedKw}kW Installation Quote</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                )}
+
                 <button
                   onClick={() => {
                     if (onSelectCategory) {
@@ -1185,7 +1196,7 @@ Generated via SellSolar.pk Load Calculator`;
                       onNavigate('home');
                     }
                   }}
-                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary-500 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-primary-500/30 hover:bg-primary-600 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary-500 py-3 text-sm font-extrabold text-white shadow-md shadow-primary-500/20 hover:bg-primary-600 transition-all hover:scale-[1.01] active:scale-[0.98]"
                 >
                   <Search className="h-4 w-4" />
                   <span>Browse {calculations.recommendedKw}kW Solar Equipment</span>

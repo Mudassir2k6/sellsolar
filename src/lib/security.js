@@ -34,21 +34,37 @@ export const RATE_LIMIT_RULES = {
     lockoutMs: 10 * 60 * 1000,
   },
   installation_request: {
-    maxAttempts: 3,
+    maxAttempts: 6,
     windowMs: 5 * 60 * 1000, // 5 minutes
-    lockoutMs: 5 * 60 * 1000,
+    lockoutMs: 2 * 60 * 1000,
   },
   post_ad: {
-    maxAttempts: 6,
+    maxAttempts: 10,
     windowMs: 10 * 60 * 1000, // 10 minutes
-    lockoutMs: 5 * 60 * 1000,
+    lockoutMs: 3 * 60 * 1000,
   },
   inquiry: {
-    maxAttempts: 6,
+    maxAttempts: 10,
     windowMs: 3 * 60 * 1000, // 3 minutes
     lockoutMs: 2 * 60 * 1000,
   },
 };
+
+/**
+ * Resolve client identifier safely so global fallback does not block all visitors
+ */
+function getResolvedIdentifier(identifier) {
+  const clean = String(identifier || '').toLowerCase().replace(/[^a-z0-9_.-]/g, '').slice(0, 40);
+  if (clean && clean !== 'global' && clean !== 'null' && clean !== 'undefined') {
+    return clean;
+  }
+  let fallbackId = getStorageItem('sellsolar_client_sec_id');
+  if (!fallbackId) {
+    fallbackId = `cli_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+    setStorageItem('sellsolar_client_sec_id', fallbackId);
+  }
+  return fallbackId;
+}
 
 /**
  * Get stored security state safely from sessionStorage / localStorage
@@ -84,7 +100,7 @@ function removeStorageItem(key) {
  */
 export function checkRateLimit(action, identifier = 'global') {
   const rule = RATE_LIMIT_RULES[action] || { maxAttempts: 10, windowMs: 60000, lockoutMs: 60000 };
-  const cleanId = String(identifier).toLowerCase().replace(/[^a-z0-9_.-]/g, '').slice(0, 40) || 'global';
+  const cleanId = getResolvedIdentifier(identifier);
   const lockKey = `${LOCKOUT_PREFIX}${action}_${cleanId}`;
   const rateKey = `${RATE_LIMIT_PREFIX}${action}_${cleanId}`;
   const now = Date.now();
@@ -151,7 +167,7 @@ export function checkRateLimit(action, identifier = 'global') {
  */
 export function recordRateLimitAttempt(action, identifier = 'global') {
   const rule = RATE_LIMIT_RULES[action] || { maxAttempts: 10, windowMs: 60000, lockoutMs: 60000 };
-  const cleanId = String(identifier).toLowerCase().replace(/[^a-z0-9_.-]/g, '').slice(0, 40) || 'global';
+  const cleanId = getResolvedIdentifier(identifier);
   const lockKey = `${LOCKOUT_PREFIX}${action}_${cleanId}`;
   const rateKey = `${RATE_LIMIT_PREFIX}${action}_${cleanId}`;
   const now = Date.now();

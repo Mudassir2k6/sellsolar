@@ -5,8 +5,8 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
   Cache-Control: public, max-age=0, must-revalidate
-  CDN-Cache-Control: max-age=600, stale-while-revalidate=86400
-  Cloudflare-CDN-Cache-Control: max-age=600, stale-while-revalidate=86400
+  CDN-Cache-Control: no-cache, no-store, must-revalidate
+  Cloudflare-CDN-Cache-Control: no-cache, no-store, must-revalidate
   X-SellSolar-Framework: nextjs
 
 /_next/static/*

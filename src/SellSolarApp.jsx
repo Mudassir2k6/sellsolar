@@ -567,6 +567,10 @@ function nx({
     className:"relative overflow-hidden pt-20 sm:pt-24 lg:pt-28 pb-4 sm:pb-5 border-b border-gray-200/60 dark:border-gray-800 transition-colors",children:[
       jsxs("div",{
         className:"absolute inset-0 -z-10",children:[
+          heroCms?.heroImageUrl ? jsx("div", {
+            className: "absolute inset-0 bg-cover bg-center opacity-10 dark:opacity-15 transition-opacity",
+            style: { backgroundImage: `url(${heroCms.heroImageUrl})` }
+          }) : null,
           jsx("div",{
             className:"absolute inset-0 bg-gradient-to-b from-gray-50 via-white to-white dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 transition-colors"
           }),

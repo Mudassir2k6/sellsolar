@@ -54,6 +54,11 @@ import {
   Wrench,
   Calculator,
   Zap,
+  ChevronUp,
+  ChevronDown,
+  Copy,
+  Download,
+  Upload,
 } from 'lucide-react';
 import { useAuth, USER_ROLES, getStoredUsers, saveStoredUsers, DEFAULT_ADMIN_ID, DEFAULT_ADMIN_EMAIL } from '../context/AuthContext';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
@@ -744,6 +749,93 @@ export default function AdminSuperDashboard({
         homeCms: { ...prev.homeCms, cards: updatedCards },
       };
     });
+  };
+
+  const handleMoveCard = (idx, direction) => {
+    setPageEditForm((prev) => {
+      const cards = [...(prev.homeCms?.cards || [])];
+      const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
+      if (targetIdx < 0 || targetIdx >= cards.length) return prev;
+      const temp = cards[idx];
+      cards[idx] = cards[targetIdx];
+      cards[targetIdx] = temp;
+      return {
+        ...prev,
+        homeCms: { ...prev.homeCms, cards },
+      };
+    });
+  };
+
+  const handleDuplicateCard = (idx) => {
+    setPageEditForm((prev) => {
+      const cards = [...(prev.homeCms?.cards || [])];
+      const source = cards[idx];
+      if (!source) return prev;
+      const clone = {
+        ...JSON.parse(JSON.stringify(source)),
+        id: `card-${Date.now()}`,
+        title: `${source.title || 'Card'} (Copy)`,
+      };
+      cards.splice(idx + 1, 0, clone);
+      return {
+        ...prev,
+        homeCms: { ...prev.homeCms, cards },
+      };
+    });
+  };
+
+  const handleExportCms = () => {
+    try {
+      const dataToExport = {
+        version: '2.0',
+        exportedAt: new Date().toISOString(),
+        settings,
+        customPages,
+      };
+      const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `sellsolar-cms-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast({
+        title: 'CMS Backup Exported',
+        message: 'JSON backup file downloaded successfully.',
+        type: 'success',
+      });
+    } catch (err) {
+      showToast({ title: 'Export Failed', message: err.message, type: 'error' });
+    }
+  };
+
+  const handleImportCms = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const parsed = JSON.parse(e.target?.result);
+        if (parsed.settings) {
+          updateSiteSettings(parsed.settings);
+        }
+        if (Array.isArray(parsed.customPages)) {
+          localStorage.setItem('sellsolar_custom_pages', JSON.stringify(parsed.customPages));
+          setCustomPages(parsed.customPages);
+        }
+        showToast({
+          title: 'CMS Backup Restored',
+          message: 'Settings, custom pages, and visual cards restored successfully.',
+          type: 'success',
+        });
+      } catch (err) {
+        showToast({ title: 'Invalid File', message: 'The uploaded file is not a valid SellSolar JSON backup.', type: 'error' });
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
   };
 
   const handleResetHomeCms = () => {
@@ -2320,11 +2412,33 @@ export default function AdminSuperDashboard({
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={handleExportCms}
+                    className="px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/60 font-bold text-xs flex items-center gap-1.5 transition-colors shadow-2xs"
+                    title="Download full backup of site settings, custom pages, and visual cards"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    <span>Backup CMS</span>
+                  </button>
+                  <label
+                    className="px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/60 font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-colors shadow-2xs"
+                    title="Upload and restore a previous CMS backup JSON"
+                  >
+                    <Upload className="h-3.5 w-3.5" />
+                    <span>Restore CMS</span>
+                    <input
+                      type="file"
+                      accept=".json"
+                      onChange={handleImportCms}
+                      className="hidden"
+                    />
+                  </label>
                   <button
                     type="button"
                     onClick={() => setIsAddingPage(true)}
-                    className="btn-primary text-xs px-3.5 py-2 flex items-center gap-1.5"
+                    className="btn-primary text-xs px-3.5 py-2 flex items-center gap-1.5 shadow-2xs"
                   >
                     <Plus className="h-4 w-4" />
                     <span>+ Add Custom Page</span>
@@ -2608,7 +2722,33 @@ export default function AdminSuperDashboard({
                                           {card.title || 'Untitled Card'}
                                         </span>
                                       </div>
-                                      <div className="flex items-center gap-2">
+                                      <div className="flex items-center gap-1.5">
+                                        <button
+                                          type="button"
+                                          disabled={cardIdx === 0}
+                                          onClick={() => handleMoveCard(cardIdx, 'up')}
+                                          className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                          title="Move Card Up"
+                                        >
+                                          <ChevronUp className="h-3.5 w-3.5" />
+                                        </button>
+                                        <button
+                                          type="button"
+                                          disabled={cardIdx === pageEditForm.homeCms.cards.length - 1}
+                                          onClick={() => handleMoveCard(cardIdx, 'down')}
+                                          className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                          title="Move Card Down"
+                                        >
+                                          <ChevronDown className="h-3.5 w-3.5" />
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => handleDuplicateCard(cardIdx)}
+                                          className="p-1.5 rounded-lg text-gray-500 hover:bg-amber-50 dark:hover:bg-amber-950/40 hover:text-amber-600 transition-colors"
+                                          title="Duplicate Card"
+                                        >
+                                          <Copy className="h-3.5 w-3.5" />
+                                        </button>
                                         <button
                                           type="button"
                                           onClick={() => handleUpdateHomeCard(cardIdx, 'enabled', card.enabled === false)}
@@ -2618,7 +2758,7 @@ export default function AdminSuperDashboard({
                                               : 'bg-gray-100 dark:bg-gray-800 text-gray-400'
                                           }`}
                                         >
-                                          {card.enabled !== false ? '● Live on Page' : '○ Hidden'}
+                                          {card.enabled !== false ? '● Live' : '○ Hidden'}
                                         </button>
                                         <button
                                           type="button"
@@ -2932,6 +3072,81 @@ export default function AdminSuperDashboard({
                                 className="input-field text-xs"
                                 placeholder="e.g. Search panels, inverters, batteries or cities..."
                               />
+                            </div>
+
+                            <div className="space-y-1.5 pt-2 border-t border-gray-100 dark:border-gray-800">
+                              <label className="font-bold text-gray-700 dark:text-gray-300 block">
+                                Ambient Hero Background Image (Optional)
+                              </label>
+                              <div className="flex flex-col sm:flex-row items-start gap-3">
+                                <div className="w-28 h-20 shrink-0 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                                  {pageEditForm.homeCms?.hero?.heroImageUrl ? (
+                                    <img
+                                      src={pageEditForm.homeCms.hero.heroImageUrl}
+                                      alt="Hero Background"
+                                      className="w-full h-full object-cover"
+                                      onError={(e) => { e.target.style.display = 'none'; }}
+                                    />
+                                  ) : (
+                                    <Image className="h-6 w-6 text-gray-400" />
+                                  )}
+                                </div>
+                                <div className="flex-1 w-full space-y-1.5">
+                                  <input
+                                    type="url"
+                                    value={pageEditForm.homeCms?.hero?.heroImageUrl || ''}
+                                    onChange={(e) =>
+                                      setPageEditForm((prev) => ({
+                                        ...prev,
+                                        homeCms: {
+                                          ...prev.homeCms,
+                                          hero: { ...prev.homeCms?.hero, heroImageUrl: e.target.value },
+                                        },
+                                      }))
+                                    }
+                                    className="input-field text-xs"
+                                    placeholder="Paste background image URL (e.g. https://images.unsplash.com/...)"
+                                  />
+                                  <div className="flex items-center gap-1.5 flex-wrap">
+                                    <span className="text-[10px] text-gray-400">Presets:</span>
+                                    {SOLAR_PRESET_IMAGES.map((preset) => (
+                                      <button
+                                        key={preset.label}
+                                        type="button"
+                                        onClick={() =>
+                                          setPageEditForm((prev) => ({
+                                            ...prev,
+                                            homeCms: {
+                                              ...prev.homeCms,
+                                              hero: { ...prev.homeCms?.hero, heroImageUrl: preset.url },
+                                            },
+                                          }))
+                                        }
+                                        className="px-2 py-0.5 rounded text-[10px] bg-gray-100 dark:bg-gray-800 hover:bg-amber-100 dark:hover:bg-amber-950/40 text-gray-700 dark:text-gray-300 transition-colors"
+                                      >
+                                        {preset.label}
+                                      </button>
+                                    ))}
+                                    {pageEditForm.homeCms?.hero?.heroImageUrl && (
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          setPageEditForm((prev) => ({
+                                            ...prev,
+                                            homeCms: {
+                                              ...prev.homeCms,
+                                              hero: { ...prev.homeCms?.hero, heroImageUrl: '' },
+                                            },
+                                          }))
+                                        }
+                                        className="px-2 py-0.5 rounded text-[10px] text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/50"
+                                      >
+                                        Remove Background
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         )}

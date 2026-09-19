@@ -47,6 +47,7 @@ import {
 } from 'lucide-react';
 import { sendContactMessage } from '../services/inboxService';
 import EmailContactModal from '../components/EmailContactModal';
+import { useSiteSettings } from '../context/SiteSettingsContext';
 
 // Navigation groups definition
 export const FOOTER_PAGES = {
@@ -1763,6 +1764,13 @@ function HelpCenterContent({ onNavigate }) {
 }
 
 function ContactUsContent() {
+  const { settings } = useSiteSettings();
+  const supportEmail = settings?.supportEmail || 'info@sellsolar.pk';
+  const salesEmail = settings?.salesEmail || 'support@sellsolar.pk';
+  const supportPhone = settings?.supportPhone || '+92 300 1234567';
+  const rawWhatsApp = (settings?.whatsAppNumber || '923001234567').replace(/\D/g, '');
+  const headOfficeAddress = settings?.headOfficeAddress || 'Blue Area, Sector G-7, Islamabad, Pakistan';
+
   const [submitted, setSubmitted] = useState(false);
   const [ticketNo, setTicketNo] = useState('');
   const [submissionLinks, setSubmissionLinks] = useState(null);
@@ -1778,7 +1786,7 @@ function ContactUsContent() {
     message: ''
   });
 
-  const handleCopyEmail = async (emailText = 'info@sellsolar.pk') => {
+  const handleCopyEmail = async (emailText = supportEmail) => {
     try {
       if (typeof navigator !== 'undefined' && navigator.clipboard) {
         await navigator.clipboard.writeText(emailText);
@@ -1793,7 +1801,7 @@ function ContactUsContent() {
 
   const handleCopySummary = async () => {
     try {
-      const summary = `SellSolar Support Ticket #${ticketNo}\nSender: ${form.name} (${form.email})\nPhone: ${form.phone || 'N/A'}\nSubject: ${form.subject}\nMessage:\n${form.message}\nSent to: info@sellsolar.pk`;
+      const summary = `SellSolar Support Ticket #${ticketNo}\nSender: ${form.name} (${form.email})\nPhone: ${form.phone || 'N/A'}\nSubject: ${form.subject}\nMessage:\n${form.message}\nSent to: ${supportEmail}`;
       if (typeof navigator !== 'undefined' && navigator.clipboard) {
         await navigator.clipboard.writeText(summary);
       }
@@ -1816,7 +1824,7 @@ function ContactUsContent() {
         subject: form.subject,
         message: form.message,
         category: form.subject || 'General Inquiry',
-        recipientEmail: 'info@sellsolar.pk'
+        recipientEmail: supportEmail
       });
       const ticket = res?.ticketNumber || `SLR-${Math.floor(100000 + Math.random() * 900000)}`;
       setTicketNo(ticket);
@@ -1837,7 +1845,7 @@ function ContactUsContent() {
       <EmailContactModal
         isOpen={emailModalOpen}
         onClose={() => setEmailModalOpen(false)}
-        recipientEmail="info@sellsolar.pk"
+        recipientEmail={supportEmail}
         defaultSubject="Inquiry via SellSolar.pk Contact Desk"
       />
 
@@ -1867,10 +1875,10 @@ function ContactUsContent() {
               <p className="font-bold text-xs text-gray-900 dark:text-white">Email Us</p>
               <div className="mt-1 space-y-0.5">
                 <p className="text-xs font-mono font-bold text-primary-600 dark:text-primary-400 select-all">
-                  info@sellsolar.pk
+                  {supportEmail}
                 </p>
                 <p className="text-[11px] text-gray-500 dark:text-gray-400">
-                  support@sellsolar.pk
+                  {salesEmail}
                 </p>
               </div>
             </div>
@@ -1884,7 +1892,7 @@ function ContactUsContent() {
               </button>
               <button
                 type="button"
-                onClick={() => handleCopyEmail('info@sellsolar.pk')}
+                onClick={() => handleCopyEmail(supportEmail)}
                 className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-[11px] font-medium hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
               >
                 {copiedEmail ? <Check className="h-3 w-3 text-emerald-500" /> : <Copy className="h-3 w-3" />}
@@ -1904,13 +1912,13 @@ function ContactUsContent() {
               </div>
               <p className="font-bold text-xs text-gray-900 dark:text-white">Call / WhatsApp</p>
               <p className="text-xs font-mono font-bold text-gray-800 dark:text-gray-200 mt-1 select-all">
-                +92 300 1234567
+                {supportPhone}
               </p>
               <p className="text-[10px] text-gray-400 mt-0.5">Mon-Sat: 9am - 7pm PKT</p>
             </div>
             <div className="mt-3 pt-3 border-t border-gray-200/60 dark:border-gray-700/60 flex items-center gap-1.5 flex-wrap">
               <a
-                href="https://wa.me/923001234567?text=Assalam-o-Alaikum%20SellSolar%20Team%2C%20I%20have%20an%20inquiry"
+                href={`https://wa.me/${rawWhatsApp}?text=Assalam-o-Alaikum%20SellSolar%20Team%2C%20I%20have%20an%20inquiry`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] shadow-2xs transition-all inline-flex items-center gap-1 active:scale-95"
@@ -1919,7 +1927,7 @@ function ContactUsContent() {
                 <ExternalLink className="h-3 w-3" />
               </a>
               <a
-                href="tel:+923001234567"
+                href={`tel:${supportPhone.replace(/[^0-9+]/g, '')}`}
                 className="px-2.5 py-1 rounded-lg bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-[11px] font-medium hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
               >
                 Call Now
@@ -1932,8 +1940,7 @@ function ContactUsContent() {
             <div>
               <MapPin className="h-5 w-5 text-primary-600 dark:text-primary-400 mb-2" />
               <p className="font-bold text-xs text-gray-900 dark:text-white">Head Office</p>
-              <p className="text-[11px] text-gray-600 dark:text-gray-300 mt-1">Blue Area, Sector G-7</p>
-              <p className="text-[11px] text-gray-500 dark:text-gray-400">Islamabad, Pakistan</p>
+              <p className="text-[11px] text-gray-600 dark:text-gray-300 mt-1 whitespace-pre-line">{headOfficeAddress}</p>
             </div>
             <div className="mt-3 pt-3 border-t border-gray-200/60 dark:border-gray-700/60">
               <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold inline-flex items-center gap-1">
@@ -1950,7 +1957,7 @@ function ContactUsContent() {
           <div>
             <h2 className="text-xl font-black text-gray-900 dark:text-white">Send Us a Direct Message</h2>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-              Target address: <strong className="text-primary-600 dark:text-primary-400 font-mono">info@sellsolar.pk</strong>
+              Target address: <strong className="text-primary-600 dark:text-primary-400 font-mono">{supportEmail}</strong>
             </p>
           </div>
           <button

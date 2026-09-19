@@ -4290,7 +4290,7 @@ function yx({
 }function jx({
   listingId:t,onBack:e
 }){
-  const[r,n]=useState(null),[s,a]=useState(null),[l,o]=useState(!0),[c,u]=useState(null),[d,h]=useState(!1),[activePhotoIdx,setActivePhotoIdx]=useState(0);
+  const[r,n]=useState(null),[s,a]=useState(null),[l,o]=useState(!0),[c,u]=useState(null),[d,h]=useState(!1),[activePhotoIdx,setActivePhotoIdx]=useState(0),[inquiryModalOpen,setInquiryModalOpen]=useState(!1);
   const { user: currentUser } = useAuth();
   const toastCtx = useToast ? useToast() : null;
   useEffect(()=>{
@@ -4393,7 +4393,9 @@ function yx({
     window.open(`https://wa.me/${clean}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
   };
 
-  return jsxs("div",{
+  return jsxs(Fragment, {
+    children: [
+      jsxs("div",{
     className:"min-h-screen bg-gray-50 dark:bg-gray-950",children:[jsx("div",{
       className:"sticky top-0 z-40 border-b border-gray-100 dark:border-gray-800 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md",children:jsxs("div",{
         className:"container-page flex h-16 items-center justify-between",children:[jsxs("button",{
@@ -4519,6 +4521,10 @@ function yx({
                   }):jsx("div",{
                     className:"rounded-xl bg-gray-50 dark:bg-gray-800 p-4 text-center text-sm text-gray-500 dark:text-gray-400",children:"No phone number provided"
                   }),jsxs("button",{
+                    onClick:()=>setInquiryModalOpen(!0),className:"flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 px-4 py-3 text-sm font-bold text-white shadow-md shadow-amber-500/20 transition-all hover:scale-[1.01] active:scale-98 cursor-pointer",children:[jsx(Mail,{
+                      className:"h-4 w-4"
+                    }),"Send Online Message / Inquiry"]
+                  }),jsxs("button",{
                     onClick:handleWhatsApp,className:"btn-ghost w-full",children:[jsx(MessageCircle,{
                       className:"h-4 w-4 text-emerald-600"
                     }),"Send WhatsApp Inquiry"]
@@ -4601,7 +4607,15 @@ function yx({
         })]
       })
     })]
+  }),
+  jsx(EmailContactModal, {
+    isOpen: inquiryModalOpen,
+    onClose: () => setInquiryModalOpen(!1),
+    recipientEmail: r.seller_email || "info@sellsolar.pk",
+    defaultSubject: `Inquiry: ${r.title} (${formatPrice(r.price)})`
   })
+]
+});
 }const Vu={
   category:"",brand:"",condition:"",city:"",minPrice:"",maxPrice:"",query:""
 };

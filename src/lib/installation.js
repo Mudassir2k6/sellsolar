@@ -1,6 +1,7 @@
 import { supabase } from './supabase';
 import { isValidUuid } from './auth';
 import { checkRateLimit, recordRateLimitAttempt, sanitizeText } from './security';
+import { sendContactMessage } from '../services/inboxService';
 
 export const ADMIN_NOTIFICATION_EMAIL = 'mudassir2k6@gmail.com';
 
@@ -157,6 +158,21 @@ export async function submitInstallationRequest({
     }
   } catch (notifErr) {
     console.warn('In-app admin notification error:', notifErr);
+  }
+
+  // 4. Also register inquiry in Admin Unified Inbox so it appears under Messages / Inquiries
+  try {
+    await sendContactMessage({
+      name: safeFullName,
+      email: `${cleanPhone}@sellsolar-lead.pk`,
+      phone: cleanPhone,
+      subject: `⚡ Turnkey Installation Request: ${safeSystemSize} (${safeCity})`,
+      message: `Customer: ${safeFullName}\nPhone: ${cleanPhone}\nCity: ${safeCity}\nProperty: ${safePropertyType}\nSystem Size: ${safeSystemSize}\nAddress: ${safeAddress}\n\nClient Notes:\n${safeNotes || 'None'}`,
+      category: 'Installation Request',
+      recipientEmail: 'info@sellsolar.pk',
+    });
+  } catch (inboxErr) {
+    console.warn('Unified inbox lead sync warning:', inboxErr);
   }
 
   return {

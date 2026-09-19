@@ -122,6 +122,7 @@ export default function AdminSuperDashboard({
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [replyText, setReplyText] = useState('');
   const [inboxFilter, setInboxFilter] = useState('all'); // 'all' | 'unread' | 'replied'
+  const [inboxSearchQuery, setInboxSearchQuery] = useState('');
   const [syncingInbox, setSyncingInbox] = useState(false);
   const [productFilter, setProductFilter] = useState('all'); // 'all' | 'featured' | 'hot_sell' | 'pending' | 'approved'
   const [myAdsFilter, setMyAdsFilter] = useState('all'); // 'all' | 'active' | 'sold'
@@ -376,15 +377,34 @@ export default function AdminSuperDashboard({
     loadData();
     const handleInboxUpdate = () => setInboxMessages(getInboxMessages());
     const handleUsersUpdate = () => loadData();
+    const handleStorageChange = (e) => {
+      if (e.key === 'sellsolar_inbox_messages' || !e.key) {
+        setInboxMessages(getInboxMessages());
+      }
+      if (e.key === 'sellsolar_custom_pages' || e.key === 'sellsolar_settings' || e.key === 'sellsolar_users_roles') {
+        loadData();
+      }
+    };
     window.addEventListener('sellsolar_inbox_updated', handleInboxUpdate);
     window.addEventListener('sellsolar_users_updated', handleUsersUpdate);
     window.addEventListener('sellsolar_auth_updated', handleUsersUpdate);
+    window.addEventListener('storage', handleStorageChange);
     return () => {
       window.removeEventListener('sellsolar_inbox_updated', handleInboxUpdate);
       window.removeEventListener('sellsolar_users_updated', handleUsersUpdate);
       window.removeEventListener('sellsolar_auth_updated', handleUsersUpdate);
+      window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
+
+  useEffect(() => {
+    if (activeTab === 'inbox') {
+      setInboxMessages(getInboxMessages());
+      fetchSharedInboxMessages().then((msgs) => {
+        if (msgs && msgs.length > 0) setInboxMessages(msgs);
+      }).catch(() => {});
+    }
+  }, [activeTab]);
 
   useEffect(() => {
     setCmsForm({ ...settings });
@@ -1007,15 +1027,16 @@ export default function AdminSuperDashboard({
   const filteredInbox = inboxMessages.filter((msg) => {
     if (inboxFilter === 'unread') return !msg.is_read;
     if (inboxFilter === 'replied') return msg.status === 'replied';
-    return true;
   }).filter((msg) => {
-    if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
+    if (!inboxSearchQuery) return true;
+    const q = inboxSearchQuery.toLowerCase();
     return (
       (msg.senderName || '').toLowerCase().includes(q) ||
       (msg.senderEmail || '').toLowerCase().includes(q) ||
+      (msg.senderPhone || '').toLowerCase().includes(q) ||
       (msg.ticketNumber || '').toLowerCase().includes(q) ||
-      (msg.subject || '').toLowerCase().includes(q)
+      (msg.subject || '').toLowerCase().includes(q) ||
+      (msg.category || '').toLowerCase().includes(q)
     );
   });
 
@@ -1741,6 +1762,17 @@ export default function AdminSuperDashboard({
                   >
                     Replied ({inboxMessages.filter((m) => m.status === 'replied').length})
                   </button>
+
+                  <div className="relative">
+                    <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search tickets, senders..."
+                      value={inboxSearchQuery}
+                      onChange={(e) => setInboxSearchQuery(e.target.value)}
+                      className="pl-8 pr-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 text-xs bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 outline-none focus:ring-1 focus:ring-amber-500 w-44 sm:w-56"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -4015,8 +4047,8 @@ export default function AdminSuperDashboard({
             </div>
           )}
 
-          {/* TAB 6: WEBSITE SETTINGS & CMS (SUPER ADMIN ONLY) */}
-          {activeTab === 'settings' && isSuperAdmin && (
+          {/* TAB 6: WEBSITE SETTINGS & CMS (SUPER ADMIN & ADMIN) */}
+          {activeTab === 'settings' && (isSuperAdmin || isAdmin) && (
             <div className="space-y-6 max-w-4xl">
               <div>
                 <h1 className="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-2">

@@ -1,5 +1,44 @@
 [
   {
+    "updated_at": "21-Sept-2026, 2:07:59 am",
+    "iso": "2026-09-20T21:07:59.517Z",
+    "date_str": "21 September 2026",
+    "panels_count": 27,
+    "inverters_count": 24,
+    "batteries_count": 17,
+    "systems_count": 5,
+    "structures_count": 4,
+    "average_panel_rate": "Rs 33.00 – 44.50 / W",
+    "average_inverter_rate": "Rs 112,000 – 549,000",
+    "average_battery_lithium_rate": "Rs 238,500 – 564,000",
+    "average_battery_tubular_rate": "Rs 31,500 – 51,500",
+    "average_system_rate": "Rs 825,000 – 2,340,000",
+    "average_structure_rate": "Rs 210 – 18,500",
+    "categories_benchmarked": [
+      "Solar Panels (Plates)",
+      "Solar Inverters",
+      "Solar Batteries",
+      "Turnkey Complete Systems",
+      "Structures & BOS Accessories"
+    ],
+    "tags_active": [
+      "Tier-1 N-Type TOPCon",
+      "Bifacial Double Glass",
+      "Pakistan #1 Hybrid",
+      "Net Metering Approved",
+      "Dual MPPT IP65",
+      "Top Lithium 6000 Cycles",
+      "Tall Tubular 27-Plates",
+      "AI Smart AFCI",
+      "Turnkey Net-Metering 10kW",
+      "Hot-Dip Galvanized GI",
+      "Pure Copper TUV DC Cable"
+    ],
+    "customer_dealer_ads_protected": true,
+    "ads_modified_count": 0,
+    "status": "SUCCESS"
+  },
+  {
     "updated_at": "20-Sept-2026, 2:11:37 am",
     "iso": "2026-09-19T21:11:37.545Z",
     "date_str": "20 September 2026",

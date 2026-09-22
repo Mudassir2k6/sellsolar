@@ -1220,7 +1220,7 @@ function Xy({
   value:"used",label:"Used"
 }];
 function nx({
-  filters:t,onFilterChange:e,onSearch:r,onReset:n,onNavigatePrices:np,onNavigateCalculator:nc,onNavigateDealers:nd
+  filters:t,onFilterChange:e,onSearch:r,onReset:n,onNavigatePrices:np,onNavigateCalculator:nc,onNavigateDealers:nd,onNavigateInstallation:ni
 }){
   const { settings } = useSiteSettings();
   const heroCms = settings?.homePageCms?.hero;
@@ -1499,6 +1499,107 @@ function nx({
                   ]
                 })
               ]
+            })
+          }),
+          jsx("div",{
+            className:"mx-auto mt-3.5 max-w-4xl",children:jsx("div",{
+              className:"flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pb-1.5 scrollbar-none",children:[
+                {
+                  label: "Solar Panels",
+                  sub: "550W & N-Type",
+                  icon: Sun,
+                  action: () => {
+                    e("category", "panel");
+                    const el = document.getElementById("listings");
+                    el && el.scrollIntoView({ behavior: "smooth", block: "start" });
+                  },
+                  active: t.category === "panel"
+                },
+                {
+                  label: "Inverters",
+                  sub: "Hybrid & On-Grid",
+                  icon: Zap,
+                  action: () => {
+                    e("category", "inverter");
+                    const el = document.getElementById("listings");
+                    el && el.scrollIntoView({ behavior: "smooth", block: "start" });
+                  },
+                  active: t.category === "inverter"
+                },
+                {
+                  label: "Batteries",
+                  sub: "Lithium & Tubular",
+                  icon: BatteryCharging,
+                  action: () => {
+                    e("category", "battery");
+                    const el = document.getElementById("listings");
+                    el && el.scrollIntoView({ behavior: "smooth", block: "start" });
+                  },
+                  active: t.category === "battery"
+                },
+                {
+                  label: "Complete Systems",
+                  sub: "5kW to 20kW+",
+                  icon: Boxes,
+                  action: () => {
+                    e("category", "complete_system");
+                    const el = document.getElementById("listings");
+                    el && el.scrollIntoView({ behavior: "smooth", block: "start" });
+                  },
+                  active: t.category === "complete_system"
+                },
+                {
+                  label: "Daily Rates",
+                  sub: "Rs 34-42/W Live",
+                  icon: TrendingUp,
+                  action: np || (() => {
+                    const el = document.getElementById("daily-market-rates");
+                    el && el.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }),
+                  highlight: true
+                },
+                {
+                  label: "Solar Calculator",
+                  sub: "Find System kW",
+                  icon: Calculator,
+                  action: nc
+                },
+                {
+                  label: "Verified Dealers",
+                  sub: "80+ Certified",
+                  icon: Store,
+                  action: nd
+                }
+              ].map(cat => jsxs("button", {
+                type: "button",
+                onClick: cat.action,
+                className: `flex items-center gap-2 px-3 py-1.5 sm:py-2 rounded-xl text-left border transition-all shrink-0 cursor-pointer ${
+                  cat.active
+                    ? "bg-primary-500 text-white border-primary-600 shadow-xs"
+                    : cat.highlight
+                    ? "bg-amber-500/10 hover:bg-amber-500/20 text-amber-900 dark:text-amber-200 border-amber-300/80 dark:border-amber-800"
+                    : "bg-white dark:bg-gray-850 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700 shadow-2xs"
+                }`,
+                children: [
+                  jsx("div", {
+                    className: `h-7 w-7 sm:h-8 sm:w-8 rounded-lg flex items-center justify-center shrink-0 ${
+                      cat.active
+                        ? "bg-white/20 text-white"
+                        : cat.highlight
+                        ? "bg-amber-500 text-white"
+                        : "bg-primary-50 dark:bg-primary-950/60 text-primary-600 dark:text-primary-400"
+                    }`,
+                    children: jsx(cat.icon, { className: "h-3.5 w-3.5 sm:h-4 sm:w-4" })
+                  }),
+                  jsxs("div", {
+                    className: "min-w-0 pr-1",
+                    children: [
+                      jsx("div", { className: `text-[11px] sm:text-xs font-bold leading-tight ${cat.active ? "text-white" : ""}`, children: cat.label }),
+                      jsx("div", { className: `text-[9px] sm:text-[10px] leading-tight ${cat.active ? "text-white/80" : "text-gray-500 dark:text-gray-400"}`, children: cat.sub })
+                    ]
+                  })
+                ]
+              }, cat.label))
             })
           }),
           jsx("div",{
@@ -2041,19 +2142,19 @@ function ax({
 }
 
 function lx({
-  listings:t,loading:e,error:r,totalCount:n,onSelectListing:s,onResetFilters:rf,onNavigate:nav,currentCondition,onConditionChange
+  listings:t,loading:e,error:r,totalCount:n,onSelectListing:s,onResetFilters:rf,onNavigate:nav,currentCondition,onConditionChange,currentCategory,onCategoryChange
 }){
-  const [visibleCount, setVisibleCount] = useState(12);
+  const [visibleCount, setVisibleCount] = useState(8);
 
   useEffect(() => {
-    setVisibleCount(12);
-  }, [t.length, currentCondition]);
+    setVisibleCount(8);
+  }, [t.length, currentCondition, currentCategory]);
 
   return jsx("section",{
     id:"listings",className:"bg-white dark:bg-gray-950 py-5 sm:py-6 border-b border-gray-200/60 dark:border-gray-800 transition-colors",children:jsxs("div",{
       className:"container-page",children:[
         jsxs("div",{
-          className:"flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 border-b border-gray-200 dark:border-gray-800 pb-2.5 mb-4",children:[
+          className:"flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 border-b border-gray-200 dark:border-gray-800 pb-2.5 mb-3.5",children:[
             jsxs("div",{
               children:[
                 jsx("h2",{
@@ -2125,6 +2226,30 @@ function lx({
             })
           ]
         }),
+        jsxs("div",{
+          className:"flex items-center gap-1.5 overflow-x-auto pb-2 mb-3.5 scrollbar-none",children:[
+            { id:"", label:"All Equipment" },
+            { id:"panel", label:"Solar Panels", icon:Sun },
+            { id:"inverter", label:"Inverters", icon:Zap },
+            { id:"battery", label:"Batteries", icon:BatteryCharging },
+            { id:"complete_system", label:"Complete Systems", icon:Boxes }
+          ].map(cat => {
+            const isSelected = (!currentCategory && cat.id === "") || currentCategory === cat.id;
+            return jsxs("button", {
+              type: "button",
+              onClick: () => onCategoryChange && onCategoryChange(cat.id),
+              className: `inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                isSelected
+                  ? "bg-primary-600 text-white shadow-xs"
+                  : "bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-750 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
+              }`,
+              children: [
+                cat.icon && jsx(cat.icon, { className: "h-3.5 w-3.5" }),
+                cat.label
+              ]
+            }, cat.id || "all");
+          })
+        }),
         e?jsx("div",{
           className:"grid grid-cols-1 xs:grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4",children:[1,2,3,4,5,6,7,8].map(sk=>jsxs("div",{
             className:"card overflow-hidden animate-pulse dark:bg-gray-900 border border-gray-200 dark:border-gray-800",children:[jsx("div",{
@@ -2166,15 +2291,15 @@ function lx({
                 listing:a,onClick:()=>s(a.id),onNavigate:nav
               },a.id))
             }),
-            t.length > 12 && jsxs("div",{
+            t.length > 8 && jsxs("div",{
               className:"mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 border-t border-gray-100 dark:border-gray-800",
               children:[
                 visibleCount < t.length ? jsxs("button",{
                   type:"button",
-                  onClick:()=>setVisibleCount(prev=>Math.min(prev+12, t.length)),
-                  className:"btn bg-white dark:bg-gray-850 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-300 dark:border-gray-700 px-6 py-2.5 text-xs sm:text-sm font-bold shadow-xs hover:border-primary-500 transition-all flex items-center gap-2",
+                  onClick:()=>setVisibleCount(prev=>Math.min(prev+8, t.length)),
+                  className:"btn bg-white dark:bg-gray-850 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-300 dark:border-gray-700 px-5 py-2.5 text-xs sm:text-sm font-bold shadow-xs hover:border-primary-500 transition-all flex items-center gap-2",
                   children:[
-                    `Load More Equipment (${t.length - visibleCount} more)`,
+                    `Load Next 8 Equipment (${t.length - visibleCount} more)`,
                     jsx(ChevronDown,{ className:"h-4 w-4 text-primary-500" })
                   ]
                 }) : null,
@@ -2183,19 +2308,19 @@ function lx({
                   onClick:()=>setVisibleCount(t.length),
                   className:"btn-primary px-6 py-2.5 text-xs sm:text-sm font-bold shadow-xs flex items-center gap-2",
                   children:[
-                    `View All ${n || t.length} Listings`,
+                    `Explore All ${n || t.length} Ads`,
                     jsx(ArrowRight,{ className:"h-4 w-4" })
                   ]
                 }) : jsxs("button",{
                   type:"button",
                   onClick:()=>{
-                    setVisibleCount(12);
+                    setVisibleCount(8);
                     const el = document.getElementById("listings");
                     el && el.scrollIntoView({ behavior: "smooth", block: "start" });
                   },
                   className:"btn-ghost text-xs px-5 py-2 flex items-center gap-1.5",
                   children:[
-                    "Show Less (First 12)",
+                    "Show Less (First 8)",
                     jsx(ChevronDown,{ className:"h-3.5 w-3.5 rotate-180" })
                   ]
                 })
@@ -2291,27 +2416,30 @@ function hx({
 
   const supportEmail = settings?.supportEmail || "info@sellsolar.pk";
   const supportPhone = settings?.supportPhone || "+92 300 1234567";
+  const supportPhoneStr = String(supportPhone);
   const officeAddress = settings?.headOfficeAddress || "Sector G-7, Blue Area, Islamabad, Pakistan";
   const copyrightText = settings?.copyrightText || "© 2026 SellSolar Pakistan. All rights reserved.";
   const aboutText = settings?.footerAboutText || "Pakistan's #1 marketplace for solar panels, on-grid & hybrid inverters, lithium batteries, and turnkey solar installations. Buy and sell with total confidence.";
 
-  const rawWa = (settings?.whatsAppNumber || "923001234567").replace(/\D/g, "");
+  const rawWa = String(settings?.whatsAppNumber || "923001234567").replace(/\D/g, "");
   const waUrl = `https://wa.me/${rawWa}?text=${encodeURIComponent("Assalam-o-Alaikum, I am inquiring about solar equipment on SellSolar.pk")}`;
 
   const socialLinksList = [
     { label: "WhatsApp Support", href: waUrl, Icon: MessageCircle, isExternal: true },
-    settings?.socialLinks?.facebook && { label: "Facebook", href: settings.socialLinks.facebook, Icon: Facebook, isExternal: true },
-    settings?.socialLinks?.instagram && { label: "Instagram", href: settings.socialLinks.instagram, Icon: Instagram, isExternal: true },
-    settings?.socialLinks?.linkedin && { label: "LinkedIn", href: settings.socialLinks.linkedin, Icon: Linkedin, isExternal: true },
-    settings?.socialLinks?.youtube && { label: "YouTube", href: settings.socialLinks.youtube, Icon: Youtube, isExternal: true },
-    settings?.socialLinks?.twitter && { label: "Twitter / X", href: settings.socialLinks.twitter, Icon: Twitter, isExternal: true },
+    settings?.socialLinks?.facebook ? { label: "Facebook", href: settings.socialLinks.facebook, Icon: Facebook, isExternal: true } : null,
+    settings?.socialLinks?.instagram ? { label: "Instagram", href: settings.socialLinks.instagram, Icon: Instagram, isExternal: true } : null,
+    settings?.socialLinks?.linkedin ? { label: "LinkedIn", href: settings.socialLinks.linkedin, Icon: Linkedin, isExternal: true } : null,
+    settings?.socialLinks?.youtube ? { label: "YouTube", href: settings.socialLinks.youtube, Icon: Youtube, isExternal: true } : null,
+    settings?.socialLinks?.twitter ? { label: "Twitter / X", href: settings.socialLinks.twitter, Icon: Twitter, isExternal: true } : null,
     { label: "Email Support", href: `mailto:${supportEmail}`, Icon: Mail, isEmail: true },
   ].filter(Boolean);
 
   const handleNav = (page) => {
     if (navigate) {
       navigate(page);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (typeof window !== "undefined") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
     }
   };
 
@@ -2327,7 +2455,9 @@ function hx({
         onNavigateToContactForm: () => {
           if (navigate) {
             navigate("contact");
-            window.scrollTo({ top: 0, behavior: "smooth" });
+            if (typeof window !== "undefined") {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
           }
         }
       }),
@@ -2360,7 +2490,7 @@ function hx({
               jsxs("div", {
                 className: "flex flex-wrap items-center justify-center gap-2.5 shrink-0",
                 children: [
-                  jsx("button", {
+                  jsxs("button", {
                     type: "button",
                     onClick: t,
                     className: "inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 sm:px-6 sm:py-3 text-primary-700 shadow-md hover:bg-primary-50 active:scale-[0.98] text-xs sm:text-sm font-extrabold cursor-pointer transition-all",
@@ -2368,8 +2498,8 @@ function hx({
                       jsx(CirclePlus, { className: "h-4 w-4 stroke-[2.5]" }),
                       "Post Ad — It's Free"
                     ]
-                  }),
-                  jsx("button", {
+                  }, "footer-cta-post-ad"),
+                  jsxs("button", {
                     type: "button",
                     onClick: () => handleNav("calculator"),
                     className: "inline-flex items-center gap-2 rounded-xl bg-gray-900/40 hover:bg-gray-900/60 border border-white/25 px-4 py-2.5 sm:px-5 sm:py-3 text-white text-xs sm:text-sm font-bold cursor-pointer transition-all",
@@ -2377,8 +2507,8 @@ function hx({
                       jsx(Calculator, { className: "h-4 w-4" }),
                       "Load Calculator"
                     ]
-                  }),
-                  jsx("button", {
+                  }, "footer-cta-calculator"),
+                  jsxs("button", {
                     type: "button",
                     onClick: () => handleNav("prices"),
                     className: "hidden sm:inline-flex items-center gap-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-bold cursor-pointer transition-all",
@@ -2386,7 +2516,7 @@ function hx({
                       jsx(Zap, { className: "h-4 w-4 text-amber-300" }),
                       "Today's Rates"
                     ]
-                  })
+                  }, "footer-cta-rates")
                 ]
               })
             ]
@@ -2416,7 +2546,7 @@ function hx({
                     ]
                   })
                 ]
-              }),
+              }, "trust-verified-dealers"),
               jsxs("div", {
                 className: "flex items-center gap-3 p-2 rounded-xl bg-gray-900/40 border border-gray-800/60",
                 children: [
@@ -2431,7 +2561,7 @@ function hx({
                     ]
                   })
                 ]
-              }),
+              }, "trust-daily-rates"),
               jsxs("div", {
                 className: "flex items-center gap-3 p-2 rounded-xl bg-gray-900/40 border border-gray-800/60",
                 children: [
@@ -2446,7 +2576,7 @@ function hx({
                     ]
                   })
                 ]
-              }),
+              }, "trust-free-posting"),
               jsxs("div", {
                 className: "flex items-center gap-3 p-2 rounded-xl bg-gray-900/40 border border-gray-800/60",
                 children: [
@@ -2461,7 +2591,7 @@ function hx({
                     ]
                   })
                 ]
-              })
+              }, "trust-complete-solutions")
             ]
           })
         })
@@ -2523,7 +2653,7 @@ function hx({
                           jsxs("span", {
                             children: [
                               "WhatsApp: ",
-                              jsx("span", { className: "font-semibold text-white", children: settings?.whatsAppDisplayNumber || supportPhone })
+                              jsx("span", { className: "font-semibold text-white", children: settings?.whatsAppDisplayNumber || supportPhoneStr })
                             ]
                           })
                         ]
@@ -2540,11 +2670,11 @@ function hx({
                       }),
                       /* Phone Call */
                       jsxs("a", {
-                        href: `tel:${supportPhone.replace(/\s+/g, "")}`,
+                        href: `tel:${supportPhoneStr.replace(/\s+/g, "")}`,
                         className: "flex items-center gap-2.5 text-gray-300 hover:text-white transition-colors group cursor-pointer",
                         children: [
                           jsx(Phone, { className: "h-4 w-4 text-amber-400 group-hover:scale-110 transition-transform shrink-0" }),
-                          jsx("span", { children: supportPhone })
+                          jsx("span", { children: supportPhoneStr })
                         ]
                       }),
                       /* Office Location */
@@ -2558,10 +2688,10 @@ function hx({
                     ]
                   })
                 ]
-              }),
+              }, "brand-contact-info"),
 
               /* Navigation Link Columns */
-              Object.entries(ux).map(([sectionTitle, links]) =>
+              ...Object.entries(ux).map(([sectionTitle, links]) =>
                 jsxs("div", {
                   children: [
                     jsx("h4", {
@@ -2570,7 +2700,7 @@ function hx({
                     }),
                     jsx("ul", {
                       className: "space-y-2 text-xs sm:text-sm",
-                      children: links.map((item) =>
+                      children: links.map((item, idx) =>
                         jsx("li", {
                           children: jsx("a", {
                             href: `/${item.page}`,
@@ -2581,11 +2711,11 @@ function hx({
                             className: "text-gray-400 hover:text-white transition-colors cursor-pointer inline-block py-0.5",
                             children: item.label
                           })
-                        }, item.page || item.label)
+                        }, `footer-link-${sectionTitle}-${item.page || item.label}-${idx}`)
                       )
                     })
                   ]
-                }, sectionTitle)
+                }, `footer-col-${sectionTitle}`)
               )
             ]
           }),
@@ -2594,7 +2724,7 @@ function hx({
           jsxs("div", {
             className: "mt-10 pt-6 border-t border-gray-800/60",
             children: [
-              jsx("div", {
+              jsxs("div", {
                 className: "text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2.5 flex items-center gap-1.5",
                 children: [
                   jsx(MapPin, { className: "h-3.5 w-3.5 text-primary-400" }),
@@ -2603,13 +2733,13 @@ function hx({
               }),
               jsx("div", {
                 className: "flex flex-wrap gap-1.5",
-                children: PAKISTAN_SOLAR_CITIES.map((city) =>
+                children: PAKISTAN_SOLAR_CITIES.map((city, cIdx) =>
                   jsx("button", {
                     type: "button",
                     onClick: () => handleNav("home"),
                     className: "px-2.5 py-1 rounded-lg text-xs bg-gray-900 hover:bg-gray-800 text-gray-300 hover:text-primary-400 border border-gray-800/80 transition-all cursor-pointer",
                     children: city
-                  }, `city-tag-${city}`)
+                  }, `city-tag-${city}-${cIdx}`)
                 )
               })
             ]
@@ -2634,7 +2764,7 @@ function hx({
               /* Social Media Buttons */
               jsx("div", {
                 className: "flex items-center gap-2",
-                children: socialLinksList.map(({ label, href, Icon, isEmail }) =>
+                children: socialLinksList.map(({ label, href, Icon, isEmail }, sIdx) =>
                   jsx("a", {
                     href,
                     onClick: (ev) => {
@@ -2648,16 +2778,20 @@ function hx({
                     "aria-label": label,
                     title: label,
                     className: "flex h-8 w-8 items-center justify-center rounded-lg bg-gray-900 border border-gray-800 text-gray-400 hover:text-white hover:bg-primary-600 transition-all cursor-pointer active:scale-95",
-                    children: jsx(Icon, { className: "h-4 w-4" })
-                  }, label)
+                    children: Icon ? jsx(Icon, { className: "h-4 w-4" }) : null
+                  }, `social-btn-${label}-${sIdx}`)
                 )
               }),
 
               /* Back to top button */
-              jsx("button", {
+              jsxs("button", {
                 type: "button",
                 id: "footer-back-to-top-btn",
-                onClick: () => window.scrollTo({ top: 0, behavior: "smooth" }),
+                onClick: () => {
+                  if (typeof window !== "undefined") {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }
+                },
                 className: "flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-900 hover:bg-gray-800 text-gray-300 hover:text-white border border-gray-800 transition-all cursor-pointer text-xs font-semibold active:scale-95",
                 title: "Scroll back to the top of the page",
                 children: [
@@ -5728,10 +5862,15 @@ function _x({
 
   return jsxs(Fragment,{
     children:[jsx(nx,{
-      filters:e,onFilterChange:y,onSearch:w,onReset:j,onNavigatePrices:nav?()=>nav("prices"):void 0,onNavigateCalculator:nav?()=>nav("calculator"):void 0,onNavigateDealers:nav?()=>nav("dealers"):void 0
+      filters:e,onFilterChange:y,onSearch:w,onReset:j,onNavigatePrices:nav?()=>nav("prices"):void 0,onNavigateCalculator:nav?()=>nav("calculator"):void 0,onNavigateDealers:nav?()=>nav("dealers"):void 0,onNavigateInstallation:nav?()=>nav("installation"):void 0
     }),jsx(lx,{
       listings:n,loading:a,error:o,totalCount:u,onSelectListing:t,onResetFilters:j,onNavigate:nav,currentCondition:e.condition,onConditionChange:(newCond)=>{
         y("condition", newCond);
+        p(cnt => cnt + 1);
+      },
+      currentCategory:e.category,
+      onCategoryChange:(newCat)=>{
+        y("category", newCat);
         p(cnt => cnt + 1);
       }
     }),jsx(PakWheelsSellCards,{
@@ -5740,7 +5879,7 @@ function _x({
     }),jsx(DailyMarketRates,{
       onNavigate:nav,
       onSelectCategory:C,
-      compact:false
+      compact:true
     }),nav && calcBanner?.enabled !== false ? jsx("div",{
       className:"container-page my-3.5 sm:my-4",children:jsxs("div",{
         className:"rounded-2xl bg-gradient-to-r from-gray-900 via-gray-850 to-primary-950 p-4 sm:p-5 text-white shadow-md border border-gray-800 transition-all",children:[

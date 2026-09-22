@@ -23,7 +23,7 @@ export default function FloatingWhatsAppWidget() {
     return null;
   }
 
-  const cleanNumber = settings.whatsAppNumber.replace(/\D/g, '');
+  const cleanNumber = String(settings.whatsAppNumber || '').replace(/\D/g, '');
   const encodedText = encodeURIComponent(settings.whatsAppDefaultMessage || 'Assalam-o-Alaikum SellSolar');
   const waUrl = `https://wa.me/${cleanNumber}?text=${encodedText}`;
 

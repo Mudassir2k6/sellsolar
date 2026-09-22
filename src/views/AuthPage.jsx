@@ -23,6 +23,7 @@ import { useToast } from '../context/ToastContext';
 import { CITIES } from '../lib/constants';
 import { digitsOnlyPhone, isValidEmail, isValidPhone, normalizePhone } from '../lib/auth';
 import { isBotHoneypotTriggered, isSubmissionTooFast, checkRateLimit, sanitizeText } from '../lib/security';
+import FloatingLabelInput from '../components/FloatingLabelInput';
 
 function authErrorMessage(error, activeView = 'login') {
   if (!error) return 'An error occurred. Please try again.';
@@ -1123,339 +1124,246 @@ export default function AuthPage({ onSuccess, onBack, onForgotPassword, initialV
 
               {view === 'signup' && (
                 <>
-                  <div>
-                    <label className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                      Full Name *
-                    </label>
-                    <div className="relative">
-                      <User
-                        className={`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${
-                          fieldErrors.fullName ? 'text-error-500' : 'text-gray-400'
-                        }`}
-                      />
-                      <input
-                        ref={fullNameRef}
-                        id="signup-fullname-input"
-                        type="text"
-                        value={fullName}
-                        onChange={(e) => {
-                          setFullName(e.target.value);
-                          clearFieldError('fullName');
-                        }}
-                        onKeyDown={(e) => handleFieldKeyDown(e, 'fullName')}
-                        placeholder="Enter your full name"
-                        className={fieldClass('fullName', 'pl-11 pr-11')}
-                      />
-                      {fieldErrors.fullName ? (
-                        <CircleAlert className="absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" />
-                      ) : null}
-                    </div>
-                    {fieldErrors.fullName && (
-                      <p className="mt-1.5 text-xs font-medium text-error-600">Full Name is required.</p>
-                    )}
-                  </div>
+                  <FloatingLabelInput
+                    ref={fullNameRef}
+                    id="signup-fullname-input"
+                    label="Full Name"
+                    required
+                    value={fullName}
+                    onChange={(e) => {
+                      setFullName(e.target.value);
+                      clearFieldError('fullName');
+                    }}
+                    onKeyDown={(e) => handleFieldKeyDown(e, 'fullName')}
+                    placeholder="Enter your full name"
+                    icon={User}
+                    error={fieldErrors.fullName ? 'Full Name is required.' : null}
+                  />
 
-                  <div>
-                    <label className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                      Username *
-                    </label>
-                    <div className="relative">
-                      <User
-                        className={`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${
-                          fieldErrors.username ? 'text-error-500' : 'text-gray-400'
-                        }`}
-                      />
-                      <input
-                        ref={signupUsernameRef}
-                        id="signup-username-input"
-                        type="text"
-                        autoComplete="username"
-                        required
-                        value={signupUsername}
-                        onChange={(e) => {
-                          setSignupUsername(e.target.value.trim());
-                          clearFieldError('username');
-                        }}
-                        onKeyDown={(e) => handleFieldKeyDown(e, 'signupUsername')}
-                        placeholder=""
-                        className={fieldClass('username', 'pl-11 pr-11')}
-                      />
-                      {fieldErrors.username ? (
-                        <CircleAlert className="absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" />
-                      ) : null}
-                    </div>
-                    {fieldErrors.username && fieldErrorMessages.username ? (
-                      <p className="mt-1.5 text-xs font-semibold text-error-600 dark:text-error-400">
-                        {fieldErrorMessages.username}
-                      </p>
-                    ) : fieldErrors.username && !signupUsername.trim() ? (
-                      <p className="mt-1.5 text-xs font-medium text-error-600">Username is required.</p>
-                    ) : fieldErrors.username && signupUsername.trim().length < 3 ? (
-                      <p className="mt-1.5 text-xs font-medium text-error-600">Username must be at least 3 characters.</p>
-                    ) : null}
-                  </div>
+                  <FloatingLabelInput
+                    ref={signupUsernameRef}
+                    id="signup-username-input"
+                    label="Username"
+                    required
+                    autoComplete="username"
+                    value={signupUsername}
+                    onChange={(e) => {
+                      setSignupUsername(e.target.value.trim());
+                      clearFieldError('username');
+                    }}
+                    onKeyDown={(e) => handleFieldKeyDown(e, 'signupUsername')}
+                    placeholder="Choose a username"
+                    icon={User}
+                    error={
+                      fieldErrors.username && fieldErrorMessages.username
+                        ? fieldErrorMessages.username
+                        : fieldErrors.username && !signupUsername.trim()
+                        ? 'Username is required.'
+                        : fieldErrors.username && signupUsername.trim().length < 3
+                        ? 'Username must be at least 3 characters.'
+                        : null
+                    }
+                  />
 
-                  <div>
-                    <label className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                      Email Address *
-                    </label>
-                    <div className="relative">
-                      <Mail
-                        className={`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${
-                          fieldErrors.signupEmail ? 'text-error-500' : 'text-gray-400'
-                        }`}
-                      />
-                      <input
-                        ref={signupEmailRef}
-                        id="signup-email-input"
-                        type="email"
-                        autoComplete="email"
-                        inputMode="email"
-                        required
-                        value={signupEmail}
-                        onChange={(e) => {
-                          setSignupEmail(e.target.value.replace(/\s/g, ''));
-                          clearFieldError('signupEmail');
-                          setSignupEmailTouched(true);
-                        }}
-                        onBlur={() => setSignupEmailTouched(true)}
-                        onKeyDown={(e) => handleFieldKeyDown(e, 'signupEmail')}
-                        placeholder="you@example.com"
-                        className={fieldClass(
-                          'signupEmail',
-                          `pl-11 pr-11 ${
-                            signupEmail.trim() && !isValidEmail(signupEmail) ? 'border-error-400' : ''
-                          }`
-                        )}
-                      />
-                      {fieldErrors.signupEmail ||
-                      (signupEmailTouched && signupEmail.trim() && !isValidEmail(signupEmail)) ? (
-                        <CircleAlert className="absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" />
-                      ) : null}
-                    </div>
-                    {fieldErrors.signupEmail && fieldErrorMessages.signupEmail ? (
-                      <p className="mt-1.5 text-xs font-semibold text-error-600 dark:text-error-400">
-                        {fieldErrorMessages.signupEmail}
-                      </p>
-                    ) : fieldErrors.signupEmail && !signupEmail.trim() ? (
-                      <p className="mt-1.5 text-xs font-medium text-error-600">Email address is mandatory.</p>
-                    ) : (signupEmailTouched || fieldErrors.signupEmail) &&
-                      signupEmail.trim() &&
-                      !isValidEmail(signupEmail) ? (
-                      <p className="mt-1.5 text-xs font-medium text-error-600">
-                        Please enter a valid email address (e.g. you@example.com).
-                      </p>
-                    ) : (
-                      <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-                        Mandatory. Official notifications and account recovery will be sent here.
-                      </p>
-                    )}
-                  </div>
+                  <FloatingLabelInput
+                    ref={signupEmailRef}
+                    id="signup-email-input"
+                    label="Email Address"
+                    type="email"
+                    required
+                    autoComplete="email"
+                    inputMode="email"
+                    value={signupEmail}
+                    onChange={(e) => {
+                      setSignupEmail(e.target.value.replace(/\s/g, ''));
+                      clearFieldError('signupEmail');
+                      setSignupEmailTouched(true);
+                    }}
+                    onBlur={() => setSignupEmailTouched(true)}
+                    onKeyDown={(e) => handleFieldKeyDown(e, 'signupEmail')}
+                    placeholder="you@example.com"
+                    icon={Mail}
+                    error={
+                      fieldErrors.signupEmail && fieldErrorMessages.signupEmail
+                        ? fieldErrorMessages.signupEmail
+                        : fieldErrors.signupEmail && !signupEmail.trim()
+                        ? 'Email address is mandatory.'
+                        : (signupEmailTouched || fieldErrors.signupEmail) &&
+                          signupEmail.trim() &&
+                          !isValidEmail(signupEmail)
+                        ? 'Please enter a valid email address (e.g. you@example.com).'
+                        : null
+                    }
+                    helperText={
+                      !fieldErrors.signupEmail && !signupEmailTouched
+                        ? 'Mandatory. Official notifications and account recovery will be sent here.'
+                        : null
+                    }
+                  />
                 </>
               )}
 
               {view === 'forgot' && (
-                <div>
-                  <label className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    Registered Email Address *
-                  </label>
-                  <div className="relative">
-                    <Mail
-                      className={`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${
-                        fieldErrors.email || (email.trim() && !isValidEmail(email))
-                          ? 'text-error-500'
-                          : 'text-gray-400'
-                      }`}
-                    />
-                    <input
-                      ref={emailRef}
-                      id="forgot-email-input"
-                      type="email"
-                      autoComplete="email"
-                      inputMode="email"
-                      required
-                      value={email}
-                      onChange={(e) => {
-                        setEmail(e.target.value.replace(/\s/g, ''));
-                        clearFieldError('email');
-                        setEmailTouched(true);
-                      }}
-                      onBlur={() => setEmailTouched(true)}
-                      onKeyDown={(e) => handleFieldKeyDown(e, 'forgotEmail')}
-                      placeholder="you@example.com"
-                      className={fieldClass(
-                        'email',
-                        `pl-11 pr-11 ${
-                          email.trim() && !isValidEmail(email) ? 'border-error-400' : ''
-                        }`
-                      )}
-                    />
-                    {fieldErrors.email ||
-                    (emailTouched && email.trim() && !isValidEmail(email)) ? (
-                      <CircleAlert className="absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" />
-                    ) : null}
-                  </div>
-                  {fieldErrors.email && !email.trim() ? (
-                    <p className="mt-1.5 text-xs font-medium text-error-600">Email address is required.</p>
-                  ) : email.trim() && !isValidEmail(email) ? (
-                    <p className="mt-1.5 text-xs font-medium text-error-600">
-                      Please enter a valid email address (e.g. you@example.com) to receive the password reset link.
-                    </p>
-                  ) : (
-                    <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-                      ✉️ A secure password reset link will be sent to your verified email address.
-                    </p>
-                  )}
-                </div>
+                <FloatingLabelInput
+                  ref={emailRef}
+                  id="forgot-email-input"
+                  label="Registered Email Address"
+                  type="email"
+                  autoComplete="email"
+                  inputMode="email"
+                  required
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value.replace(/\s/g, ''));
+                    clearFieldError('email');
+                    setEmailTouched(true);
+                  }}
+                  onBlur={() => setEmailTouched(true)}
+                  onKeyDown={(e) => handleFieldKeyDown(e, 'forgotEmail')}
+                  placeholder="you@example.com"
+                  icon={Mail}
+                  error={
+                    fieldErrors.email && !email.trim()
+                      ? 'Email address is required.'
+                      : email.trim() && !isValidEmail(email)
+                      ? 'Please enter a valid email address (e.g. you@example.com).'
+                      : null
+                  }
+                  helperText="✉️ A secure password reset link will be sent to your verified email address."
+                  rightElement={
+                    fieldErrors.email || (emailTouched && email.trim() && !isValidEmail(email)) ? (
+                      <CircleAlert className="h-5 w-5 text-error-500" />
+                    ) : null
+                  }
+                />
               )}
 
               {view === 'reset' && (
-                <div>
-                  <div className="mb-1.5 flex items-center justify-between">
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                      Registered Email or Username *
-                    </label>
-                    <span className="text-[11px] font-medium text-gray-400 dark:text-gray-500">
-                      Account identifier
-                    </span>
-                  </div>
-                  <div className="relative">
-                    <Mail
-                      className={`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${
-                        fieldErrors.email ? 'text-error-500' : 'text-gray-400'
-                      }`}
-                    />
-                    <input
-                      ref={emailRef}
-                      id="reset-identifier-input"
-                      type="text"
-                      autoComplete="username"
-                      required
-                      value={email}
-                      onChange={(e) => {
-                        setEmail(e.target.value.trim());
-                        clearFieldError('email');
-                        setEmailTouched(true);
-                      }}
-                      onBlur={() => setEmailTouched(true)}
-                      onKeyDown={(e) => handleFieldKeyDown(e, 'resetEmail')}
-                      placeholder="e.g. naveedms1253@gmail.com or username"
-                      className={fieldClass('email', 'pl-11 pr-11')}
-                    />
-                    {fieldErrors.email ? (
-                      <CircleAlert className="absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" />
-                    ) : null}
-                  </div>
-                  {fieldErrors.email ? (
-                    <p className="mt-1.5 text-xs font-medium text-error-600">
-                      Registered email or username is required.
-                    </p>
-                  ) : (
-                    <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-                      🔑 Enter the email address or username registered with your account.
-                    </p>
-                  )}
-                </div>
-              )}
+                <div className="space-y-4">
+                  <FloatingLabelInput
+                    ref={emailRef}
+                    id="reset-identifier-input"
+                    label="Registered Email or Username"
+                    autoComplete="username"
+                    required
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value.trim());
+                      clearFieldError('email');
+                      setEmailTouched(true);
+                    }}
+                    onBlur={() => setEmailTouched(true)}
+                    onKeyDown={(e) => handleFieldKeyDown(e, 'resetEmail')}
+                    placeholder="e.g. naveedms1253@gmail.com or username"
+                    icon={Mail}
+                    error={fieldErrors.email ? 'Registered email or username is required.' : null}
+                    helperText="🔑 Enter the email address or username registered with your account."
+                    rightElement={
+                      fieldErrors.email ? (
+                        <CircleAlert className="h-5 w-5 text-error-500" />
+                      ) : null
+                    }
+                  />
 
-              {view === 'reset' && (
-                <div>
-                  <div className="mb-1.5 flex items-center justify-between">
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                      Registered Mobile Number or CNIC *
-                    </label>
-                    <span className="text-[11px] font-semibold text-primary-600 dark:text-primary-400">
-                      Ownership check
-                    </span>
-                  </div>
-                  <div className="relative">
-                    <ShieldCheck
-                      className={`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${
-                        fieldErrors.verificationCode ? 'text-error-500' : 'text-gray-400'
-                      }`}
-                    />
-                    <input
-                      ref={verificationCodeRef}
-                      id="reset-verification-input"
-                      type="text"
-                      required
-                      value={verificationCode}
-                      onChange={(e) => {
-                        setVerificationCode(e.target.value.trim());
-                        clearFieldError('verificationCode');
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          focusField('password');
-                        }
-                      }}
-                      placeholder="e.g. 03001234567, 35201-1234567-1, or Admin PIN"
-                      className={fieldClass('verificationCode', 'pl-11 pr-11')}
-                    />
-                    {fieldErrors.verificationCode ? (
-                      <CircleAlert className="absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" />
-                    ) : null}
-                  </div>
-                  {fieldErrors.verificationCode ? (
-                    <p className="mt-1.5 text-xs font-medium text-error-600">
-                      Please enter your registered mobile number or CNIC to verify ownership.
-                    </p>
-                  ) : (
-                    <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-                      🔒 Anti-Hack Protection: Required to confirm you are the true owner of this account.
-                    </p>
-                  )}
+                  <FloatingLabelInput
+                    ref={verificationCodeRef}
+                    id="reset-verification-input"
+                    label="Registered Mobile Number or CNIC"
+                    required
+                    value={verificationCode}
+                    onChange={(e) => {
+                      setVerificationCode(e.target.value.trim());
+                      clearFieldError('verificationCode');
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        focusField('password');
+                      }
+                    }}
+                    placeholder="e.g. 03001234567, 35201-1234567-1, or Admin PIN"
+                    icon={ShieldCheck}
+                    error={fieldErrors.verificationCode ? 'Please enter your registered mobile number or CNIC to verify ownership.' : null}
+                    helperText="🔒 Anti-Hack Protection: Required to confirm you are the true owner of this account."
+                    rightElement={
+                      fieldErrors.verificationCode ? (
+                        <CircleAlert className="h-5 w-5 text-error-500" />
+                      ) : null
+                    }
+                  />
                 </div>
               )}
 
               {view === 'login' && (
-                <div>
-                  <label className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    Username *
-                  </label>
-                  <div className="relative">
-                    <User
-                      className={`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${
-                        fieldErrors.email ? 'text-error-500' : 'text-gray-400'
-                      }`}
-                    />
-                    <input
-                      ref={emailRef}
-                      id="login-username-input"
-                      type="text"
-                      autoComplete="username"
-                      required
-                      value={email}
-                      onChange={(e) => {
-                        setEmail(e.target.value.trim());
-                        clearFieldError('email');
-                        setEmailTouched(true);
-                      }}
-                      onBlur={() => setEmailTouched(true)}
-                      onKeyDown={(e) => handleFieldKeyDown(e, 'loginUsername')}
-                      placeholder=""
-                      className={fieldClass('email', 'pl-11 pr-11')}
-                    />
-                    {fieldErrors.email ? (
-                      <CircleAlert className="absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" />
-                    ) : null}
-                  </div>
-                  {fieldErrors.email && !email.trim() ? (
-                    <p className="mt-1.5 text-xs font-medium text-error-600">
-                      Username is required.
-                    </p>
-                  ) : null}
-                </div>
+                <FloatingLabelInput
+                  ref={emailRef}
+                  id="login-username-input"
+                  label="Username"
+                  autoComplete="username"
+                  required
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value.trim());
+                    clearFieldError('email');
+                    setEmailTouched(true);
+                  }}
+                  onBlur={() => setEmailTouched(true)}
+                  onKeyDown={(e) => handleFieldKeyDown(e, 'loginUsername')}
+                  placeholder="Enter your username or email"
+                  icon={User}
+                  error={fieldErrors.email && !email.trim() ? 'Username is required.' : null}
+                  rightElement={
+                    fieldErrors.email ? (
+                      <CircleAlert className="h-5 w-5 text-error-500" />
+                    ) : null
+                  }
+                />
               )}
 
               {(view === 'login' || view === 'signup' || view === 'reset') && (
                 <div>
-                  <div className="mb-1.5 flex items-center justify-between">
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                      {view === 'reset' ? 'New password *' : 'Password *'}
-                    </label>
-                    {view === 'login' && (
+                  <FloatingLabelInput
+                    ref={passwordRef}
+                    id="auth-password-input"
+                    label={view === 'reset' ? 'New password' : 'Password'}
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      clearFieldError('password');
+                    }}
+                    onKeyDown={(e) => {
+                      if (view === 'login') handleFieldKeyDown(e, 'loginPassword');
+                      else if (view === 'signup') handleFieldKeyDown(e, 'signupPassword');
+                      else if (view === 'reset') handleFieldKeyDown(e, 'resetPassword');
+                    }}
+                    placeholder={view === 'reset' ? 'Enter new password' : 'Enter your password'}
+                    icon={Lock}
+                    required
+                    error={
+                      fieldErrors.password && fieldErrorMessages.password
+                        ? fieldErrorMessages.password
+                        : fieldErrors.password
+                        ? 'Password is required (min 6 chars).'
+                        : null
+                    }
+                    rightElement={
+                      <div className="flex items-center gap-1.5">
+                        {fieldErrors.password ? (
+                          <CircleAlert className="h-5 w-5 text-error-500" />
+                        ) : null}
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword((v) => !v)}
+                          className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                        >
+                          {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                        </button>
+                      </div>
+                    }
+                  />
+                  {view === 'login' && (
+                    <div className="mt-1.5 flex justify-end">
                       <button
                         type="button"
                         onClick={() => (onForgotPassword ? onForgotPassword() : go('forgot'))}
@@ -1463,51 +1371,9 @@ export default function AuthPage({ onSuccess, onBack, onForgotPassword, initialV
                       >
                         Forgot password?
                       </button>
-                    )}
-                  </div>
-                  <div className="relative">
-                    <Lock
-                      className={`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${
-                        fieldErrors.password ? 'text-error-500' : 'text-gray-400'
-                      }`}
-                    />
-                    <input
-                      ref={passwordRef}
-                      id="auth-password-input"
-                      type={showPassword ? 'text' : 'password'}
-                      value={password}
-                      onChange={(e) => {
-                        setPassword(e.target.value);
-                        clearFieldError('password');
-                      }}
-                      onKeyDown={(e) => {
-                        if (view === 'login') handleFieldKeyDown(e, 'loginPassword');
-                        else if (view === 'signup') handleFieldKeyDown(e, 'signupPassword');
-                        else if (view === 'reset') handleFieldKeyDown(e, 'resetPassword');
-                      }}
-                      placeholder=""
-                      className={fieldClass('password', 'pl-11 pr-16')}
-                    />
-                    {fieldErrors.password ? (
-                      <CircleAlert className="absolute right-11 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" />
-                    ) : null}
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword((v) => !v)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-                    >
-                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                    </button>
-                  </div>
-                  {fieldErrors.password ? (
-                    <p className="mt-1.5 text-xs font-medium text-error-600">
-                      {password.trim()
-                        ? 'Password must be at least 8 characters.'
-                        : 'Password is required.'}
-                    </p>
-                  ) : (
-                    <p className="mt-1.5 text-xs text-gray-400">Any 8 or more characters.</p>
+                    </div>
                   )}
+
                   {view === 'reset' && password && (
                     <div className="mt-2 space-y-1">
                       <div className="flex items-center justify-between text-xs">
@@ -1529,99 +1395,81 @@ export default function AuthPage({ onSuccess, onBack, onForgotPassword, initialV
               )}
 
               {(view === 'signup' || view === 'reset') && (
-                <div>
-                  <label className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    Confirm Password *
-                  </label>
-                  <div className="relative">
-                    <Lock
-                      className={`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${
-                        fieldErrors.confirmPassword ? 'text-error-500' : 'text-gray-400'
-                      }`}
-                    />
-                    <input
-                      ref={confirmPasswordRef}
-                      id="auth-confirm-password-input"
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      value={confirmPassword}
-                      onChange={(e) => {
-                        setConfirmPassword(e.target.value);
-                        clearFieldError('confirmPassword');
-                        if (error && (error.toLowerCase().includes('password') || error.toLowerCase().includes('match'))) {
-                          setError(null);
-                        }
-                      }}
-                      onKeyDown={(e) => handleFieldKeyDown(e, 'confirmPassword')}
-                      placeholder=""
-                      className={fieldClass('confirmPassword', 'pl-11 pr-16')}
-                      autoComplete="new-password"
-                      required={view === 'signup' || view === 'reset'}
-                    />
-                    {fieldErrors.confirmPassword ? (
-                      <CircleAlert className="absolute right-11 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" />
-                    ) : null}
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword((v) => !v)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-                      aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
-                    >
-                      {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                    </button>
-                  </div>
-                  {fieldErrors.confirmPassword && (
-                    <p className="mt-1.5 text-xs font-medium text-error-600">
-                      {!confirmPassword.trim()
+                <FloatingLabelInput
+                  ref={confirmPasswordRef}
+                  id="auth-confirm-password-input"
+                  label="Confirm Password"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    clearFieldError('confirmPassword');
+                    if (error && (error.toLowerCase().includes('password') || error.toLowerCase().includes('match'))) {
+                      setError(null);
+                    }
+                  }}
+                  onKeyDown={(e) => handleFieldKeyDown(e, 'confirmPassword')}
+                  placeholder="Re-enter your password"
+                  icon={Lock}
+                  autoComplete="new-password"
+                  required={view === 'signup' || view === 'reset'}
+                  error={
+                    fieldErrors.confirmPassword
+                      ? !confirmPassword.trim()
                         ? 'Please confirm your password.'
-                        : 'Passwords do not match.'}
-                    </p>
-                  )}
-                </div>
+                        : 'Passwords do not match.'
+                      : null
+                  }
+                  rightElement={
+                    <div className="flex items-center gap-1.5">
+                      {fieldErrors.confirmPassword ? (
+                        <CircleAlert className="h-5 w-5 text-error-500" />
+                      ) : null}
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword((v) => !v)}
+                        className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                        aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                      >
+                        {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      </button>
+                    </div>
+                  }
+                />
               )}
-
-
 
               {view === 'signup' && (
                 <>
-                  <div>
-                    <label className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                      Phone *
-                    </label>
-                    <div className="relative">
-                      <Phone
-                        className={`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${
-                          fieldErrors.phone ? 'text-error-500' : 'text-gray-400'
-                        }`}
-                      />
-                      <input
-                        ref={phoneRef}
-                        id="signup-phone-input"
-                        type="tel"
-                        inputMode="numeric"
-                        maxLength={11}
-                        value={phone}
-                        onChange={(e) => {
-                          setPhone(digitsOnlyPhone(e.target.value));
-                          clearFieldError('phone');
-                        }}
-                        onKeyDown={(e) => handleFieldKeyDown(e, 'phone')}
-                        placeholder=""
-                        className={fieldClass('phone', 'pl-11 pr-11')}
-                      />
-                      {fieldErrors.phone ? (
-                        <CircleAlert className="absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" />
-                      ) : null}
-                    </div>
-                    {fieldErrors.phone && fieldErrorMessages.phone ? (
-                      <p className="mt-1.5 text-xs font-semibold text-error-600 dark:text-error-400">
-                        {fieldErrorMessages.phone}
-                      </p>
-                    ) : fieldErrors.phone ? (
-                      <p className="mt-1.5 text-xs font-medium text-error-600">
-                        {phone ? 'Phone number must be exactly 11 digits.' : 'Phone is required.'}
-                      </p>
-                    ) : null}
-                  </div>
+                  <FloatingLabelInput
+                    ref={phoneRef}
+                    id="signup-phone-input"
+                    label="Mobile Number (WhatsApp)"
+                    type="tel"
+                    inputMode="numeric"
+                    maxLength={11}
+                    value={phone}
+                    onChange={(e) => {
+                      setPhone(digitsOnlyPhone(e.target.value));
+                      clearFieldError('phone');
+                    }}
+                    onKeyDown={(e) => handleFieldKeyDown(e, 'phone')}
+                    placeholder="03001234567"
+                    icon={Phone}
+                    required
+                    error={
+                      fieldErrors.phone && fieldErrorMessages.phone
+                        ? fieldErrorMessages.phone
+                        : fieldErrors.phone
+                        ? phone ? 'Phone number must be exactly 11 digits.' : 'Phone is required.'
+                        : null
+                    }
+                    rightElement={
+                      fieldErrors.phone ? (
+                        <CircleAlert className="h-5 w-5 text-error-500" />
+                      ) : null
+                    }
+                  />
+
                   <div>
                     <label className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300">
                       City *
@@ -1660,114 +1508,96 @@ export default function AuthPage({ onSuccess, onBack, onForgotPassword, initialV
                       <p className="mt-1.5 text-xs font-medium text-error-600">City is required.</p>
                     ) : null}
                   </div>
+
                   {isDealer && (
                     <div className="space-y-4 rounded-xl bg-primary-50/50 dark:bg-primary-950/30 p-4 ring-1 ring-primary-100 dark:ring-primary-900">
                       <div className="flex items-center gap-2 text-sm font-bold text-primary-700 dark:text-primary-300">
                         <Store className="h-4 w-4" />
                         Dealer Information (Mandatory)
                       </div>
-                      <div>
-                        <label className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                          CNIC Number *
-                        </label>
-                        <div className="relative">
-                          <CreditCard
-                            className={`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${
-                              fieldErrors.cnic ? 'text-error-500' : 'text-gray-400'
-                            }`}
-                          />
-                          <input
-                            ref={cnicRef}
-                            id="signup-cnic-input"
-                            type="text"
-                            value={cnic}
-                            onChange={(e) => {
-                              setCnic(e.target.value);
-                              clearFieldError('cnic');
-                            }}
-                            onKeyDown={(e) => handleFieldKeyDown(e, 'cnic')}
-                            placeholder="12345-1234567-1"
-                            className={fieldClass('cnic', 'pl-11 pr-11')}
-                          />
-                          {fieldErrors.cnic ? (
-                            <CircleAlert className="absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" />
-                          ) : null}
-                        </div>
-                        {fieldErrors.cnic && fieldErrorMessages.cnic ? (
-                          <p className="mt-1.5 text-xs font-semibold text-error-600 dark:text-error-400">
-                            {fieldErrorMessages.cnic}
-                          </p>
-                        ) : fieldErrors.cnic ? (
-                          <p className="mt-1.5 text-xs font-medium text-error-600">CNIC is required for dealers.</p>
-                        ) : null}
-                      </div>
-                      <div>
-                        <label className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                          Business Name *
-                        </label>
-                        <div className="relative">
-                          <input
-                            ref={businessNameRef}
-                            id="signup-business-name-input"
-                            type="text"
-                            value={businessName}
-                            onChange={(e) => {
-                              setBusinessName(e.target.value);
-                              clearFieldError('businessName');
-                            }}
-                            onKeyDown={(e) => handleFieldKeyDown(e, 'businessName')}
-                            placeholder="e.g. SolarTech Pakistan"
-                            className={fieldClass('businessName', 'pr-11')}
-                          />
-                          {fieldErrors.businessName ? (
-                            <CircleAlert className="absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" />
-                          ) : null}
-                        </div>
-                      </div>
-                      <div>
-                        <label className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                          Business Address *
-                        </label>
-                        <div className="relative">
-                          <input
-                            ref={businessAddressRef}
-                            id="signup-business-address-input"
-                            type="text"
-                            value={businessAddress}
-                            onChange={(e) => {
-                              setBusinessAddress(e.target.value);
-                              clearFieldError('businessAddress');
-                            }}
-                            onKeyDown={(e) => handleFieldKeyDown(e, 'businessAddress')}
-                            placeholder="Shop address"
-                            className={fieldClass('businessAddress', 'pr-11')}
-                          />
-                          {fieldErrors.businessAddress ? (
-                            <CircleAlert className="absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-error-500" />
-                          ) : null}
-                        </div>
-                      </div>
-                      <div>
-                        <label className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                          Visiting Card Image URL
-                        </label>
-                        <div className="relative">
-                          <Image className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
-                          <input
-                            ref={visitingCardRef}
-                            id="signup-visiting-card-input"
-                            type="text"
-                            value={visitingCard}
-                            onChange={(e) => {
-                              setVisitingCard(e.target.value);
-                              setError(null);
-                            }}
-                            onKeyDown={(e) => handleFieldKeyDown(e, 'visitingCard')}
-                            placeholder="https://..."
-                            className="input-field pl-11"
-                          />
-                        </div>
-                      </div>
+
+                      <FloatingLabelInput
+                        ref={cnicRef}
+                        id="signup-cnic-input"
+                        label="CNIC Number"
+                        required
+                        value={cnic}
+                        onChange={(e) => {
+                          setCnic(e.target.value);
+                          clearFieldError('cnic');
+                        }}
+                        onKeyDown={(e) => handleFieldKeyDown(e, 'cnic')}
+                        placeholder="12345-1234567-1"
+                        icon={CreditCard}
+                        error={
+                          fieldErrors.cnic && fieldErrorMessages.cnic
+                            ? fieldErrorMessages.cnic
+                            : fieldErrors.cnic
+                            ? 'CNIC is required for dealers.'
+                            : null
+                        }
+                        rightElement={
+                          fieldErrors.cnic ? (
+                            <CircleAlert className="h-5 w-5 text-error-500" />
+                          ) : null
+                        }
+                      />
+
+                      <FloatingLabelInput
+                        ref={businessNameRef}
+                        id="signup-business-name-input"
+                        label="Business Name"
+                        required
+                        value={businessName}
+                        onChange={(e) => {
+                          setBusinessName(e.target.value);
+                          clearFieldError('businessName');
+                        }}
+                        onKeyDown={(e) => handleFieldKeyDown(e, 'businessName')}
+                        placeholder="e.g. SolarTech Pakistan"
+                        icon={Store}
+                        error={fieldErrors.businessName ? 'Business Name is required.' : null}
+                        rightElement={
+                          fieldErrors.businessName ? (
+                            <CircleAlert className="h-5 w-5 text-error-500" />
+                          ) : null
+                        }
+                      />
+
+                      <FloatingLabelInput
+                        ref={businessAddressRef}
+                        id="signup-business-address-input"
+                        label="Business Address"
+                        required
+                        value={businessAddress}
+                        onChange={(e) => {
+                          setBusinessAddress(e.target.value);
+                          clearFieldError('businessAddress');
+                        }}
+                        onKeyDown={(e) => handleFieldKeyDown(e, 'businessAddress')}
+                        placeholder="Shop or office address"
+                        icon={MapPin}
+                        error={fieldErrors.businessAddress ? 'Business Address is required.' : null}
+                        rightElement={
+                          fieldErrors.businessAddress ? (
+                            <CircleAlert className="h-5 w-5 text-error-500" />
+                          ) : null
+                        }
+                      />
+
+                      <FloatingLabelInput
+                        ref={visitingCardRef}
+                        id="signup-visiting-card-input"
+                        label="Visiting Card Image URL"
+                        value={visitingCard}
+                        onChange={(e) => {
+                          setVisitingCard(e.target.value);
+                          setError(null);
+                        }}
+                        onKeyDown={(e) => handleFieldKeyDown(e, 'visitingCard')}
+                        placeholder="https://..."
+                        icon={Image}
+                      />
                     </div>
                   )}
                 </>

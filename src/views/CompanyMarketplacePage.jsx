@@ -1768,7 +1768,7 @@ function ContactUsContent() {
   const supportEmail = settings?.supportEmail || 'info@sellsolar.pk';
   const salesEmail = settings?.salesEmail || 'support@sellsolar.pk';
   const supportPhone = settings?.supportPhone || '+92 300 1234567';
-  const rawWhatsApp = (settings?.whatsAppNumber || '923001234567').replace(/\D/g, '');
+  const rawWhatsApp = String(settings?.whatsAppNumber || '923001234567').replace(/\D/g, '');
   const headOfficeAddress = settings?.headOfficeAddress || 'Blue Area, Sector G-7, Islamabad, Pakistan';
 
   const [submitted, setSubmitted] = useState(false);

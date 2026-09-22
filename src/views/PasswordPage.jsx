@@ -22,6 +22,7 @@ import { useAuth, getStoredUsers } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { isValidEmail } from '../lib/auth';
 import { checkRateLimit, isBotHoneypotTriggered, sanitizeText } from '../lib/security';
+import FloatingLabelInput from '../components/FloatingLabelInput';
 
 function getPasswordStrength(pass) {
   if (!pass) return { score: 0, text: '', color: 'bg-gray-200', width: 'w-0' };
@@ -68,7 +69,6 @@ export default function PasswordPage({
   // 3-step state for forgot password flow
   const [step, setStep] = useState(initialMode === 'reset' ? 3 : 1); // 1: Request, 2: Verify, 3: Set New Password
   const [isVerified, setIsVerified] = useState(initialMode === 'reset');
-  const [previewOtp, setPreviewOtp] = useState('');
 
   const [email, setEmail] = useState(user?.email || '');
   const [verificationCode, setVerificationCode] = useState('');
@@ -108,7 +108,6 @@ export default function PasswordPage({
       const stored = sessionStorage.getItem('sellsolar_reset_otp');
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (parsed.otp) setPreviewOtp(parsed.otp);
         if (parsed.email && !email) setEmail(parsed.email);
       }
     } catch {}
@@ -256,17 +255,6 @@ export default function PasswordPage({
     }
   };
 
-  const fillCode = (code) => {
-    const chars = code.split('').slice(0, 6);
-    const next = [...otpDigits];
-    chars.forEach((c, i) => {
-      next[i] = c;
-    });
-    setOtpDigits(next);
-    setVerificationCode(code);
-    triggerAutoVerify(code);
-  };
-
   // STEP 1: Send OTP to Email
   const handleSendResetEmail = async (e) => {
     e?.preventDefault();
@@ -293,10 +281,7 @@ export default function PasswordPage({
     setBusy(true);
     try {
       if (requestPasswordResetOtp) {
-        const res = await requestPasswordResetOtp(targetEmail);
-        if (res.otp) {
-          setPreviewOtp(res.otp);
-        }
+        await requestPasswordResetOtp(targetEmail);
       } else if (isSupabaseConfigured()) {
         const redirectUrl = `${window.location.origin}/reset-password`;
         await supabase.auth.resetPasswordForEmail(targetEmail, { redirectTo: redirectUrl });
@@ -615,51 +600,32 @@ export default function PasswordPage({
               </div>
             )}
 
-            {/* Prominent Verification Code Helper (Guarantees user is never stuck if email is delayed) */}
-            {step === 2 && (
-              <div className="mb-4 p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-xs">
-                <div>
-                  <div className="flex items-center gap-1.5 font-bold text-amber-900 dark:text-amber-200">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                    <span>6-Digit Verification Code</span>
-                  </div>
-                  <p className="text-[11px] text-amber-800/90 dark:text-amber-300/90 mt-0.5">
-                    If email is delayed or filtered by spam, use code:{' '}
-                    <span className="font-mono font-black text-amber-950 dark:text-amber-100 text-sm tracking-widest ml-1 bg-amber-200/60 dark:bg-amber-900/60 px-2 py-0.5 rounded">
-                      {previewOtp || '123456'}
-                    </span>
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => fillCode(previewOtp || '123456')}
-                  className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-xs transition-all flex items-center justify-center gap-1.5 shrink-0 active:scale-95"
-                >
-                  <span>Auto-Fill & Verify</span>
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                </button>
+            {/* Step 2 Security Notice: Dispatched via email only */}
+            {mode === 'forgot' && step === 2 && (
+              <div className="mb-4 p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 flex items-start gap-2.5 text-xs">
+                <Mail className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
+                <p className="leading-relaxed text-amber-900 dark:text-amber-200">
+                  A 6-digit verification code has been sent to{' '}
+                  <span className="font-bold text-gray-900 dark:text-white underline">{email}</span>.
+                  Please check your inbox (or spam folder) and enter the code below to verify your identity.
+                </p>
               </div>
             )}
 
             {/* STEP 1: REQUEST VERIFICATION CODE (EMAIL ONLY) */}
             {mode === 'forgot' && step === 1 && (
               <form onSubmit={handleSendResetEmail} className="space-y-4">
-                <div>
-                  <label className="mb-1.5 block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                    Registered Email Address *
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                    <input
-                      type="email"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="e.g. mudassir2k6@gmail.com"
-                      className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all outline-none"
-                    />
-                  </div>
-                </div>
+                <FloatingLabelInput
+                  id="reset-email-input"
+                  label="Registered Email Address"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="e.g. mudassir2k6@gmail.com"
+                  icon={Mail}
+                  autoComplete="email"
+                />
 
                 {/* Notice: SMS Coming Soon */}
                 <div className="flex items-center gap-2 p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-800 text-xs text-gray-500 dark:text-gray-400">
@@ -732,13 +698,6 @@ export default function PasswordPage({
                     <span>
                       Sent to: <strong className="text-gray-700 dark:text-gray-300">{email}</strong>
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => fillCode('123456')}
-                      className="text-[10px] text-gray-400 hover:text-amber-600 underline font-medium"
-                    >
-                      Demo Code: 123456
-                    </button>
                   </div>
                 </div>
 
@@ -803,56 +762,54 @@ export default function PasswordPage({
 
                 {/* Current password if logged in */}
                 {mode === 'change' && user && (
-                  <div>
-                    <label className="mb-1.5 block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                      Current Password *
-                    </label>
-                    <div className="relative">
-                      <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                      <input
-                        type={showCurrentPassword ? 'text' : 'password'}
-                        required
-                        value={currentPassword}
-                        onChange={(e) => setCurrentPassword(e.target.value)}
-                        placeholder="Enter current password"
-                        className="w-full pl-10 pr-10 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all outline-none"
-                      />
+                  <FloatingLabelInput
+                    id="current-password-input"
+                    label="Current Password"
+                    type={showCurrentPassword ? 'text' : 'password'}
+                    required
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    placeholder="Enter current password"
+                    icon={Lock}
+                    autoComplete="current-password"
+                    rightElement={
                       <button
                         type="button"
                         onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                        title={showCurrentPassword ? 'Hide password' : 'Show password'}
                       >
                         {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
-                    </div>
-                  </div>
+                    }
+                  />
                 )}
 
                 {/* New Password */}
                 <div>
-                  <label className="mb-1.5 block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                    New Password *
-                  </label>
-                  <div className="relative">
-                    <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                    <input
-                      ref={newPasswordRef}
-                      type={showNewPassword ? 'text' : 'password'}
-                      required
-                      minLength={8}
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder="Minimum 8 characters"
-                      className="w-full pl-10 pr-10 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all outline-none"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowNewPassword(!showNewPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
-                      {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
+                  <FloatingLabelInput
+                    ref={newPasswordRef}
+                    id="new-password-input"
+                    label="New Password"
+                    type={showNewPassword ? 'text' : 'password'}
+                    required
+                    minLength={8}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Minimum 8 characters"
+                    icon={Lock}
+                    autoComplete="new-password"
+                    rightElement={
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                        title={showNewPassword ? 'Hide password' : 'Show password'}
+                      >
+                        {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    }
+                  />
 
                   {/* Password strength bar */}
                   {newPassword && (
@@ -874,28 +831,28 @@ export default function PasswordPage({
 
                 {/* Confirm New Password */}
                 <div>
-                  <label className="mb-1.5 block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                    Confirm New Password *
-                  </label>
-                  <div className="relative">
-                    <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                    <input
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      required
-                      minLength={8}
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="Re-type new password"
-                      className="w-full pl-10 pr-10 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all outline-none"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
-                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
+                  <FloatingLabelInput
+                    id="confirm-password-input"
+                    label="Confirm New Password"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    required
+                    minLength={8}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Re-type new password"
+                    icon={Lock}
+                    autoComplete="new-password"
+                    rightElement={
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                        title={showConfirmPassword ? 'Hide password' : 'Show password'}
+                      >
+                        {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    }
+                  />
 
                   {confirmPassword && (
                     <p className={`mt-1 text-[11px] font-semibold ${

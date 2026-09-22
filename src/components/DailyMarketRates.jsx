@@ -17,6 +17,8 @@ import {
   MapPin,
   CheckCircle2,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   SlidersHorizontal,
   Flame,
   Layers,
@@ -438,6 +440,7 @@ const MAJOR_CITIES = [
 
 export default function DailyMarketRates({ onNavigate, onSelectCategory, compact = false }) {
   const [ratesData, setRatesData] = useState(NATIONAL_RATE_BENCHMARKS);
+  const [isTableExpanded, setIsTableExpanded] = useState(!compact);
   const [selectedCategory, setSelectedCategory] = useState('all'); // 'all' | 'panel' | 'inverter' | 'battery'
   const [selectedCity, setSelectedCity] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -720,7 +723,86 @@ export default function DailyMarketRates({ onNavigate, onSelectCategory, compact
             </div>
           </div>
 
-          {/* Filtering and Controls Bar */}
+          {/* In Compact Mode (Homepage), if not expanded, show a sleek 4-row benchmark snapshot and 1-click expand bar */}
+          {compact && !isTableExpanded ? (
+            <div className="p-4 sm:p-5 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3.5">
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-xs font-bold text-gray-800 dark:text-gray-200">
+                    Live Today's Benchmark Snapshot
+                  </span>
+                  <span className="text-[11px] text-gray-500 dark:text-gray-400">
+                    (Wholesale averages across Lahore, Karachi &amp; Rawalpindi)
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsTableExpanded(true)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-primary-50 dark:bg-primary-950/60 hover:bg-primary-100 dark:hover:bg-primary-900 text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 transition-all cursor-pointer"
+                  >
+                    <span>Expand Full Sheet ({ratesData.length}+ Models)</span>
+                    <ChevronDown className="h-3.5 w-3.5" />
+                  </button>
+                  {onNavigate && (
+                    <button
+                      type="button"
+                      onClick={() => onNavigate('prices')}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-750 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 transition-all cursor-pointer"
+                    >
+                      <span>Full Page</span>
+                      <ArrowRight className="h-3 w-3" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* 4 Compact cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+                {ratesData.slice(0, 4).map((bench) => (
+                  <div
+                    key={bench.id}
+                    className="p-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-850/60 hover:border-primary-400 transition-all flex items-center justify-between gap-3"
+                  >
+                    <div className="min-w-0">
+                      <div className="text-xs font-bold text-gray-900 dark:text-white truncate">
+                        {bench.brand}
+                      </div>
+                      <div className="text-[11px] text-gray-500 dark:text-gray-400 truncate">
+                        {bench.spec || bench.model}
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <div className="text-xs font-extrabold text-primary-600 dark:text-primary-400">
+                        {bench.pricePerWatt || `Rs ${bench.nationalAvgRate?.toLocaleString()}`}
+                      </div>
+                      <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                        Ready Stock
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <>
+              {compact && (
+                <div className="px-4 py-2 bg-primary-50/50 dark:bg-primary-950/30 border-b border-primary-100 dark:border-primary-900/50 flex items-center justify-between">
+                  <span className="text-xs font-bold text-primary-700 dark:text-primary-300">
+                    Showing Complete 30+ Model National Rates
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setIsTableExpanded(false)}
+                    className="inline-flex items-center gap-1 text-xs font-bold text-gray-600 dark:text-gray-400 hover:text-primary-600"
+                  >
+                    <span>Collapse to Snapshot</span>
+                    <ChevronUp className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              )}
+              {/* Filtering and Controls Bar */}
           <div className="p-4 sm:p-5 border-b border-gray-100 dark:border-gray-800/80 bg-gray-50/50 dark:bg-gray-850/50 flex flex-col md:flex-row md:items-center justify-between gap-3.5">
             {/* Category Filter Tabs */}
             <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
@@ -1133,6 +1215,8 @@ export default function DailyMarketRates({ onNavigate, onSelectCategory, compact
               </span>
             )}
           </div>
+          </>
+          )}
 
         </div>
       </div>

@@ -1364,6 +1364,60 @@ export function AuthProvider({ children }) {
       throw new Error('Please enter a valid registered email address.');
     }
 
+    // Check if user exists in local store or Supabase
+    const users = getStoredUsers();
+    let userExists = false;
+
+    // 1. Check default admin accounts
+    if (
+      cleanMail === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
+      cleanMail === 'mudassir2k6@gmail.com' ||
+      cleanMail === 'mudassir2k6'
+    ) {
+      userExists = true;
+    }
+
+    // 2. Check local users store
+    if (!userExists) {
+      for (const [key, val] of Object.entries(users)) {
+        if (!val) continue;
+        const prof = val.profile || {};
+        const storedEmail = (prof.email || key || '').toLowerCase();
+        const storedUsername = (prof.username || '').toLowerCase();
+        const emailPrefix = storedEmail.split('@')[0]?.toLowerCase();
+
+        if (
+          key.toLowerCase() === cleanMail ||
+          storedEmail === cleanMail ||
+          storedUsername === cleanMail ||
+          (emailPrefix && emailPrefix === cleanMail)
+        ) {
+          userExists = true;
+          break;
+        }
+      }
+    }
+
+    // 3. If not found in local store and Supabase is configured, check Supabase profiles
+    if (!userExists && isSupabaseConfigured()) {
+      try {
+        const { data } = await supabase
+          .from('profiles')
+          .select('id, email')
+          .eq('email', cleanMail)
+          .maybeSingle();
+        if (data && data.id) {
+          userExists = true;
+        }
+      } catch (sbErr) {
+        console.warn('Supabase user existence check:', sbErr);
+      }
+    }
+
+    if (!userExists) {
+      throw new Error('This email is not registered with SellSolar.pk. Please check your email address.');
+    }
+
     // Generate 6-digit OTP code
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiry = Date.now() + 10 * 60 * 1000; // 10 minutes
@@ -1401,7 +1455,6 @@ export function AuthProvider({ children }) {
     return {
       success: true,
       email: cleanMail,
-      otp, // available for preview testing
       message: `A 6-digit verification code has been sent to ${cleanMail}.`,
     };
   }, []);

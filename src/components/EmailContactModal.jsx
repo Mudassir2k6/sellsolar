@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Mail, Copy, Check, ExternalLink, MessageSquare, Phone, X, Send, CheckCircle2, Sparkles } from 'lucide-react';
 import { useSiteSettings } from '../context/SiteSettingsContext';
 import { sendContactMessage } from '../services/inboxService';
+import FloatingLabelInput from './FloatingLabelInput';
 
 export default function EmailContactModal({
   isOpen,
@@ -15,7 +16,7 @@ export default function EmailContactModal({
   const { settings } = useSiteSettings();
   const recipientEmail = propRecipientEmail || settings?.supportEmail || 'info@sellsolar.pk';
   const supportPhone = settings?.supportPhone || '+92 300 1234567';
-  const rawWhatsApp = (settings?.whatsAppNumber || '923001234567').replace(/\D/g, '');
+  const rawWhatsApp = String(settings?.whatsAppNumber || '923001234567').replace(/\D/g, '');
 
   const [activeTab, setActiveTab] = useState('direct'); // 'direct' | 'external'
   const [copied, setCopied] = useState(false);
@@ -250,60 +251,42 @@ export default function EmailContactModal({
                   </div>
                 )}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
-                      Your Name *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formName}
-                      onChange={(e) => setFormName(e.target.value)}
-                      placeholder="e.g. Ali Khan"
-                      className="w-full p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-amber-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
-                      Phone Number or Email *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formContact}
-                      onChange={(e) => setFormContact(e.target.value)}
-                      placeholder="0300 1234567 or email"
-                      className="w-full p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-amber-500"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
-                    Subject
-                  </label>
-                  <input
-                    type="text"
-                    value={formSubject}
-                    onChange={(e) => setFormSubject(e.target.value)}
-                    placeholder="e.g. Inquiry regarding solar package"
-                    className="w-full p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-amber-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
-                    Your Message / Inquiry *
-                  </label>
-                  <textarea
-                    rows={3}
+                  <FloatingLabelInput
+                    id="contact-form-name"
+                    label="Your Name"
                     required
-                    value={formMessage}
-                    onChange={(e) => setFormMessage(e.target.value)}
-                    placeholder="Describe your requirement or question..."
-                    className="w-full p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-amber-500"
+                    value={formName}
+                    onChange={(e) => setFormName(e.target.value)}
+                    placeholder="e.g. Ali Khan"
+                  />
+                  <FloatingLabelInput
+                    id="contact-form-contact"
+                    label="Phone or Email"
+                    required
+                    value={formContact}
+                    onChange={(e) => setFormContact(e.target.value)}
+                    placeholder="0300 1234567 or email"
                   />
                 </div>
+
+                <FloatingLabelInput
+                  id="contact-form-subject"
+                  label="Subject"
+                  value={formSubject}
+                  onChange={(e) => setFormSubject(e.target.value)}
+                  placeholder="e.g. Inquiry regarding solar package"
+                />
+
+                <FloatingLabelInput
+                  id="contact-form-message"
+                  as="textarea"
+                  label="Your Message / Inquiry"
+                  required
+                  rows={3}
+                  value={formMessage}
+                  onChange={(e) => setFormMessage(e.target.value)}
+                  placeholder="Describe your requirement or question..."
+                />
 
                 <div className="pt-1 flex items-center justify-between">
                   <span className="text-[11px] text-gray-400 flex items-center gap-1">

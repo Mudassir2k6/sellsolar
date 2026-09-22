@@ -279,8 +279,15 @@ export function canonicalPage(page) {
 }
 
 export function pageToPath(page, listingId, hash) {
+  if (typeof page === 'string' && page.startsWith('/')) {
+    return page;
+  }
+  if (typeof page === 'string' && page.startsWith('custom:')) {
+    return page.replace('custom:', '');
+  }
   const key = canonicalPage(page);
   if (key === 'listing-detail' && listingId) return `/listing/${listingId}`;
+  if (typeof key === 'string' && key.startsWith('/')) return key;
   const meta = PAGE_SEO[key] || PAGE_SEO.home;
   const base = meta.path || '/';
   if (hash) return `${base}${hash.startsWith('#') ? hash : `#${hash}`}`;
@@ -348,6 +355,28 @@ export function parseLocation(pathname = '/', hash = '') {
 
   if (map[path]) {
     return { page: map[path], listingId: null, hash };
+  }
+
+  // Check if it matches a custom CMS page in localStorage
+  if (typeof window !== 'undefined') {
+    try {
+      const rawCustom = localStorage.getItem('sellsolar_custom_pages');
+      if (rawCustom) {
+        const customPages = JSON.parse(rawCustom);
+        const cleanP = path.toLowerCase();
+        const match = customPages.find((p) => {
+          const itemPath = (p.path || '').toLowerCase();
+          return (
+            itemPath === cleanP ||
+            itemPath === cleanP + '/' ||
+            '/' + itemPath.replace(/^\//, '') === cleanP
+          );
+        });
+        if (match) {
+          return { page: `custom:${match.path}`, customPage: match, listingId: null, hash };
+        }
+      }
+    } catch {}
   }
 
   return { page: 'not-found', listingId: null, hash };

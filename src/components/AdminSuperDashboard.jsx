@@ -119,6 +119,20 @@ export default function AdminSuperDashboard({
   const { showToast } = useToast();
   const { settings, updateSiteSettings, updateHomePageCms } = useSiteSettings();
 
+  const userEmail = (user?.email || profile?.email || '').toLowerCase();
+  const effectiveIsSuperAdmin = Boolean(
+    isSuperAdmin ||
+    profile?.role === 'super_admin' ||
+    profile?.is_super_admin ||
+    ['admin@sellsolar.pk', 'info@sellsolar.pk', DEFAULT_ADMIN_EMAIL.toLowerCase(), 'mudassirkhan78907890@gmail.com', 'mudassir2k6@gmail.com'].includes(userEmail)
+  );
+  const effectiveIsAdmin = Boolean(
+    effectiveIsSuperAdmin ||
+    isAdmin ||
+    profile?.role === 'admin' ||
+    profile?.is_admin
+  );
+
   const [activeTab, setActiveTab] = useState(initialTab);
   const [usersList, setUsersList] = useState([]);
   const [listingsList, setListingsList] = useState([]);
@@ -995,6 +1009,21 @@ export default function AdminSuperDashboard({
     });
   };
 
+  // Delete Marketplace Listing (Admin Moderation)
+  const handleDeleteListing = (listingId) => {
+    if (!confirm('Are you sure you want to permanently delete this marketplace listing?')) return;
+    const updated = listingsList.filter((item) => item.id !== listingId);
+    setListingsList(updated);
+    try {
+      localStorage.setItem('sellsolar_custom_listings', JSON.stringify(updated));
+    } catch {}
+    showToast({
+      title: 'Listing Deleted',
+      message: 'The listing has been permanently removed from the marketplace.',
+      type: 'info',
+    });
+  };
+
   // Delete Personal Ad
   const handleDeleteMyAd = (listingId) => {
     if (!confirm('Are you sure you want to remove this solar ad?')) return;
@@ -1141,18 +1170,18 @@ export default function AdminSuperDashboard({
               <span className="text-base sm:text-lg font-black tracking-tight text-gray-900 dark:text-white shrink-0">
                 Sell<span className="text-amber-500">Solar</span>
               </span>
-              <span className={`px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-wider truncate max-w-[130px] sm:max-w-none ${
-                isSuperAdmin
+              <span className={`px-2 sm:px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-wider truncate max-w-[130px] sm:max-w-none ${
+                effectiveIsSuperAdmin
                   ? 'bg-purple-100 dark:bg-purple-950/70 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800'
-                  : isAdmin
+                  : effectiveIsAdmin
                   ? 'bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
                   : isDealer
                   ? 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
                   : 'bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
               }`}>
-                {isSuperAdmin
+                {effectiveIsSuperAdmin
                   ? '👑 Super Admin'
-                  : isAdmin
+                  : effectiveIsAdmin
                   ? '🛡️ Admin'
                   : isDealer
                   ? '🏬 Dealer'
@@ -1177,9 +1206,9 @@ export default function AdminSuperDashboard({
           <div className="hidden md:block text-right">
             <p className="text-xs font-bold text-gray-900 dark:text-white">{user?.email || DEFAULT_ADMIN_EMAIL}</p>
             <p className="text-[10px] text-gray-400 capitalize">
-              {isSuperAdmin
+              {effectiveIsSuperAdmin
                 ? 'Super Administrator'
-                : isAdmin
+                : effectiveIsAdmin
                 ? 'Administrator'
                 : isDealer
                 ? 'Solar Dealer Store'
@@ -1415,7 +1444,7 @@ export default function AdminSuperDashboard({
             </button>
 
             {/* TAB 3: PRODUCTS & MODERATION (SUPER ADMIN & ADMIN ONLY) */}
-            {(isSuperAdmin || isAdmin) && (
+            {effectiveIsAdmin && (
               <button
                 type="button"
                 onClick={() => selectTab('products')}
@@ -1445,7 +1474,7 @@ export default function AdminSuperDashboard({
             >
               <div className="flex items-center gap-2.5">
                 <MessageSquare className="h-4 w-4" />
-                <span>Inbox {(isSuperAdmin || isAdmin) ? '(info@sellsolar.pk)' : 'Messages'}</span>
+                <span>Inbox {effectiveIsAdmin ? '(info@sellsolar.pk)' : 'Messages'}</span>
               </div>
               {unreadInboxCount > 0 && (
                 <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-rose-500 text-white font-black">
@@ -1455,7 +1484,7 @@ export default function AdminSuperDashboard({
             </button>
 
             {/* TAB 5: ANALYTICS & TRAFFIC */}
-            {(isSuperAdmin || isAdmin) && (
+            {effectiveIsAdmin && (
               <button
                 type="button"
                 onClick={() => selectTab('analytics')}
@@ -1473,7 +1502,7 @@ export default function AdminSuperDashboard({
             )}
 
             {/* TAB 6: PAGES & CONTENT CMS (SUPER ADMIN & ADMIN) */}
-            {(isSuperAdmin || isAdmin) && (
+            {effectiveIsAdmin && (
               <button
                 type="button"
                 onClick={() => selectTab('pages')}
@@ -1550,7 +1579,7 @@ export default function AdminSuperDashboard({
             )}
 
             {/* SUPER ADMIN & ADMIN ROLES TABS */}
-            {(isSuperAdmin || isAdmin) && (
+            {effectiveIsAdmin && (
               <>
                 <div className="pt-3 pb-1 px-3 text-[10px] font-black uppercase tracking-wider text-purple-600 dark:text-purple-400">
                   Administration & Access
@@ -1651,17 +1680,17 @@ export default function AdminSuperDashboard({
                       Welcome back,
                     </span>
                     <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                      isSuperAdmin
+                      effectiveIsSuperAdmin
                         ? 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300 border border-purple-200 dark:border-purple-800'
-                        : isAdmin
+                        : effectiveIsAdmin
                         ? 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
                         : isDealer
                         ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
                         : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
                     }`}>
-                      {isSuperAdmin
+                      {effectiveIsSuperAdmin
                         ? '👑 Super Admin Master'
-                        : isAdmin
+                        : effectiveIsAdmin
                         ? '🛡️ Administrator'
                         : isDealer
                         ? '🏬 Verified Dealer'
@@ -1672,7 +1701,7 @@ export default function AdminSuperDashboard({
                     {profile?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'SellSolar User'}
                   </h1>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {isSuperAdmin
+                    {effectiveIsSuperAdmin
                       ? 'You have master control over website CMS, user roles, inbox, and marketplace equipment.'
                       : isDealer
                       ? 'Manage your commercial solar inventory, monitor buyer inquiries, and update showroom profile.'
@@ -1703,7 +1732,7 @@ export default function AdminSuperDashboard({
 
               {/* KPI Cards: Platform KPIs (if Super Admin/Admin) or Personal KPIs (if Dealer/Customer) */}
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-                {isSuperAdmin || isAdmin ? (
+                {effectiveIsAdmin ? (
                   <>
                     <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
                       <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Total Users</p>
@@ -2743,7 +2772,7 @@ export default function AdminSuperDashboard({
           )}
 
           {/* TAB: PAGES & CONTENT CMS */}
-          {activeTab === 'pages' && (isSuperAdmin || isAdmin) && (
+          {activeTab === 'pages' && effectiveIsAdmin && (
             <div className="space-y-6">
               {/* Header & Add Button */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -4050,6 +4079,14 @@ export default function AdminSuperDashboard({
                           </td>
                           <td className="p-3.5 text-right">
                             <div className="flex items-center justify-end gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => onNavigateToListing && onNavigateToListing(item.id)}
+                                className="p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                title="View Product Page"
+                              >
+                                <ExternalLink className="h-3.5 w-3.5" />
+                              </button>
                               {item.status !== 'approved' && (
                                 <button
                                   type="button"
@@ -4070,6 +4107,14 @@ export default function AdminSuperDashboard({
                                   <CircleX className="h-3.5 w-3.5" />
                                 </button>
                               )}
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteListing(item.id)}
+                                className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors"
+                                title="Delete Listing Permanently"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -4082,7 +4127,7 @@ export default function AdminSuperDashboard({
           )}
 
           {/* TAB 5: ROLES & ACCESS (SUPER ADMIN & ADMIN) */}
-          {activeTab === 'roles' && (isSuperAdmin || isAdmin) && (
+          {activeTab === 'roles' && effectiveIsAdmin && (
             <div className="space-y-6">
               {/* Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -4415,7 +4460,7 @@ export default function AdminSuperDashboard({
           )}
 
           {/* TAB 6: WEBSITE SETTINGS & CMS (SUPER ADMIN & ADMIN) */}
-          {activeTab === 'settings' && (isSuperAdmin || isAdmin) && (
+          {activeTab === 'settings' && effectiveIsAdmin && (
             <div className="space-y-6 max-w-4xl">
               <div>
                 <h1 className="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-2">

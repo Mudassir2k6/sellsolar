@@ -15,6 +15,7 @@ import LoadCalculatorPage from './views/LoadCalculatorPage';
 import SolarLoadCalculator from './components/SolarLoadCalculator';
 import FloatingPostAdButton from './components/FloatingPostAdButton';
 import CompanyMarketplacePage from './views/CompanyMarketplacePage';
+import CustomPageView from './views/CustomPageView';
 import KeywordLandingPage, { KEYWORD_LANDING_KEYS } from './views/KeywordLandingPage';
 import EmailContactModal from './components/EmailContactModal';
 import { applyPageSeo, parseLocation, pageToPath } from './lib/seo';
@@ -5835,6 +5836,7 @@ function _x({
   const initialLoc = getInitialLocation();
   const [n, s] = useState(initialLoc.page || "home");
   const [a, l] = useState(initialLoc.listingId || null);
+  const [customPageData, setCustomPageData] = useState(initialLoc.customPage || null);
   const [searchFilters, setSearchFilters] = useState(null);
 
   useEffect(() => {
@@ -5843,6 +5845,7 @@ function _x({
       if (loc.page && loc.page !== n) {
         s(loc.page);
         if (loc.listingId) l(loc.listingId);
+        if (loc.customPage) setCustomPageData(loc.customPage);
       }
     }
   }, []);
@@ -5857,6 +5860,7 @@ function _x({
       const loc = parseLocation(window.location.pathname, window.location.hash);
       s(loc.page || 'home');
       l(loc.listingId || null);
+      if (loc.customPage) setCustomPageData(loc.customPage);
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
@@ -5904,6 +5908,10 @@ function _x({
       }
     } else if (d === "password" || d === "change-password") {
       o("password");
+    } else if (typeof d === 'string' && (d.startsWith('custom:') || d.startsWith('/'))) {
+      const loc = parseLocation(d.startsWith('/') ? d : d.replace('custom:', ''), '');
+      if (loc.customPage) setCustomPageData(loc.customPage);
+      o(loc.page);
     } else {
       o(d);
     }
@@ -6006,6 +6014,22 @@ function _x({
       id: "main",
       children: jsx(CompanyMarketplacePage, {
         page: n, onNavigate: handleNavigate, onPostAd: c
+      })
+    }), jsx(hx, {
+      onPostAd: c, onNavigate: handleNavigate
+    })]
+  }) : (n && typeof n === 'string' && (n.startsWith('custom:') || n === 'custom-page')) ? jsxs("div", {
+    className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
+      onNavigate: handleNavigate, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
+    }), jsx("main", {
+      id: "main",
+      children: jsx(CustomPageView, {
+        pageData: customPageData || {
+          title: n.replace('custom:', '').replace(/^\//, '').toUpperCase(),
+          path: n.replace('custom:', '')
+        },
+        onNavigate: handleNavigate,
+        onPostAd: c
       })
     }), jsx(hx, {
       onPostAd: c, onNavigate: handleNavigate

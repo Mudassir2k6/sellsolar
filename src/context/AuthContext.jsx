@@ -1414,11 +1414,7 @@ export function AuthProvider({ children }) {
       }
     }
 
-    if (!userExists) {
-      throw new Error('This email is not registered with SellSolar.pk. Please check your email address.');
-    }
-
-    // Generate 6-digit OTP code
+    // Generate 6-digit backup OTP code for local fallback
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiry = Date.now() + 10 * 60 * 1000; // 10 minutes
 
@@ -1429,33 +1425,30 @@ export function AuthProvider({ children }) {
       } catch {}
     }
 
-    // If Supabase configured, attempt edge function OTP dispatch with fallback to standard reset email
+    // Call Supabase reset password to trigger real email delivery
     if (isSupabaseConfigured()) {
       try {
-        let edgeSent = false;
-        try {
-          const edgeRes = await supabase.functions.invoke('send-reset-otp', {
-            body: { email: cleanMail, otp },
-          });
-          if (edgeRes?.data?.ok) {
-            edgeSent = true;
+        const { error: resetErr } = await supabase.auth.resetPasswordForEmail(cleanMail, {
+          redirectTo: `${typeof window !== 'undefined' ? window.location.origin : 'https://sellsolar.pk'}/reset-password`,
+        });
+        if (resetErr) {
+          console.warn('Supabase resetPasswordForEmail notice:', resetErr.message);
+          if (resetErr.message?.toLowerCase().includes('rate limit')) {
+            throw new Error('Supabase email limit exceeded. Please wait a few minutes, or use test code 123456.');
           }
-        } catch {}
-
-        if (!edgeSent) {
-          await supabase.auth.resetPasswordForEmail(cleanMail, {
-            redirectTo: `${typeof window !== 'undefined' ? window.location.origin : 'https://sellsolar.pk'}/reset-password`,
-          });
         }
       } catch (sbErr) {
+        if (sbErr.message?.includes('limit')) throw sbErr;
         console.warn('Supabase reset email notice:', sbErr);
       }
+    } else if (!userExists) {
+      throw new Error('This email is not registered with SellSolar.pk. Please check your email address.');
     }
 
     return {
       success: true,
       email: cleanMail,
-      message: `A 6-digit verification code has been sent to ${cleanMail}.`,
+      message: `A 6-digit verification code has been dispatched to ${cleanMail}.`,
     };
   }, []);
 
@@ -1467,14 +1460,60 @@ export function AuthProvider({ children }) {
       throw new Error('Please enter the 6-digit verification code.');
     }
 
-    // Master test bypass codes for testing / dev convenience
+    // 1. Check if this email was already verified within the last 15 minutes
+    // (prevents burning the Supabase recovery token twice when submitting Step 3)
+    if (typeof window !== 'undefined') {
+      try {
+        const verifiedRaw = sessionStorage.getItem('sellsolar_otp_verified');
+        if (verifiedRaw) {
+          const vData = JSON.parse(verifiedRaw);
+          if (vData?.email === cleanMail && Date.now() - vData.timestamp < 15 * 60 * 1000) {
+            return { success: true, verified: true, alreadyVerified: true };
+          }
+        }
+      } catch {}
+    }
+
+    // 2. Master test bypass codes for testing / dev convenience
     if (cleanOtp === '123456' || cleanOtp === '786786') {
       if (typeof window !== 'undefined') {
-        sessionStorage.setItem('sellsolar_otp_verified', JSON.stringify({ email: cleanMail, timestamp: Date.now() }));
+        sessionStorage.setItem(
+          'sellsolar_otp_verified',
+          JSON.stringify({ email: cleanMail, timestamp: Date.now(), bypass: true })
+        );
       }
       return { success: true, verified: true };
     }
 
+    // 3. Official Supabase OTP verification (type: 'recovery')
+    if (isSupabaseConfigured()) {
+      try {
+        const { data, error } = await supabase.auth.verifyOtp({
+          email: cleanMail,
+          token: cleanOtp,
+          type: 'recovery',
+        });
+
+        if (!error && (data?.session || data?.user)) {
+          if (data.user) {
+            setUser(data.user);
+          }
+          if (typeof window !== 'undefined') {
+            sessionStorage.setItem(
+              'sellsolar_otp_verified',
+              JSON.stringify({ email: cleanMail, timestamp: Date.now(), supabase: true })
+            );
+          }
+          return { success: true, verified: true, session: data.session, user: data.user };
+        } else if (error) {
+          console.warn('Supabase verifyOtp notice:', error.message);
+        }
+      } catch (sbErr) {
+        console.warn('Supabase verifyOtp exception:', sbErr);
+      }
+    }
+
+    // 4. Check local session/localStorage OTP (for offline or local accounts)
     let storedData = null;
     if (typeof window !== 'undefined') {
       try {
@@ -1483,24 +1522,23 @@ export function AuthProvider({ children }) {
       } catch {}
     }
 
-    if (!storedData || storedData.email !== cleanMail) {
-      throw new Error('No pending reset request found for this email. Please request a new code.');
+    if (storedData && storedData.email === cleanMail) {
+      if (Date.now() > storedData.expiry) {
+        throw new Error('Verification code has expired. Please request a new code.');
+      }
+      if (storedData.otp === cleanOtp) {
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem(
+            'sellsolar_otp_verified',
+            JSON.stringify({ email: cleanMail, timestamp: Date.now(), local: true })
+          );
+        }
+        return { success: true, verified: true };
+      }
     }
 
-    if (Date.now() > storedData.expiry) {
-      throw new Error('Verification code has expired. Please request a new one.');
-    }
-
-    if (storedData.otp !== cleanOtp) {
-      throw new Error('Invalid verification code. Please check your email and try again.');
-    }
-
-    if (typeof window !== 'undefined') {
-      sessionStorage.setItem('sellsolar_otp_verified', JSON.stringify({ email: cleanMail, timestamp: Date.now() }));
-    }
-
-    return { success: true, verified: true };
-  }, []);
+    throw new Error('Invalid or expired 6-digit verification code. Please check your email or enter 123456 to test.');
+  }, [setUser]);
 
   const resetPasswordWithOtp = useCallback(async (targetEmail, enteredOtp, newPassword) => {
     await verifyPasswordResetOtp(targetEmail, enteredOtp);

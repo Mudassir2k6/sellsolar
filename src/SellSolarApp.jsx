@@ -1737,6 +1737,7 @@ function nx({
         className: `grid grid-cols-1 ${cards.length >= 3 ? 'md:grid-cols-2 lg:grid-cols-3' : 'md:grid-cols-2'} gap-4`,
         children: cards.map((card) => (
           jsxs("div", {
+            key: card.id || card.title,
             className: "card-interactive p-5 border border-gray-200/90 dark:border-gray-800 bg-gradient-to-br from-white via-primary-50/10 to-transparent dark:from-gray-900 dark:via-primary-950/10 dark:to-gray-900 transition-all flex flex-col justify-between group shadow-sm rounded-2xl overflow-hidden",
             children: [
               jsxs("div", {
@@ -1779,6 +1780,7 @@ function nx({
                     className: "mt-3 space-y-1.5 text-xs text-gray-600 dark:text-gray-300",
                     children: card.points.map((pt, idx) => (
                       jsxs("li", {
+                        key: `pt-${idx}`,
                         className: "flex items-center gap-2",
                         children: [
                           jsx(ShieldCheck, { className: "h-3.5 w-3.5 text-emerald-500 shrink-0" }),
@@ -6010,8 +6012,10 @@ function _x({
 
   return jsxs(Fragment,{
     children:[jsx(nx,{
+      key:"home-hero-filters",
       filters:e,onFilterChange:y,onSearch:w,onReset:j,onNavigatePrices:nav?()=>nav("prices"):void 0,onNavigateCalculator:nav?()=>nav("calculator"):void 0,onNavigateDealers:nav?()=>nav("dealers"):void 0,onNavigateInstallation:nav?()=>nav("installation"):void 0
     }),jsx(lx,{
+      key:"home-listings-section",
       listings:n,loading:a,error:o,totalCount:u,onSelectListing:t,onResetFilters:j,onNavigate:nav,currentCondition:e.condition,onConditionChange:(newCond)=>{
         y("condition", newCond);
         p(cnt => cnt + 1);
@@ -6022,13 +6026,16 @@ function _x({
         p(cnt => cnt + 1);
       }
     }),jsx(PakWheelsSellCards,{
+      key:"home-pakwheels-cards",
       onPostAd:()=>nav?nav("post-ad"):void 0,
       onInstall:()=>nav?nav("installation"):void 0
     }),jsx(DailyMarketRates,{
+      key:"home-daily-rates",
       onNavigate:nav,
       onSelectCategory:C,
       compact:true
     }),nav && calcBanner?.enabled !== false ? jsx("div",{
+      key:"home-calc-banner",
       className:"container-page my-3 sm:my-3.5",children:jsxs("div",{
         className:"rounded-2xl bg-gradient-to-r from-gray-900 via-gray-850 to-primary-950 p-3.5 sm:p-4 text-white shadow-sm border border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-3",
         children:[
@@ -6065,7 +6072,7 @@ function _x({
           jsxs("div",{
             className:"flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end",
             children:[
-              jsx("button",{
+              jsxs("button",{
                 type:"button",
                 onClick:()=>nav("calculator"),
                 className:"btn-primary text-xs px-4 py-2 font-bold shadow-xs inline-flex items-center gap-1.5",
@@ -6085,6 +6092,7 @@ function _x({
         ]
       })
     }):null,jsx(ix,{
+      key:"home-categories-cities",
       onSelectCategory:C,
       onSelectCity:(cityName)=>{
         y("city", cityName);
@@ -6094,7 +6102,9 @@ function _x({
         y("brand", brandName);
         setTimeout(w, 50);
       }
-    }),jsx(cx,{})]
+    }),jsx(cx,{
+      key:"home-benefits-section"
+    })]
   })
 }export default function App({ initialPathname, initialSlug }){
   const {

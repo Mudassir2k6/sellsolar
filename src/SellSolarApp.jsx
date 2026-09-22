@@ -1982,38 +1982,21 @@ function ix({
           ]
         }),
         activeBrowseTab === "city" && jsx("div",{
-          className:"grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 sm:gap-3",children:browseCities.map(c=>jsxs("button",{
+          className:"flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1.5 scrollbar-none",children:browseCities.map(c=>jsxs("button",{
             onClick:()=>onCity&&onCity(c.name),
-            className:"card p-3 text-left border border-gray-200/90 dark:border-gray-800 hover:border-primary-400 dark:hover:border-primary-500 hover:shadow-xs transition-all group dark:bg-gray-900 flex items-center justify-between shadow-2xs",children:[
-              jsxs("div",{
-                children:[
-                  jsx("div",{
-                    className:"font-bold text-xs sm:text-sm text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors",children:c.name
-                  }),
-                  jsx("div",{
-                    className:"text-[11px] text-gray-500 dark:text-gray-400 mt-0.5",children:c.count
-                  })
-                ]
-              }),
-              jsx(MapPin,{ className:"h-3.5 w-3.5 text-gray-400 group-hover:text-primary-500 transition-colors shrink-0" })
+            className:"px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-primary-500 hover:text-primary-600 text-xs font-bold text-gray-700 dark:text-gray-200 shrink-0 transition-all flex items-center gap-1.5 shadow-2xs",children:[
+              jsx(MapPin,{ className:"h-3 w-3 text-primary-500 shrink-0" }),
+              c.name,
+              jsx("span",{ className:"text-[10px] text-gray-400 font-normal", children:`(${c.count.split(" ")[0]})` })
             ]
           },c.name))
         }),
         activeBrowseTab === "brand" && jsx("div",{
-          className:"grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 sm:gap-3",children:browseBrands.map(b=>jsxs("button",{
+          className:"flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1.5 scrollbar-none",children:browseBrands.map(b=>jsxs("button",{
             onClick:()=>onBrand&&onBrand(b.name),
-            className:"card p-3 text-left border border-gray-200/90 dark:border-gray-800 hover:border-primary-400 dark:hover:border-primary-500 hover:shadow-xs transition-all group dark:bg-gray-900 flex items-center justify-between shadow-2xs",children:[
-              jsxs("div",{
-                children:[
-                  jsx("div",{
-                    className:"font-bold text-xs sm:text-sm text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors",children:b.name
-                  }),
-                  jsx("div",{
-                    className:"text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 truncate max-w-[120px]",children:b.desc
-                  })
-                ]
-              }),
-              jsx(Award,{ className:"h-3.5 w-3.5 text-gray-400 group-hover:text-primary-500 transition-colors shrink-0" })
+            className:"px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-primary-500 hover:text-primary-600 text-xs font-bold text-gray-700 dark:text-gray-200 shrink-0 transition-all flex items-center gap-1.5 shadow-2xs",children:[
+              jsx(Award,{ className:"h-3 w-3 text-amber-500 shrink-0" }),
+              b.name
             ]
           },b.name))
         })
@@ -2058,7 +2041,7 @@ function ax({
   return jsxs("div",{
     className:"card group cursor-pointer overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:bg-gray-900 border border-gray-200/90 dark:border-gray-800 flex flex-col justify-between shadow-2xs",onClick:e,children:[jsxs("div",{
       children:[jsxs("div",{
-        className:"relative aspect-[4/3] overflow-hidden bg-gray-100 dark:bg-gray-800",children:[jsx("img",{
+        className:"relative aspect-[16/10] overflow-hidden bg-gray-100 dark:bg-gray-800",children:[jsx("img",{
           src:imgUrl,alt:t.title,loading:"lazy",className:"h-full w-full object-cover transition-transform duration-300 group-hover:scale-105",onError:s=>{
             s.currentTarget.src = getEquipmentFallbackImage(t.category, t.title);
           }
@@ -2095,8 +2078,8 @@ function ax({
           })
         })]
       }),jsxs("div",{
-        className:"p-3.5",children:[jsxs("div",{
-          className:"mb-1 flex items-center gap-1.5 text-xs font-semibold text-primary-600 dark:text-primary-400",children:[jsx("span",{
+        className:"p-2.5 sm:p-3",children:[jsxs("div",{
+          className:"mb-1 flex items-center gap-1.5 text-[11px] sm:text-xs font-semibold text-primary-600 dark:text-primary-400",children:[jsx("span",{
             children:CATEGORIES[t.category]||t.category
           }),t.capacity_kw&&jsx("span",{
             className:"text-gray-400 dark:text-gray-600",children:"•"
@@ -2106,7 +2089,7 @@ function ax({
         }),jsx("h3",{
           className:"line-clamp-2 text-xs sm:text-sm font-bold leading-snug text-gray-900 dark:text-gray-100 transition-colors group-hover:text-primary-600 dark:group-hover:text-primary-400",children:t.title
         }),jsxs("div",{
-          className:"mt-2 flex items-center gap-1.5 text-[11px] sm:text-xs text-gray-500 dark:text-gray-400",children:[jsx(MapPin,{
+          className:"mt-1.5 flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400",children:[jsx(MapPin,{
             className:"h-3 w-3 shrink-0 text-primary-500"
           }),t.city,jsx("span",{
             className:"text-gray-300 dark:text-gray-600",children:"•"
@@ -2116,16 +2099,16 @@ function ax({
         })]
       })]
     }),jsx("div",{
-      className:"px-3.5 pb-3.5",children:jsxs("div",{
-        className:"flex items-end justify-between border-t border-gray-100 dark:border-gray-800 pt-2.5",children:[jsxs("div",{
+      className:"px-2.5 pb-2.5 sm:px-3 sm:pb-3",children:jsxs("div",{
+        className:"flex items-end justify-between border-t border-gray-100 dark:border-gray-800 pt-2",children:[jsxs("div",{
           children:[jsx("div",{
-            className:"text-sm sm:text-base font-extrabold text-primary-600 dark:text-primary-400",children:formatPrice(t.price)
+            className:"text-xs sm:text-sm md:text-base font-extrabold text-primary-600 dark:text-primary-400",children:formatPrice(t.price)
           }),t.warranty_years?jsxs("div",{
-            className:"flex items-center gap-1 text-[11px] font-medium text-secondary-600 dark:text-secondary-400",children:[jsx(ShieldCheck,{
-              className:"h-3 w-3"
+            className:"flex items-center gap-1 text-[10px] sm:text-[11px] font-medium text-secondary-600 dark:text-secondary-400",children:[jsx(ShieldCheck,{
+              className:"h-2.5 w-2.5 sm:h-3 sm:w-3"
             }),formatWarrantyShort(t.warranty_years)]
           }):jsx("div",{
-            className:"text-[11px] text-gray-400 dark:text-gray-500",children:"No warranty"
+            className:"text-[10px] text-gray-400 dark:text-gray-500",children:"No warranty"
           })]
         }),jsx("button",{
           type:"button",onClick:handleWhatsApp,className:"inline-flex items-center gap-1 rounded bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-800/60 text-[#128C7E] dark:text-emerald-300 px-2 py-0.5 text-xs font-bold transition-colors",children:jsxs(Fragment,{
@@ -2287,7 +2270,7 @@ function lx({
         }):jsxs("div",{
           children:[
             jsx("div",{
-              className:"grid grid-cols-1 xs:grid-cols-2 gap-3.5 sm:gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4",children:t.slice(0, visibleCount).map(a=>jsx(ax,{
+              className:"grid grid-cols-2 gap-2 sm:gap-3.5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4",children:t.slice(0, visibleCount).map(a=>jsx(ax,{
                 listing:a,onClick:()=>s(a.id),onNavigate:nav
               },a.id))
             }),
@@ -5881,64 +5864,59 @@ function _x({
       onSelectCategory:C,
       compact:true
     }),nav && calcBanner?.enabled !== false ? jsx("div",{
-      className:"container-page my-3.5 sm:my-4",children:jsxs("div",{
-        className:"rounded-2xl bg-gradient-to-r from-gray-900 via-gray-850 to-primary-950 p-4 sm:p-5 text-white shadow-md border border-gray-800 transition-all",children:[
+      className:"container-page my-3 sm:my-3.5",children:jsxs("div",{
+        className:"rounded-2xl bg-gradient-to-r from-gray-900 via-gray-850 to-primary-950 p-3.5 sm:p-4 text-white shadow-sm border border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-3",
+        children:[
           jsxs("div",{
-            className:"flex flex-col md:flex-row items-center justify-between gap-4",children:[
-              jsxs("div",{
-                className:"flex items-center gap-4",children:[jsx("div",{
-                  className:"flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary-500/20 border border-primary-400/30 text-primary-400 shadow-inner",children:jsx(Calculator,{
-                    className:"h-6 w-6"
-                  })
-                }),jsxs("div",{
-                  children:[jsxs("div",{
-                    className:"inline-flex items-center gap-1.5 rounded-full bg-primary-500/20 border border-primary-400/30 px-2.5 py-0.5 text-xs font-bold text-primary-300 mb-1",children:[jsx(Zap,{
-                      className:"h-3 w-3 fill-primary-400 text-primary-400"
-                    }), calcBanner?.badge || "Instant System Sizing Tool"]
-                  }),jsx("h3",{
-                    className:"text-base sm:text-lg font-bold text-white tracking-tight",children: calcBanner?.title || "Calculate Your Solar Load in 30 Seconds"
-                  }),jsx("p",{
-                    className:"mt-0.5 text-xs text-gray-300 max-w-xl",children: calcBanner?.description || "Enter your Fans, LED Bulbs, Inverter ACs, Water Pumps, Iron & Fridge. Find your required kW system size, panel count, and battery backup."
-                  })]
-                })]
+            className:"flex items-center gap-3 w-full sm:w-auto",
+            children:[
+              jsx("div",{
+                className:"flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-500/20 border border-primary-400/30 text-primary-400",
+                children:jsx(Calculator,{ className:"h-5 w-5" })
               }),
               jsxs("div",{
-                className:"flex items-center gap-2.5 shrink-0 flex-wrap",children:[
-                  jsxs("button",{
-                    type:"button",
-                    onClick:()=>setCalcOpen(prev=>!prev),
-                    className:`inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-xs sm:text-sm font-bold transition-all border ${
-                      calcOpen
-                        ? "bg-gray-800 border-primary-400 text-primary-300"
-                        : "bg-primary-500 hover:bg-primary-600 border-primary-400 text-white shadow-xs"
-                    }`,
+                children:[
+                  jsxs("div",{
+                    className:"flex items-center gap-2",
                     children:[
-                      jsx(Calculator,{ className:"h-4 w-4" }),
-                      calcOpen ? "Hide Calculator" : (calcBanner?.calculateButtonText || "Calculate Here (Instant kW)")
+                      jsx("h3",{
+                        className:"text-sm sm:text-base font-bold text-white tracking-tight",
+                        children: calcBanner?.title || "Calculate Your Solar System Size in 30 Seconds"
+                      }),
+                      jsx("span",{
+                        className:"hidden md:inline-flex items-center gap-1 rounded-full bg-primary-500/20 px-2 py-0.5 text-[10px] font-bold text-primary-300",
+                        children:"⚡ Instant kW"
+                      })
                     ]
                   }),
-                  jsxs("button",{
-                    type:"button",
-                    onClick:()=>nav("calculator"),
-                    className:"inline-flex items-center gap-1.5 rounded-lg border border-gray-700 bg-gray-800/80 hover:bg-gray-800 px-4 py-2.5 text-xs sm:text-sm font-bold text-gray-200 transition-all",
-                    children:[
-                      calcBanner?.fullPageButtonText || "Full Page",
-                      jsx(ArrowRight,{ className:"h-3.5 w-3.5" })
-                    ]
+                  jsx("p",{
+                    className:"text-[11px] text-gray-300 line-clamp-1",
+                    children: calcBanner?.description || "Enter your home appliances to find required kW capacity, panel count & battery backup."
                   })
                 ]
               })
             ]
           }),
-          calcOpen ? jsx("div",{
-            className:"mt-6 pt-6 border-t border-gray-800",
-            children: jsx(SolarLoadCalculator,{
-              compact:true,
-              showHeroBanner:false,
-              onNavigate:nav,
-              onSelectCategory:C
-            })
-          }) : null
+          jsxs("div",{
+            className:"flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end",
+            children:[
+              jsx("button",{
+                type:"button",
+                onClick:()=>nav("calculator"),
+                className:"btn-primary text-xs px-4 py-2 font-bold shadow-xs inline-flex items-center gap-1.5",
+                children:[
+                  jsx(Calculator,{ className:"h-3.5 w-3.5" }),
+                  "Calculate Load Now ↗"
+                ]
+              }),
+              jsx("button",{
+                type:"button",
+                onClick:()=>nav("installation"),
+                className:"btn-ghost border border-gray-700 hover:bg-gray-800 text-xs px-3 py-2 font-semibold text-gray-200",
+                children:"Get Installation Quote"
+              })
+            ]
+          })
         ]
       })
     }):null,jsx(ix,{

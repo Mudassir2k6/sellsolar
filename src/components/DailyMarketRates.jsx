@@ -902,7 +902,7 @@ export default function DailyMarketRates({ onNavigate, onSelectCategory, compact
           </div>
 
           {/* Sub-filters for Panels & Batteries */}
-          {selectedCategory === 'panel' && (
+          {selectedCategory === 'panel' && !compact && (
             <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-800 bg-amber-50/30 dark:bg-amber-950/10 flex items-center gap-2 overflow-x-auto text-xs">
               <span className="font-semibold text-gray-500 dark:text-gray-400 shrink-0">Wattage:</span>
               <button
@@ -952,7 +952,7 @@ export default function DailyMarketRates({ onNavigate, onSelectCategory, compact
             </div>
           )}
 
-          {selectedCategory === 'battery' && (
+          {selectedCategory === 'battery' && !compact && (
             <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-800 bg-emerald-50/30 dark:bg-emerald-950/10 flex items-center gap-2 overflow-x-auto text-xs">
               <span className="font-semibold text-gray-500 dark:text-gray-400 shrink-0">Battery Chemistry:</span>
               <button
@@ -1025,7 +1025,7 @@ export default function DailyMarketRates({ onNavigate, onSelectCategory, compact
                     </td>
                   </tr>
                 ) : (
-                  filteredRates.map((item) => {
+                  (compact ? filteredRates.slice(0, 4) : filteredRates).map((item) => {
                     const effectiveRate = getEffectiveRate(item);
                     const isDown = item.status === 'down';
                     const isUp = item.status === 'up';
@@ -1200,6 +1200,25 @@ export default function DailyMarketRates({ onNavigate, onSelectCategory, compact
               </tbody>
             </table>
           </div>
+
+          {compact && (
+            <div className="p-3 bg-amber-50/50 dark:bg-amber-950/20 border-t border-amber-200/60 dark:border-amber-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+              <span className="font-semibold text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
+                <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                Showing top 4 national benchmarks (Updated Daily at 12:00 AM)
+              </span>
+              {onNavigate && (
+                <button
+                  type="button"
+                  onClick={() => onNavigate('prices')}
+                  className="font-bold text-primary-600 dark:text-primary-400 hover:text-primary-700 hover:underline flex items-center gap-1 shrink-0 cursor-pointer"
+                >
+                  <span>View All 40+ City Rates Sheet</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+          )}
 
           {/* Footer note with disclaimer & last update info */}
           <div className="p-3.5 sm:p-4 bg-gray-50 dark:bg-gray-850/80 border-t border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs text-gray-500 dark:text-gray-400">

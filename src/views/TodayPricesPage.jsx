@@ -47,6 +47,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
   const todayDateLabel = pktDateInfo.shortDate; // e.g. "11-Sep-2026"
   const yesterdayDateLabel = pktDateInfo.yesterdayShortDate || '10-Sep-2026';
 
+  const [pageTab, setPageTab] = useState('rates'); // 'rates' | 'catalog'
   const [selectedCategory, setSelectedCategory] = useState('all'); // 'all', 'panel', 'inverter', 'battery', 'complete_system', 'structure_accessories'
   const [selectedBrand, setSelectedBrand] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -438,6 +439,37 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
 
       {/* Main Content Area */}
       <div className="container-page -mt-6">
+
+        {/* ===== PAGE-LEVEL TAB SWITCHER ===== */}
+        <div className="mb-6 flex items-center justify-center">
+          <div className="inline-flex items-center gap-1 rounded-2xl bg-white dark:bg-gray-900 p-1.5 shadow-lg ring-1 ring-gray-200/80 dark:ring-gray-800">
+            <button
+              id="prices-tab-rates"
+              onClick={() => setPageTab('rates')}
+              className={`inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold transition-all ${
+                pageTab === 'rates'
+                  ? 'bg-gradient-to-r from-primary-600 to-primary-500 text-white shadow-md shadow-primary-500/25'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
+              }`}
+            >
+              <BarChart3 className="h-4 w-4" />
+              📊 Daily Rate Sheet
+            </button>
+            <button
+              id="prices-tab-catalog"
+              onClick={() => setPageTab('catalog')}
+              className={`inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold transition-all ${
+                pageTab === 'catalog'
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md shadow-amber-500/25'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
+              }`}
+            >
+              <Layers className="h-4 w-4" />
+              🛒 Equipment Catalog
+            </button>
+          </div>
+        </div>
+
         {/* Top Category Filter Tabs Bar */}
         <div className="rounded-2xl bg-white dark:bg-gray-900 p-2 shadow-lg ring-1 ring-gray-200/80 dark:ring-gray-800 mb-6">
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
@@ -495,6 +527,9 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
           </div>
         </div>
 
+        {/* Daily Rate Sheet Tab Content */}
+        {pageTab === 'rates' && (
+        <>
         {/* Daily Market Rates Feed Component */}
         <div className="mb-6 -mx-4 sm:mx-0">
           <DailyMarketRates
@@ -1791,7 +1826,12 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
             </button>
           </div>
         </div>
+        </>
+        )}
 
+        {/* Equipment Catalog Tab Content */}
+        {pageTab === 'catalog' && (
+        <>
         {/* Filter controls & Search */}
         <div id="catalog-results" className="rounded-2xl bg-white dark:bg-gray-900 p-4 sm:p-5 shadow-sm ring-1 ring-gray-200/70 dark:ring-gray-800 mb-8">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -2049,183 +2089,29 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
             </div>
           </div>
         )}
+          </>
+        )}
 
-        {/* ================= CALCULATOR WIDGET ================= */}
-        <section className="mt-16 rounded-3xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6 sm:p-10 text-white shadow-xl">
-          <div className="flex flex-col lg:flex-row items-start justify-between gap-8">
-            <div className="lg:max-w-md">
-              <div className="inline-flex items-center gap-2 rounded-full bg-primary-500/20 px-3 py-1 text-xs font-semibold text-primary-300 border border-primary-500/30 mb-3">
-                <Calculator className="h-3.5 w-3.5 text-primary-400" />
-                Live Rate Calculator
+        {/* ===== COMPACT CALCULATOR CTA (replaces full widget) ===== */}
+        <section className="mt-10 rounded-2xl bg-gradient-to-r from-primary-900 via-gray-900 to-gray-900 p-4 sm:px-6 text-white shadow-lg">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-500/20 border border-primary-400/30">
+                <Calculator className="h-5 w-5 text-primary-400" />
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
-                Calculate Solar Plate & System Cost
-              </h2>
-              <p className="mt-2 text-sm text-gray-300 leading-relaxed">
-                Estimate the exact equipment cost of your solar setup based on today's per-watt
-                market rates in Pakistan.
-              </p>
-
-              {/* Calculator Inputs */}
-              <div className="mt-6 space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">
-                    Solar Panel Wattage (per plate): <span className="text-amber-400 font-bold">{calcWatts}W</span>
-                  </label>
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="range"
-                      min="450"
-                      max="670"
-                      step="5"
-                      value={calcWatts}
-                      onChange={(e) => setCalcWatts(Number(e.target.value))}
-                      className="w-full accent-primary-500 cursor-pointer"
-                    />
-                    <div className="flex gap-1.5 shrink-0">
-                      {[550, 585, 615, 650].map((w) => (
-                        <button
-                          key={w}
-                          onClick={() => setCalcWatts(w)}
-                          className={`rounded-lg px-2 py-1 text-[11px] font-bold ${
-                            calcWatts === w
-                              ? 'bg-primary-500 text-white'
-                              : 'bg-white/10 text-gray-300 hover:bg-white/20'
-                          }`}
-                        >
-                          {w}W
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">
-                    Per Watt Price (PKR): <span className="text-amber-400 font-bold">Rs {calcPanelBrandRate} / W</span>
-                  </label>
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="range"
-                      min="30"
-                      max="50"
-                      step="0.5"
-                      value={calcPanelBrandRate}
-                      onChange={(e) => setCalcPanelBrandRate(Number(e.target.value))}
-                      className="w-full accent-primary-500 cursor-pointer"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">
-                    System Size: <span className="text-amber-400 font-bold">{calcSystemSizeKw} kW</span>
-                  </label>
-                  <div className="grid grid-cols-4 gap-2">
-                    {[5, 10, 15, 20].map((kw) => (
-                      <button
-                        key={kw}
-                        onClick={() => setCalcSystemSizeKw(kw)}
-                        className={`rounded-xl py-2 text-xs font-bold transition-colors ${
-                          calcSystemSizeKw === kw
-                            ? 'bg-primary-500 text-white'
-                            : 'bg-white/10 text-gray-300 hover:bg-white/20'
-                        }`}
-                      >
-                        {kw} kW
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">
-                    Optional Battery Storage:
-                  </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { id: 'none', label: 'No Battery' },
-                      { id: 'tubular', label: 'Tubular (4x)' },
-                      { id: 'lithium', label: 'Lithium (5.12kWh)' },
-                    ].map((b) => (
-                      <button
-                        key={b.id}
-                        onClick={() => setCalcIncludeBattery(b.id)}
-                        className={`rounded-xl py-2 text-xs font-bold transition-colors ${
-                          calcIncludeBattery === b.id
-                            ? 'bg-emerald-600 text-white'
-                            : 'bg-white/10 text-gray-300 hover:bg-white/20'
-                        }`}
-                      >
-                        {b.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+              <div>
+                <div className="text-xs font-bold uppercase tracking-wider text-primary-400">Solar Load Calculator</div>
+                <div className="text-sm font-bold text-white">Calculate your exact system size, panel count &amp; turnkey budget</div>
               </div>
             </div>
-
-            {/* Calculated Output Breakdown Card */}
-            <div className="w-full lg:w-96 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 p-6 shadow-2xl">
-              <div className="text-xs font-bold uppercase tracking-wider text-primary-300 mb-1">
-                Estimated Equipment Cost
-              </div>
-              <div className="text-3xl font-extrabold text-white">
-                {formatPrice(totalCalculatedSystem)}
-              </div>
-              <div className="text-xs text-gray-300 mt-1">
-                For a complete {calcSystemSizeKw}kW solar setup
-              </div>
-
-              <div className="mt-6 space-y-3 border-t border-white/10 pt-4 text-xs">
-                <div className="flex justify-between items-center text-gray-300">
-                  <span>Single Panel ({calcWatts}W Plate):</span>
-                  <span className="font-bold text-amber-300">
-                    {formatPrice(calculatedPanelCost)}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center text-gray-300">
-                  <span>
-                    Panels Cost ({Math.ceil((calcSystemSizeKw * 1000) / calcWatts)} plates):
-                  </span>
-                  <span className="font-bold text-white">
-                    {formatPrice(calculatedSystemPanelsCost)}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center text-gray-300">
-                  <span>{calcSystemSizeKw}kW Inverter (Est):</span>
-                  <span className="font-bold text-white">
-                    {calcIncludeInverter ? formatPrice(estimatedInverterCost) : 'Excluded'}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center text-gray-300">
-                  <span>Battery Storage:</span>
-                  <span className="font-bold text-emerald-400">
-                    {calcIncludeBattery === 'none'
-                      ? 'No Battery'
-                      : formatPrice(estimatedBatteryCost)}
-                  </span>
-                </div>
-              </div>
-
-              <div className="mt-6 rounded-xl bg-primary-500/20 border border-primary-500/30 p-3 text-[11px] text-primary-200">
-                💡 Note: Structural mounting frames, DC/AC wiring, net-metering fees, and labor
-                typically add PKR 80,000 – 180,000 depending on location.
-              </div>
-
-              <button
-                onClick={() => {
-                  if (onSelectCategory) {
-                    onSelectCategory({ query: `${calcSystemSizeKw}kW complete system` });
-                  } else if (onNavigate) {
-                    onNavigate('home');
-                  }
-                }}
-                className="btn-primary w-full mt-4 py-2.5 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-[1.01] active:scale-[0.99]"
-              >
-                Find Sellers for {calcSystemSizeKw}kW Kit <ArrowRight className="h-3.5 w-3.5" />
-              </button>
-            </div>
+            <button
+              onClick={() => onNavigate && onNavigate('calculator')}
+              className="inline-flex items-center gap-2 rounded-xl bg-primary-500 hover:bg-primary-400 px-5 py-2.5 text-sm font-extrabold text-white shadow-lg shadow-primary-600/30 transition-all hover:scale-[1.02] active:scale-[0.98] shrink-0"
+            >
+              <Calculator className="h-4 w-4" />
+              Open Load Calculator
+              <ArrowRight className="h-4 w-4" />
+            </button>
           </div>
         </section>
 

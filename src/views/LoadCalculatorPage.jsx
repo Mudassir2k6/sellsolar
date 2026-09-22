@@ -11,6 +11,7 @@ import {
   RotateCcw,
   SlidersHorizontal,
   ChevronRight,
+  ChevronDown,
   HelpCircle,
   Award,
   BarChart3,
@@ -86,6 +87,8 @@ export default function LoadCalculatorPage({ onNavigate, onSelectCategory }) {
   const [activePreset, setActivePreset] = useState('medium_home');
   const [customAppliances, setCustomAppliances] = useState([]);
   const [showAddCustom, setShowAddCustom] = useState(false);
+  // Which accordion categories are open (default: fans, cooling since they have qty > 0 in medium_home preset)
+  const [openCategories, setOpenCategories] = useState(() => new Set(['fans', 'lights', 'cooling']));
 
   // Custom appliance form
   const [newCustomName, setNewCustomName] = useState('');
@@ -388,6 +391,15 @@ Generated via SellSolar.pk Load Calculator`;
     window.print();
   };
 
+  const toggleCategory = (catId) => {
+    setOpenCategories(prev => {
+      const next = new Set(prev);
+      if (next.has(catId)) next.delete(catId);
+      else next.add(catId);
+      return next;
+    });
+  };
+
   // Filter appliances by category
   const filteredAppliances = useMemo(() => {
     const standard = DEFAULT_APPLIANCES.filter((app) => {
@@ -653,298 +665,246 @@ Generated via SellSolar.pk Load Calculator`;
               </form>
             )}
 
-            {/* Appliance Item Cards List */}
-            <div className="space-y-3.5">
-              {/* Standard Appliances */}
-              {filteredAppliances.standard.map((app) => {
-                const current = applianceState[app.id] || {
-                  quantity: app.defaultQuantity,
-                  watts: app.defaultWatts,
-                  dayHours: app.dayHours,
-                  nightHours: app.nightHours,
-                };
-                const totalItemRunningWatts = current.quantity * current.watts;
-                const totalDailyUnits = (
-                  (current.quantity * current.watts * (current.dayHours + current.nightHours)) /
-                  1000
-                ).toFixed(2);
-                const isActive = current.quantity > 0;
+            {/* ========= CATEGORIZED ACCORDION APPLIANCE LIST ========= */}
+            <div className="space-y-3">
+              {APPLIANCE_CATEGORIES.map((cat) => {
+                const catAppliances = DEFAULT_APPLIANCES.filter(app => app.category === cat.id);
+                const activeCount = catAppliances.filter(app => (applianceState[app.id]?.quantity || 0) > 0).length;
+                const totalCatWatts = catAppliances.reduce((sum, app) => {
+                  return sum + (applianceState[app.id]?.quantity || 0) * (applianceState[app.id]?.watts || app.defaultWatts);
+                }, 0);
+                const isOpen = openCategories.has(cat.id);
 
                 return (
-                  <div
-                    key={app.id}
-                    className={`rounded-2xl border p-4 transition-all duration-200 ${
-                      isActive
-                        ? 'border-primary-200 bg-white shadow-xs'
-                        : 'border-gray-200/80 bg-white/70 opacity-80 hover:opacity-100 hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      {/* Left: Icon and Name */}
-                      <div className="flex items-start gap-3">
-                        <div
-                          className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors ${
-                            isActive
-                              ? 'bg-primary-500 text-white shadow-xs shadow-primary-500/20'
-                              : 'bg-gray-100 text-gray-500'
-                          }`}
-                        >
-                          <CategoryIcon name={app.icon} className="h-5 w-5" />
+                  <div key={cat.id} className={`rounded-2xl border transition-all ${
+                    activeCount > 0 ? 'border-primary-200 bg-white shadow-sm' : 'border-gray-200/80 bg-white/70'
+                  }`}>
+                    {/* Category accordion header */}
+                    <button
+                      type="button"
+                      onClick={() => toggleCategory(cat.id)}
+                      className="w-full flex items-center justify-between p-4 text-left"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-colors ${
+                          activeCount > 0 ? 'bg-primary-500 text-white shadow-sm' : 'bg-gray-100 text-gray-500'
+                        }`}>
+                          <CategoryIcon name={cat.icon} className="h-4 w-4" />
                         </div>
                         <div>
-                          <div className="flex items-center gap-2">
-                            <h3 className="text-sm font-extrabold text-gray-900">{app.name}</h3>
-                            {isActive && (
-                              <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-extrabold text-emerald-700">
-                                {totalItemRunningWatts} W active
-                              </span>
-                            )}
+                          <div className="text-sm font-extrabold text-gray-900">{cat.name}</div>
+                          <div className="text-xs text-gray-500">
+                            {activeCount > 0
+                              ? <span className="text-primary-600 font-bold">{activeCount} item{activeCount !== 1 ? 's' : ''} active • {totalCatWatts}W</span>
+                              : `${catAppliances.length} appliances — click to configure`
+                            }
                           </div>
-                          <p className="mt-0.5 text-xs text-gray-500">{app.hint}</p>
                         </div>
                       </div>
+                      <ChevronDown className={`h-5 w-5 text-gray-400 transition-transform duration-200 ${
+                        isOpen ? 'rotate-180' : ''
+                      }`} />
+                    </button>
 
-                      {/* Right: Quantity Stepper */}
-                      <div className="flex items-center justify-between sm:justify-end gap-3">
-                        <div className="flex items-center rounded-xl border border-gray-200 bg-gray-50 p-1 shadow-2xs">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleUpdateAppliance(app.id, 'quantity', current.quantity - 1)
-                            }
-                            className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
-                          >
-                            <Minus className="h-3.5 w-3.5" />
-                          </button>
-                          <input
-                            type="number"
-                            min="0"
-                            max="99"
-                            value={current.quantity}
-                            onChange={(e) =>
-                              handleUpdateAppliance(app.id, 'quantity', e.target.value)
-                            }
-                            className="w-10 bg-transparent text-center text-sm font-extrabold text-gray-900 focus:outline-hidden"
-                          />
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleUpdateAppliance(app.id, 'quantity', current.quantity + 1)
-                            }
-                            className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
-                          >
-                            <Plus className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                    {/* Category accordion body */}
+                    {isOpen && (
+                      <div className="border-t border-gray-100 p-3 space-y-3">
+                        {catAppliances.map((app) => {
+                          const current = applianceState[app.id] || {
+                            quantity: app.defaultQuantity,
+                            watts: app.defaultWatts,
+                            dayHours: app.dayHours,
+                            nightHours: app.nightHours,
+                          };
+                          const totalItemRunningWatts = current.quantity * current.watts;
+                          const totalDailyUnits = (
+                            (current.quantity * current.watts * (current.dayHours + current.nightHours)) /
+                            1000
+                          ).toFixed(2);
+                          const isActive = current.quantity > 0;
 
-                    {/* Expandable / Inline Controls for Active Items */}
-                    {isActive && (
-                      <div className="mt-4 border-t border-gray-100 pt-3.5">
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                          {/* Wattage Setting */}
-                          <div>
-                            <div className="flex items-center justify-between">
-                              <label className="text-[11px] font-bold text-gray-600">Power Rating</label>
-                              <span className="text-[11px] font-extrabold text-primary-600">
-                                {current.watts} Watts
-                              </span>
-                            </div>
-                            <div className="mt-1 flex items-center gap-1.5">
-                              {app.wattOptions ? (
-                                <select
-                                  value={current.watts}
-                                  onChange={(e) =>
-                                    handleUpdateAppliance(app.id, 'watts', e.target.value)
-                                  }
-                                  className="w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs font-semibold text-gray-800 focus:border-primary-500 focus:outline-hidden"
-                                >
-                                  {app.wattOptions.map((opt) => (
-                                    <option key={opt} value={opt}>
-                                      {opt} W {opt === app.defaultWatts ? '(Standard)' : ''}
-                                    </option>
-                                  ))}
-                                </select>
-                              ) : (
-                                <input
-                                  type="number"
-                                  min="1"
-                                  value={current.watts}
-                                  onChange={(e) =>
-                                    handleUpdateAppliance(app.id, 'watts', e.target.value)
-                                  }
-                                  className="w-full rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs font-semibold text-gray-800 focus:border-primary-500 focus:outline-hidden"
-                                />
+                          return (
+                            <div
+                              key={app.id}
+                              className={`rounded-xl border p-3 transition-all duration-200 ${
+                                isActive
+                                  ? 'border-primary-200 bg-primary-50/40'
+                                  : 'border-gray-100 bg-gray-50/40 hover:bg-white'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between gap-2">
+                                {/* Left: Name */}
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <div>
+                                    <div className="text-xs font-bold text-gray-900 leading-tight">{app.name}</div>
+                                    {isActive && (
+                                      <div className="text-[10px] text-primary-600 font-semibold">{totalItemRunningWatts}W active • {totalDailyUnits} Units/day</div>
+                                    )}
+                                    {!isActive && <div className="text-[10px] text-gray-400">{app.hint}</div>}
+                                  </div>
+                                </div>
+
+                                {/* Right: Quantity Stepper */}
+                                <div className="flex items-center rounded-xl border border-gray-200 bg-white p-0.5 shadow-2xs shrink-0">
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleUpdateAppliance(app.id, 'quantity', current.quantity - 1)
+                                    }
+                                    className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+                                  >
+                                    <Minus className="h-3 w-3" />
+                                  </button>
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    max="99"
+                                    value={current.quantity}
+                                    onChange={(e) =>
+                                      handleUpdateAppliance(app.id, 'quantity', e.target.value)
+                                    }
+                                    className="w-8 bg-transparent text-center text-xs font-extrabold text-gray-900 focus:outline-hidden"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleUpdateAppliance(app.id, 'quantity', current.quantity + 1)
+                                    }
+                                    className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+                                  >
+                                    <Plus className="h-3 w-3" />
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Expandable inline controls for active items */}
+                              {isActive && (
+                                <div className="mt-2.5 border-t border-primary-100 pt-2.5">
+                                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                                    {/* Wattage Setting */}
+                                    <div>
+                                      <div className="flex items-center justify-between">
+                                        <label className="text-[10px] font-bold text-gray-600">Power Rating</label>
+                                        <span className="text-[10px] font-extrabold text-primary-600">{current.watts} W</span>
+                                      </div>
+                                      <div className="mt-1">
+                                        {app.wattOptions ? (
+                                          <select
+                                            value={current.watts}
+                                            onChange={(e) =>
+                                              handleUpdateAppliance(app.id, 'watts', e.target.value)
+                                            }
+                                            className="w-full rounded-lg border border-gray-200 bg-white px-2 py-1 text-[11px] font-semibold text-gray-800 focus:border-primary-500 focus:outline-hidden"
+                                          >
+                                            {app.wattOptions.map((opt) => (
+                                              <option key={opt} value={opt}>
+                                                {opt}W {opt === app.defaultWatts ? '(Std)' : ''}
+                                              </option>
+                                            ))}
+                                          </select>
+                                        ) : (
+                                          <input
+                                            type="number"
+                                            min="1"
+                                            value={current.watts}
+                                            onChange={(e) =>
+                                              handleUpdateAppliance(app.id, 'watts', e.target.value)
+                                            }
+                                            className="w-full rounded-lg border border-gray-200 bg-white px-2 py-1 text-[11px] font-semibold text-gray-800 focus:border-primary-500 focus:outline-hidden"
+                                          />
+                                        )}
+                                      </div>
+                                    </div>
+
+                                    {/* Day Usage Hours */}
+                                    <div>
+                                      <div className="flex items-center justify-between">
+                                        <label className="text-[10px] font-bold text-amber-700 flex items-center gap-1">
+                                          <Sun className="h-3 w-3 text-amber-500" /> Day hrs
+                                        </label>
+                                        <span className="text-[10px] font-extrabold text-gray-800">{current.dayHours}h</span>
+                                      </div>
+                                      <input
+                                        type="range"
+                                        min="0" max="12" step="0.5"
+                                        value={current.dayHours}
+                                        onChange={(e) =>
+                                          handleUpdateAppliance(app.id, 'dayHours', e.target.value)
+                                        }
+                                        className="mt-1.5 w-full accent-amber-500 h-1.5 rounded-lg bg-gray-200 cursor-pointer"
+                                      />
+                                    </div>
+
+                                    {/* Night Usage Hours */}
+                                    <div>
+                                      <div className="flex items-center justify-between">
+                                        <label className="text-[10px] font-bold text-indigo-700 flex items-center gap-1">
+                                          <BatteryCharging className="h-3 w-3 text-indigo-500" /> Night hrs
+                                        </label>
+                                        <span className="text-[10px] font-extrabold text-gray-800">{current.nightHours}h</span>
+                                      </div>
+                                      <input
+                                        type="range"
+                                        min="0" max="12" step="0.5"
+                                        value={current.nightHours}
+                                        onChange={(e) =>
+                                          handleUpdateAppliance(app.id, 'nightHours', e.target.value)
+                                        }
+                                        className="mt-1.5 w-full accent-indigo-500 h-1.5 rounded-lg bg-gray-200 cursor-pointer"
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
                               )}
                             </div>
-                          </div>
-
-                          {/* Day Usage Hours */}
-                          <div>
-                            <div className="flex items-center justify-between">
-                              <label className="text-[11px] font-bold text-amber-700 flex items-center gap-1">
-                                <Sun className="h-3 w-3 text-amber-500" /> Day Hours (Solar)
-                              </label>
-                              <span className="text-[11px] font-extrabold text-gray-800">
-                                {current.dayHours} hrs
-                              </span>
-                            </div>
-                            <input
-                              type="range"
-                              min="0"
-                              max="12"
-                              step="0.5"
-                              value={current.dayHours}
-                              onChange={(e) =>
-                                handleUpdateAppliance(app.id, 'dayHours', e.target.value)
-                              }
-                              className="mt-2 w-full accent-amber-500 h-1.5 rounded-lg bg-gray-200 cursor-pointer"
-                            />
-                          </div>
-
-                          {/* Night Usage Hours */}
-                          <div>
-                            <div className="flex items-center justify-between">
-                              <label className="text-[11px] font-bold text-indigo-700 flex items-center gap-1">
-                                <BatteryCharging className="h-3 w-3 text-indigo-500" /> Night Hours (Battery)
-                              </label>
-                              <span className="text-[11px] font-extrabold text-gray-800">
-                                {current.nightHours} hrs
-                              </span>
-                            </div>
-                            <input
-                              type="range"
-                              min="0"
-                              max="12"
-                              step="0.5"
-                              value={current.nightHours}
-                              onChange={(e) =>
-                                handleUpdateAppliance(app.id, 'nightHours', e.target.value)
-                              }
-                              className="mt-2 w-full accent-indigo-500 h-1.5 rounded-lg bg-gray-200 cursor-pointer"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Daily kWh footprint pill */}
-                        <div className="mt-2 flex items-center justify-between text-[11px] text-gray-500">
-                          <span>
-                            Surge multiplier: <strong className="text-gray-700">{app.surgeMultiplier}x</strong>
-                          </span>
-                          <span>
-                            Daily consumption: <strong className="text-primary-700">{totalDailyUnits} Units/Day</strong>
-                          </span>
-                        </div>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
                 );
               })}
 
-              {/* Custom Appliances List */}
-              {filteredAppliances.custom.map((app, idx) => {
-                const totalItemRunningWatts = app.quantity * app.watts;
-                const totalDailyUnits = (
-                  (app.quantity * app.watts * (app.dayHours + app.nightHours)) /
-                  1000
-                ).toFixed(2);
-
-                return (
-                  <div
-                    key={app.id}
-                    className="rounded-2xl border-2 border-dashed border-primary-300 bg-white p-4 shadow-xs"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-100 text-primary-700">
-                          <Sparkles className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h3 className="text-sm font-extrabold text-gray-900">{app.name}</h3>
-                            <span className="rounded-full bg-primary-100 px-2 py-0.5 text-[10px] font-extrabold text-primary-800">
-                              Custom ({totalItemRunningWatts} W)
-                            </span>
-                          </div>
-                          <p className="text-xs text-gray-500">User created appliance</p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center rounded-xl border border-gray-200 bg-gray-50 p-1">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleUpdateCustomAppliance(idx, 'quantity', app.quantity - 1)
-                            }
-                            className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-gray-600"
-                          >
-                            <Minus className="h-3.5 w-3.5" />
-                          </button>
-                          <span className="w-8 text-center text-sm font-bold text-gray-900">
-                            {app.quantity}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleUpdateCustomAppliance(idx, 'quantity', app.quantity + 1)
-                            }
-                            className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-gray-600"
-                          >
-                            <Plus className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveCustom(idx)}
-                          className="flex h-8 w-8 items-center justify-center rounded-lg text-rose-500 hover:bg-rose-50"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="mt-3 border-t border-gray-100 pt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      <div>
-                        <label className="text-[11px] font-bold text-gray-600">Wattage</label>
-                        <input
-                          type="number"
-                          value={app.watts}
-                          onChange={(e) =>
-                            handleUpdateCustomAppliance(idx, 'watts', e.target.value)
-                          }
-                          className="mt-1 w-full rounded-lg border border-gray-200 bg-gray-50 px-2 py-1 text-xs"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[11px] font-bold text-amber-700">Day Hours</label>
-                        <input
-                          type="number"
-                          step="0.5"
-                          value={app.dayHours}
-                          onChange={(e) =>
-                            handleUpdateCustomAppliance(idx, 'dayHours', e.target.value)
-                          }
-                          className="mt-1 w-full rounded-lg border border-gray-200 bg-gray-50 px-2 py-1 text-xs"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[11px] font-bold text-indigo-700">Night Hours</label>
-                        <input
-                          type="number"
-                          step="0.5"
-                          value={app.nightHours}
-                          onChange={(e) =>
-                            handleUpdateCustomAppliance(idx, 'nightHours', e.target.value)
-                          }
-                          className="mt-1 w-full rounded-lg border border-gray-200 bg-gray-50 px-2 py-1 text-xs"
-                        />
-                      </div>
-                    </div>
+              {/* Custom Appliances (always shown if any) */}
+              {customAppliances.length > 0 && (
+                <div className="rounded-2xl border-2 border-dashed border-primary-300 bg-primary-50/30 p-3">
+                  <div className="text-xs font-bold text-primary-700 mb-2 flex items-center gap-1.5">
+                    <Sparkles className="h-3.5 w-3.5" /> Custom Added Appliances
                   </div>
-                );
-              })}
+                  <div className="space-y-2">
+                    {customAppliances.map((app, idx) => {
+                      const totalItemRunningWatts = app.quantity * app.watts;
+                      return (
+                        <div key={app.id} className="rounded-xl border border-primary-200 bg-white p-3">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-bold text-gray-900">{app.name}</span>
+                              <span className="rounded-full bg-primary-100 px-2 py-0.5 text-[10px] font-extrabold text-primary-800">
+                                Custom • {totalItemRunningWatts}W
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="flex items-center rounded-xl border border-gray-200 bg-gray-50 p-0.5">
+                                <button type="button" onClick={() => handleUpdateCustomAppliance(idx, 'quantity', app.quantity - 1)} className="flex h-7 w-7 items-center justify-center rounded-lg bg-white text-gray-600">
+                                  <Minus className="h-3 w-3" />
+                                </button>
+                                <span className="w-7 text-center text-xs font-bold text-gray-900">{app.quantity}</span>
+                                <button type="button" onClick={() => handleUpdateCustomAppliance(idx, 'quantity', app.quantity + 1)} className="flex h-7 w-7 items-center justify-center rounded-lg bg-white text-gray-600">
+                                  <Plus className="h-3 w-3" />
+                                </button>
+                              </div>
+                              <button type="button" onClick={() => handleRemoveCustom(idx)} className="flex h-7 w-7 items-center justify-center rounded-lg text-rose-500 hover:bg-rose-50">
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
             </div>
           </div>
 

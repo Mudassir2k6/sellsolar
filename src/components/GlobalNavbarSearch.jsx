@@ -362,8 +362,10 @@ export default function GlobalNavbarSearch({
                         <img
                           src={itemImg}
                           alt={item.title}
+                          referrerPolicy="no-referrer"
                           className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
                           onError={(e) => {
+                            e.currentTarget.onerror = null;
                             e.currentTarget.src = getEquipmentFallbackImage(item.category, item.title);
                           }}
                         />
@@ -605,8 +607,10 @@ export default function GlobalNavbarSearch({
                         <img
                           src={itemImg}
                           alt={item.title}
+                          referrerPolicy="no-referrer"
                           className="h-full w-full object-cover"
                           onError={(e) => {
+                            e.currentTarget.onerror = null;
                             e.currentTarget.src = getEquipmentFallbackImage(item.category, item.title);
                           }}
                         />

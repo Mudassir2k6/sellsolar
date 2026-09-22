@@ -1,4 +1,4 @@
-import { SOLAR_PANEL_IMAGE, INVERTER_IMAGE, COMPLETE_SYSTEM_IMAGE } from '../utils/solarImages';
+import { SOLAR_PANEL_IMAGE, INVERTER_IMAGE, BATTERY_IMAGE, COMPLETE_SYSTEM_IMAGE } from '../utils/solarImages';
 
 export const SEED_LISTINGS = [
   {
@@ -117,7 +117,7 @@ export const SEED_LISTINGS = [
     city: 'Lahore',
     capacity_kw: 4.8,
     warranty_years: 5,
-    image_url: INVERTER_IMAGE,
+    image_url: BATTERY_IMAGE,
     description: 'Original Narada 48V 100Ah Lithium Iron Phosphate (LiFePO4) battery module. 6000+ deep cycles at 80% DOD, built-in smart BMS, compatible with Inverex Nitrox, Fronus, Deye, and Knox inverters.',
     featured: true,
     seller_name: 'Battery Hub Lahore',
@@ -159,7 +159,7 @@ export const SEED_LISTINGS = [
     city: 'Gujranwala',
     capacity_kw: null,
     warranty_years: 1,
-    image_url: INVERTER_IMAGE,
+    image_url: BATTERY_IMAGE,
     description: 'Brand new Phoenix TX-1800 Tubular Tall batteries specially engineered for heavy solar backup and UPS systems. 1-year replacement card warranty included.',
     featured: false,
     seller_name: 'Gujranwala Traders',
@@ -222,7 +222,7 @@ export const SEED_LISTINGS = [
     city: 'Rawalpindi',
     capacity_kw: null,
     warranty_years: 1,
-    image_url: INVERTER_IMAGE,
+    image_url: BATTERY_IMAGE,
     description: 'Original Osaka TR-2000 Tall Tubular battery. High acid volume for longer backup, deep discharge recovery, and 12-month manufacturer warranty.',
     featured: false,
     seller_name: 'Potohar Solar Emporium',

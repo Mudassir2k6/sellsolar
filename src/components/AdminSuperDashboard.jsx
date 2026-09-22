@@ -71,12 +71,23 @@ import { formatPrice } from '../lib/constants';
 import AdminDailyRatesModule from './AdminDailyRatesModule';
 import AdminDealersModule from './AdminDealersModule';
 import AdminInstallationsModule from './AdminInstallationsModule';
+import {
+  getEquipmentFallbackImage,
+  SOLAR_PANEL_IMAGE,
+  INVERTER_IMAGE,
+  BATTERY_IMAGE,
+  COMPLETE_SYSTEM_IMAGE,
+  SELL_SOLAR_PROMO_IMAGE,
+  TURNKEY_INSTALL_PROMO_IMAGE
+} from '../utils/solarImages';
 
 const SOLAR_PRESET_IMAGES = [
-  { label: 'Solar Field', url: 'https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=600&q=80' },
-  { label: 'Rooftop Setup', url: 'https://images.unsplash.com/photo-1508873696983-2df5293cb32f?auto=format&fit=crop&w=600&q=80' },
-  { label: 'Inverters', url: 'https://images.unsplash.com/photo-1613665813446-82a78c468a1d?auto=format&fit=crop&w=600&q=80' },
-  { label: 'Green Energy', url: 'https://images.unsplash.com/photo-1497440001374-f26997328c1b?auto=format&fit=crop&w=600&q=80' },
+  { label: 'Solar Field (SVG)', url: SELL_SOLAR_PROMO_IMAGE },
+  { label: 'Turnkey Rooftop (SVG)', url: TURNKEY_INSTALL_PROMO_IMAGE },
+  { label: 'Solar Panel Hi-MO (SVG)', url: SOLAR_PANEL_IMAGE },
+  { label: 'Hybrid Inverter (SVG)', url: INVERTER_IMAGE },
+  { label: 'Lithium Battery (SVG)', url: BATTERY_IMAGE },
+  { label: 'Complete System (SVG)', url: COMPLETE_SYSTEM_IMAGE },
 ];
 
 export const SYSTEM_PAGES = [
@@ -2696,7 +2707,16 @@ export default function AdminSuperDashboard({
                           <td className="p-3.5">
                             <div className="flex items-center gap-2.5">
                               {item.image_url ? (
-                                <img src={item.image_url} alt="" className="w-9 h-9 rounded-xl object-cover shrink-0" />
+                                <img
+                                  src={item.image_url}
+                                  alt=""
+                                  referrerPolicy="no-referrer"
+                                  className="w-9 h-9 rounded-xl object-cover shrink-0"
+                                  onError={(e) => {
+                                    e.currentTarget.onerror = null;
+                                    e.currentTarget.src = getEquipmentFallbackImage(item.category, item.title);
+                                  }}
+                                />
                               ) : null}
                               <div className="min-w-0">
                                 <p className="font-bold text-gray-900 dark:text-white truncate max-w-xs">{item.title}</p>
@@ -3158,7 +3178,10 @@ export default function AdminSuperDashboard({
                                               alt={card.title}
                                               className="w-full h-full object-cover"
                                               onError={(e) => {
-                                                e.target.style.display = 'none';
+                                                e.currentTarget.onerror = null;
+                                                e.currentTarget.src = (card.id === 'card-turnkey-install' || card.ctaLink === 'installation')
+                                                  ? TURNKEY_INSTALL_PROMO_IMAGE
+                                                  : SELL_SOLAR_PROMO_IMAGE;
                                               }}
                                             />
                                           ) : (
@@ -4018,7 +4041,16 @@ export default function AdminSuperDashboard({
                           <td className="p-3.5">
                             <div className="flex items-center gap-3">
                               {item.image_url ? (
-                                <img src={item.image_url} alt="" className="w-10 h-10 rounded-xl object-cover shrink-0" />
+                                <img
+                                  src={item.image_url}
+                                  alt=""
+                                  referrerPolicy="no-referrer"
+                                  className="w-10 h-10 rounded-xl object-cover shrink-0"
+                                  onError={(e) => {
+                                    e.currentTarget.onerror = null;
+                                    e.currentTarget.src = getEquipmentFallbackImage(item.category, item.title);
+                                  }}
+                                />
                               ) : null}
                               <div>
                                 <p className="font-bold text-gray-900 dark:text-white truncate max-w-xs">{item.title}</p>
@@ -5128,7 +5160,16 @@ export default function AdminSuperDashboard({
                           <div className="flex items-start gap-3 mb-3">
                             <div className="w-16 h-16 rounded-xl bg-gray-100 dark:bg-gray-800 shrink-0 overflow-hidden flex items-center justify-center">
                               {ad.image_url ? (
-                                <img src={ad.image_url} alt={ad.title} className="w-full h-full object-cover" />
+                                <img
+                                  src={ad.image_url}
+                                  alt={ad.title}
+                                  referrerPolicy="no-referrer"
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    e.currentTarget.onerror = null;
+                                    e.currentTarget.src = getEquipmentFallbackImage(ad.category, ad.title);
+                                  }}
+                                />
                               ) : (
                                 <Package className="w-6 h-6 text-gray-400" />
                               )}

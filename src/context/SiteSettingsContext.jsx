@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { SELL_SOLAR_PROMO_IMAGE, TURNKEY_INSTALL_PROMO_IMAGE } from '../utils/solarImages';
 
 const SITE_SETTINGS_KEY = 'sellsolar_site_settings';
 
@@ -81,7 +82,7 @@ export const DEFAULT_SITE_SETTINGS = {
         ],
         ctaText: 'Post an Ad — Free',
         ctaLink: 'post-ad',
-        imageUrl: 'https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=600&q=80',
+        imageUrl: SELL_SOLAR_PROMO_IMAGE,
         enabled: true,
       },
       {
@@ -98,7 +99,7 @@ export const DEFAULT_SITE_SETTINGS = {
         ],
         ctaText: 'Request Installation',
         ctaLink: 'installation',
-        imageUrl: 'https://images.unsplash.com/photo-1508873696983-2df5293cb32f?auto=format&fit=crop&w=600&q=80',
+        imageUrl: TURNKEY_INSTALL_PROMO_IMAGE,
         enabled: true,
       }
     ],
@@ -148,7 +149,17 @@ export function SiteSettingsProvider({ children }) {
                 ...(parsed.homePageCms?.hero || {}),
               },
               cards: Array.isArray(parsed.homePageCms?.cards) && parsed.homePageCms.cards.length > 0
-                ? parsed.homePageCms.cards
+                ? parsed.homePageCms.cards.map((c) => {
+                    if (!c.imageUrl || c.imageUrl.includes('images.unsplash.com')) {
+                      return {
+                        ...c,
+                        imageUrl: (c.id === 'card-turnkey-install' || c.ctaLink === 'installation')
+                          ? TURNKEY_INSTALL_PROMO_IMAGE
+                          : SELL_SOLAR_PROMO_IMAGE
+                      };
+                    }
+                    return c;
+                  })
                 : prev.homePageCms.cards,
               calculatorBanner: {
                 ...prev.homePageCms.calculatorBanner,

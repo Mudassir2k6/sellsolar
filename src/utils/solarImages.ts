@@ -1,7 +1,22 @@
 // High-fidelity, self-contained SVG Data URIs for Solar Equipment
-// These never fail to load regardless of network, ad-blockers, or sandbox restrictions.
+// Encoded as standard base64 data URIs so they load reliably across all browsers, webviews, and iframes.
 
-export const SOLAR_PANEL_IMAGE = `data:image/svg+xml;utf8,${encodeURIComponent(`
+function toSvgDataUri(svg: string): string {
+  const clean = svg.trim();
+  if (typeof Buffer !== 'undefined') {
+    return `data:image/svg+xml;base64,${Buffer.from(clean).toString('base64')}`;
+  }
+  if (typeof btoa !== 'undefined') {
+    try {
+      return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(clean)))}`;
+    } catch {
+      return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(clean)}`;
+    }
+  }
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(clean)}`;
+}
+
+export const SOLAR_PANEL_IMAGE = toSvgDataUri(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
   <defs>
     <linearGradient id="skyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -46,7 +61,6 @@ export const SOLAR_PANEL_IMAGE = `data:image/svg+xml;utf8,${encodeURIComponent(`
     <rect x="12" y="12" width="496" height="396" rx="6" fill="#020617"/>
 
     <!-- Solar Cells Matrix (6x10 Mono Cells) -->
-    <!-- Rows -->
     <g fill="url(#cellGrad)" stroke="#38bdf8" stroke-width="1.2" stroke-opacity="0.6">
       <!-- Col 1 -->
       <rect x="18" y="18" width="76" height="60" rx="3"/>
@@ -110,7 +124,7 @@ export const SOLAR_PANEL_IMAGE = `data:image/svg+xml;utf8,${encodeURIComponent(`
   <g transform="translate(60, 520)">
     <rect width="220" height="42" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
     <circle cx="24" cy="21" r="10" fill="#f59e0b"/>
-    <text x="44" y="26" fill="#ffffff" font-family="system-ui, sans-serif" font-size="14" font-weight="bold">Longi Hi-MO X6 585W</text>
+    <text x="44" y="26" fill="#ffffff" font-family="system-ui, sans-serif" font-size="14" font-weight="bold">Longi / Jinko / Canadian</text>
   </g>
 
   <g transform="translate(520, 520)">
@@ -118,9 +132,9 @@ export const SOLAR_PANEL_IMAGE = `data:image/svg+xml;utf8,${encodeURIComponent(`
     <text x="32" y="26" fill="#34d399" font-family="system-ui, sans-serif" font-size="13" font-weight="bold">Tier-1 TopCon N-Type</text>
   </g>
 </svg>
-`)}`;
+`);
 
-export const INVERTER_IMAGE = `data:image/svg+xml;utf8,${encodeURIComponent(`
+export const INVERTER_IMAGE = toSvgDataUri(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
   <defs>
     <linearGradient id="invBg" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -164,8 +178,8 @@ export const INVERTER_IMAGE = `data:image/svg+xml;utf8,${encodeURIComponent(`
     <rect x="0" y="0" width="320" height="18" rx="10" fill="url(#orangeAccent)"/>
 
     <!-- Brand Header -->
-    <text x="160" y="52" fill="#0f172a" font-family="system-ui, sans-serif" font-size="22" font-weight="900" text-anchor="middle" letter-spacing="2">INVEREX</text>
-    <text x="160" y="72" fill="#ea580c" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" letter-spacing="1">NITROX 6KW HYBRID</text>
+    <text x="160" y="52" fill="#0f172a" font-family="system-ui, sans-serif" font-size="22" font-weight="900" text-anchor="middle" letter-spacing="2">INVEREX / CROWN</text>
+    <text x="160" y="72" fill="#ea580c" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" letter-spacing="1">HYBRID ON/OFF GRID SMART INVERTER</text>
 
     <!-- LCD Glass Display Window -->
     <rect x="35" y="95" width="250" height="180" rx="14" fill="url(#lcdGrad)" stroke="#334155" stroke-width="3"/>
@@ -173,7 +187,7 @@ export const INVERTER_IMAGE = `data:image/svg+xml;utf8,${encodeURIComponent(`
 
     <!-- Screen UI Graphics -->
     <g fill="#ffffff" font-family="system-ui, sans-serif">
-      <text x="60" y="132" font-size="12" font-weight="bold" opacity="0.9">SOLAR PV POWER</text>
+      <text x="60" y="132" font-size="12" font-weight="bold" opacity="0.9">SOLAR PV GENERATION</text>
       <text x="60" y="165" font-size="26" font-weight="900">5,840 <tspan font-size="14">W</tspan></text>
       
       <line x1="60" y1="180" x2="255" y2="180" stroke="#bae6fd" stroke-width="1.5" opacity="0.5"/>
@@ -218,9 +232,59 @@ export const INVERTER_IMAGE = `data:image/svg+xml;utf8,${encodeURIComponent(`
     <text x="25" y="26" fill="#f59e0b" font-family="system-ui, sans-serif" font-size="13" font-weight="bold">Net-Metering IP65</text>
   </g>
 </svg>
-`)}`;
+`);
 
-export const COMPLETE_SYSTEM_IMAGE = `data:image/svg+xml;utf8,${encodeURIComponent(`
+export const BATTERY_IMAGE = toSvgDataUri(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="batBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="batCase" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="50%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="emeraldLed" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#batBg)"/>
+  <circle cx="400" cy="270" r="220" fill="#10b981" opacity="0.12"/>
+  <g transform="translate(180, 80)">
+    <rect x="0" y="0" width="440" height="380" rx="20" fill="url(#batCase)" stroke="#334155" stroke-width="3"/>
+    <rect x="0" y="0" width="440" height="24" rx="10" fill="#047857"/>
+    <text x="220" y="65" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="22" font-weight="900" text-anchor="middle" letter-spacing="2">NARADA / PHOENIX / OSAKA</text>
+    <text x="220" y="88" fill="#34d399" font-family="system-ui, sans-serif" font-size="13" font-weight="bold" text-anchor="middle" letter-spacing="1">48V 100Ah LiFePO4 / TUBULAR DEEP CYCLE</text>
+    <rect x="40" y="120" width="360" height="150" rx="12" fill="#020617" stroke="#1e293b" stroke-width="2"/>
+    <text x="65" y="160" fill="#94a3b8" font-family="sans-serif" font-size="12" font-weight="bold">BATTERY STATUS</text>
+    <text x="65" y="195" fill="#ffffff" font-family="sans-serif" font-size="28" font-weight="900">53.4 V <tspan font-size="14" fill="#10b981">100% S.O.C</tspan></text>
+    <g transform="translate(65, 215)">
+      <rect x="0" y="0" width="55" height="16" rx="4" fill="url(#emeraldLed)"/>
+      <rect x="62" y="0" width="55" height="16" rx="4" fill="url(#emeraldLed)"/>
+      <rect x="124" y="0" width="55" height="16" rx="4" fill="url(#emeraldLed)"/>
+      <rect x="186" y="0" width="55" height="16" rx="4" fill="url(#emeraldLed)"/>
+      <rect x="248" y="0" width="55" height="16" rx="4" fill="url(#emeraldLed)"/>
+    </g>
+    <circle cx="80" cy="330" r="16" fill="#ef4444" stroke="#f87171" stroke-width="2"/>
+    <text x="80" y="335" fill="#ffffff" font-family="sans-serif" font-size="16" font-weight="bold" text-anchor="middle">+</text>
+    <circle cx="360" cy="330" r="16" fill="#1e293b" stroke="#64748b" stroke-width="2"/>
+    <text x="360" y="335" fill="#ffffff" font-family="sans-serif" font-size="16" font-weight="bold" text-anchor="middle">-</text>
+  </g>
+  <g transform="translate(60, 520)">
+    <rect width="220" height="42" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+    <text x="25" y="26" fill="#34d399" font-family="system-ui, sans-serif" font-size="13" font-weight="bold">6,000+ Cycle Life</text>
+  </g>
+  <g transform="translate(520, 520)">
+    <rect width="220" height="42" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+    <text x="25" y="26" fill="#f59e0b" font-family="system-ui, sans-serif" font-size="13" font-weight="bold">Built-in Smart BMS</text>
+  </g>
+</svg>
+`);
+
+export const COMPLETE_SYSTEM_IMAGE = toSvgDataUri(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
   <defs>
     <linearGradient id="sky" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -307,17 +371,141 @@ export const COMPLETE_SYSTEM_IMAGE = `data:image/svg+xml;utf8,${encodeURICompone
     <text x="20" y="28" fill="#34d399" font-family="system-ui, sans-serif" font-size="13" font-weight="bold">Save 1,200+ Units / Month</text>
   </g>
 </svg>
-`)}`;
+`);
+
+export const SELL_SOLAR_PROMO_IMAGE = toSvgDataUri(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <linearGradient id="sellBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="60%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#064e3b"/>
+    </linearGradient>
+    <linearGradient id="goldSun" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="pnlG" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="450" fill="url(#sellBg)"/>
+  <circle cx="680" cy="90" r="140" fill="url(#goldSun)" opacity="0.25"/>
+  <circle cx="680" cy="90" r="60" fill="url(#goldSun)"/>
+  
+  <g transform="translate(80, 100)">
+    <rect x="0" y="20" width="220" height="150" rx="8" fill="url(#pnlG)" stroke="#38bdf8" stroke-width="2" transform="skewY(-4)"/>
+    <rect x="180" y="0" width="220" height="150" rx="8" fill="url(#pnlG)" stroke="#38bdf8" stroke-width="2" transform="skewY(-4)"/>
+    <rect x="360" y="-20" width="220" height="150" rx="8" fill="url(#pnlG)" stroke="#38bdf8" stroke-width="2" transform="skewY(-4)"/>
+  </g>
+  
+  <g transform="translate(50, 310)">
+    <rect width="360" height="80" rx="14" fill="#0f172a" opacity="0.95" stroke="#334155" stroke-width="2"/>
+    <text x="25" y="38" fill="#ffffff" font-family="system-ui, sans-serif" font-size="20" font-weight="900">Post Free Solar Ads</text>
+    <text x="25" y="62" fill="#34d399" font-family="system-ui, sans-serif" font-size="13" font-weight="bold">Connect with 10,000+ Monthly Buyers</text>
+  </g>
+  <g transform="translate(460, 310)">
+    <rect width="290" height="80" rx="14" fill="#065f46" opacity="0.95" stroke="#10b981" stroke-width="2"/>
+    <text x="25" y="38" fill="#ffffff" font-family="system-ui, sans-serif" font-size="18" font-weight="900">0% Commission</text>
+    <text x="25" y="62" fill="#a7f3d0" font-family="system-ui, sans-serif" font-size="13" font-weight="bold">Direct WhatsApp &amp; Call Inquiries</text>
+  </g>
+</svg>
+`);
+
+export const TURNKEY_INSTALL_PROMO_IMAGE = toSvgDataUri(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <linearGradient id="instBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16"/>
+      <stop offset="60%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#064e3b"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="450" fill="url(#instBg)"/>
+  
+  <g transform="translate(100, 40)">
+    <polygon points="50,220 300,70 550,220" fill="#1e293b" stroke="#334155" stroke-width="3"/>
+    <g transform="translate(120, 110) skewY(14) scale(0.9, 0.7)">
+      <rect x="0" y="0" width="70" height="50" fill="#0284c7" stroke="#67e8f9" stroke-width="1.5" rx="2"/>
+      <rect x="80" y="0" width="70" height="50" fill="#0284c7" stroke="#67e8f9" stroke-width="1.5" rx="2"/>
+      <rect x="160" y="0" width="70" height="50" fill="#0284c7" stroke="#67e8f9" stroke-width="1.5" rx="2"/>
+      <rect x="0" y="60" width="70" height="50" fill="#0284c7" stroke="#67e8f9" stroke-width="1.5" rx="2"/>
+      <rect x="80" y="60" width="70" height="50" fill="#0284c7" stroke="#67e8f9" stroke-width="1.5" rx="2"/>
+      <rect x="160" y="60" width="70" height="50" fill="#0284c7" stroke="#67e8f9" stroke-width="1.5" rx="2"/>
+    </g>
+    <rect x="90" y="220" width="420" height="100" fill="#f8fafc"/>
+    <rect x="120" y="240" width="40" height="50" fill="#0284c7" rx="3"/>
+    <rect x="420" y="240" width="40" height="50" fill="#0284c7" rx="3"/>
+    <rect x="280" y="235" width="40" height="50" fill="#0f172a" rx="4"/>
+    <circle cx="300" cy="250" r="8" fill="#10b981"/>
+    <text x="300" y="272" fill="#34d399" font-family="sans-serif" font-size="8" font-weight="bold" text-anchor="middle">NET</text>
+  </g>
+  
+  <g transform="translate(50, 310)">
+    <rect width="360" height="80" rx="14" fill="#0f172a" opacity="0.95" stroke="#334155" stroke-width="2"/>
+    <text x="25" y="38" fill="#ffffff" font-family="system-ui, sans-serif" font-size="20" font-weight="900">Turnkey EPC Installation</text>
+    <text x="25" y="62" fill="#38bdf8" font-family="system-ui, sans-serif" font-size="13" font-weight="bold">On-Grid, Hybrid &amp; Commercial Systems</text>
+  </g>
+  <g transform="translate(460, 310)">
+    <rect width="290" height="80" rx="14" fill="#065f46" opacity="0.95" stroke="#10b981" stroke-width="2"/>
+    <text x="25" y="38" fill="#ffffff" font-family="system-ui, sans-serif" font-size="18" font-weight="900">Green Net-Metering</text>
+    <text x="25" y="62" fill="#a7f3d0" font-family="system-ui, sans-serif" font-size="13" font-weight="bold">DISCO &amp; NEPRA Approval Handled</text>
+  </g>
+</svg>
+`);
 
 export function getEquipmentFallbackImage(category: string, title?: string): string {
   const t = (title || '').toLowerCase();
   const cat = (category || '').toLowerCase();
 
-  if (cat === 'panel' || t.includes('panel') || t.includes('longi') || t.includes('jinko') || t.includes('canadian')) {
+  if (
+    cat.includes('battery') ||
+    t.includes('battery') ||
+    t.includes('narada') ||
+    t.includes('phoenix') ||
+    t.includes('osaka') ||
+    t.includes('daewoo') ||
+    t.includes('pylontech') ||
+    t.includes('lifepo4') ||
+    t.includes('tubular')
+  ) {
+    return BATTERY_IMAGE;
+  }
+
+  if (
+    cat === 'panel' ||
+    cat.includes('panel') ||
+    t.includes('panel') ||
+    t.includes('longi') ||
+    t.includes('jinko') ||
+    t.includes('canadian') ||
+    t.includes('trina') ||
+    t.includes('bifacial') ||
+    t.includes('topcon') ||
+    t.includes('mono') ||
+    t.includes('himo')
+  ) {
     return SOLAR_PANEL_IMAGE;
   }
-  if (cat === 'inverter' || t.includes('inverter') || t.includes('nitrox') || t.includes('growatt') || t.includes('huawei')) {
+
+  if (
+    cat === 'inverter' ||
+    cat.includes('inverter') ||
+    t.includes('inverter') ||
+    t.includes('nitrox') ||
+    t.includes('growatt') ||
+    t.includes('huawei') ||
+    t.includes('inverex') ||
+    t.includes('crown') ||
+    t.includes('fronius') ||
+    t.includes('knox') ||
+    t.includes('goodwe') ||
+    t.includes('solis') ||
+    t.includes('hybrid')
+  ) {
     return INVERTER_IMAGE;
   }
+
   return COMPLETE_SYSTEM_IMAGE;
 }

@@ -2625,12 +2625,12 @@ function hx({
                   jsxs("div", {
                     className: "mt-6 space-y-2.5 text-xs sm:text-sm",
                     children: [
-                      /* WhatsApp direct link */
+                      /* WhatsApp direct link (Hidden per user request) */
                       jsxs("a", {
                         href: waUrl,
                         target: "_blank",
                         rel: "noopener noreferrer",
-                        className: "flex items-center gap-2.5 text-gray-300 hover:text-emerald-400 transition-colors group cursor-pointer",
+                        className: "hidden",
                         children: [
                           jsx(MessageCircle, { className: "h-4 w-4 text-emerald-400 group-hover:scale-110 transition-transform shrink-0" }),
                           jsxs("span", {
@@ -2651,10 +2651,10 @@ function hx({
                           jsx("span", { className: "group-hover:underline", children: supportEmail })
                         ]
                       }),
-                      /* Phone Call */
+                      /* Phone Call (Hidden per user request) */
                       jsxs("a", {
                         href: `tel:${supportPhoneStr.replace(/\s+/g, "")}`,
-                        className: "flex items-center gap-2.5 text-gray-300 hover:text-white transition-colors group cursor-pointer",
+                        className: "hidden",
                         children: [
                           jsx(Phone, { className: "h-4 w-4 text-amber-400 group-hover:scale-110 transition-transform shrink-0" }),
                           jsx("span", { children: supportPhoneStr })

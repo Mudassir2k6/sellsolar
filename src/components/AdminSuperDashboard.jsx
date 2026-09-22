@@ -59,6 +59,7 @@ import {
   Copy,
   Download,
   Upload,
+  Menu,
 } from 'lucide-react';
 import { useAuth, USER_ROLES, getStoredUsers, saveStoredUsers, DEFAULT_ADMIN_ID, DEFAULT_ADMIN_EMAIL } from '../context/AuthContext';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
@@ -67,6 +68,9 @@ import { useSiteSettings, DEFAULT_SITE_SETTINGS } from '../context/SiteSettingsC
 import { getInboxMessages, fetchSharedInboxMessages, createDirectMessage, replyToInboxMessage, markMessageAsRead, deleteInboxMessage } from '../services/inboxService';
 import { getAnalyticsSummary } from '../services/analyticsService';
 import { formatPrice } from '../lib/constants';
+import AdminDailyRatesModule from './AdminDailyRatesModule';
+import AdminDealersModule from './AdminDealersModule';
+import AdminInstallationsModule from './AdminInstallationsModule';
 
 const SOLAR_PRESET_IMAGES = [
   { label: 'Solar Field', url: 'https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=600&q=80' },
@@ -164,6 +168,16 @@ export default function AdminSuperDashboard({
   const [userSearchQuery, setUserSearchQuery] = useState('');
   const [userRoleFilter, setUserRoleFilter] = useState('all'); // 'all' | 'super_admin' | 'admin' | 'dealer' | 'customer'
   const [isAddingUser, setIsAddingUser] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const selectTab = (tabId) => {
+    setActiveTab(tabId);
+    setMobileMenuOpen(false);
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   const [newUserForm, setNewUserForm] = useState({
     name: '',
     email: '',
@@ -1101,22 +1115,33 @@ export default function AdminSuperDashboard({
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex flex-col">
       {/* Top Header Navigation */}
-      <header className="sticky top-0 z-30 border-b border-gray-200 dark:border-gray-800 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md px-4 sm:px-6 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <header className="sticky top-0 z-30 border-b border-gray-200 dark:border-gray-800 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md px-3 sm:px-6 h-16 flex items-center justify-between">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          {/* Mobile navigation toggle button */}
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen((prev) => !prev)}
+            className="md:hidden p-2 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-200 transition-colors shrink-0 shadow-2xs"
+            title={mobileMenuOpen ? 'Close Menu' : 'Open Navigation Menu'}
+            aria-label="Toggle navigation menu"
+          >
+            {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          </button>
+
           <button
             type="button"
             onClick={onBack}
-            className="p-2 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors"
+            className="p-2 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors shrink-0"
             title="Back to Marketplace"
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-base sm:text-lg font-black tracking-tight text-gray-900 dark:text-white">
+          <div className="min-w-0 truncate">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className="text-base sm:text-lg font-black tracking-tight text-gray-900 dark:text-white shrink-0">
                 Sell<span className="text-amber-500">Solar</span>
               </span>
-              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+              <span className={`px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-wider truncate max-w-[130px] sm:max-w-none ${
                 isSuperAdmin
                   ? 'bg-purple-100 dark:bg-purple-950/70 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800'
                   : isAdmin
@@ -1126,23 +1151,23 @@ export default function AdminSuperDashboard({
                   : 'bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
               }`}>
                 {isSuperAdmin
-                  ? '👑 Super Admin Dashboard'
+                  ? '👑 Super Admin'
                   : isAdmin
-                  ? '🛡️ Admin Dashboard'
+                  ? '🛡️ Admin'
                   : isDealer
-                  ? '🏬 Verified Dealer Dashboard'
-                  : '👤 My Dashboard'}
+                  ? '🏬 Dealer'
+                  : '👤 Dashboard'}
               </span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3">
           {onPostAd && (
             <button
               type="button"
               onClick={onPostAd}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-xs transition-colors"
+              className="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-xs transition-colors shrink-0"
             >
               <PlusCircle className="h-3.5 w-3.5" />
               <span>Post Ad</span>
@@ -1165,18 +1190,180 @@ export default function AdminSuperDashboard({
           <button
             type="button"
             onClick={onBack}
-            className="btn-secondary text-xs px-2.5 sm:px-3 py-1.5"
+            className="btn-secondary text-xs px-2 sm:px-3 py-1.5 shrink-0"
           >
-            Marketplace ↗
+            <span className="hidden sm:inline">Marketplace ↗</span>
+            <span className="sm:hidden">Exit</span>
           </button>
         </div>
       </header>
 
+      {/* Mobile Horizontal Subnav Quick Switcher */}
+      <div className="md:hidden sticky top-16 z-20 border-b border-gray-200 dark:border-gray-800 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md px-2.5 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar shadow-2xs">
+        <button
+          type="button"
+          onClick={() => setMobileMenuOpen(true)}
+          className="px-2.5 py-1.5 rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-200 text-xs font-bold shrink-0 flex items-center gap-1.5 active:scale-95 transition-transform"
+        >
+          <Menu className="h-3.5 w-3.5" />
+          <span>All Tabs</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => selectTab('dashboard')}
+          className={`px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 transition-colors ${
+            activeTab === 'dashboard'
+              ? 'bg-amber-500 text-white shadow-xs'
+              : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+          }`}
+        >
+          Overview
+        </button>
+
+        <button
+          type="button"
+          onClick={() => selectTab('my-ads')}
+          className={`px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 flex items-center gap-1.5 transition-colors ${
+            activeTab === 'my-ads'
+              ? 'bg-amber-500 text-white shadow-xs'
+              : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+          }`}
+        >
+          <span>My Ads</span>
+          <span className="text-[10px] opacity-80 font-mono">({myAds.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => selectTab('inbox')}
+          className={`px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 flex items-center gap-1.5 transition-colors ${
+            activeTab === 'inbox'
+              ? 'bg-amber-500 text-white shadow-xs'
+              : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+          }`}
+        >
+          <span>Inbox</span>
+          {unreadInboxCount > 0 && (
+            <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-rose-500 text-white font-black">
+              {unreadInboxCount}
+            </span>
+          )}
+        </button>
+
+        {(isSuperAdmin || isAdmin) && (
+          <>
+            <button
+              type="button"
+              onClick={() => selectTab('products')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 transition-colors ${
+                activeTab === 'products'
+                  ? 'bg-amber-500 text-white shadow-xs'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+              }`}
+            >
+              Moderation ({listingsList.length})
+            </button>
+
+            <button
+              type="button"
+              onClick={() => selectTab('daily-rates')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 transition-colors ${
+                activeTab === 'daily-rates'
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+              }`}
+            >
+              Daily Rates
+            </button>
+
+            <button
+              type="button"
+              onClick={() => selectTab('dealers-directory')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 transition-colors ${
+                activeTab === 'dealers-directory'
+                  ? 'bg-primary-600 text-white shadow-xs'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+              }`}
+            >
+              Dealers
+            </button>
+
+            <button
+              type="button"
+              onClick={() => selectTab('pages')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 transition-colors ${
+                activeTab === 'pages'
+                  ? 'bg-amber-500 text-white shadow-xs'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+              }`}
+            >
+              CMS Pages
+            </button>
+
+            <button
+              type="button"
+              onClick={() => selectTab('settings')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 transition-colors ${
+                activeTab === 'settings'
+                  ? 'bg-purple-600 text-white shadow-xs'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+              }`}
+            >
+              Site Settings
+            </button>
+          </>
+        )}
+
+        <button
+          type="button"
+          onClick={() => selectTab('profile')}
+          className={`px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 transition-colors ${
+            activeTab === 'profile'
+              ? 'bg-amber-500 text-white shadow-xs'
+              : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+          }`}
+        >
+          Profile
+        </button>
+      </div>
+
       {/* Main Unified Dashboard Body */}
-      <div className="flex-1 flex flex-col md:flex-row">
-        {/* Navigation Sidebar */}
-        <aside className="w-full md:w-64 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shrink-0 flex flex-col justify-between">
+      <div className="flex-1 flex flex-col md:flex-row relative">
+        {/* Mobile Backdrop Overlay */}
+        {mobileMenuOpen && (
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 md:hidden transition-opacity"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
+        )}
+
+        {/* Navigation Sidebar (Desktop persistent sidebar + Mobile slide-out drawer) */}
+        <aside
+          className={`fixed md:sticky top-0 md:top-16 left-0 z-50 md:z-10 h-full md:h-[calc(100vh-4rem)] w-72 md:w-64 max-w-[85vw] md:max-w-none border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shrink-0 flex flex-col justify-between overflow-y-auto transition-transform duration-300 ease-in-out ${
+            mobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'
+          }`}
+        >
           <nav className="space-y-1">
+            {/* Mobile Drawer Close Header */}
+            <div className="flex md:hidden items-center justify-between pb-3 mb-3 border-b border-gray-100 dark:border-gray-800">
+              <div className="flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" />
+                <span className="text-xs font-black uppercase tracking-wider text-gray-900 dark:text-white">
+                  Navigation Menu
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-1.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                aria-label="Close menu"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
             {/* User card in sidebar */}
             <div className="mb-4 p-3 rounded-2xl bg-slate-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-800 flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 text-white font-black flex items-center justify-center text-sm shadow-xs">
@@ -1193,7 +1380,7 @@ export default function AdminSuperDashboard({
             {/* TAB 1: OVERVIEW */}
             <button
               type="button"
-              onClick={() => setActiveTab('dashboard')}
+              onClick={() => selectTab('dashboard')}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
                 activeTab === 'dashboard'
                   ? 'bg-amber-500 text-white shadow-sm font-black'
@@ -1209,7 +1396,7 @@ export default function AdminSuperDashboard({
             {/* TAB 2: MY ADS & INVENTORY */}
             <button
               type="button"
-              onClick={() => setActiveTab('my-ads')}
+              onClick={() => selectTab('my-ads')}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
                 activeTab === 'my-ads'
                   ? 'bg-amber-500 text-white shadow-sm font-black'
@@ -1231,7 +1418,7 @@ export default function AdminSuperDashboard({
             {(isSuperAdmin || isAdmin) && (
               <button
                 type="button"
-                onClick={() => setActiveTab('products')}
+                onClick={() => selectTab('products')}
                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
                   activeTab === 'products'
                     ? 'bg-amber-500 text-white shadow-sm font-black'
@@ -1249,7 +1436,7 @@ export default function AdminSuperDashboard({
             {/* TAB 4: INBOX & INQUIRIES */}
             <button
               type="button"
-              onClick={() => setActiveTab('inbox')}
+              onClick={() => selectTab('inbox')}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
                 activeTab === 'inbox'
                   ? 'bg-amber-500 text-white shadow-sm font-black'
@@ -1271,7 +1458,7 @@ export default function AdminSuperDashboard({
             {(isSuperAdmin || isAdmin) && (
               <button
                 type="button"
-                onClick={() => setActiveTab('analytics')}
+                onClick={() => selectTab('analytics')}
                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
                   activeTab === 'analytics'
                     ? 'bg-amber-500 text-white shadow-sm font-black'
@@ -1289,7 +1476,7 @@ export default function AdminSuperDashboard({
             {(isSuperAdmin || isAdmin) && (
               <button
                 type="button"
-                onClick={() => setActiveTab('pages')}
+                onClick={() => selectTab('pages')}
                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
                   activeTab === 'pages'
                     ? 'bg-amber-500 text-white shadow-sm font-black'
@@ -1304,6 +1491,64 @@ export default function AdminSuperDashboard({
               </button>
             )}
 
+            {/* TAB 7: DAILY PRICE BENCHMARKS & SHEETS */}
+            {(isSuperAdmin || isAdmin) && (
+              <button
+                type="button"
+                onClick={() => selectTab('daily-rates')}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+                  activeTab === 'daily-rates'
+                    ? 'bg-emerald-600 text-white shadow-sm font-black'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <DollarSign className="h-4 w-4 text-emerald-500" />
+                  <span>Daily Prices & Sheets</span>
+                </div>
+                <span className="px-1.5 py-0.5 rounded-full text-[9px] bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 font-bold">
+                  Live
+                </span>
+              </button>
+            )}
+
+            {/* TAB 8: VERIFIED DEALERS DIRECTORY */}
+            {(isSuperAdmin || isAdmin) && (
+              <button
+                type="button"
+                onClick={() => selectTab('dealers-directory')}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+                  activeTab === 'dealers-directory'
+                    ? 'bg-primary-600 text-white shadow-sm font-black'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Store className="h-4 w-4 text-primary-500" />
+                  <span>Solar Dealers (80+)</span>
+                </div>
+                <span className="text-[10px] text-gray-400 font-mono">8 Cities</span>
+              </button>
+            )}
+
+            {/* TAB 9: TURNKEY INSTALLATION LEADS */}
+            {(isSuperAdmin || isAdmin) && (
+              <button
+                type="button"
+                onClick={() => selectTab('installation-leads')}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+                  activeTab === 'installation-leads'
+                    ? 'bg-indigo-600 text-white shadow-sm font-black'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Wrench className="h-4 w-4 text-indigo-500" />
+                  <span>Installation Leads</span>
+                </div>
+              </button>
+            )}
+
             {/* SUPER ADMIN & ADMIN ROLES TABS */}
             {(isSuperAdmin || isAdmin) && (
               <>
@@ -1313,7 +1558,7 @@ export default function AdminSuperDashboard({
 
                 <button
                   type="button"
-                  onClick={() => setActiveTab('roles')}
+                  onClick={() => selectTab('roles')}
                   className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
                     activeTab === 'roles'
                       ? 'bg-purple-600 text-white shadow-sm font-black'
@@ -1329,7 +1574,7 @@ export default function AdminSuperDashboard({
 
                 <button
                   type="button"
-                  onClick={() => setActiveTab('settings')}
+                  onClick={() => selectTab('settings')}
                   className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
                     activeTab === 'settings'
                       ? 'bg-purple-600 text-white shadow-sm font-black'
@@ -1350,7 +1595,7 @@ export default function AdminSuperDashboard({
             </div>
             <button
               type="button"
-              onClick={() => setActiveTab('profile')}
+              onClick={() => selectTab('profile')}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
                 activeTab === 'profile'
                   ? 'bg-amber-500 text-white shadow-sm font-black'
@@ -1369,7 +1614,10 @@ export default function AdminSuperDashboard({
             {onPostAd && (
               <button
                 type="button"
-                onClick={onPostAd}
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onPostAd();
+                }}
                 className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs font-bold shadow-sm hover:from-amber-600 hover:to-amber-700 transition-all"
               >
                 <PlusCircle className="h-4 w-4" />
@@ -1378,7 +1626,10 @@ export default function AdminSuperDashboard({
             )}
             <button
               type="button"
-              onClick={() => signOut?.()}
+              onClick={() => {
+                setMobileMenuOpen(false);
+                signOut?.();
+              }}
               className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
             >
               <LogOut className="h-3.5 w-3.5" />
@@ -1388,7 +1639,7 @@ export default function AdminSuperDashboard({
         </aside>
 
         {/* Content Area */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+        <main className="flex-1 min-w-0 p-3 sm:p-6 lg:p-8 overflow-y-auto">
           {/* TAB 1: DASHBOARD / OVERVIEW */}
           {activeTab === 'dashboard' && (
             <div className="space-y-6">
@@ -1605,6 +1856,68 @@ export default function AdminSuperDashboard({
                   </div>
                 )}
               </div>
+
+              {/* Quick Navigation Cards for Administrative Modules */}
+              {isSuperAdmin && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="p-5 rounded-2xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/40 dark:bg-emerald-950/20 flex flex-col justify-between">
+                    <div>
+                      <h3 className="font-bold text-sm text-emerald-950 dark:text-emerald-200 flex items-center gap-2">
+                        <DollarSign className="h-4 w-4 text-emerald-600" />
+                        Daily Rates & Benchmarks
+                      </h3>
+                      <p className="text-xs text-emerald-800/80 dark:text-emerald-300 mt-1">
+                        Adjust official Islamabad PKR/Watt panel rates, inverters, and lithium storage prices live.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('daily-rates')}
+                      className="mt-4 px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors"
+                    >
+                      Update Benchmark Rates
+                    </button>
+                  </div>
+
+                  <div className="p-5 rounded-2xl border border-primary-200 dark:border-primary-900/60 bg-primary-50/40 dark:bg-primary-950/20 flex flex-col justify-between">
+                    <div>
+                      <h3 className="font-bold text-sm text-primary-950 dark:text-primary-200 flex items-center gap-2">
+                        <Store className="h-4 w-4 text-primary-600" />
+                        Solar Dealers Directory
+                      </h3>
+                      <p className="text-xs text-primary-800/80 dark:text-primary-300 mt-1">
+                        Manage 80+ certified verified solar dealers, authorized brands, and city showrooms.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('dealers-directory')}
+                      className="mt-4 px-4 py-2 rounded-xl text-xs font-bold bg-primary-600 hover:bg-primary-700 text-white transition-colors"
+                    >
+                      Manage Verified Dealers
+                    </button>
+                  </div>
+
+                  <div className="p-5 rounded-2xl border border-indigo-200 dark:border-indigo-900/60 bg-indigo-50/40 dark:bg-indigo-950/20 flex flex-col justify-between">
+                    <div>
+                      <h3 className="font-bold text-sm text-indigo-950 dark:text-indigo-200 flex items-center gap-2">
+                        <Wrench className="h-4 w-4 text-indigo-600" />
+                        Installation Leads
+                      </h3>
+                      <p className="text-xs text-indigo-800/80 dark:text-indigo-300 mt-1">
+                        Review customer site surveys, EPC requests, tracking codes, and WhatsApp dispatch.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('installation-leads')}
+                      className="mt-4 px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white transition-colors"
+                    >
+                      View Installation Leads
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* My Recent Listings on Overview */}
               <div className="p-6 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xs space-y-4">
@@ -2824,13 +3137,37 @@ export default function AdminSuperDashboard({
                                           )}
                                         </div>
                                         <div className="flex-1 w-full space-y-1.5">
-                                          <input
-                                            type="url"
-                                            value={card.imageUrl || ''}
-                                            onChange={(e) => handleUpdateHomeCard(cardIdx, 'imageUrl', e.target.value)}
-                                            className="input-field text-xs"
-                                            placeholder="Paste image URL (e.g. https://images.unsplash.com/...)"
-                                          />
+                                          <div className="flex items-center gap-2">
+                                            <input
+                                              type="url"
+                                              value={card.imageUrl || ''}
+                                              onChange={(e) => handleUpdateHomeCard(cardIdx, 'imageUrl', e.target.value)}
+                                              className="input-field text-xs flex-1"
+                                              placeholder="Paste image URL (e.g. https://images.unsplash.com/...)"
+                                            />
+                                            <label
+                                              className="px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 text-xs font-semibold flex items-center gap-1.5 cursor-pointer shrink-0 transition-colors shadow-2xs"
+                                              title="Upload image from device"
+                                            >
+                                              <Upload className="h-3.5 w-3.5 text-primary-600 dark:text-primary-400" />
+                                              <span>Upload</span>
+                                              <input
+                                                type="file"
+                                                accept="image/jpeg,image/png,image/webp,image/jpg"
+                                                className="hidden"
+                                                onChange={(e) => {
+                                                  const file = e.target.files?.[0];
+                                                  if (!file) return;
+                                                  const reader = new FileReader();
+                                                  reader.onload = (event) => {
+                                                    handleUpdateHomeCard(cardIdx, 'imageUrl', event.target?.result);
+                                                  };
+                                                  reader.readAsDataURL(file);
+                                                  e.target.value = '';
+                                                }}
+                                              />
+                                            </label>
+                                          </div>
                                           <div className="flex items-center gap-1.5 flex-wrap">
                                             <span className="text-[10px] text-gray-400">Quick Presets:</span>
                                             {SOLAR_PRESET_IMAGES.map((preset) => (
@@ -3124,21 +3461,51 @@ export default function AdminSuperDashboard({
                                   )}
                                 </div>
                                 <div className="flex-1 w-full space-y-1.5">
-                                  <input
-                                    type="url"
-                                    value={pageEditForm.homeCms?.hero?.heroImageUrl || ''}
-                                    onChange={(e) =>
-                                      setPageEditForm((prev) => ({
-                                        ...prev,
-                                        homeCms: {
-                                          ...prev.homeCms,
-                                          hero: { ...prev.homeCms?.hero, heroImageUrl: e.target.value },
-                                        },
-                                      }))
-                                    }
-                                    className="input-field text-xs"
-                                    placeholder="Paste background image URL (e.g. https://images.unsplash.com/...)"
-                                  />
+                                  <div className="flex items-center gap-2">
+                                    <input
+                                      type="url"
+                                      value={pageEditForm.homeCms?.hero?.heroImageUrl || ''}
+                                      onChange={(e) =>
+                                        setPageEditForm((prev) => ({
+                                          ...prev,
+                                          homeCms: {
+                                            ...prev.homeCms,
+                                            hero: { ...prev.homeCms?.hero, heroImageUrl: e.target.value },
+                                          },
+                                        }))
+                                      }
+                                      className="input-field text-xs flex-1"
+                                      placeholder="Paste background image URL (e.g. https://images.unsplash.com/...)"
+                                    />
+                                    <label
+                                      className="px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 text-xs font-semibold flex items-center gap-1.5 cursor-pointer shrink-0 transition-colors shadow-2xs"
+                                      title="Upload image from device"
+                                    >
+                                      <Upload className="h-3.5 w-3.5 text-primary-600 dark:text-primary-400" />
+                                      <span>Upload</span>
+                                      <input
+                                        type="file"
+                                        accept="image/jpeg,image/png,image/webp,image/jpg"
+                                        className="hidden"
+                                        onChange={(e) => {
+                                          const file = e.target.files?.[0];
+                                          if (!file) return;
+                                          const reader = new FileReader();
+                                          reader.onload = (event) => {
+                                            setPageEditForm((prev) => ({
+                                              ...prev,
+                                              homeCms: {
+                                                ...prev.homeCms,
+                                                hero: { ...prev.homeCms?.hero, heroImageUrl: event.target?.result },
+                                              },
+                                            }));
+                                          };
+                                          reader.readAsDataURL(file);
+                                          e.target.value = '';
+                                        }}
+                                      />
+                                    </label>
+                                  </div>
                                   <div className="flex items-center gap-1.5 flex-wrap">
                                     <span className="text-[10px] text-gray-400">Presets:</span>
                                     {SOLAR_PRESET_IMAGES.map((preset) => (
@@ -4324,6 +4691,72 @@ export default function AdminSuperDashboard({
 
                   <div>
                     <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                      Website Brand Logo (URL or Upload)
+                    </label>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                      <div className="w-14 h-14 shrink-0 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                        {cmsForm.logoUrl ? (
+                          <img
+                            src={cmsForm.logoUrl}
+                            alt="Logo preview"
+                            className="w-full h-full object-contain p-1"
+                            onError={(e) => { e.target.style.display = 'none'; }}
+                          />
+                        ) : (
+                          <span className="text-[10px] font-bold text-gray-400">No Logo</span>
+                        )}
+                      </div>
+                      <div className="flex-1 w-full space-y-1.5">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={cmsForm.logoUrl || ''}
+                            onChange={(e) => setCmsForm({ ...cmsForm, logoUrl: e.target.value })}
+                            placeholder="Paste custom logo URL or upload image file..."
+                            className="input-field text-xs flex-1"
+                          />
+                          <label
+                            className="px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 text-xs font-semibold flex items-center gap-1.5 cursor-pointer shrink-0 transition-colors shadow-2xs"
+                            title="Upload logo from device"
+                          >
+                            <Upload className="h-3.5 w-3.5 text-primary-600 dark:text-primary-400" />
+                            <span>Upload Logo</span>
+                            <input
+                              type="file"
+                              accept="image/jpeg,image/png,image/webp,image/svg+xml,image/jpg"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                const reader = new FileReader();
+                                reader.onload = (event) => {
+                                  setCmsForm({ ...cmsForm, logoUrl: event.target?.result });
+                                };
+                                reader.readAsDataURL(file);
+                                e.target.value = '';
+                              }}
+                            />
+                          </label>
+                          {cmsForm.logoUrl && (
+                            <button
+                              type="button"
+                              onClick={() => setCmsForm({ ...cmsForm, logoUrl: '' })}
+                              className="px-2.5 py-2 rounded-xl text-xs text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/50"
+                              title="Clear logo"
+                            >
+                              Remove
+                            </button>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-gray-400">
+                          Recommended: Transparent PNG, WebP or SVG format. Displays in the header navbar and branding areas.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
                       Hero Banner Heading
                     </label>
                     <input
@@ -4533,6 +4966,21 @@ export default function AdminSuperDashboard({
                 </div>
               </form>
             </div>
+          )}
+
+          {/* TAB 7: DAILY PRICE BENCHMARKS & SHEETS */}
+          {activeTab === 'daily-rates' && (isSuperAdmin || isAdmin) && (
+            <AdminDailyRatesModule />
+          )}
+
+          {/* TAB 8: VERIFIED SOLAR DEALERS DIRECTORY */}
+          {activeTab === 'dealers-directory' && (isSuperAdmin || isAdmin) && (
+            <AdminDealersModule />
+          )}
+
+          {/* TAB 9: TURNKEY SOLAR INSTALLATION LEADS */}
+          {activeTab === 'installation-leads' && (isSuperAdmin || isAdmin) && (
+            <AdminInstallationsModule />
           )}
 
           {/* TAB: MY SOLAR ADS */}

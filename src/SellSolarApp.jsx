@@ -10,6 +10,7 @@ import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
 import AuthPage from './views/AuthPage';
 import PasswordPage from './views/PasswordPage';
 import TodayPricesPage from './views/TodayPricesPage';
+import DailyMarketRates from './components/DailyMarketRates';
 import LoadCalculatorPage from './views/LoadCalculatorPage';
 import SolarLoadCalculator from './components/SolarLoadCalculator';
 import FloatingPostAdButton from './components/FloatingPostAdButton';
@@ -21,6 +22,7 @@ import { getInboxMessages } from './services/inboxService';
 import {
   ArrowLeft,
   ArrowRight,
+  ArrowUp,
   Award,
   BadgeCheck,
   BatteryCharging,
@@ -41,6 +43,7 @@ import {
   DollarSign,
   Eye,
   EyeOff,
+  Facebook,
   FilePen,
   FileText,
   Filter,
@@ -49,8 +52,10 @@ import {
   Headphones,
   Heart,
   Image,
+  Instagram,
   Layers,
   LayoutDashboard,
+  Linkedin,
   LoaderCircle,
   Lock,
   LogOut,
@@ -77,10 +82,13 @@ import {
   Tag,
   Trash2,
   TrendingUp,
+  Twitter,
+  Upload,
   User,
   Users,
   Wrench,
   X,
+  Youtube,
   Zap,
 } from 'lucide-react';
 import { useAuth, DEFAULT_ADMIN_ID, DEFAULT_ADMIN_EMAIL, getStoredUsers, saveStoredUsers } from './context/AuthContext';
@@ -99,6 +107,7 @@ import { listingImages, uploadListingPhotos } from './lib/images';
 import GlobalNavbarSearch from './components/GlobalNavbarSearch';
 import { SiteSettingsProvider, useSiteSettings } from './context/SiteSettingsContext';
 import FloatingWhatsAppWidget from './components/FloatingWhatsAppWidget';
+import MobileBottomNav from './components/MobileBottomNav';
 import AdminSuperDashboard from './components/AdminSuperDashboard';
 import { recordPageView, recordProductView } from './services/analyticsService';
 
@@ -106,367 +115,1092 @@ function Xy({
   onNavigate:t,currentPage:e,onSelectListing:selList,onSearchSubmit:searchSub
 }){
   var w;
-  const[r,n]=useState(!1),[s,a]=useState(!1),[l,o]=useState(!1),{
-    user:c,profile:u,signOut:d,isSuperAdmin:isSuperAdm,isAdmin:isAdmRole
-  }=useAuth();
-  const isUserAdmin = Boolean(c && (isSuperAdm || isAdmRole || u?.is_admin || u?.is_super_admin || u?.role === 'super_admin' || u?.role === 'admin' || c?.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase()));
+  const [r, n] = useState(!1),
+    [s, a] = useState(!1),
+    [l, o] = useState(!1),
+    [isMobileSearchOpen, setIsMobileSearchOpen] = useState(!1),
+    {
+      user: c,
+      profile: u,
+      signOut: d,
+      isSuperAdmin: isSuperAdm,
+      isAdmin: isAdmRole,
+    } = useAuth();
+  const isUserAdmin = Boolean(
+    c &&
+      (isSuperAdm ||
+        isAdmRole ||
+        u?.is_admin ||
+        u?.is_super_admin ||
+        u?.role === 'super_admin' ||
+        u?.role === 'admin' ||
+        c?.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase())
+  );
   const { settings } = useSiteSettings();
   const mobileMenuRef = useRef(null);
   const mobileToggleBtnRef = useRef(null);
   const userDropdownRef = useRef(null);
 
-  useEffect(()=>{
-    const j=()=>n(window.scrollY>20);
-    return window.addEventListener("scroll",j),()=>window.removeEventListener("scroll",j)
-  },[]);
+  useEffect(() => {
+    const j = () => n(window.scrollY > 20);
+    return (
+      window.addEventListener('scroll', j),
+      () => window.removeEventListener('scroll', j)
+    );
+  }, []);
 
-  useEffect(()=>{
-    if(!s) return;
-    const handleOutsideClick=(event)=>{
-      if(
+  useEffect(() => {
+    if (!s) return;
+    const handleOutsideClick = (event) => {
+      if (
         mobileMenuRef.current &&
         !mobileMenuRef.current.contains(event.target) &&
         mobileToggleBtnRef.current &&
         !mobileToggleBtnRef.current.contains(event.target)
-      ){
+      ) {
         a(!1);
       }
     };
-    const handleKeyDown=(event)=>{
-      if(event.key==="Escape") a(!1);
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') a(!1);
     };
-    document.addEventListener("mousedown",handleOutsideClick);
-    document.addEventListener("touchstart",handleOutsideClick);
-    document.addEventListener("keydown",handleKeyDown);
-    return ()=>{
-      document.removeEventListener("mousedown",handleOutsideClick);
-      document.removeEventListener("touchstart",handleOutsideClick);
-      document.removeEventListener("keydown",handleKeyDown);
+    document.addEventListener('mousedown', handleOutsideClick);
+    document.addEventListener('touchstart', handleOutsideClick);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('touchstart', handleOutsideClick);
+      document.removeEventListener('keydown', handleKeyDown);
     };
-  },[s]);
+  }, [s]);
 
-  useEffect(()=>{
-    if(!l) return;
-    const handleUserOutside=(event)=>{
-      if(userDropdownRef.current && !userDropdownRef.current.contains(event.target)){
+  useEffect(() => {
+    if (!l) return;
+    const handleUserOutside = (event) => {
+      if (
+        userDropdownRef.current &&
+        !userDropdownRef.current.contains(event.target)
+      ) {
         o(!1);
       }
     };
-    document.addEventListener("mousedown",handleUserOutside);
-    document.addEventListener("touchstart",handleUserOutside);
-    return ()=>{
-      document.removeEventListener("mousedown",handleUserOutside);
-      document.removeEventListener("touchstart",handleUserOutside);
+    document.addEventListener('mousedown', handleUserOutside);
+    document.addEventListener('touchstart', handleUserOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleUserOutside);
+      document.removeEventListener('touchstart', handleUserOutside);
     };
-  },[l]);
+  }, [l]);
 
   const [unreadInboxCount, setUnreadInboxCount] = useState(0);
   useEffect(() => {
     const updateCount = () => {
       try {
         const msgs = getInboxMessages();
-        setUnreadInboxCount(msgs.filter(m => !m.is_read).length);
+        setUnreadInboxCount(msgs.filter((m) => !m.is_read).length);
       } catch {}
     };
     updateCount();
     window.addEventListener('sellsolar_inbox_updated', updateCount);
-    return () => window.removeEventListener('sellsolar_inbox_updated', updateCount);
+    return () =>
+      window.removeEventListener('sellsolar_inbox_updated', updateCount);
   }, []);
 
-  const h=j=>{
-    t(j),a(!1),o(!1)
-  },p=async()=>{
-    await d(),t("home"),o(!1)
-  },y=[{
-    label:"Today's Rates",page:"prices",highlight:true
-  },{
-    label:"Load Calculator",page:"calculator",isCalc:true
-  },{
-    label:"Verified Dealers",page:"dealers"
-  },{
-    label:"Request Complete Installation",page:"install",isInstall:true
-  }];
-  return jsxs("header",{
-    className:`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${r?"bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-md border-b border-gray-200/80 dark:border-gray-800":"bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-200/50 dark:border-gray-800/50"}`,children:[
-      settings?.topBannerEnabled !== false ? jsx("div",{
-        className:"hidden lg:block bg-gray-950 text-gray-300 text-xs py-1.5 border-b border-gray-800",children:jsxs("div",{
-          className:"container-page flex items-center justify-between",children:[
-            jsxs("div",{
-              className:"flex items-center gap-4 text-xs",children:[
-                jsxs("span",{
-                  className:"flex items-center gap-1.5 text-gray-300 font-medium",children:[
-                    jsx(TrendingUp,{ className:"h-3.5 w-3.5 text-primary-400" }),
-                    settings?.tagline || "Pakistan's #1 Solar Marketplace"
-                  ]
-                }),
-                jsx("span",{ className:"text-gray-700", children:"|" }),
-                jsxs("span",{
-                  className:"text-amber-400 font-semibold flex items-center gap-1",children:[
-                    jsx(Zap,{ className:"h-3 w-3 fill-amber-400" }),
-                    settings?.topBannerText || "Daily Rates: Longi 585W Rs 38/W • Inverex 6kW Rs 210,000"
-                  ]
-                })
-              ]
-            }),
-            jsxs("div",{
-              className:"flex items-center gap-5 text-gray-400 font-medium",children:[
-                jsx("button",{ onClick:()=>h("prices"), className:"hover:text-amber-400 transition-colors font-semibold", children:"Today's Rates" }),
-                jsx("button",{ onClick:()=>h("calculator"), className:"hover:text-white transition-colors", children:"Load Calculator" }),
-                jsx("button",{ onClick:()=>h("install"), className:"hover:text-white transition-colors", children:"Turnkey Installation" }),
-                jsx("button",{ onClick:()=>h("dealers"), className:"hover:text-white transition-colors", children:"Verified Dealers" })
-              ]
-            })
-          ]
-        })
-      }) : null,
-      jsx("div",{
-      className:"container-page",children:jsxs("div",{
-        className:"flex h-16 items-center justify-between lg:h-18 gap-2 sm:gap-4",children:[
-          jsxs("button",{
-            onClick:()=>h("home"),className:"flex items-center gap-2 shrink-0",children:[
-              settings?.logoUrl ? (
-                jsx("img",{
-                  src: settings.logoUrl,
-                  alt: settings.siteTitle || "SellSolar",
-                  className: "h-9 max-w-[170px] object-contain"
-                })
-              ) : (
-                jsxs(Fragment,{
+  const h = (j) => {
+    t(j);
+    a(!1);
+    o(!1);
+    setIsMobileSearchOpen(!1);
+  };
+  const p = async () => {
+    await d();
+    t('home');
+    o(!1);
+    a(!1);
+    setIsMobileSearchOpen(!1);
+  };
+  const y = [
+    {
+      label: "Today's Rates",
+      page: 'prices',
+      highlight: true,
+    },
+    {
+      label: 'Load Calculator',
+      page: 'calculator',
+      isCalc: true,
+    },
+    {
+      label: 'Verified Dealers',
+      page: 'dealers',
+    },
+    {
+      label: 'Request Complete Installation',
+      page: 'install',
+      isInstall: true,
+    },
+  ];
+
+  const userInitial = ((u?.full_name || c?.email || 'U').charAt(0).toUpperCase());
+
+  return jsxs('header', {
+    className: `fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      r
+        ? 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-md border-b border-gray-200/80 dark:border-gray-800'
+        : 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-200/50 dark:border-gray-800/50'
+    }`,
+    children: [
+      settings?.topBannerEnabled !== false
+        ? jsx('div', {
+            className:
+              'hidden lg:block bg-gray-950 text-gray-300 text-xs py-1.5 border-b border-gray-800',
+            children: jsxs('div', {
+              className: 'container-page flex items-center justify-between',
+              children: [
+                jsxs('div', {
+                  className: 'flex items-center gap-4 text-xs',
                   children: [
-                    jsx("div",{
-                      className:"flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 shadow-lg shadow-primary-500/30",children:jsx(Sun,{
-                        className:"h-5 w-5 text-white",strokeWidth:2.5
-                      })
+                    jsxs('span', {
+                      className:
+                        'flex items-center gap-1.5 text-gray-300 font-medium',
+                      children: [
+                        jsx(TrendingUp, {
+                          className: 'h-3.5 w-3.5 text-primary-400',
+                        }),
+                        settings?.tagline || "Pakistan's #1 Solar Marketplace",
+                      ],
                     }),
-                    jsxs("span",{
-                      className:"text-xl font-extrabold tracking-tight text-gray-900 dark:text-white",children:["Sell",jsx("span",{
-                        className:"text-primary-500",children:"Solar"
-                      })]
-                    })
-                  ]
-                })
-              )
-            ]
-          }),
-          jsx(GlobalNavbarSearch,{
-            onSelectListing:selList,
-            onSearchSubmit:searchSub,
-            className:"flex-1 min-w-[120px] sm:min-w-[180px] md:min-w-[220px] max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl mx-1 sm:mx-2"
-          }),
-          jsxs("div",{
-          className:"flex items-center gap-1.5 sm:gap-2.5",children:[
-            jsx("button",{
-              onClick:()=>h("prices"),
-              className:`hidden sm:flex items-center gap-1.5 sm:gap-2 rounded-lg px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all shadow-xs ${
-                e==="prices"
-                  ?"bg-amber-500 text-white shadow-amber-500/25"
-                  :"bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/60 hover:bg-amber-100 dark:hover:bg-amber-900/60"
-              }`,
-              children:jsxs(Fragment,{
-                children:[
-                  jsxs("span",{
-                    className:"relative flex h-2 w-2 shrink-0",
-                    children:[
-                      jsx("span",{ className:"absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" }),
-                      jsx("span",{ className:"relative inline-flex h-2 w-2 rounded-full bg-amber-500" })
-                    ]
-                  }),
-                  jsx("span",{ className:"whitespace-nowrap", children:"Today's Rates" }),
-                  jsx("span",{
-                    className:`hidden md:inline rounded px-1.5 py-0.5 text-[10px] font-extrabold uppercase ${
-                      e==="prices"?"bg-white/20 text-white":"bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-200"
-                    }`,
-                    children:"LIVE"
-                  })
-                ]
-              })
-            }),
-            jsx("button",{
-              onClick:()=>h("calculator"),
-              className:`hidden md:flex items-center gap-1.5 sm:gap-2 rounded-lg px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all ${
-                e==="calculator"
-                  ?"bg-primary-500 text-white shadow-xs shadow-primary-500/20"
-                  :"bg-primary-50 dark:bg-primary-950/40 text-primary-800 dark:text-primary-300 border border-primary-200/70 dark:border-primary-800/60 hover:bg-primary-100 dark:hover:bg-primary-900/60"
-              }`,
-              children:jsxs(Fragment,{
-                children:[
-                  jsx(Calculator,{
-                    className:`h-4 w-4 shrink-0 ${e==="calculator"?"text-white":"text-primary-600 dark:text-primary-400"}`
-                  }),
-                  jsx("span",{ className:"whitespace-nowrap", children:"Calculator" })
-                ]
-              })
-            }),
-            jsx("button",{
-              onClick:()=>h("install"),
-              className:`hidden xl:flex items-center gap-1.5 sm:gap-2 rounded-lg px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all ${
-                e==="install"
-                  ?"bg-secondary-600 text-white shadow-xs shadow-secondary-600/20"
-                  :"bg-secondary-50 dark:bg-secondary-950/40 text-secondary-800 dark:text-secondary-300 border border-secondary-200/70 dark:border-secondary-800/60 hover:bg-secondary-100 dark:hover:bg-secondary-900/60"
-              }`,
-              children:jsxs(Fragment,{
-                children:[
-                  jsx(Wrench,{
-                    className:`h-4 w-4 shrink-0 ${e==="install"?"text-white":"text-secondary-600 dark:text-secondary-400"}`
-                  }),
-                  jsx("span",{ className:"whitespace-nowrap", children:"Installation" })
-                ]
-              })
-            }),
-            jsx(ThemeRadioToggle,{
-              className:"shrink-0"
-            }),c?jsxs(Fragment,{
-            children:[jsxs("button",{
-              onClick:()=>h("post-ad"),className:"btn-primary hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm shadow-xs",children:[jsx(CirclePlus,{
-                className:"h-4 w-4"
-              }),"Post an Ad"]
-            }),jsxs("div",{
-              className:"relative",children:[jsxs("button",{
-                onClick:()=>o(!l),className:"flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx("div",{
-                  className:"flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-primary-400 to-primary-600 text-xs font-bold text-white",children:((u==null?void 0:u.full_name)||c.email||"U").charAt(0).toUpperCase()
-                }),jsx("span",{
-                  className:"hidden sm:inline",children:((w=u==null?void 0:u.full_name)==null?void 0:w.split(" ")[0])||"User"
-                }),jsx(ChevronDown,{
-                  className:"h-4 w-4 text-gray-400"
-                })]
-              }),l&&jsxs("div",{
-                ref:userDropdownRef,
-                className:"absolute right-0 mt-2 w-56 animate-slide-down rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 py-2 shadow-xl",children:[jsxs("div",{
-                  className:"border-b border-gray-100 dark:border-gray-800 px-4 py-2",children:[jsx("p",{
-                    className:"text-sm font-bold text-gray-900 dark:text-white",children:(u==null?void 0:u.full_name)||"User"
-                  }),jsx("p",{
-                    className:"truncate text-xs text-gray-500 dark:text-gray-400",children:(u?.username||(c?.email?.endsWith('@sellsolar.local')?c.email.replace('@sellsolar.local',''):c?.email))||""
-                  }),(u==null?void 0:u.account_type)==="dealer"&&jsx("span",{
-                    className:"mt-1 inline-block rounded-full bg-primary-100 dark:bg-primary-950/60 px-2 py-0.5 text-xs font-semibold text-primary-700 dark:text-primary-300",children:u.is_verified_dealer?"Verified Dealer":"Dealer"
-                  })]
-                }),jsxs("button",{
-                  onClick:()=>h("dashboard"),className:"flex w-full items-center gap-2 px-4 py-2.5 text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx(LayoutDashboard,{
-                    className:"h-4 w-4 text-amber-500"
-                  }), (u?.is_super_admin || u?.role === 'super_admin' || c?.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase()) ? "👑 Super Admin Dashboard" : (u?.is_admin || u?.role === 'admin') ? "🛡️ Admin Dashboard" : (u?.role === 'dealer' || u?.is_dealer) ? "🏪 Dealer Dashboard" : "📊 My Dashboard"]
-                }),isUserAdmin && jsxs("button",{
-                  onClick:()=>h("inbox"),className:"flex w-full items-center justify-between px-4 py-2.5 text-sm font-medium text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950/40",children:[
-                    jsxs("div",{
-                      className:"flex items-center gap-2",children:[jsx(MessageSquare,{
-                        className:"h-4 w-4 text-purple-500"
-                      }),"Admin Inquiries & Inbox"]
+                    jsx('span', { className: 'text-gray-700', children: '|' }),
+                    jsxs('span', {
+                      className:
+                        'text-amber-400 font-semibold flex items-center gap-1',
+                      children: [
+                        jsx(Zap, { className: 'h-3 w-3 fill-amber-400' }),
+                        settings?.topBannerText ||
+                          'Daily Rates: Longi 585W Rs 38/W • Inverex 6kW Rs 210,000',
+                      ],
                     }),
-                    unreadInboxCount > 0 && jsx("span",{
-                      className:"px-1.5 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white",children:unreadInboxCount
-                    })
-                  ]
-                }),jsxs("button",{
-                  onClick:()=>h("password"),className:"flex w-full items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx(Lock,{
-                    className:"h-4 w-4 text-gray-400"
-                  }),"Change Password"]
-                }),jsxs("button",{
-                  onClick:()=>h("post-ad"),className:"flex w-full items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx(CirclePlus,{
-                    className:"h-4 w-4 text-gray-400"
-                  }),"Post Ad"]
-                }),jsxs("button",{
-                  onClick:()=>h("dealers"),className:"flex w-full items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx(Store,{
-                    className:"h-4 w-4 text-gray-400"
-                  }),"View Dealers"]
-                }),jsxs("button",{
-                  onClick:p,className:"flex w-full items-center gap-2 border-t border-gray-100 dark:border-gray-800 px-4 py-2.5 text-sm font-medium text-error-600 dark:text-error-400 hover:bg-error-50 dark:hover:bg-error-950/40",children:[jsx(LogOut,{
-                    className:"h-4 w-4"
-                  }),"Sign Out"]
-                })]
-              })]
-            })]
-          }):jsxs(Fragment,{
-            children:[jsxs("button",{
-              onClick:()=>h("login"),
-              id:"header-signin-btn",
-              className:"inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/90 px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-750 hover:border-gray-300 dark:hover:border-gray-600 hover:text-primary-600 dark:hover:text-primary-400 transition-all shadow-2xs cursor-pointer shrink-0 active:scale-95",
-              children:[
-                jsx(User,{ className:"h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-500 dark:text-gray-400 shrink-0" }),
-                jsx("span",{ children:"Sign In" })
-              ]
-            }),jsxs("button",{
-              onClick:()=>h("login"),
-              id:"header-post-ad-btn",
-              className:"btn-primary hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm shadow-xs shrink-0 cursor-pointer",
-              children:[jsx(CirclePlus,{
-                className:"h-4 w-4 shrink-0"
-              }),"Post an Ad"]
-            })]
-          }),jsx("button",{
-            ref:mobileToggleBtnRef,
-            onClick:()=>a(!s),className:"rounded-lg p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 lg:hidden","aria-label":"Toggle menu",children:s?jsx(X,{
-              className:"h-6 w-6"
-            }):jsx(Menu,{
-              className:"h-6 w-6"
-            })
-          })]
-        })]
-      })
-    }),s&&jsxs(Fragment,{
-      children:[
-        jsx("div",{
-          className:"fixed inset-0 top-16 bg-black/40 backdrop-blur-[1px] lg:hidden z-40 transition-opacity",
-          onClick:()=>a(!1),
-          "aria-hidden":"true"
-        }),
-        jsx("div",{
-          ref:mobileMenuRef,
-          className:"relative z-50 animate-slide-down border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 lg:hidden shadow-2xl max-h-[calc(100vh-4.5rem)] overflow-y-auto",children:jsxs("nav",{
-            className:"container-page flex flex-col gap-1 py-4",children:[...y.map(j=>jsxs("button",{
-              onClick:()=>h(j.page),className:`flex items-center justify-between rounded-lg px-4 py-3 text-sm font-semibold transition-all ${j.highlight?"bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 border border-amber-200/80 dark:border-amber-800/60 font-bold":j.isCalc?"bg-primary-50 dark:bg-primary-950/40 text-primary-900 dark:text-primary-200 border border-primary-200/80 dark:border-primary-800/60 font-bold":"text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800"}`,children:[jsxs("span",{
-                className:"flex items-center gap-2",children:[j.highlight&&jsx("span",{
-                  className:"h-2 w-2 rounded-full bg-amber-500"
-                }),j.isCalc&&jsx(Calculator,{
-                  className:"h-4 w-4 text-primary-600 dark:text-primary-400"
-                }),j.isInstall&&jsx(Wrench,{
-                  className:"h-4 w-4 text-secondary-600 dark:text-secondary-400"
-                }),j.label,j.highlight&&jsx("span",{
-                  className:"rounded bg-amber-200 dark:bg-amber-900 px-1.5 py-0.5 text-[10px] font-extrabold text-amber-900 dark:text-amber-200",children:"LIVE"
-                })]
-              }),jsx(ChevronDown,{
-                className:"h-4 w-4 -rotate-90 text-gray-400"
-              })]
-            },j.label)),c?jsxs(Fragment,{
-              children:[jsxs("button",{
-                onClick:()=>h("dashboard"),className:"flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx(LayoutDashboard,{
-                  className:"h-4 w-4 text-amber-500"
-                }),(u?.is_super_admin || u?.role === 'super_admin' || c?.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase()) ? "👑 Super Admin Dashboard" : (u?.is_admin || u?.role === 'admin') ? "🛡️ Admin Dashboard" : (u?.role === 'dealer' || u?.is_dealer) ? "🏪 Dealer Dashboard" : "📊 My Dashboard"]
-              }),isUserAdmin && jsxs("button",{
-                onClick:()=>h("inbox"),className:"flex items-center justify-between rounded-lg px-4 py-3 text-sm font-semibold text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950/40",children:[
-                  jsxs("div",{
-                    className:"flex items-center gap-2",children:[jsx(MessageSquare,{
-                      className:"h-4 w-4 text-purple-500"
-                    }),"Admin Inquiries & Inbox"]
-                  }),
-                  unreadInboxCount > 0 && jsx("span",{
-                    className:"px-1.5 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white",children:unreadInboxCount
-                  })
-                ]
-              }),jsxs("button",{
-                onClick:()=>h("password"),className:"flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx(Lock,{
-                  className:"h-4 w-4 text-gray-400"
-                }),"Change Password"]
-              }),jsxs("button",{
-                onClick:()=>h("post-ad"),className:"flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800",children:[jsx(CirclePlus,{
-                  className:"h-4 w-4 text-gray-400"
-                }),"Post Ad"]
-              }),jsxs("button",{
-                onClick:p,className:"flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-error-600 dark:text-error-400 hover:bg-error-50 dark:hover:bg-error-950/40",children:[jsx(LogOut,{
-                  className:"h-4 w-4"
-                }),"Sign Out"]
-              })]
-            }):jsxs("button",{
-              onClick:()=>h("login"),
-              id:"mobile-signin-btn",
-              className:"btn-primary mt-2 w-full flex items-center justify-center gap-2 py-2.5 text-sm font-bold shadow-xs cursor-pointer",
-              children:[
-                jsx(User,{ className:"h-4 w-4" }),
-                "Sign In / Register"
-              ]
-            })]
+                  ],
+                }),
+                jsxs('div', {
+                  className: 'flex items-center gap-5 text-gray-400 font-medium',
+                  children: [
+                    jsx('button', {
+                      onClick: () => h('prices'),
+                      className:
+                        'hover:text-amber-400 transition-colors font-semibold cursor-pointer',
+                      children: "Today's Rates",
+                    }),
+                    jsx('button', {
+                      onClick: () => h('calculator'),
+                      className: 'hover:text-white transition-colors cursor-pointer',
+                      children: 'Load Calculator',
+                    }),
+                    jsx('button', {
+                      onClick: () => h('install'),
+                      className: 'hover:text-white transition-colors cursor-pointer',
+                      children: 'Turnkey Installation',
+                    }),
+                    jsx('button', {
+                      onClick: () => h('dealers'),
+                      className: 'hover:text-white transition-colors cursor-pointer',
+                      children: 'Verified Dealers',
+                    }),
+                  ],
+                }),
+              ],
+            }),
           })
-        })
-      ]
-    })]
-  })
+        : null,
+
+      jsx('div', {
+        className: 'container-page',
+        children: jsxs('div', {
+          className:
+            'flex h-16 items-center justify-between gap-2 sm:gap-4',
+          children: [
+            // Brand Logo
+            jsxs('button', {
+              onClick: () => h('home'),
+              className: 'flex items-center gap-2 shrink-0 select-none cursor-pointer',
+              children: [
+                settings?.logoUrl
+                  ? jsx('img', {
+                      src: settings.logoUrl,
+                      alt: settings.siteTitle || 'SellSolar',
+                      className: 'h-8 sm:h-9 max-w-[140px] sm:max-w-[180px] object-contain',
+                    })
+                  : jsxs(Fragment, {
+                      children: [
+                        jsx('div', {
+                          className:
+                            'flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 shadow-md shadow-primary-500/25 shrink-0',
+                          children: jsx(Sun, {
+                            className: 'h-4 w-4 sm:h-5 sm:w-5 text-white',
+                            strokeWidth: 2.5,
+                          }),
+                        }),
+                        jsxs('span', {
+                          className:
+                            'text-lg sm:text-xl font-black tracking-tight text-gray-900 dark:text-white',
+                          children: [
+                            'Sell',
+                            jsx('span', {
+                              className: 'text-primary-500',
+                              children: 'Solar',
+                            }),
+                          ],
+                        }),
+                      ],
+                    }),
+              ],
+            }),
+
+            // Search Component (desktop navbar bar + mobile full overlay)
+            jsx(GlobalNavbarSearch, {
+              onSelectListing: (id) => {
+                setIsMobileSearchOpen(!1);
+                selList && selList(id);
+              },
+              onSearchSubmit: (filterObj) => {
+                setIsMobileSearchOpen(!1);
+                searchSub && searchSub(filterObj);
+              },
+              mobileOpen: isMobileSearchOpen,
+              onCloseMobile: () => setIsMobileSearchOpen(!1),
+              className:
+                'flex-1 min-w-0 md:min-w-[180px] max-w-sm lg:max-w-md xl:max-w-lg mx-0 md:mx-2 lg:mx-4',
+            }),
+
+            // Desktop Navigation Buttons (hidden on mobile, md:flex)
+            jsxs('div', {
+              className: 'hidden md:flex items-center gap-2 lg:gap-2.5',
+              children: [
+                jsx('button', {
+                  onClick: () => h('prices'),
+                  className: `flex items-center gap-1.5 rounded-lg px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all shadow-xs cursor-pointer ${
+                    e === 'prices'
+                      ? 'bg-amber-500 text-white shadow-amber-500/25'
+                      : 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/60 hover:bg-amber-100 dark:hover:bg-amber-900/60'
+                  }`,
+                  children: jsxs(Fragment, {
+                    children: [
+                      jsxs('span', {
+                        className: 'relative flex h-2 w-2 shrink-0',
+                        children: [
+                          jsx('span', {
+                            className:
+                              'absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75',
+                          }),
+                          jsx('span', {
+                            className:
+                              'relative inline-flex h-2 w-2 rounded-full bg-amber-500',
+                          }),
+                        ],
+                      }),
+                      jsx('span', {
+                        className: 'whitespace-nowrap',
+                        children: "Today's Rates",
+                      }),
+                      jsx('span', {
+                        className: `hidden lg:inline rounded px-1.5 py-0.5 text-[10px] font-extrabold uppercase ${
+                          e === 'prices'
+                            ? 'bg-white/20 text-white'
+                            : 'bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-200'
+                        }`,
+                        children: 'LIVE',
+                      }),
+                    ],
+                  }),
+                }),
+                jsx('button', {
+                  onClick: () => h('calculator'),
+                  className: `flex items-center gap-1.5 rounded-lg px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                    e === 'calculator'
+                      ? 'bg-primary-500 text-white shadow-xs shadow-primary-500/20'
+                      : 'bg-primary-50 dark:bg-primary-950/40 text-primary-800 dark:text-primary-300 border border-primary-200/70 dark:border-primary-800/60 hover:bg-primary-100 dark:hover:bg-primary-900/60'
+                  }`,
+                  children: jsxs(Fragment, {
+                    children: [
+                      jsx(Calculator, {
+                        className: `h-4 w-4 shrink-0 ${
+                          e === 'calculator'
+                            ? 'text-white'
+                            : 'text-primary-600 dark:text-primary-400'
+                        }`,
+                      }),
+                      jsx('span', {
+                        className: 'whitespace-nowrap',
+                        children: 'Calculator',
+                      }),
+                    ],
+                  }),
+                }),
+                jsx('button', {
+                  onClick: () => h('install'),
+                  className: `hidden xl:flex items-center gap-1.5 rounded-lg px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                    e === 'install'
+                      ? 'bg-secondary-600 text-white shadow-xs shadow-secondary-600/20'
+                      : 'bg-secondary-50 dark:bg-secondary-950/40 text-secondary-800 dark:text-secondary-300 border border-secondary-200/70 dark:border-secondary-800/60 hover:bg-secondary-100 dark:hover:bg-secondary-900/60'
+                  }`,
+                  children: jsxs(Fragment, {
+                    children: [
+                      jsx(Wrench, {
+                        className: `h-4 w-4 shrink-0 ${
+                          e === 'install'
+                            ? 'text-white'
+                            : 'text-secondary-600 dark:text-secondary-400'
+                        }`,
+                      }),
+                      jsx('span', {
+                        className: 'whitespace-nowrap',
+                        children: 'Installation',
+                      }),
+                    ],
+                  }),
+                }),
+                jsx(ThemeRadioToggle, {
+                  className: 'shrink-0',
+                }),
+                c
+                  ? jsxs(Fragment, {
+                      children: [
+                        jsxs('button', {
+                          onClick: () => h('post-ad'),
+                          className:
+                            'btn-primary inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm shadow-xs cursor-pointer',
+                          children: [
+                            jsx(CirclePlus, {
+                              className: 'h-4 w-4',
+                            }),
+                            'Post an Ad',
+                          ],
+                        }),
+                        jsxs('div', {
+                          className: 'relative',
+                          children: [
+                            jsxs('button', {
+                              onClick: () => o(!l),
+                              className:
+                                'flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer',
+                              children: [
+                                jsx('div', {
+                                  className:
+                                    'flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-primary-400 to-primary-600 text-xs font-bold text-white',
+                                  children: userInitial,
+                                }),
+                                jsx('span', {
+                                  className: 'max-w-[100px] truncate',
+                                  children:
+                                    ((w = u == null ? void 0 : u.full_name) ==
+                                    null
+                                      ? void 0
+                                      : w.split(' ')[0]) || 'User',
+                                }),
+                                jsx(ChevronDown, {
+                                  className: 'h-4 w-4 text-gray-400',
+                                }),
+                              ],
+                            }),
+                            l &&
+                              jsxs('div', {
+                                ref: userDropdownRef,
+                                className:
+                                  'absolute right-0 mt-2 w-56 animate-slide-down rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 py-2 shadow-xl z-50',
+                                children: [
+                                  jsxs('div', {
+                                    className:
+                                      'border-b border-gray-100 dark:border-gray-800 px-4 py-2',
+                                    children: [
+                                      jsx('p', {
+                                        className:
+                                          'text-sm font-bold text-gray-900 dark:text-white',
+                                        children:
+                                          (u == null ? void 0 : u.full_name) ||
+                                          'User',
+                                      }),
+                                      jsx('p', {
+                                        className:
+                                          'truncate text-xs text-gray-500 dark:text-gray-400',
+                                        children:
+                                          u?.username ||
+                                          (c?.email?.endsWith('@sellsolar.local')
+                                            ? c.email.replace(
+                                                '@sellsolar.local',
+                                                ''
+                                              )
+                                            : c?.email) ||
+                                          '',
+                                      }),
+                                      (u == null ? void 0 : u.account_type) ===
+                                        'dealer' &&
+                                        jsx('span', {
+                                          className:
+                                            'mt-1 inline-block rounded-full bg-primary-100 dark:bg-primary-950/60 px-2 py-0.5 text-xs font-semibold text-primary-700 dark:text-primary-300',
+                                          children: u.is_verified_dealer
+                                            ? 'Verified Dealer'
+                                            : 'Dealer',
+                                        }),
+                                    ],
+                                  }),
+                                  jsxs('button', {
+                                    onClick: () => h('dashboard'),
+                                    className:
+                                      'flex w-full items-center gap-2 px-4 py-2.5 text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer',
+                                    children: [
+                                      jsx(LayoutDashboard, {
+                                        className: 'h-4 w-4 text-amber-500',
+                                      }),
+                                      u?.is_super_admin ||
+                                      u?.role === 'super_admin' ||
+                                      c?.email?.toLowerCase() ===
+                                        DEFAULT_ADMIN_EMAIL.toLowerCase()
+                                        ? '👑 Super Admin Dashboard'
+                                        : u?.is_admin || u?.role === 'admin'
+                                        ? '🛡️ Admin Dashboard'
+                                        : u?.role === 'dealer' || u?.is_dealer
+                                        ? '🏪 Dealer Dashboard'
+                                        : '📊 My Dashboard',
+                                    ],
+                                  }),
+                                  isUserAdmin &&
+                                    jsxs('button', {
+                                      onClick: () => h('inbox'),
+                                      className:
+                                        'flex w-full items-center justify-between px-4 py-2.5 text-sm font-medium text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950/40 cursor-pointer',
+                                      children: [
+                                        jsxs('div', {
+                                          className:
+                                            'flex items-center gap-2',
+                                          children: [
+                                            jsx(MessageSquare, {
+                                              className:
+                                                'h-4 w-4 text-purple-500',
+                                            }),
+                                            'Admin Inquiries & Inbox',
+                                          ],
+                                        }),
+                                        unreadInboxCount > 0 &&
+                                          jsx('span', {
+                                            className:
+                                              'px-1.5 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white',
+                                            children: unreadInboxCount,
+                                          }),
+                                      ],
+                                    }),
+                                  jsxs('button', {
+                                    onClick: () => h('password'),
+                                    className:
+                                      'flex w-full items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer',
+                                    children: [
+                                      jsx(Lock, {
+                                        className: 'h-4 w-4 text-gray-400',
+                                      }),
+                                      'Change Password',
+                                    ],
+                                  }),
+                                  jsxs('button', {
+                                    onClick: () => h('post-ad'),
+                                    className:
+                                      'flex w-full items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer',
+                                    children: [
+                                      jsx(CirclePlus, {
+                                        className: 'h-4 w-4 text-gray-400',
+                                      }),
+                                      'Post Ad',
+                                    ],
+                                  }),
+                                  jsxs('button', {
+                                    onClick: () => h('dealers'),
+                                    className:
+                                      'flex w-full items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer',
+                                    children: [
+                                      jsx(Store, {
+                                        className: 'h-4 w-4 text-gray-400',
+                                      }),
+                                      'View Dealers',
+                                    ],
+                                  }),
+                                  jsxs('button', {
+                                    onClick: p,
+                                    className:
+                                      'flex w-full items-center gap-2 border-t border-gray-100 dark:border-gray-800 px-4 py-2.5 text-sm font-medium text-error-600 dark:text-error-400 hover:bg-error-50 dark:hover:bg-error-950/40 cursor-pointer',
+                                    children: [
+                                      jsx(LogOut, {
+                                        className: 'h-4 w-4',
+                                      }),
+                                      'Sign Out',
+                                    ],
+                                  }),
+                                ],
+                              }),
+                          ],
+                        }),
+                      ],
+                    })
+                  : jsxs(Fragment, {
+                      children: [
+                        jsxs('button', {
+                          onClick: () => h('login'),
+                          id: 'header-signin-btn',
+                          className:
+                            'inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/90 px-3 py-1.5 text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-750 hover:border-gray-300 dark:hover:border-gray-600 hover:text-primary-600 dark:hover:text-primary-400 transition-all shadow-2xs cursor-pointer shrink-0 active:scale-95',
+                          children: [
+                            jsx(User, {
+                              className:
+                                'h-4 w-4 text-gray-500 dark:text-gray-400 shrink-0',
+                            }),
+                            jsx('span', { children: 'Sign In' }),
+                          ],
+                        }),
+                        jsxs('button', {
+                          onClick: () => h('login'),
+                          id: 'header-post-ad-btn',
+                          className:
+                            'btn-primary inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm shadow-xs shrink-0 cursor-pointer',
+                          children: [
+                            jsx(CirclePlus, {
+                              className: 'h-4 w-4 shrink-0',
+                            }),
+                            'Post an Ad',
+                          ],
+                        }),
+                      ],
+                    }),
+              ],
+            }),
+
+            // Mobile Top Bar Controls (md:hidden)
+            // Perfectly spaced 4 action buttons on mobile: Search, Theme, User/Sign In, Hamburger
+            jsxs('div', {
+              className: 'flex md:hidden items-center gap-1 sm:gap-1.5 shrink-0',
+              children: [
+                // 1. Mobile Search Trigger (opens full search overlay)
+                jsx('button', {
+                  type: 'button',
+                  onClick: () => setIsMobileSearchOpen(!0),
+                  id: 'mobile-header-search-trigger',
+                  className:
+                    'flex h-9 w-9 items-center justify-center rounded-xl bg-gray-100/90 dark:bg-gray-800/90 text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 active:scale-95 transition-all cursor-pointer',
+                  'aria-label': 'Search solar equipment',
+                  children: jsx(Search, { className: 'h-4 w-4' }),
+                }),
+
+                // 2. Mobile Theme Switcher
+                jsx(ThemeRadioToggle, {
+                  className: 'shrink-0',
+                }),
+
+                // 3. User Avatar or Sign In Icon Button
+                c
+                  ? jsx('button', {
+                      type: 'button',
+                      onClick: () => h('dashboard'),
+                      id: 'mobile-header-profile-btn',
+                      className:
+                        'flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 text-white font-bold text-xs shadow-xs active:scale-95 transition-all cursor-pointer',
+                      'aria-label': 'Open Dashboard',
+                      children: userInitial,
+                    })
+                  : jsx('button', {
+                      type: 'button',
+                      onClick: () => h('login'),
+                      id: 'mobile-header-signin-btn',
+                      className:
+                        'flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:text-primary-600 active:scale-95 transition-all shadow-2xs cursor-pointer',
+                      'aria-label': 'Sign In',
+                      children: jsx(User, {
+                        className: 'h-4 w-4 text-gray-600 dark:text-gray-300',
+                      }),
+                    }),
+
+                // 4. Hamburger Menu Toggle Button
+                jsx('button', {
+                  ref: mobileToggleBtnRef,
+                  type: 'button',
+                  onClick: () => a(!s),
+                  id: 'mobile-header-menu-toggle',
+                  className:
+                    'flex h-9 w-9 items-center justify-center rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 active:scale-95 transition-all cursor-pointer',
+                  'aria-label': s
+                    ? 'Close navigation menu'
+                    : 'Open navigation menu',
+                  children: s
+                    ? jsx(X, { className: 'h-5 w-5' })
+                    : jsx(Menu, { className: 'h-5 w-5' }),
+                }),
+              ],
+            }),
+          ],
+        }),
+      }),
+
+      // Professional Mobile Drawer Menu
+      s &&
+        jsxs(Fragment, {
+          children: [
+            // Backdrop
+            jsx('div', {
+              className:
+                'fixed inset-0 top-16 bg-black/50 backdrop-blur-xs md:hidden z-40 transition-opacity animate-in fade-in duration-150',
+              onClick: () => a(!1),
+              'aria-hidden': 'true',
+            }),
+            // Drawer Container
+            jsx('div', {
+              ref: mobileMenuRef,
+              className:
+                'fixed top-16 right-0 left-0 bottom-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shadow-2xl md:hidden z-50 overflow-y-auto flex flex-col pb-28 animate-in slide-in-from-top-2 duration-200',
+              children: jsxs('div', {
+                className: 'flex flex-col min-h-full',
+                children: [
+                  // User Profile Section / Welcome Card
+                  c
+                    ? jsxs('div', {
+                        className:
+                          'p-4 bg-gradient-to-r from-primary-50/80 to-amber-50/50 dark:from-primary-950/40 dark:to-gray-900 border-b border-gray-200/70 dark:border-gray-800 flex items-center justify-between',
+                        children: [
+                          jsxs('div', {
+                            className: 'flex items-center gap-3 min-w-0',
+                            children: [
+                              jsx('div', {
+                                className:
+                                  'flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-amber-500 text-white font-black text-sm shadow-sm',
+                                children: userInitial,
+                              }),
+                              jsxs('div', {
+                                className: 'min-w-0 flex-1',
+                                children: [
+                                  jsx('h3', {
+                                    className:
+                                      'text-sm font-extrabold text-gray-900 dark:text-white truncate',
+                                    children:
+                                      u?.full_name || 'Solar User',
+                                  }),
+                                  jsx('p', {
+                                    className:
+                                      'text-xs text-gray-500 dark:text-gray-400 truncate',
+                                    children: c?.email || '',
+                                  }),
+                                  jsx('span', {
+                                    className:
+                                      'inline-block mt-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-primary-100 dark:bg-primary-900/60 text-primary-800 dark:text-primary-300',
+                                    children: isUserAdmin
+                                      ? '🛡️ Admin Account'
+                                      : u?.account_type === 'dealer' ||
+                                        u?.is_dealer
+                                      ? '🏪 Verified Dealer'
+                                      : '👤 Member',
+                                  }),
+                                ],
+                              }),
+                            ],
+                          }),
+                          jsx('button', {
+                            onClick: () => h('dashboard'),
+                            className:
+                              'shrink-0 px-3 py-1.5 text-xs font-bold text-primary-700 dark:text-primary-300 bg-white dark:bg-gray-800 rounded-lg border border-primary-200 dark:border-primary-800 shadow-2xs active:scale-95 transition-all cursor-pointer',
+                            children: 'Dashboard →',
+                          }),
+                        ],
+                      })
+                    : jsxs('div', {
+                        className:
+                          'p-4 bg-gray-50 dark:bg-gray-850/60 border-b border-gray-200/70 dark:border-gray-800 flex items-center justify-between',
+                        children: [
+                          jsxs('div', {
+                            children: [
+                              jsx('h3', {
+                                className:
+                                  'text-sm font-extrabold text-gray-900 dark:text-white',
+                                children: 'Welcome to SellSolar',
+                              }),
+                              jsx('p', {
+                                className:
+                                  'text-xs text-gray-500 dark:text-gray-400 mt-0.5',
+                                children: "Pakistan's Premier Solar Marketplace",
+                              }),
+                            ],
+                          }),
+                          jsx('button', {
+                            onClick: () => h('login'),
+                            className:
+                              'btn-primary text-xs px-3.5 py-1.5 font-bold shadow-2xs active:scale-95 cursor-pointer',
+                            children: 'Sign In / Join',
+                          }),
+                        ],
+                      }),
+
+                  // Post Free Ad CTA Banner
+                  jsx('div', {
+                    className:
+                      'p-3.5 border-b border-gray-100 dark:border-gray-800',
+                    children: jsxs('button', {
+                      type: 'button',
+                      onClick: () => h('post-ad'),
+                      className:
+                        'w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-primary-600 via-primary-500 to-amber-500 text-white font-extrabold text-sm shadow-md shadow-primary-500/20 active:scale-[0.99] transition-all cursor-pointer',
+                      children: [
+                        jsx(CirclePlus, {
+                          className: 'h-5 w-5 shrink-0',
+                        }),
+                        jsx('span', {
+                          children: 'Post Free Solar Ad (اشتہار لگائیں)',
+                        }),
+                      ],
+                    }),
+                  }),
+
+                  // Navigation Links Sections
+                  jsxs('div', {
+                    className: 'p-3 space-y-4',
+                    children: [
+                      // Section 1: Market & Equipment
+                      jsxs('div', {
+                        children: [
+                          jsx('p', {
+                            className:
+                              'px-2 mb-1.5 text-[11px] font-extrabold uppercase tracking-wider text-gray-400 dark:text-gray-500',
+                            children: 'Marketplace & Rates',
+                          }),
+                          jsxs('div', {
+                            className: 'space-y-1',
+                            children: [
+                              // Today's Rates
+                              jsxs('button', {
+                                onClick: () => h('prices'),
+                                className: `w-full flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-bold transition-all cursor-pointer ${
+                                  e === 'prices'
+                                    ? 'bg-amber-500 text-white shadow-xs'
+                                    : 'bg-amber-50/80 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 border border-amber-200/70 dark:border-amber-800/60'
+                                }`,
+                                children: [
+                                  jsxs('div', {
+                                    className: 'flex items-center gap-2.5',
+                                    children: [
+                                      jsxs('span', {
+                                        className:
+                                          'relative flex h-2.5 w-2.5 shrink-0',
+                                        children: [
+                                          jsx('span', {
+                                            className:
+                                              'absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75',
+                                          }),
+                                          jsx('span', {
+                                            className:
+                                              'relative inline-flex h-2.5 w-2.5 rounded-full bg-amber-500',
+                                          }),
+                                        ],
+                                      }),
+                                      jsx('span', {
+                                        children: "Today's Solar Rates",
+                                      }),
+                                    ],
+                                  }),
+                                  jsx('span', {
+                                    className:
+                                      'rounded bg-amber-200 dark:bg-amber-900 px-1.5 py-0.5 text-[10px] font-black text-amber-900 dark:text-amber-100',
+                                    children: 'LIVE',
+                                  }),
+                                ],
+                              }),
+                              // Browse All Listings
+                              jsxs('button', {
+                                onClick: () => h('home'),
+                                className:
+                                  'w-full flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all cursor-pointer',
+                                children: [
+                                  jsxs('div', {
+                                    className: 'flex items-center gap-2.5',
+                                    children: [
+                                      jsx(Sun, {
+                                        className:
+                                          'h-4.5 w-4.5 text-primary-500',
+                                      }),
+                                      jsx('span', {
+                                        children: 'Browse Solar Equipment',
+                                      }),
+                                    ],
+                                  }),
+                                  jsx(ChevronRight, {
+                                    className: 'h-4 w-4 text-gray-400',
+                                  }),
+                                ],
+                              }),
+                              // Verified Dealers
+                              jsxs('button', {
+                                onClick: () => h('dealers'),
+                                className:
+                                  'w-full flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all cursor-pointer',
+                                children: [
+                                  jsxs('div', {
+                                    className: 'flex items-center gap-2.5',
+                                    children: [
+                                      jsx(Store, {
+                                        className:
+                                          'h-4.5 w-4.5 text-amber-500',
+                                      }),
+                                      jsx('span', {
+                                        children: 'Verified Solar Dealers',
+                                      }),
+                                    ],
+                                  }),
+                                  jsx(ChevronRight, {
+                                    className: 'h-4 w-4 text-gray-400',
+                                  }),
+                                ],
+                              }),
+                            ],
+                          }),
+                        ],
+                      }),
+
+                      // Section 2: Smart Tools & Services
+                      jsxs('div', {
+                        children: [
+                          jsx('p', {
+                            className:
+                              'px-2 mb-1.5 text-[11px] font-extrabold uppercase tracking-wider text-gray-400 dark:text-gray-500',
+                            children: 'Calculators & Services',
+                          }),
+                          jsxs('div', {
+                            className: 'space-y-1',
+                            children: [
+                              // Solar Calculator
+                              jsxs('button', {
+                                onClick: () => h('calculator'),
+                                className: `w-full flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-bold transition-all cursor-pointer ${
+                                  e === 'calculator'
+                                    ? 'bg-primary-500 text-white shadow-xs'
+                                    : 'bg-primary-50/80 dark:bg-primary-950/40 text-primary-900 dark:text-primary-200 border border-primary-200/70 dark:border-primary-800/60'
+                                }`,
+                                children: [
+                                  jsxs('div', {
+                                    className: 'flex items-center gap-2.5',
+                                    children: [
+                                      jsx(Calculator, {
+                                        className:
+                                          'h-4.5 w-4.5 text-primary-600 dark:text-primary-400',
+                                      }),
+                                      jsx('span', {
+                                        children:
+                                          'Solar Load & System Calculator',
+                                      }),
+                                    ],
+                                  }),
+                                  jsx(ChevronRight, {
+                                    className: 'h-4 w-4 text-gray-400',
+                                  }),
+                                ],
+                              }),
+                              // Turnkey Installation
+                              jsxs('button', {
+                                onClick: () => h('install'),
+                                className:
+                                  'w-full flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all cursor-pointer',
+                                children: [
+                                  jsxs('div', {
+                                    className: 'flex items-center gap-2.5',
+                                    children: [
+                                      jsx(Wrench, {
+                                        className:
+                                          'h-4.5 w-4.5 text-secondary-600 dark:text-secondary-400',
+                                      }),
+                                      jsx('span', {
+                                        children:
+                                          'Complete Turnkey Installation',
+                                      }),
+                                    ],
+                                  }),
+                                  jsx(ChevronRight, {
+                                    className: 'h-4 w-4 text-gray-400',
+                                  }),
+                                ],
+                              }),
+                            ],
+                          }),
+                        ],
+                      }),
+
+                      // Section 3: Account & Security
+                      jsxs('div', {
+                        className:
+                          'pt-2 border-t border-gray-100 dark:border-gray-800',
+                        children: [
+                          jsx('p', {
+                            className:
+                              'px-2 mb-1.5 text-[11px] font-extrabold uppercase tracking-wider text-gray-400 dark:text-gray-500',
+                            children: 'Account & Security',
+                          }),
+                          c
+                            ? jsxs('div', {
+                                className: 'space-y-1',
+                                children: [
+                                  // Dashboard
+                                  jsxs('button', {
+                                    onClick: () => h('dashboard'),
+                                    className:
+                                      'w-full flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-bold text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all cursor-pointer',
+                                    children: [
+                                      jsxs('div', {
+                                        className:
+                                          'flex items-center gap-2.5',
+                                        children: [
+                                          jsx(LayoutDashboard, {
+                                            className:
+                                              'h-4.5 w-4.5 text-amber-500',
+                                          }),
+                                          jsx('span', {
+                                            children:
+                                              u?.is_super_admin ||
+                                              u?.role === 'super_admin' ||
+                                              c?.email?.toLowerCase() ===
+                                                DEFAULT_ADMIN_EMAIL.toLowerCase()
+                                                ? '👑 Super Admin Dashboard'
+                                                : u?.is_admin ||
+                                                  u?.role === 'admin'
+                                                ? '🛡️ Admin Dashboard'
+                                                : u?.role === 'dealer' ||
+                                                  u?.is_dealer
+                                                ? '🏪 Dealer Dashboard'
+                                                : '📊 My Dashboard',
+                                          }),
+                                        ],
+                                      }),
+                                      jsx(ChevronRight, {
+                                        className: 'h-4 w-4 text-gray-400',
+                                      }),
+                                    ],
+                                  }),
+                                  // Admin Inbox (if admin)
+                                  isUserAdmin &&
+                                    jsxs('button', {
+                                      onClick: () => h('inbox'),
+                                      className:
+                                        'w-full flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-semibold text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950/40 transition-all cursor-pointer',
+                                      children: [
+                                        jsxs('div', {
+                                          className:
+                                            'flex items-center gap-2.5',
+                                          children: [
+                                            jsx(MessageSquare, {
+                                              className:
+                                                'h-4.5 w-4.5 text-purple-500',
+                                            }),
+                                            jsx('span', {
+                                              children:
+                                                'Admin Inbox & Inquiries',
+                                            }),
+                                          ],
+                                        }),
+                                        unreadInboxCount > 0 &&
+                                          jsx('span', {
+                                            className:
+                                              'px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white',
+                                            children: unreadInboxCount,
+                                          }),
+                                      ],
+                                    }),
+                                  // Change Password
+                                  jsxs('button', {
+                                    onClick: () => h('password'),
+                                    className:
+                                      'w-full flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all cursor-pointer',
+                                    children: [
+                                      jsxs('div', {
+                                        className:
+                                          'flex items-center gap-2.5',
+                                        children: [
+                                          jsx(Lock, {
+                                            className:
+                                              'h-4.5 w-4.5 text-gray-400',
+                                          }),
+                                          jsx('span', {
+                                            children: 'Change Password',
+                                          }),
+                                        ],
+                                      }),
+                                      jsx(ChevronRight, {
+                                        className: 'h-4 w-4 text-gray-400',
+                                      }),
+                                    ],
+                                  }),
+                                  // Sign Out
+                                  jsxs('button', {
+                                    onClick: p,
+                                    className:
+                                      'w-full flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-all cursor-pointer mt-2',
+                                    children: [
+                                      jsx(LogOut, {
+                                        className: 'h-4.5 w-4.5',
+                                      }),
+                                      jsx('span', {
+                                        children: 'Sign Out',
+                                      }),
+                                    ],
+                                  }),
+                                ],
+                              })
+                            : jsxs('div', {
+                                className: 'space-y-1.5',
+                                children: [
+                                  jsxs('button', {
+                                    onClick: () => h('login'),
+                                    className:
+                                      'w-full flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-bold text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-950/40 border border-primary-200 dark:border-primary-800 transition-all cursor-pointer',
+                                    children: [
+                                      jsxs('div', {
+                                        className:
+                                          'flex items-center gap-2.5',
+                                        children: [
+                                          jsx(User, {
+                                            className:
+                                              'h-4.5 w-4.5 text-primary-600',
+                                          }),
+                                          jsx('span', {
+                                            children:
+                                              'Sign In to Your Account',
+                                          }),
+                                        ],
+                                      }),
+                                      jsx(ChevronRight, {
+                                        className:
+                                          'h-4 w-4 text-primary-500',
+                                      }),
+                                    ],
+                                  }),
+                                ],
+                              }),
+                        ],
+                      }),
+                    ],
+                  }),
+
+                  // Support & Helpline Notice
+                  jsxs('div', {
+                    className:
+                      'mt-auto p-4 bg-gray-50 dark:bg-gray-850/60 border-t border-gray-200/60 dark:border-gray-800 text-center',
+                    children: [
+                      jsx('p', {
+                        className:
+                          'text-xs font-bold text-gray-700 dark:text-gray-300',
+                        children: 'Need help or solar consultation?',
+                      }),
+                      jsx('p', {
+                        className:
+                          'text-[11px] text-gray-500 dark:text-gray-400 mt-0.5',
+                        children:
+                          'Helpline / WhatsApp: 0300-1234567 • info@sellsolar.pk',
+                      }),
+                    ],
+                  }),
+                ],
+              }),
+            }),
+          ],
+        }),
+    ],
+  });
 }const Zy=[{
   value:"",label:"All",icon:Search
 },{
@@ -564,7 +1298,7 @@ function nx({
   };
 
   return jsxs("section",{
-    className:"relative overflow-hidden pt-20 sm:pt-24 lg:pt-28 pb-4 sm:pb-5 border-b border-gray-200/60 dark:border-gray-800 transition-colors",children:[
+    className:"relative overflow-hidden pt-18 sm:pt-24 lg:pt-28 pb-5 sm:pb-6 border-b border-gray-200/60 dark:border-gray-800 transition-colors",children:[
       jsxs("div",{
         className:"absolute inset-0 -z-10",children:[
           heroCms?.heroImageUrl ? jsx("div", {
@@ -588,19 +1322,19 @@ function nx({
       jsxs("div",{
         className:"container-page",children:[
           jsxs("div",{
-            className:"mx-auto max-w-3xl text-center",children:[
+            className:"mx-auto max-w-3xl text-center px-1 sm:px-0",children:[
               jsxs("div",{
-                className:"mb-3 inline-flex items-center gap-2 rounded-full bg-primary-50 dark:bg-primary-950/60 border border-primary-200/80 dark:border-primary-800/60 px-3.5 py-1 text-xs font-bold text-primary-700 dark:text-primary-300 shadow-2xs",children:[
-                  jsx(TrendingUp,{ className:"h-3.5 w-3.5 text-primary-600 dark:text-primary-400" }),
+                className:"mb-2.5 inline-flex items-center gap-1.5 sm:gap-2 rounded-full bg-primary-50 dark:bg-primary-950/60 border border-primary-200/80 dark:border-primary-800/60 px-3 py-1 text-[11px] sm:text-xs font-bold text-primary-700 dark:text-primary-300 shadow-2xs",children:[
+                  jsx(TrendingUp,{ className:"h-3 w-3 sm:h-3.5 sm:w-3.5 text-primary-600 dark:text-primary-400" }),
                   heroCms?.badgeText || "Pakistan's #1 Solar Marketplace"
                 ]
               }),
               jsx("h1",{
-                className:"text-balance text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white leading-tight",
+                className:"text-balance text-2xl xs:text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white leading-tight",
                 children: heroCms?.heading || "Sell & Buy Used Solar Panels in Pakistan"
               }),
               jsx("p",{
-                className:"mx-auto mt-3 max-w-2xl text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed",
+                className:"mx-auto mt-2 sm:mt-3 max-w-2xl text-xs sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed",
                 children: heroCms?.subheading || "Search 500+ verified used and new solar panels, inverters and batteries across Pakistan at live market rates."
               }),
               (nc||np||nd)&&jsxs("div",{
@@ -827,7 +1561,6 @@ function nx({
         className: `grid grid-cols-1 ${cards.length >= 3 ? 'md:grid-cols-2 lg:grid-cols-3' : 'md:grid-cols-2'} gap-4`,
         children: cards.map((card) => (
           jsxs("div", {
-            key: card.id || card.title,
             className: "card-interactive p-5 border border-gray-200/90 dark:border-gray-800 bg-gradient-to-br from-white via-primary-50/10 to-transparent dark:from-gray-900 dark:via-primary-950/10 dark:to-gray-900 transition-all flex flex-col justify-between group shadow-sm rounded-2xl overflow-hidden",
             children: [
               jsxs("div", {
@@ -862,13 +1595,12 @@ function nx({
                     className: "mt-3 space-y-1.5 text-xs text-gray-600 dark:text-gray-300",
                     children: card.points.map((pt, idx) => (
                       jsxs("li", {
-                        key: idx,
                         className: "flex items-center gap-2",
                         children: [
                           jsx(ShieldCheck, { className: "h-3.5 w-3.5 text-emerald-500 shrink-0" }),
                           pt
                         ]
-                      })
+                      }, idx)
                     ))
                   }) : null
                 ]
@@ -886,7 +1618,7 @@ function nx({
                 })
               })
             ]
-          })
+          }, card.id || card.title)
         ))
       })
     })
@@ -1393,7 +2125,7 @@ function lx({
           ]
         }),
         e?jsx("div",{
-          className:"grid grid-cols-1 gap-3.5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4",children:[1,2,3,4,5,6,7,8].map(sk=>jsxs("div",{
+          className:"grid grid-cols-1 xs:grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4",children:[1,2,3,4,5,6,7,8].map(sk=>jsxs("div",{
             className:"card overflow-hidden animate-pulse dark:bg-gray-900 border border-gray-200 dark:border-gray-800",children:[jsx("div",{
               className:"aspect-[4/3] bg-gray-200 dark:bg-gray-800"
             }),jsxs("div",{
@@ -1429,7 +2161,7 @@ function lx({
         }):jsxs("div",{
           children:[
             jsx("div",{
-              className:"grid grid-cols-1 gap-3.5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4",children:t.slice(0, visibleCount).map(a=>jsx(ax,{
+              className:"grid grid-cols-1 xs:grid-cols-2 gap-3.5 sm:gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4",children:t.slice(0, visibleCount).map(a=>jsx(ax,{
                 listing:a,onClick:()=>s(a.id),onNavigate:nav
               },a.id))
             }),
@@ -1513,49 +2245,83 @@ function cx(){
 ];
 
 const ux={
-  Company:[
-    { label: "About Us", page: "about" },
-    { label: "Careers", page: "careers" },
-    { label: "Press", page: "press" },
-    { label: "Blog", page: "blog" }
-  ],
-  Marketplace:[
-    { label: "Verified Dealers", page: "dealers" },
-    { label: "Buy Solar", page: "buy-solar" },
-    { label: "Sell Solar", page: "sell-solar" },
-    { label: "Used Solar", page: "used-solar" },
-    { label: "Solar Price", page: "solar-price" },
+  "Solar Marketplace":[
+    { label: "Today's Solar Rates", page: "prices" },
+    { label: "Solar Panels", page: "solar-panels" },
     { label: "Solar Inverter", page: "solar-inverter" },
     { label: "Solar Batteries", page: "solar-batteries" },
-    { label: "Solar Panels", page: "solar-panels" },
-    { label: "How It Works", page: "how-it-works" },
-    { label: "Pricing", page: "pricing" }
+    { label: "Used Solar Deals", page: "used-solar" },
+    { label: "Verified Dealers", page: "dealers" }
   ],
-  Support:[
-    { label: "Help Center", page: "help" },
+  "Tools & Services":[
+    { label: "Solar Load Calculator", page: "calculator" },
+    { label: "Turnkey Installation", page: "install" },
+    { label: "How It Works", page: "how-it-works" },
+    { label: "Pricing & Plans", page: "pricing" },
+    { label: "Safety Tips", page: "safety" }
+  ],
+  "Company & Support":[
+    { label: "About SellSolar", page: "about" },
     { label: "Contact Us", page: "contact" },
-    { label: "Safety Tips", page: "safety" },
+    { label: "Help Center", page: "help" },
+    { label: "Careers", page: "careers" },
+    { label: "Blog & Guides", page: "blog" },
     { label: "Report an Issue", page: "report-issue" }
   ],
-  Legal:[
+  "Legal & Privacy":[
     { label: "Terms of Service", page: "terms" },
     { label: "Privacy Policy", page: "privacy" },
     { label: "Cookie Policy", page: "cookies" },
     { label: "Disclaimer", page: "disclaimer" }
   ]
 };
+
+const PAKISTAN_SOLAR_CITIES = [
+  "Lahore", "Karachi", "Islamabad", "Rawalpindi", "Faisalabad",
+  "Multan", "Gujranwala", "Peshawar", "Quetta", "Sialkot", "Sargodha", "Bahawalpur"
+];
+
 function hx({
-  onPostAd:t,
-  onNavigate:navigate
+  onPostAd: t,
+  onNavigate: navigate
 }){
   const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const { settings } = useSiteSettings();
 
-  return jsxs("footer",{
-    id:"contact",className:"bg-gray-900 text-gray-400",children:[
+  const supportEmail = settings?.supportEmail || "info@sellsolar.pk";
+  const supportPhone = settings?.supportPhone || "+92 300 1234567";
+  const officeAddress = settings?.headOfficeAddress || "Sector G-7, Blue Area, Islamabad, Pakistan";
+  const copyrightText = settings?.copyrightText || "© 2026 SellSolar Pakistan. All rights reserved.";
+  const aboutText = settings?.footerAboutText || "Pakistan's #1 marketplace for solar panels, on-grid & hybrid inverters, lithium batteries, and turnkey solar installations. Buy and sell with total confidence.";
+
+  const rawWa = (settings?.whatsAppNumber || "923001234567").replace(/\D/g, "");
+  const waUrl = `https://wa.me/${rawWa}?text=${encodeURIComponent("Assalam-o-Alaikum, I am inquiring about solar equipment on SellSolar.pk")}`;
+
+  const socialLinksList = [
+    { label: "WhatsApp Support", href: waUrl, Icon: MessageCircle, isExternal: true },
+    settings?.socialLinks?.facebook && { label: "Facebook", href: settings.socialLinks.facebook, Icon: Facebook, isExternal: true },
+    settings?.socialLinks?.instagram && { label: "Instagram", href: settings.socialLinks.instagram, Icon: Instagram, isExternal: true },
+    settings?.socialLinks?.linkedin && { label: "LinkedIn", href: settings.socialLinks.linkedin, Icon: Linkedin, isExternal: true },
+    settings?.socialLinks?.youtube && { label: "YouTube", href: settings.socialLinks.youtube, Icon: Youtube, isExternal: true },
+    settings?.socialLinks?.twitter && { label: "Twitter / X", href: settings.socialLinks.twitter, Icon: Twitter, isExternal: true },
+    { label: "Email Support", href: `mailto:${supportEmail}`, Icon: Mail, isEmail: true },
+  ].filter(Boolean);
+
+  const handleNav = (page) => {
+    if (navigate) {
+      navigate(page);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  return jsxs("footer", {
+    id: "contact",
+    className: "bg-gray-950 text-gray-400 border-t border-gray-800/80 pb-28 sm:pb-24 md:pb-8 transition-colors",
+    children: [
       jsx(EmailContactModal, {
         isOpen: emailModalOpen,
         onClose: () => setEmailModalOpen(false),
-        recipientEmail: "info@sellsolar.pk",
+        recipientEmail: supportEmail,
         defaultSubject: "Inquiry via SellSolar.pk",
         onNavigateToContactForm: () => {
           if (navigate) {
@@ -1564,100 +2330,346 @@ function hx({
           }
         }
       }),
-      jsx("div",{
-      className:"border-b border-gray-800",children:jsx("div",{
-        className:"container-page py-6 sm:py-8",children:jsxs("div",{
-          className:"flex flex-col items-center justify-between gap-4 rounded-2xl bg-gradient-to-r from-primary-500 to-primary-600 p-5 sm:p-6 text-center lg:flex-row lg:text-left",children:[jsxs("div",{
-            children:[jsx("h3",{
-              className:"text-xl sm:text-2xl font-extrabold text-white",children:"Ready to go solar?"
-            }),jsx("p",{
-              className:"mt-1 text-primary-50 text-xs sm:text-sm",children:"Post your first ad free and reach thousands of buyers across Pakistan."
-            })]
-          }),jsx("button",{
-            onClick:t,className:"btn shrink-0 bg-white px-6 py-2.5 sm:px-8 sm:py-3 text-primary-600 shadow-md hover:bg-primary-50 active:scale-[0.98] text-xs sm:text-sm font-bold",children:"Post an Ad — It's Free"
-          })]
+
+      /* CTA Banner Strip */
+      jsx("div", {
+        className: "border-b border-gray-800/80 bg-gray-900/50",
+        children: jsx("div", {
+          className: "container-page py-6 sm:py-8",
+          children: jsxs("div", {
+            className: "flex flex-col items-center justify-between gap-5 rounded-2xl bg-gradient-to-r from-emerald-600 via-primary-600 to-amber-600 p-5 sm:p-7 text-center lg:flex-row lg:text-left shadow-lg shadow-primary-950/20",
+            children: [
+              jsxs("div", {
+                className: "max-w-2xl",
+                children: [
+                  jsx("span", {
+                    className: "inline-block text-[11px] font-extrabold uppercase tracking-wider bg-white/20 text-white px-2.5 py-0.5 rounded-full mb-1.5",
+                    children: "پاکستان کا #1 سولر پورٹل"
+                  }),
+                  jsx("h3", {
+                    className: "text-xl sm:text-2xl font-black text-white tracking-tight",
+                    children: "Ready to Buy or Sell Solar Equipment in Pakistan?"
+                  }),
+                  jsx("p", {
+                    className: "mt-1 text-primary-50 text-xs sm:text-sm leading-relaxed",
+                    children: "Post your ad 100% free or connect directly with verified solar dealers across 35+ Pakistani cities."
+                  })
+                ]
+              }),
+              jsxs("div", {
+                className: "flex flex-wrap items-center justify-center gap-2.5 shrink-0",
+                children: [
+                  jsx("button", {
+                    type: "button",
+                    onClick: t,
+                    className: "inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 sm:px-6 sm:py-3 text-primary-700 shadow-md hover:bg-primary-50 active:scale-[0.98] text-xs sm:text-sm font-extrabold cursor-pointer transition-all",
+                    children: [
+                      jsx(CirclePlus, { className: "h-4 w-4 stroke-[2.5]" }),
+                      "Post Ad — It's Free"
+                    ]
+                  }),
+                  jsx("button", {
+                    type: "button",
+                    onClick: () => handleNav("calculator"),
+                    className: "inline-flex items-center gap-2 rounded-xl bg-gray-900/40 hover:bg-gray-900/60 border border-white/25 px-4 py-2.5 sm:px-5 sm:py-3 text-white text-xs sm:text-sm font-bold cursor-pointer transition-all",
+                    children: [
+                      jsx(Calculator, { className: "h-4 w-4" }),
+                      "Load Calculator"
+                    ]
+                  }),
+                  jsx("button", {
+                    type: "button",
+                    onClick: () => handleNav("prices"),
+                    className: "hidden sm:inline-flex items-center gap-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-bold cursor-pointer transition-all",
+                    children: [
+                      jsx(Zap, { className: "h-4 w-4 text-amber-300" }),
+                      "Today's Rates"
+                    ]
+                  })
+                ]
+              })
+            ]
+          })
         })
+      }),
+
+      /* Trust & Key Metrics Strip */
+      jsx("div", {
+        className: "border-b border-gray-800/80 bg-gray-900/20",
+        children: jsx("div", {
+          className: "container-page py-4 sm:py-5",
+          children: jsxs("div", {
+            className: "grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-center sm:text-left",
+            children: [
+              jsxs("div", {
+                className: "flex items-center gap-3 p-2 rounded-xl bg-gray-900/40 border border-gray-800/60",
+                children: [
+                  jsx("div", {
+                    className: "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400",
+                    children: jsx(ShieldCheck, { className: "h-5 w-5" })
+                  }),
+                  jsxs("div", {
+                    children: [
+                      jsx("p", { className: "text-xs font-bold text-gray-200", children: "Verified Dealers" }),
+                      jsx("p", { className: "text-[11px] text-gray-400", children: "250+ Certified Businesses" })
+                    ]
+                  })
+                ]
+              }),
+              jsxs("div", {
+                className: "flex items-center gap-3 p-2 rounded-xl bg-gray-900/40 border border-gray-800/60",
+                children: [
+                  jsx("div", {
+                    className: "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-400",
+                    children: jsx(TrendingUp, { className: "h-5 w-5" })
+                  }),
+                  jsxs("div", {
+                    children: [
+                      jsx("p", { className: "text-xs font-bold text-gray-200", children: "Live Daily Rates" }),
+                      jsx("p", { className: "text-[11px] text-gray-400", children: "PKR/Watt Benchmarks" })
+                    ]
+                  })
+                ]
+              }),
+              jsxs("div", {
+                className: "flex items-center gap-3 p-2 rounded-xl bg-gray-900/40 border border-gray-800/60",
+                children: [
+                  jsx("div", {
+                    className: "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-500/10 text-primary-400",
+                    children: jsx(CirclePlus, { className: "h-5 w-5" })
+                  }),
+                  jsxs("div", {
+                    children: [
+                      jsx("p", { className: "text-xs font-bold text-gray-200", children: "Free Ad Posting" }),
+                      jsx("p", { className: "text-[11px] text-gray-400", children: "Zero Listing Commission" })
+                    ]
+                  })
+                ]
+              }),
+              jsxs("div", {
+                className: "flex items-center gap-3 p-2 rounded-xl bg-gray-900/40 border border-gray-800/60",
+                children: [
+                  jsx("div", {
+                    className: "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-blue-400",
+                    children: jsx(Sun, { className: "h-5 w-5" })
+                  }),
+                  jsxs("div", {
+                    children: [
+                      jsx("p", { className: "text-xs font-bold text-gray-200", children: "Panels, Inverters, Batteries" }),
+                      jsx("p", { className: "text-[11px] text-gray-400", children: "Complete Solar Solutions" })
+                    ]
+                  })
+                ]
+              })
+            ]
+          })
+        })
+      }),
+
+      /* Main Footer Navigation Columns */
+      jsxs("div", {
+        className: "container-page py-10 sm:py-12",
+        children: [
+          jsxs("div", {
+            className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-8 sm:gap-10",
+            children: [
+              /* Col 1 & 2: Brand & Contact Info */
+              jsxs("div", {
+                className: "sm:col-span-2",
+                children: [
+                  jsxs("div", {
+                    className: "flex items-center gap-2.5",
+                    children: [
+                      jsx("div", {
+                        className: "flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary-400 via-primary-500 to-amber-500 shadow-sm shadow-primary-500/30",
+                        children: jsx(Sun, { className: "h-5 w-5 text-white", strokeWidth: 2.5 })
+                      }),
+                      jsxs("div", {
+                        children: [
+                          jsxs("span", {
+                            className: "text-xl font-black text-white tracking-tight",
+                            children: [
+                              "Sell",
+                              jsx("span", { className: "text-primary-400", children: "Solar" }),
+                              jsx("span", { className: "text-xs text-amber-400 font-bold ml-1", children: ".pk" })
+                            ]
+                          }),
+                          jsx("p", {
+                            className: "text-[10px] text-gray-400 font-semibold tracking-wide",
+                            children: "پاکستان کا سب سے بڑا سولر پلیٹ فارم"
+                          })
+                        ]
+                      })
+                    ]
+                  }),
+                  jsx("p", {
+                    className: "mt-4 max-w-sm text-xs sm:text-sm text-gray-400 leading-relaxed",
+                    children: aboutText
+                  }),
+
+                  /* Direct Contact Details */
+                  jsxs("div", {
+                    className: "mt-6 space-y-2.5 text-xs sm:text-sm",
+                    children: [
+                      /* WhatsApp direct link */
+                      jsxs("a", {
+                        href: waUrl,
+                        target: "_blank",
+                        rel: "noopener noreferrer",
+                        className: "flex items-center gap-2.5 text-gray-300 hover:text-emerald-400 transition-colors group cursor-pointer",
+                        children: [
+                          jsx(MessageCircle, { className: "h-4 w-4 text-emerald-400 group-hover:scale-110 transition-transform shrink-0" }),
+                          jsxs("span", {
+                            children: [
+                              "WhatsApp: ",
+                              jsx("span", { className: "font-semibold text-white", children: settings?.whatsAppDisplayNumber || supportPhone })
+                            ]
+                          })
+                        ]
+                      }),
+                      /* Email Modal Trigger */
+                      jsxs("button", {
+                        type: "button",
+                        onClick: () => setEmailModalOpen(true),
+                        className: "flex items-center gap-2.5 text-gray-300 hover:text-primary-400 transition-colors cursor-pointer text-left group",
+                        children: [
+                          jsx(Mail, { className: "h-4 w-4 text-primary-400 group-hover:scale-110 transition-transform shrink-0" }),
+                          jsx("span", { className: "group-hover:underline", children: supportEmail })
+                        ]
+                      }),
+                      /* Phone Call */
+                      jsxs("a", {
+                        href: `tel:${supportPhone.replace(/\s+/g, "")}`,
+                        className: "flex items-center gap-2.5 text-gray-300 hover:text-white transition-colors group cursor-pointer",
+                        children: [
+                          jsx(Phone, { className: "h-4 w-4 text-amber-400 group-hover:scale-110 transition-transform shrink-0" }),
+                          jsx("span", { children: supportPhone })
+                        ]
+                      }),
+                      /* Office Location */
+                      jsxs("p", {
+                        className: "flex items-start gap-2.5 text-gray-400",
+                        children: [
+                          jsx(MapPin, { className: "h-4 w-4 text-gray-500 shrink-0 mt-0.5" }),
+                          jsx("span", { children: officeAddress })
+                        ]
+                      })
+                    ]
+                  })
+                ]
+              }),
+
+              /* Navigation Link Columns */
+              Object.entries(ux).map(([sectionTitle, links]) =>
+                jsxs("div", {
+                  children: [
+                    jsx("h4", {
+                      className: "mb-3 text-xs sm:text-sm font-bold uppercase tracking-wider text-white",
+                      children: sectionTitle
+                    }),
+                    jsx("ul", {
+                      className: "space-y-2 text-xs sm:text-sm",
+                      children: links.map((item) =>
+                        jsx("li", {
+                          children: jsx("a", {
+                            href: `/${item.page}`,
+                            onClick: (ev) => {
+                              ev.preventDefault();
+                              handleNav(item.page);
+                            },
+                            className: "text-gray-400 hover:text-white transition-colors cursor-pointer inline-block py-0.5",
+                            children: item.label
+                          })
+                        }, item.page || item.label)
+                      )
+                    })
+                  ]
+                }, sectionTitle)
+              )
+            ]
+          }),
+
+          /* Solar Cities Strip */
+          jsxs("div", {
+            className: "mt-10 pt-6 border-t border-gray-800/60",
+            children: [
+              jsx("div", {
+                className: "text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2.5 flex items-center gap-1.5",
+                children: [
+                  jsx(MapPin, { className: "h-3.5 w-3.5 text-primary-400" }),
+                  "Solar Equipment in Popular Pakistani Cities:"
+                ]
+              }),
+              jsx("div", {
+                className: "flex flex-wrap gap-1.5",
+                children: PAKISTAN_SOLAR_CITIES.map((city) =>
+                  jsx("button", {
+                    type: "button",
+                    onClick: () => handleNav("home"),
+                    className: "px-2.5 py-1 rounded-lg text-xs bg-gray-900 hover:bg-gray-800 text-gray-300 hover:text-primary-400 border border-gray-800/80 transition-all cursor-pointer",
+                    children: city
+                  }, `city-tag-${city}`)
+                )
+              })
+            ]
+          }),
+
+          /* Bottom Bar: Copyright, Social Icons, Back to Top */
+          jsxs("div", {
+            className: "mt-8 pt-6 border-t border-gray-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400",
+            children: [
+              jsxs("div", {
+                className: "flex flex-col sm:flex-row items-center sm:items-start gap-1 sm:gap-3 text-center sm:text-left",
+                children: [
+                  jsx("p", { children: copyrightText }),
+                  jsx("span", { className: "hidden sm:inline text-gray-700", children: "•" }),
+                  jsx("p", {
+                    className: "text-[11px] text-gray-400",
+                    children: "Made with pride in Pakistan 🇵🇰"
+                  })
+                ]
+              }),
+
+              /* Social Media Buttons */
+              jsx("div", {
+                className: "flex items-center gap-2",
+                children: socialLinksList.map(({ label, href, Icon, isEmail }) =>
+                  jsx("a", {
+                    href,
+                    onClick: (ev) => {
+                      if (isEmail) {
+                        ev.preventDefault();
+                        setEmailModalOpen(true);
+                      }
+                    },
+                    target: isEmail ? undefined : "_blank",
+                    rel: isEmail ? undefined : "noopener noreferrer",
+                    "aria-label": label,
+                    title: label,
+                    className: "flex h-8 w-8 items-center justify-center rounded-lg bg-gray-900 border border-gray-800 text-gray-400 hover:text-white hover:bg-primary-600 transition-all cursor-pointer active:scale-95",
+                    children: jsx(Icon, { className: "h-4 w-4" })
+                  }, label)
+                )
+              }),
+
+              /* Back to top button */
+              jsx("button", {
+                type: "button",
+                id: "footer-back-to-top-btn",
+                onClick: () => window.scrollTo({ top: 0, behavior: "smooth" }),
+                className: "flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-900 hover:bg-gray-800 text-gray-300 hover:text-white border border-gray-800 transition-all cursor-pointer text-xs font-semibold active:scale-95",
+                title: "Scroll back to the top of the page",
+                children: [
+                  jsx(ArrowUp, { className: "h-3.5 w-3.5 text-primary-400" }),
+                  "Back to Top"
+                ]
+              })
+            ]
+          })
+        ]
       })
-    }),jsxs("div",{
-      className:"container-page py-8 sm:py-10",children:[jsxs("div",{
-        className:"grid grid-cols-2 gap-8 lg:grid-cols-6",children:[jsxs("div",{
-          className:"col-span-2",children:[jsxs("div",{
-            className:"flex items-center gap-2",children:[jsx("div",{
-              className:"flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary-400 to-primary-600",children:jsx(Sun,{
-                className:"h-5 w-5 text-white",strokeWidth:2.5
-              })
-            }),jsxs("span",{
-              className:"text-xl font-extrabold text-white",children:["Sell",jsx("span",{
-                className:"text-primary-400",children:"Solar"
-              })]
-            })]
-          }),jsx("p",{
-            className:"mt-4 max-w-xs text-sm leading-relaxed",children:"Pakistan's #1 marketplace for solar panels, inverters, batteries, and complete solar systems. Buy and sell with confidence."
-          }),jsxs("div",{
-            className:"mt-6 space-y-2 text-sm",children:[jsxs("button",{
-              type:"button",
-              onClick:()=>setEmailModalOpen(true),
-              className:"flex items-center gap-2 hover:text-white transition-colors cursor-pointer text-left group",
-              title:"Click to email info@sellsolar.pk",
-              children:[jsx(Mail,{
-                className:"h-4 w-4 text-primary-400 group-hover:scale-110 transition-transform"
-              }),"info@sellsolar.pk"]
-            }),jsxs("p",{
-              className:"flex items-center gap-2",children:[jsx(MapPin,{
-                className:"h-4 w-4"
-              }),"Islamabad, Pakistan"]
-            })]
-          })]
-        }),Object.entries(ux).map(([e,r])=>jsxs("div",{
-          children:[jsx("h4",{
-            className:"mb-4 text-sm font-bold uppercase tracking-wide text-white",children:e
-          }),jsx("ul",{
-            className:"space-y-2.5",children:r.map(item=>jsx("li",{
-              children:jsx("a",{
-                href:`/${item.page}`,
-                onClick:(ev)=>{
-                  ev.preventDefault();
-                  if(navigate){
-                    navigate(item.page);
-                    window.scrollTo({top:0,behavior:"smooth"});
-                  }
-                },
-                className:"text-sm transition-colors hover:text-white cursor-pointer",
-                children:item.label
-              })
-            },item.page))
-          })]
-        },e))]
-      }),jsxs("div",{
-        className:"mt-12 flex flex-col items-center justify-between gap-4 border-t border-gray-800 pt-8 sm:flex-row",children:[jsx("p",{
-          className:"text-sm",children:"© 2026 SellSolar. All rights reserved."
-        }),jsx("div",{
-          className:"flex gap-3",children:[
-            { href: "mailto:info@sellsolar.pk", label: "Email SellSolar (info@sellsolar.pk)", Icon: Mail, isEmail: true },
-            { href: "/contact", label: "Contact SellSolar", Icon: MapPin, page: "contact" },
-          ].map(({ href, label, Icon, page, isEmail }) => jsx("a", {
-            href,
-            onClick: (ev) => {
-              if (isEmail) {
-                ev.preventDefault();
-                setEmailModalOpen(true);
-                return;
-              }
-              if (page && navigate) {
-                ev.preventDefault();
-                navigate(page);
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }
-            },
-            "aria-label": label,
-            title: label,
-            className: "flex h-9 w-9 items-center justify-center rounded-lg bg-gray-800 transition-colors hover:bg-primary-500 text-gray-300 hover:text-white cursor-pointer",
-            children: jsx(Icon, { className: "h-4 w-4" })
-          }, label))
-        })]
-      })]
-    })]
-  })
+    ]
+  });
 }function Wu(t){
   const e=t instanceof Error?t.message.toLowerCase():"";
   return e.includes("invalid login")||e.includes("invalid credentials")?"Incorrect email or password. Please try again.":e.includes("user already registered")||e.includes("already been registered")?"An account with this email already exists. Try logging in instead.":e.includes("email_rate_limit")||e.includes("rate limit")?"Too many attempts. Please wait a moment and try again.":e.includes("email not confirmed")?"Please check your email and confirm your account before logging in.":e.includes("unable to validate email")||e.includes("invalid email")||e.includes("email address")&&e.includes("invalid")?"Please enter a valid email address.":t instanceof Error&&t.message?t.message:"Something went wrong. Please try again."
@@ -2028,12 +3040,27 @@ function yx({
               })
             }),jsxs("details",{
               className:"group text-xs text-gray-500",children:[jsx("summary",{
-                className:"cursor-pointer font-semibold hover:text-gray-700 dark:hover:text-gray-300 select-none",children:"Or enter image link manually"
+                className:"cursor-pointer font-semibold hover:text-gray-700 dark:hover:text-gray-300 select-none",children:"Or enter image link manually / quick upload"
               }),jsxs("div",{
-                className:"mt-2 relative",children:[jsx(Image,{
-                  className:"absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
-                }),jsx("input",{
-                  type:"text",value:z,onChange:_=>I(_.target.value),placeholder:"https://...",className:"input-field pl-10 text-xs"
+                className:"mt-2 flex items-center gap-2",children:[jsxs("div",{
+                  className:"relative flex-1",children:[jsx(Image,{
+                    className:"absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
+                  }),jsx("input",{
+                    type:"text",value:z,onChange:_=>I(_.target.value),placeholder:"https://... or upload file directly",className:"input-field pl-10 text-xs"
+                  })]
+                }),jsxs("label",{
+                  className:"px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 text-xs font-semibold flex items-center gap-1.5 cursor-pointer shrink-0 transition-colors shadow-2xs",title:"Upload single image",children:[jsx(Upload,{
+                    className:"h-3.5 w-3.5 text-primary-600 dark:text-primary-400"
+                  }),jsx("span",{children:"Upload"}),jsx("input",{
+                    type:"file",accept:"image/jpeg,image/png,image/webp,image/jpg",className:"hidden",onChange:e=>{
+                      const f=e.target.files?.[0];
+                      if(!f)return;
+                      const r=new FileReader();
+                      r.onload=ev=>{if(ev.target?.result)I(ev.target.result)};
+                      r.readAsDataURL(f);
+                      e.target.value='';
+                    }
+                  })]
                 })]
               })]
             }),jsxs("div",{
@@ -2489,7 +3516,6 @@ function yx({
                     const IconComp=item.icon;
                     const isActive=e===item.id;
                     return jsxs("button",{
-                      key:item.id,
                       type:"button",
                       onClick:()=>{
                         y(item.id);
@@ -2509,7 +3535,7 @@ function yx({
                           children:item.badge
                         })
                       ]
-                    });
+                    }, item.id);
                   })
                 }),
                 jsx("div",{ className:"border-t border-gray-100 dark:border-gray-800 my-1" }),
@@ -3770,7 +4796,6 @@ function yx({
           }].map(T=>{
             const vt=T.icon;
             return jsxs("button",{
-              key:T.label,
               type:"button",
               onClick:()=>a(T.tab),
               title:`View ${T.label}`,
@@ -3801,7 +4826,7 @@ function yx({
                   children:T.hint
                 })
               ]
-            })
+            }, T.label)
           })
         }),b.length>0&&jsxs("div",{
           className:"mt-8",children:[jsx("h2",{
@@ -4711,6 +5736,10 @@ function _x({
     }),jsx(PakWheelsSellCards,{
       onPostAd:()=>nav?nav("post-ad"):void 0,
       onInstall:()=>nav?nav("installation"):void 0
+    }),jsx(DailyMarketRates,{
+      onNavigate:nav,
+      onSelectCategory:C,
+      compact:false
     }),nav && calcBanner?.enabled !== false ? jsx("div",{
       className:"container-page my-3.5 sm:my-4",children:jsxs("div",{
         className:"rounded-2xl bg-gradient-to-r from-gray-900 via-gray-850 to-primary-950 p-4 sm:p-5 text-white shadow-md border border-gray-800 transition-all",children:[
@@ -5189,12 +6218,19 @@ function _x({
 
   const showFloatingPostBtn = !r && !pr && n !== "post-ad" && n !== "login" && n !== "password" && n !== "forgot-password" && n !== "reset-password";
 
+  const showMobileBottomNav = !r && !pr && n !== "post-ad" && n !== "login" && n !== "password" && n !== "forgot-password" && n !== "reset-password";
+
   return jsx(SiteSettingsProvider, {
     children: jsxs(Fragment, {
       children: [
         pageContent,
         showFloatingPostBtn ? jsx(FloatingPostAdButton, { onPostAd: c }) : null,
-        jsx(FloatingWhatsAppWidget, {})
+        jsx(FloatingWhatsAppWidget, {}),
+        showMobileBottomNav ? jsx(MobileBottomNav, {
+          currentPage: n,
+          onNavigate: handleNavigate,
+          onPostAd: c
+        }) : null
       ]
     })
   });

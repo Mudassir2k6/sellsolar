@@ -9,6 +9,7 @@ import {
   MapPin,
   Sparkles,
   ArrowRight,
+  ArrowLeft,
   TrendingUp,
   ChevronRight,
 } from 'lucide-react';
@@ -39,6 +40,8 @@ export default function GlobalNavbarSearch({
   onSelectListing,
   onSearchSubmit,
   className = '',
+  mobileOpen = false,
+  onCloseMobile,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -48,7 +51,24 @@ export default function GlobalNavbarSearch({
 
   const containerRef = useRef(null);
   const inputRef = useRef(null);
+  const mobileInputRef = useRef(null);
   const resultsContainerRef = useRef(null);
+
+  // Focus mobile input & manage body scroll when mobile search opens
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = 'hidden';
+      const timer = setTimeout(() => {
+        mobileInputRef.current?.focus();
+      }, 100);
+      return () => {
+        clearTimeout(timer);
+        document.body.style.overflow = '';
+      };
+    } else {
+      document.body.style.overflow = '';
+    }
+  }, [mobileOpen]);
 
   // Load listings cache for fast instant search
   useEffect(() => {
@@ -137,6 +157,7 @@ export default function GlobalNavbarSearch({
 
   const handleSelect = (listingId) => {
     setIsOpen(false);
+    if (onCloseMobile) onCloseMobile();
     if (onSelectListing) {
       onSelectListing(listingId);
     }
@@ -144,6 +165,7 @@ export default function GlobalNavbarSearch({
 
   const handleSubmitSearch = (searchQuery = query, categoryId = activeCategory, brandName = '') => {
     setIsOpen(false);
+    if (onCloseMobile) onCloseMobile();
     if (onSearchSubmit) {
       onSearchSubmit({
         query: searchQuery,
@@ -199,7 +221,7 @@ export default function GlobalNavbarSearch({
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
-      {/* Clickable Search Input for Mobile, Tablet, and Desktop */}
+      {/* Clickable Search Input for Desktop (hidden on mobile, opens modal on mobile) */}
       <div
         id="navbar-search-bar-container"
         role="search"
@@ -207,7 +229,7 @@ export default function GlobalNavbarSearch({
           inputRef.current?.focus();
           setIsOpen(true);
         }}
-        className={`flex items-center w-full transition-all duration-200 rounded-xl border cursor-text bg-gray-50/90 dark:bg-gray-800/90 ${
+        className={`hidden md:flex items-center w-full transition-all duration-200 rounded-xl border cursor-text bg-gray-50/90 dark:bg-gray-800/90 ${
           isOpen
             ? 'border-primary-500 ring-2 ring-primary-500/20 shadow-md bg-white dark:bg-gray-800'
             : 'border-gray-200/90 dark:border-gray-700 hover:border-primary-400 dark:hover:border-primary-500/60 shadow-2xs'
@@ -475,6 +497,215 @@ export default function GlobalNavbarSearch({
               className="flex items-center gap-1 font-bold text-primary-600 dark:text-primary-400 hover:text-primary-700 transition-colors cursor-pointer"
             >
               <span>View all</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Dedicated Mobile Fullscreen Search Overlay */}
+      {mobileOpen && (
+        <div
+          id="mobile-search-fullscreen-overlay"
+          className="fixed inset-0 z-[100] bg-white dark:bg-gray-950 flex flex-col md:hidden animate-in fade-in duration-150"
+        >
+          {/* Mobile Top Bar */}
+          <div className="flex items-center gap-2 p-3 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+            <button
+              type="button"
+              id="mobile-search-back-btn"
+              onClick={onCloseMobile}
+              className="flex h-10 w-10 items-center justify-center rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 active:scale-95 transition-all cursor-pointer shrink-0"
+              aria-label="Close search"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+
+            <div className="flex-1 flex items-center bg-gray-100 dark:bg-gray-800 rounded-xl px-3 py-2">
+              <Search className="h-4 w-4 text-primary-500 mr-2 shrink-0" />
+              <input
+                ref={mobileInputRef}
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleSubmitSearch();
+                  } else if (e.key === 'Escape') {
+                    if (onCloseMobile) onCloseMobile();
+                  }
+                }}
+                placeholder="Search solar panels, inverters..."
+                className="w-full bg-transparent text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none"
+              />
+              {query && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setQuery('');
+                    mobileInputRef.current?.focus();
+                  }}
+                  className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Category Chips on Mobile */}
+          <div className="flex items-center gap-1.5 overflow-x-auto p-2.5 bg-gray-50 dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 no-scrollbar">
+            {CATEGORY_TABS.map((tab) => {
+              const TabIcon = tab.icon;
+              const count = categoryCounts[tab.id] ?? 0;
+              const isActive = activeCategory === tab.id;
+              return (
+                <button
+                  key={`mobile-tab-${tab.id}`}
+                  type="button"
+                  onClick={() => setActiveCategory(tab.id)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                    isActive
+                      ? 'bg-primary-500 text-white shadow-xs'
+                      : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200/80 dark:border-gray-700'
+                  }`}
+                >
+                  <TabIcon className="h-3 w-3 shrink-0" />
+                  <span>{tab.label}</span>
+                  {count > 0 && (
+                    <span
+                      className={`rounded-full px-1.5 py-0.2 text-[10px] font-extrabold ${
+                        isActive
+                          ? 'bg-white/20 text-white'
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
+                      }`}
+                    >
+                      {count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Results / Suggestions Container */}
+          <div className="flex-1 overflow-y-auto p-3 divide-y divide-gray-100 dark:divide-gray-800/60">
+            {displayedResults.length > 0 ? (
+              <div className="space-y-1.5">
+                {displayedResults.map((item) => {
+                  const itemImg = item.image_url || getEquipmentFallbackImage(item.category, item.title);
+                  return (
+                    <div
+                      key={`mob-item-${item.id}`}
+                      onClick={() => handleSelect(item.id)}
+                      className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/60 cursor-pointer active:scale-[0.99] transition-all"
+                    >
+                      <div className="relative h-14 w-14 shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-200/60 dark:border-gray-700">
+                        <img
+                          src={itemImg}
+                          alt={item.title}
+                          className="h-full w-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = getEquipmentFallbackImage(item.category, item.title);
+                          }}
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-1 mb-0.5">
+                          <h4 className="text-xs font-bold text-gray-900 dark:text-white truncate">
+                            {item.title}
+                          </h4>
+                          <span className="text-xs font-black text-primary-600 dark:text-primary-400 shrink-0">
+                            {formatPrice(item.price)}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 text-[11px] text-gray-500 dark:text-gray-400">
+                          {item.brand && <span className="font-semibold">{item.brand}</span>}
+                          {item.city && (
+                            <span className="flex items-center gap-0.5">
+                              <MapPin className="h-3 w-3" />
+                              {item.city}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <ChevronRight className="h-4 w-4 text-gray-400 shrink-0" />
+                    </div>
+                  );
+                })}
+              </div>
+            ) : query.trim() ? (
+              <div className="py-12 text-center">
+                <Search className="h-10 w-10 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+                <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  No listings found for "{query}"
+                </p>
+                <p className="text-xs text-gray-400 mt-1">
+                  Try searching by brand like Longi, Inverex, Crown or Narada
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4 py-2">
+                <div>
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                    <TrendingUp className="h-3.5 w-3.5 text-amber-500" />
+                    <span>Popular Searches</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {POPULAR_SEARCHES.map((item) => (
+                      <button
+                        key={`mob-pop-${item.label}`}
+                        type="button"
+                        onClick={() => {
+                          setQuery(item.brand || item.label);
+                          handleSubmitSearch(item.brand || item.label, item.category, item.brand);
+                        }}
+                        className="rounded-lg bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-300"
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                    Top Solar Brands
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {['Longi', 'Inverex', 'Canadian Solar', 'Crown', 'Trina', 'Jinko', 'Huawei', 'Narada', 'Phoenix'].map(
+                      (brand) => (
+                        <button
+                          key={`mob-brand-${brand}`}
+                          type="button"
+                          onClick={() => {
+                            setQuery(brand);
+                            handleSubmitSearch(brand);
+                          }}
+                          className="rounded-lg bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-300"
+                        >
+                          {brand}
+                        </button>
+                      )
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Mobile Footer */}
+          <div className="p-3 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+            <span className="text-xs text-gray-500 font-medium">
+              {filteredResults.length} matching items
+            </span>
+            <button
+              type="button"
+              onClick={() => handleSubmitSearch()}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-bold transition-colors"
+            >
+              <span>View Results</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </div>

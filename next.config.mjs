@@ -13,6 +13,7 @@ const nextConfig = {
     unoptimized: true,
   },
   transpilePackages: ['lucide-react'],
+  serverExternalPackages: ['@supabase/supabase-js'],
   reactStrictMode: true,
   trailingSlash: false,
   outputFileTracingRoot: __dirname,

@@ -36,9 +36,11 @@ import {
   TODAY_DATE_STR,
   LAST_MIDNIGHT_UPDATE,
   ISLAMABAD_DAILY_SHEETS,
+  getActiveDailyRates,
 } from '../data/todayPricesData';
 import { getPakistanDateDetails } from '../lib/dateUtils';
 import { formatPrice } from '../lib/constants';
+import DailyMarketRates from '../components/DailyMarketRates';
 
 export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
   const pktDateInfo = useMemo(() => getPakistanDateDetails(), []);
@@ -200,8 +202,8 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
   const displayedSheetRates = useMemo(() => {
     const isYesterday = dailySheetDate === 'yesterday';
     const sheet = isYesterday
-      ? (ISLAMABAD_DAILY_SHEETS['yesterday'] || ISLAMABAD_DAILY_SHEETS[yesterdayDateLabel] || ISLAMABAD_DAILY_SHEETS['14-Sep-2026'] || ISLAMABAD_DAILY_SHEETS['13-Sep-2026'])
-      : (ISLAMABAD_DAILY_SHEETS['today'] || ISLAMABAD_DAILY_SHEETS[todayDateLabel] || ISLAMABAD_DAILY_SHEETS['15-Sep-2026'] || ISLAMABAD_DAILY_SHEETS['14-Sep-2026']);
+      ? (ISLAMABAD_DAILY_SHEETS['yesterday'] || ISLAMABAD_DAILY_SHEETS[yesterdayDateLabel] || ISLAMABAD_DAILY_SHEETS['15-Sep-2026'] || ISLAMABAD_DAILY_SHEETS['14-Sep-2026'])
+      : getActiveDailyRates(todayDateLabel || '16-Sep-2026');
 
     let activeData = [];
     if (sheetCategory === 'inverter') {
@@ -491,6 +493,15 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
               );
             })}
           </div>
+        </div>
+
+        {/* Daily Market Rates Feed Component */}
+        <div className="mb-6 -mx-4 sm:mx-0">
+          <DailyMarketRates
+            onNavigate={onNavigate}
+            onSelectCategory={(cat) => handleSelectCategory(cat)}
+            compact={true}
+          />
         </div>
 
         {/* Islamabad Ready Stock Daily Sheet Verification & Date Comparison */}

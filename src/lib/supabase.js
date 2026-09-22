@@ -81,18 +81,49 @@ function getValidAnonKey(rawKey) {
 const supabaseUrl = getValidSupabaseUrl(getPublicEnv('SUPABASE_URL'));
 const supabaseAnonKey = getValidAnonKey(getPublicEnv('SUPABASE_ANON_KEY'));
 
+const isBrowser = typeof window !== 'undefined';
+
 let client;
 try {
   client = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true,
+      persistSession: isBrowser,
+      autoRefreshToken: isBrowser,
+      detectSessionInUrl: isBrowser,
     },
   });
 } catch (err) {
   console.warn('[SellSolar] Supabase client init fallback:', err);
-  client = createClient(DEFAULT_SUPABASE_URL, DEFAULT_ANON_KEY);
+  try {
+    client = createClient(DEFAULT_SUPABASE_URL, DEFAULT_ANON_KEY, {
+      auth: {
+        persistSession: isBrowser,
+        autoRefreshToken: isBrowser,
+        detectSessionInUrl: isBrowser,
+      },
+    });
+  } catch (fallbackErr) {
+    console.warn('[SellSolar] Supabase fallback client init error:', fallbackErr);
+    client = {
+      auth: {
+        getSession: async () => ({ data: { session: null }, error: null }),
+        onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+        signInWithPassword: async () => ({ data: null, error: new Error('Auth unavailable') }),
+        signOut: async () => ({ error: null }),
+        getUser: async () => ({ data: { user: null }, error: null }),
+      },
+      from: () => ({
+        select: () => ({
+          order: () => ({ limit: async () => ({ data: [], error: null }) }),
+          limit: async () => ({ data: [], error: null }),
+          eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }),
+        }),
+        insert: async () => ({ data: null, error: null }),
+        update: async () => ({ data: null, error: null }),
+        delete: async () => ({ data: null, error: null }),
+      }),
+    };
+  }
 }
 
 export const supabase = client;

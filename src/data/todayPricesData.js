@@ -1925,3 +1925,49 @@ export const SOLAR_PRICES_DATA = [
     "popular": true
   }
 ];
+
+export const CUSTOM_DAILY_RATES_STORAGE_KEY = 'sellsolar_custom_daily_rates';
+
+/**
+ * Get active benchmark rates merging default ISLAMABAD_DAILY_SHEETS with any admin-customized rates
+ */
+export function getActiveDailyRates(sheetDateKey = '16-Sep-2026') {
+  const baseSheet = ISLAMABAD_DAILY_SHEETS[sheetDateKey] || ISLAMABAD_DAILY_SHEETS['16-Sep-2026'];
+  if (typeof window === 'undefined') {
+    return baseSheet;
+  }
+  try {
+    const raw = localStorage.getItem(CUSTOM_DAILY_RATES_STORAGE_KEY);
+    if (raw) {
+      const overrides = JSON.parse(raw);
+      if (overrides && typeof overrides === 'object') {
+        return {
+          ...baseSheet,
+          ...overrides,
+          rates: overrides.rates || baseSheet.rates,
+          inverterRates: overrides.inverterRates || baseSheet.inverterRates,
+          batteryRates: overrides.batteryRates || baseSheet.batteryRates,
+          essRates: overrides.essRates || baseSheet.essRates,
+          systemRates: overrides.systemRates || baseSheet.systemRates,
+          structureRates: overrides.structureRates || baseSheet.structureRates,
+        };
+      }
+    }
+  } catch (err) {
+    console.warn('Error reading custom daily rates:', err);
+  }
+  return baseSheet;
+}
+
+/**
+ * Save updated benchmark rates from the Admin Daily Rates Editor
+ */
+export function saveCustomDailyRates(updatedSheetData) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(CUSTOM_DAILY_RATES_STORAGE_KEY, JSON.stringify(updatedSheetData));
+    window.dispatchEvent(new CustomEvent('sellsolar_daily_rates_updated', { detail: updatedSheetData }));
+  } catch (err) {
+    console.error('Failed to persist custom daily rates:', err);
+  }
+}

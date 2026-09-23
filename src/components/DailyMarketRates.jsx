@@ -1005,8 +1005,8 @@ export default function DailyMarketRates({ onNavigate, onSelectCategory, compact
           )}
 
           {/* Rates Table / List */}
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
+          <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+            <table className="w-full text-left text-xs border-collapse min-w-[700px]">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-850/80 text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider text-[11px]">
                   <th className="py-3 px-4">Component & Specification</th>

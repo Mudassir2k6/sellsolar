@@ -255,29 +255,34 @@ function Xy({
               className: 'container-page flex items-center justify-between',
               children: [
                 jsxs('div', {
-                  className: 'flex items-center gap-4 text-xs',
+                  className: 'flex items-center overflow-hidden whitespace-nowrap text-xs max-w-[60%]',
                   children: [
-                    jsxs('span', {
-                      className:
-                        'flex items-center gap-1.5 text-gray-300 font-medium',
-                      children: [
-                        jsx(TrendingUp, {
-                          className: 'h-3.5 w-3.5 text-primary-400',
-                        }),
-                        settings?.tagline || "Pakistan's #1 Solar Marketplace",
-                      ],
+                    jsx('style', {
+                      dangerouslySetInnerHTML: { __html: `
+                        @keyframes ticker {
+                          0% { transform: translateX(100%); }
+                          100% { transform: translateX(-100%); }
+                        }
+                        .animate-ticker {
+                          display: inline-block;
+                          animation: ticker 35s linear infinite;
+                        }
+                      ` }
                     }),
-                    jsx('span', { className: 'text-gray-700', children: '|' }),
                     jsxs('span', {
-                      className:
-                        'text-amber-400 font-semibold flex items-center gap-1',
+                      className: 'animate-ticker font-semibold text-gray-300 flex items-center gap-3',
                       children: [
-                        jsx(Zap, { className: 'h-3 w-3 fill-amber-400' }),
-                        settings?.topBannerText ||
-                          'Daily Rates: Longi 585W Rs 38/W • Inverex 6kW Rs 210,000',
-                      ],
-                    }),
-                  ],
+                        jsxs('span', { className: 'flex items-center gap-1', children: [jsx(TrendingUp, { className: 'h-3.5 w-3.5 text-primary-400' }), "LIVE RATES:"] }),
+                        jsxs('span', { className: 'text-emerald-400', children: ['🟢 Longi 585W: Rs 38.50/W'] }),
+                        jsx('span', { className: 'text-gray-700', children: '|' }),
+                        jsxs('span', { className: 'text-emerald-400', children: ['🟢 Jinko 585W: Rs 40.00/W'] }),
+                        jsx('span', { className: 'text-gray-700', children: '|' }),
+                        jsxs('span', { className: 'text-amber-400', children: ['🟡 Inverex 6kW: Rs 266,000'] }),
+                        jsx('span', { className: 'text-gray-700', children: '|' }),
+                        jsxs('span', { className: 'text-emerald-400', children: ['🟢 Tubular 230Ah: Rs 51,500'] }),
+                      ]
+                    })
+                  ]
                 }),
                 jsxs('div', {
                   className: 'flex items-center gap-5 text-gray-400 font-medium',
@@ -2043,7 +2048,7 @@ function ax({
 }
 
 function lx({
-  listings:t,loading:e,error:r,totalCount:n,onSelectListing:s,onResetFilters:rf,onNavigate:nav,currentCondition,onConditionChange,currentCategory,onCategoryChange
+  listings:t,loading:e,error:r,totalCount:n,onSelectListing:s,onResetFilters:rf,onNavigate:nav,currentCondition,onConditionChange,currentCategory,onCategoryChange,isCarousel
 }){
   const [visibleCount, setVisibleCount] = useState(8);
 
@@ -2190,9 +2195,10 @@ function lx({
           children:[
             jsx("div",{
               id:"listings-grid",
-              className:"grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4",children:t.slice(0, visibleCount).map(a=>jsx(ax,{
+              className: isCarousel ? "flex overflow-x-auto snap-x snap-mandatory gap-3 sm:gap-4 pb-4 scrollbar-hide" : "grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4",
+              children:t.slice(0, visibleCount).map(a=>jsx("div", { className: isCarousel ? "shrink-0 w-[240px] sm:w-[280px] snap-start" : "", children: jsx(ax,{
                 listing:a,onClick:()=>s(a.id),onNavigate:nav
-              },a.id))
+              },a.id)}, a.id))
             }),
             t.length > 8 && jsxs("div",{
               className:"mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 border-t border-gray-100 dark:border-gray-800",
@@ -5653,11 +5659,45 @@ function yx({
   })
 ]
 });
-}const Vu={
+function BrandLogosRow({ onSelectBrand }) {
+  const brands = [
+    { name: "Longi Solar", short: "Longi", color: "from-blue-600 to-blue-800" },
+    { name: "Jinko Solar", short: "Jinko", color: "from-blue-500 to-blue-700" },
+    { name: "Canadian Solar", short: "Canadian", color: "from-red-600 to-red-800" },
+    { name: "Inverex", short: "Inverex", color: "from-emerald-600 to-emerald-800" },
+    { name: "Growatt", short: "Growatt", color: "from-amber-500 to-amber-700" },
+    { name: "Knox Solar", short: "Knox", color: "from-purple-600 to-purple-800" }
+  ];
+  return jsx("section", {
+    className: "bg-white dark:bg-gray-950 py-4 border-b border-gray-200/60 dark:border-gray-800 transition-colors",
+    children: jsx("div", {
+      className: "container-page",
+      children: jsxs("div", {
+        className: "flex flex-col gap-3",
+        children: [
+          jsx("h3", { className: "text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider", children: "Top Brands" }),
+          jsx("div", {
+            className: "flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-2",
+            children: brands.map(b => jsxs("button", {
+              key: b.name,
+              onClick: () => onSelectBrand(b.name),
+              className: `shrink-0 snap-start h-14 sm:h-16 w-28 sm:w-32 rounded-xl bg-gradient-to-br ${b.color} flex items-center justify-center shadow-sm hover:scale-105 hover:shadow-md transition-all cursor-pointer`,
+              children: [
+                jsx("span", { className: "text-white font-black text-base sm:text-lg tracking-tight", children: b.short })
+              ]
+            }))
+          })
+        ]
+      })
+    })
+  });
+}
+
+const Vu={
   category:"",brand:"",condition:"",city:"",minPrice:"",maxPrice:"",query:""
 };
 function _x({
-  onSelectListing:t,onNavigate:nav,initialFilters
+  onSelectListing:t,onNavigate:nav,initialFilters,isHome
 }){
   const { settings } = useSiteSettings();
   const calcBanner = settings?.homePageCms?.calculatorBanner;
@@ -5714,7 +5754,7 @@ function _x({
         e.category&&(f=f.eq("category",e.category)),e.brand&&(f=f.eq("brand",e.brand)),e.condition&&(f=f.eq("condition",e.condition)),e.city&&(f=f.eq("city",e.city)),e.minPrice&&(f=f.gte("price",parseFloat(e.minPrice))),e.maxPrice&&(f=f.lte("price",parseFloat(e.maxPrice))),e.query&&(f=f.or(`title.ilike.%${e.query}%,brand.ilike.%${e.query}%,description.ilike.%${e.query}%`));
         const{
           data:m,error:v,count:k
-        }=await f.limit(50);
+        }=await f.limit(16);
         if(!active) return;
         if(!v && m && m.length > 0){
           s(m);
@@ -5740,17 +5780,6 @@ function _x({
     children:[jsx(nx,{
       key:"home-hero-filters",
       filters:e,onFilterChange:y,onSearch:w,onReset:j,onNavigatePrices:nav?()=>nav("prices"):void 0,onNavigateCalculator:nav?()=>nav("calculator"):void 0,onNavigateDealers:nav?()=>nav("dealers"):void 0,onNavigateInstallation:nav?()=>nav("installation"):void 0
-    }),jsx(lx,{
-      key:"home-listings-section",
-      listings:n,loading:a,error:o,totalCount:u,onSelectListing:t,onResetFilters:j,onNavigate:nav,currentCondition:e.condition,onConditionChange:(newCond)=>{
-        y("condition", newCond);
-        p(cnt => cnt + 1);
-      },
-      currentCategory:e.category,
-      onCategoryChange:(newCat)=>{
-        y("category", newCat);
-        p(cnt => cnt + 1);
-      }
     }),jsx(PakWheelsSellCards,{
       key:"home-pakwheels-cards",
       onPostAd:()=>nav?nav("post-ad"):void 0,
@@ -5771,6 +5800,18 @@ function _x({
       onSelectBrand:(brandName)=>{
         y("brand", brandName);
         setTimeout(w, 50);
+      }
+    }),jsx(BrandLogosRow, { key: "home-brand-logos", onSelectBrand: (brandName) => { y("brand", brandName); setTimeout(w, 50); } }),jsx(lx,{
+      key:"home-listings-section",
+      isCarousel:isHome,
+      listings:n,loading:a,error:o,totalCount:u,onSelectListing:t,onResetFilters:j,onNavigate:nav,currentCondition:e.condition,onConditionChange:(newCond)=>{
+        y("condition", newCond);
+        p(cnt => cnt + 1);
+      },
+      currentCategory:e.category,
+      onCategoryChange:(newCat)=>{
+        y("category", newCat);
+        p(cnt => cnt + 1);
       }
     })]
   })
@@ -6193,7 +6234,7 @@ function _x({
     }), jsx("main", {
       id: "main",
       children: jsx(_x, {
-        onSelectListing: u, onNavigate: handleNavigate, initialFilters: searchFilters
+        onSelectListing: u, onNavigate: handleNavigate, initialFilters: searchFilters, isHome: n === "home" || !n
       })
     }), jsx(hx, {
       onPostAd: c, onNavigate: handleNavigate

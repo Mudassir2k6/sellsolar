@@ -1436,9 +1436,15 @@ export function AuthProvider({ children }) {
           if (resetErr.message?.toLowerCase().includes('rate limit')) {
             throw new Error('Supabase email limit exceeded. Please wait a few minutes, or use test code 123456.');
           }
+          if (resetErr.message?.toLowerCase().includes('error sending') || resetErr.message?.toLowerCase().includes('smtp')) {
+            throw new Error('SMTP Error from Supabase: Unable to send email. In Supabase SMTP Settings, ensure Sender Email is "onboarding@resend.dev" and Username is "resend". (Or enter test code 123456).');
+          }
+          throw new Error(resetErr.message || 'Error sending recovery email via Supabase.');
         }
       } catch (sbErr) {
-        if (sbErr.message?.includes('limit')) throw sbErr;
+        if (sbErr.message?.includes('SMTP') || sbErr.message?.includes('limit') || sbErr.message?.includes('Supabase')) {
+          throw sbErr;
+        }
         console.warn('Supabase reset email notice:', sbErr);
       }
     } else if (!userExists) {

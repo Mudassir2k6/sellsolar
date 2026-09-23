@@ -5526,6 +5526,7 @@ function yx({
   })
 ]
 });
+}
 function BrandLogosRow({ onSelectBrand }) {
   const brands = [
     { name: "Longi Solar", short: "Longi", color: "from-blue-600 to-blue-800" },
@@ -5682,7 +5683,9 @@ function _x({
       }
     })]
   })
-}export default function App({ initialPathname, initialSlug }){
+}
+
+export default function App({ initialPathname, initialSlug }){
   const {
     user: t, profile: e, loading: r, passwordRecovery: pr, isSuperAdmin, isAdmin
   } = useAuth();

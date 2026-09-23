@@ -615,7 +615,7 @@ export default function DailyMarketRates({ onNavigate, onSelectCategory, compact
         <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-md overflow-hidden transition-all">
           
           {/* Header Bar */}
-          <div className="bg-gradient-to-r from-amber-500/10 via-primary-500/5 to-transparent p-4 sm:p-6 border-b border-gray-200/80 dark:border-gray-800">
+          <div className={`bg-gradient-to-r from-amber-500/10 via-primary-500/5 to-transparent ${compact ? 'p-3 sm:p-4' : 'p-4 sm:p-6'} border-b border-gray-200/80 dark:border-gray-800`}>
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div>
                 <div className="flex flex-wrap items-center gap-2 mb-1.5">
@@ -667,60 +667,62 @@ export default function DailyMarketRates({ onNavigate, onSelectCategory, compact
               </div>
             </div>
 
-            {/* Quick KPI Highlights Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3.5 mt-5">
-              <div className="rounded-xl p-3 bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-amber-800 dark:text-amber-400">
-                  <Sun className="h-3.5 w-3.5" />
-                  <span>550W Panel Benchmark</span>
+            {/* Quick KPI Highlights Grid (Full view only) */}
+            {!compact && (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3.5 mt-5">
+                <div className="rounded-xl p-3 bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-amber-800 dark:text-amber-400">
+                    <Sun className="h-3.5 w-3.5" />
+                    <span>550W Panel Benchmark</span>
+                  </div>
+                  <div className="text-base sm:text-lg font-black text-gray-900 dark:text-white mt-1">
+                    Rs {stats.avg550Rate} <span className="text-xs font-medium text-gray-500">/ Watt</span>
+                  </div>
+                  <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
+                    Approx Rs 21.2k / piece
+                  </div>
                 </div>
-                <div className="text-base sm:text-lg font-black text-gray-900 dark:text-white mt-1">
-                  Rs {stats.avg550Rate} <span className="text-xs font-medium text-gray-500">/ Watt</span>
-                </div>
-                <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
-                  Approx Rs 21.2k / piece
-                </div>
-              </div>
 
-              <div className="rounded-xl p-3 bg-blue-50/70 dark:bg-blue-950/20 border border-blue-200/60 dark:border-blue-900/40">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-blue-800 dark:text-blue-400">
-                  <Zap className="h-3.5 w-3.5" />
-                  <span>Inverter Range</span>
+                <div className="rounded-xl p-3 bg-blue-50/70 dark:bg-blue-950/20 border border-blue-200/60 dark:border-blue-900/40">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-blue-800 dark:text-blue-400">
+                    <Zap className="h-3.5 w-3.5" />
+                    <span>Inverter Range</span>
+                  </div>
+                  <div className="text-base sm:text-lg font-black text-gray-900 dark:text-white mt-1">
+                    {stats.invRange}
+                  </div>
+                  <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
+                    3kW Pro up to 10kW 3P
+                  </div>
                 </div>
-                <div className="text-base sm:text-lg font-black text-gray-900 dark:text-white mt-1">
-                  {stats.invRange}
-                </div>
-                <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
-                  3kW Pro up to 10kW 3P
-                </div>
-              </div>
 
-              <div className="rounded-xl p-3 bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-900/40">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-800 dark:text-emerald-400">
-                  <BatteryCharging className="h-3.5 w-3.5" />
-                  <span>LiFePO4 Lithium (5kWh)</span>
+                <div className="rounded-xl p-3 bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-900/40">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-800 dark:text-emerald-400">
+                    <BatteryCharging className="h-3.5 w-3.5" />
+                    <span>LiFePO4 Lithium (5kWh)</span>
+                  </div>
+                  <div className="text-base sm:text-lg font-black text-gray-900 dark:text-white mt-1">
+                    {stats.lithium5kWh}
+                  </div>
+                  <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
+                    51.2V 100Ah (6000 cycles)
+                  </div>
                 </div>
-                <div className="text-base sm:text-lg font-black text-gray-900 dark:text-white mt-1">
-                  {stats.lithium5kWh}
-                </div>
-                <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
-                  51.2V 100Ah (6000 cycles)
-                </div>
-              </div>
 
-              <div className="rounded-xl p-3 bg-purple-50/70 dark:bg-purple-950/20 border border-purple-200/60 dark:border-purple-900/40">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-purple-800 dark:text-purple-400">
-                  <ShieldCheck className="h-3.5 w-3.5" />
-                  <span>Tall Tubular (230Ah)</span>
-                </div>
-                <div className="text-base sm:text-lg font-black text-gray-900 dark:text-white mt-1">
-                  {stats.tubular230Ah}
-                </div>
-                <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
-                  TX 2500 27-Plates Deep Cycle
+                <div className="rounded-xl p-3 bg-purple-50/70 dark:bg-purple-950/20 border border-purple-200/60 dark:border-purple-900/40">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-purple-800 dark:text-purple-400">
+                    <ShieldCheck className="h-3.5 w-3.5" />
+                    <span>Tall Tubular (230Ah)</span>
+                  </div>
+                  <div className="text-base sm:text-lg font-black text-gray-900 dark:text-white mt-1">
+                    {stats.tubular230Ah}
+                  </div>
+                  <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
+                    TX 2500 27-Plates Deep Cycle
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* In Compact Mode (Homepage), if not expanded, show a sleek 4-row benchmark snapshot and 1-click expand bar */}

@@ -1736,7 +1736,6 @@ function nx({
         className: "grid grid-cols-1 sm:grid-cols-3 gap-2.5",
         children: items.map((item) => (
           jsxs("button", {
-            key: item.id,
             type: "button",
             onClick: item.action,
             className: "group flex items-center gap-2.5 p-2.5 sm:p-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-850 hover:border-primary-400 dark:hover:border-primary-600 hover:shadow-xs transition-all text-left w-full cursor-pointer",
@@ -5547,13 +5546,12 @@ function BrandLogosRow({ onSelectBrand }) {
           jsx("div", {
             className: "flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-2 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8",
             children: brands.map(b => jsxs("button", {
-              key: b.name,
               onClick: () => onSelectBrand(b.name),
               className: `shrink-0 snap-start h-14 sm:h-16 w-28 sm:w-32 rounded-xl bg-gradient-to-br ${b.color} flex items-center justify-center shadow-sm hover:scale-105 hover:shadow-md transition-all cursor-pointer`,
               children: [
                 jsx("span", { className: "text-white font-black text-base sm:text-lg tracking-tight", children: b.short })
               ]
-            }))
+            }, b.name))
           })
         ]
       })
@@ -5646,20 +5644,16 @@ function _x({
 
   return jsxs(Fragment,{
     children:[jsx(nx,{
-      key:"home-hero-filters",
       filters:e,onFilterChange:y,onSearch:w,onReset:j,onNavigatePrices:nav?()=>nav("prices"):void 0,onNavigateCalculator:nav?()=>nav("calculator"):void 0,onNavigateDealers:nav?()=>nav("dealers"):void 0,onNavigateInstallation:nav?()=>nav("installation"):void 0
     }),jsx(PakWheelsSellCards,{
-      key:"home-pakwheels-cards",
       onPostAd:()=>nav?nav("post-ad"):void 0,
       onInstall:()=>nav?nav("installation"):void 0,
       onNavigate:nav
     }),jsx(DailyMarketRates,{
-      key:"home-daily-rates",
       onNavigate:nav,
       onSelectCategory:C,
       compact:true
     }),jsx(ix,{
-      key:"home-categories-cities",
       onSelectCategory:C,
       onSelectCity:(cityName)=>{
         y("city", cityName);
@@ -5669,8 +5663,7 @@ function _x({
         y("brand", brandName);
         setTimeout(w, 50);
       }
-    }),jsx(BrandLogosRow, { key: "home-brand-logos", onSelectBrand: (brandName) => { y("brand", brandName); setTimeout(w, 50); } }),jsx(lx,{
-      key:"home-listings-section",
+    }),jsx(BrandLogosRow, { onSelectBrand: (brandName) => { y("brand", brandName); setTimeout(w, 50); } }),jsx(lx,{
       isCarousel:isHome,
       listings:n,loading:a,error:o,totalCount:u,onSelectListing:t,onResetFilters:j,onNavigate:nav,currentCondition:e.condition,onConditionChange:(newCond)=>{
         y("condition", newCond);

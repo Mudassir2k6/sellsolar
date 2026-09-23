@@ -1814,7 +1814,7 @@ function ix({
         }),
         /* Scrollable Chips Row */
         jsx("div",{
-          className:"flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none -mx-4 sm:mx-0 px-4 sm:px-0",
+          className:"flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8",
           children: activeBrowseTab==="category"
             ? sx.map(cat => {
                 const Icon = cat.icon;
@@ -2195,7 +2195,7 @@ function lx({
           children:[
             jsx("div",{
               id:"listings-grid",
-              className: isCarousel ? "flex overflow-x-auto snap-x snap-mandatory gap-3 sm:gap-4 pb-4 scrollbar-hide -mx-4 sm:mx-0 px-4 sm:px-0" : "grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4",
+              className: isCarousel ? "flex overflow-x-auto snap-x snap-mandatory gap-3 sm:gap-4 pb-4 scrollbar-hide -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8" : "grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4",
               children:t.slice(0, visibleCount).map(a=>jsx("div", { className: isCarousel ? "shrink-0 w-[240px] sm:w-[280px] snap-start" : "", children: jsx(ax,{
                 listing:a,onClick:()=>s(a.id),onNavigate:nav
               },a.id)}, a.id))
@@ -5545,7 +5545,7 @@ function BrandLogosRow({ onSelectBrand }) {
         children: [
           jsx("h3", { className: "text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider", children: "Top Brands" }),
           jsx("div", {
-            className: "flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-2 -mx-4 sm:mx-0 px-4 sm:px-0",
+            className: "flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-2 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8",
             children: brands.map(b => jsxs("button", {
               key: b.name,
               onClick: () => onSelectBrand(b.name),

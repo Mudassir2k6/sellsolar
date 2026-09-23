@@ -1730,78 +1730,32 @@ function nx({
   };
 
   return jsx("section", {
-    className: "bg-white dark:bg-gray-950 py-5 sm:py-6 border-b border-gray-200/70 dark:border-gray-800 transition-colors",
+    className: "bg-gray-50/60 dark:bg-gray-900/50 border-b border-gray-200/60 dark:border-gray-800 transition-colors",
     children: jsx("div", {
-      className: "container-page max-w-6xl",
+      className: "container-page py-3 sm:py-3.5",
       children: jsx("div", {
-        className: `grid grid-cols-1 ${cards.length >= 3 ? 'md:grid-cols-2 lg:grid-cols-3' : 'md:grid-cols-2'} gap-4`,
+        className: `grid grid-cols-1 ${cards.length >= 2 ? 'sm:grid-cols-2' : ''} gap-2.5`,
         children: cards.map((card) => (
-          jsxs("div", {
+          jsxs("button", {
             key: card.id || card.title,
-            className: "card-interactive p-5 border border-gray-200/90 dark:border-gray-800 bg-gradient-to-br from-white via-primary-50/10 to-transparent dark:from-gray-900 dark:via-primary-950/10 dark:to-gray-900 transition-all flex flex-col justify-between group shadow-sm rounded-2xl overflow-hidden",
+            type: "button",
+            onClick: () => handleCardClick(card.ctaLink || 'post-ad'),
+            className: "group flex items-center gap-3 p-3 sm:p-3.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-primary-400 dark:hover:border-primary-600 hover:shadow-sm transition-all text-left w-full",
             children: [
+              jsx("div", {
+                className: "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-xs",
+                children: jsx(card.ctaLink === 'installation' ? Wrench : CirclePlus, { className: "h-5 w-5" })
+              }),
               jsxs("div", {
+                className: "flex-1 min-w-0",
                 children: [
-                  jsx("div", {
-                    className: "w-full h-36 sm:h-40 rounded-xl overflow-hidden mb-3 border border-gray-100 dark:border-gray-800 bg-gray-100 dark:bg-gray-800 relative",
-                    children: jsx("img", {
-                      src: card.imageUrl || ((card.id === 'card-turnkey-install' || card.ctaLink === 'installation') ? TURNKEY_INSTALL_PROMO_IMAGE : SELL_SOLAR_PROMO_IMAGE),
-                      alt: card.title || 'Solar Equipment',
-                      loading: "lazy",
-                      referrerPolicy: "no-referrer",
-                      className: "w-full h-full object-cover group-hover:scale-105 transition-transform duration-300",
-                      onError: (e) => {
-                        e.currentTarget.onerror = null;
-                        e.currentTarget.src = (card.id === 'card-turnkey-install' || card.ctaLink === 'installation')
-                          ? TURNKEY_INSTALL_PROMO_IMAGE
-                          : SELL_SOLAR_PROMO_IMAGE;
-                      }
-                    })
-                  }),
-                  jsxs("div", {
-                    className: "flex items-center justify-between mb-2.5",
-                    children: [
-                      jsx("span", {
-                        className: getBadgeClass(card.badgeColor),
-                        children: card.badge || "Featured"
-                      }),
-                      jsx(Sun, { className: "h-4 w-4 text-primary-500" })
-                    ]
-                  }),
-                  jsx("h3", {
-                    className: "text-base sm:text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors",
-                    children: card.title
-                  }),
-                  card.description ? jsx("p", {
-                    className: "mt-1.5 text-xs text-gray-500 dark:text-gray-400 leading-relaxed",
-                    children: card.description
-                  }) : null,
-                  Array.isArray(card.points) && card.points.length > 0 ? jsx("ul", {
-                    className: "mt-3 space-y-1.5 text-xs text-gray-600 dark:text-gray-300",
-                    children: card.points.map((pt, idx) => (
-                      jsxs("li", {
-                        key: `pt-${idx}`,
-                        className: "flex items-center gap-2",
-                        children: [
-                          jsx(ShieldCheck, { className: "h-3.5 w-3.5 text-emerald-500 shrink-0" }),
-                          pt
-                        ]
-                      }, idx)
-                    ))
-                  }) : null
+                  jsx("div", { className: "text-xs font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors leading-tight truncate", children: card.title }),
+                  jsx("div", { className: "text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 leading-tight line-clamp-1", children: card.description || card.badge })
                 ]
               }),
-              jsx("div", {
-                className: "mt-4 pt-3.5 border-t border-gray-100 dark:border-gray-800",
-                children: jsxs("button", {
-                  type: "button",
-                  onClick: () => handleCardClick(card.ctaLink || 'post-ad'),
-                  className: "btn-primary w-full sm:w-auto px-5 py-2.5 text-xs font-bold shadow-xs flex items-center justify-center gap-1.5",
-                  children: [
-                    jsx(CirclePlus, { className: "h-3.5 w-3.5" }),
-                    card.ctaText || "Post an Ad — Free"
-                  ]
-                })
+              jsxs("span", {
+                className: "shrink-0 inline-flex items-center gap-1 text-[11px] font-bold text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950/60 px-2.5 py-1 rounded-lg border border-primary-200/60 dark:border-primary-800/60",
+                children: [card.ctaText || "Go", jsx(ArrowRight, { className: "h-3 w-3" })]
               })
             ]
           }, card.id || card.title)
@@ -2421,7 +2375,7 @@ function hx({
       jsx("div", {
         className: "border-b border-gray-800/80 bg-gray-900/50",
         children: jsx("div", {
-          className: "container-page py-6 sm:py-8",
+          className: "container-page py-3.5 sm:py-4",
           children: jsxs("div", {
             className: "flex flex-col items-center justify-between gap-5 rounded-2xl bg-gradient-to-r from-emerald-600 via-primary-600 to-amber-600 p-5 sm:p-7 text-center lg:flex-row lg:text-left shadow-lg shadow-primary-950/20",
             children: [
@@ -2483,7 +2437,7 @@ function hx({
       jsx("div", {
         className: "border-b border-gray-800/80 bg-gray-900/20",
         children: jsx("div", {
-          className: "container-page py-4 sm:py-5",
+          className: "container-page py-2.5 sm:py-3",
           children: jsxs("div", {
             className: "grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-center sm:text-left",
             children: [
@@ -2554,7 +2508,7 @@ function hx({
 
       /* Main Footer Navigation Columns */
       jsxs("div", {
-        className: "container-page py-10 sm:py-12",
+        className: "container-page py-6 sm:py-8",
         children: [
           jsxs("div", {
             className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-8 sm:gap-10",

@@ -193,37 +193,37 @@ export default function DealersPage({ onNavigate, onBack, hasOuterNavbar = false
       )}
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden border-b border-slate-200 dark:border-slate-800 bg-gradient-to-b from-white via-amber-50/20 to-slate-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 py-10 sm:py-14">
+      <section className="relative overflow-hidden border-b border-slate-200 dark:border-slate-800 bg-gradient-to-b from-white via-amber-50/20 to-slate-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 py-6 sm:py-8">
         <div className="container-page px-4 sm:px-6 max-w-7xl mx-auto">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-100/80 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-xs font-bold mb-4 shadow-xs">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100/80 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-xs font-bold mb-2 shadow-xs">
               <Users className="h-3.5 w-3.5" />
               Pakistan Solar Dealer & Importer Directory
             </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
               Verified Solar Dealers in <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-amber-600">Pakistan</span>
             </h1>
-            <p className="mt-3 text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
-              Find 10 verified solar equipment dealers, wholesalers, and certified distributors in each major city. Every business is verified with valid commercial market address, phone/WhatsApp, and Tier-1 brand authorizations.
+            <p className="mt-1.5 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              Find verified solar equipment dealers, wholesalers, and certified distributors in each major city. Every business is verified with valid commercial market address, phone/WhatsApp, and Tier-1 brand authorizations.
             </p>
 
             {/* Quick KPI stats */}
-            <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
-                <div className="text-xl font-black text-amber-500">{dealersList.length}+</div>
-                <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Verified Dealers</div>
+            <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+                <div className="text-lg font-black text-amber-500">{dealersList.length}+</div>
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Verified Dealers</div>
               </div>
-              <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
-                <div className="text-xl font-black text-slate-900 dark:text-white">8 Cities</div>
-                <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">10 Dealers / City</div>
+              <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+                <div className="text-lg font-black text-slate-900 dark:text-white">8 Cities</div>
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">10 Dealers / City</div>
               </div>
-              <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
-                <div className="text-xl font-black text-emerald-500">100%</div>
-                <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Verified Contacts</div>
+              <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+                <div className="text-lg font-black text-emerald-500">100%</div>
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Verified Contacts</div>
               </div>
-              <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
-                <div className="text-xl font-black text-indigo-500">Direct</div>
-                <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">WhatsApp & Call</div>
+              <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+                <div className="text-lg font-black text-indigo-500">Direct</div>
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">WhatsApp & Call</div>
               </div>
             </div>
           </div>
@@ -231,9 +231,9 @@ export default function DealersPage({ onNavigate, onBack, hasOuterNavbar = false
       </section>
 
       {/* Main Content Area */}
-      <main className="container-page px-4 sm:px-6 py-8 max-w-7xl mx-auto">
+      <main className="container-page px-4 sm:px-6 py-5 sm:py-6 max-w-7xl mx-auto">
         {/* Filter Controls Bar */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-6 shadow-sm mb-8 space-y-5">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-sm mb-5 space-y-4">
           {/* Top Row: Search & Source Filter & Verified Toggle */}
           <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 sm:gap-4">
             {/* Search Input */}

@@ -68,12 +68,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
     setSheetSearchQuery('');
   };
 
-  // Calculator State
-  const [calcWatts, setCalcWatts] = useState(585);
-  const [calcPanelBrandRate, setCalcPanelBrandRate] = useState(41.6);
-  const [calcSystemSizeKw, setCalcSystemSizeKw] = useState(10);
-  const [calcIncludeInverter, setCalcIncludeInverter] = useState(true);
-  const [calcIncludeBattery, setCalcIncludeBattery] = useState('lithium'); // 'none', 'tubular', 'lithium'
+  // Calculator state removed — full calculator lives at /calculator
 
   // Categories list
   const categoryTabs = [
@@ -296,152 +291,60 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
     });
   }, [dailySheetDate, sheetCategory, sheetFilterStatus, sheetSearchQuery]);
 
-  // Quick Calculator logic
-  const calculatedPanelCost = calcWatts * calcPanelBrandRate;
-  const calculatedSystemPanelsCost = calcSystemSizeKw * 1000 * calcPanelBrandRate;
-  const estimatedInverterCost =
-    calcSystemSizeKw <= 6
-      ? 275000
-      : calcSystemSizeKw <= 10
-      ? 460000
-      : calcSystemSizeKw <= 15
-      ? 580000
-      : 800000;
-  const estimatedBatteryCost =
-    calcIncludeBattery === 'lithium'
-      ? 265000 * Math.max(1, Math.round(calcSystemSizeKw / 6))
-      : calcIncludeBattery === 'tubular'
-      ? 53000 * 4 * Math.max(1, Math.round(calcSystemSizeKw / 6))
-      : 0;
 
-  const totalCalculatedSystem =
-    calculatedSystemPanelsCost +
-    (calcIncludeInverter ? estimatedInverterCost : 0) +
-    estimatedBatteryCost;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-20 pt-20 text-gray-900 dark:text-gray-100 transition-colors">
-      {/* Top Hero Banner */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-primary-900 via-gray-900 to-gray-900 py-14 text-white">
+      {/* Compact Top Hero Banner */}
+      <section className="relative overflow-hidden bg-gradient-to-r from-primary-900 via-gray-900 to-gray-900 py-5 sm:py-6 text-white border-b border-gray-800">
         <div className="absolute inset-0 bg-grid opacity-10 pointer-events-none" />
-        <div className="absolute -left-20 top-0 h-72 w-72 rounded-full bg-primary-500/20 blur-3xl" />
-        <div className="absolute -right-20 bottom-0 h-72 w-72 rounded-full bg-secondary-500/20 blur-3xl" />
-
         <div className="container-page relative z-10">
-          <div className="max-w-4xl">
-            <div className="mb-3 flex flex-wrap items-center gap-2">
-              <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/15 border border-amber-400/30 px-3.5 py-1 text-xs font-semibold text-amber-300">
-                <Clock className="h-3.5 w-3.5 text-amber-400" />
-                Live Market Rates • Ready Stock ({TODAY_DATE_STR})
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 border border-amber-400/30 px-2.5 py-0.5 text-[11px] font-semibold text-amber-300">
+                  <Clock className="h-3 w-3 text-amber-400" />
+                  Live Rates &bull; {TODAY_DATE_STR}
+                </div>
+                <div className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-400/30 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-300">
+                  <ShieldCheck className="h-3 w-3 text-emerald-400" />
+                  Wholesale Benchmark
+                </div>
               </div>
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 border border-emerald-400/30 px-3 py-1 text-xs font-semibold text-emerald-300">
-                <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-                Wholesale Trade Stock Benchmark
-              </div>
+              <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white">
+                Today's Solar Prices in <span className="text-amber-400">Pakistan (PKR)</span>
+              </h1>
             </div>
-            <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl text-white">
-              Today's Solar Prices in{' '}
-              <span className="text-amber-400">
-                Pakistan (PKR)
-              </span>
-            </h1>
-            <p className="mt-3 text-base text-gray-300 sm:text-lg max-w-2xl leading-relaxed">
-              Daily verified trade benchmark prices for Tier-1 Solar Panels (Canadian, Aiko, Jinko, LONGi, JA Solar, Astronergy, Risen, Korean),
-              Hybrid & On-Grid Inverters, and Lithium/Tubular Batteries across Pakistan (Rawalpindi, Lahore, and Karachi).
-            </p>
-
-            {/* Quick Key Benchmarks / Category Tabs: Solar Panels, Inverters & Batteries */}
-            <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs font-medium text-gray-300">
-              {/* 1. Solar Panels Tab */}
-              <div
-                onClick={() => handleSelectCategory('panel')}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && handleSelectCategory('panel')}
-                className={`rounded-xl p-3.5 text-left transition-all cursor-pointer shadow-sm group ${
-                  selectedCategory === 'panel'
-                    ? 'bg-amber-500/20 border-2 border-amber-400 text-amber-200 ring-2 ring-amber-400/30'
-                    : 'bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-400/40 text-gray-300'
-                }`}
-                id="hero-stat-panel-avg"
-              >
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-gray-300 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
-                    <Sun className="h-4 w-4 text-amber-400" />
-                    Solar Panels
-                  </span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 font-bold">
-                    Per Watt
-                  </span>
-                </div>
-                <div className="text-base sm:text-lg font-bold text-amber-400 tracking-tight">
-                  {MARKET_SUMMARY.panelsPerWattAvg || 'Rs 33.00 – 44.50 / W'}
-                </div>
-              </div>
-
-              {/* 2. Solar Inverters Tab */}
-              <div
-                onClick={() => handleSelectCategory('inverter')}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && handleSelectCategory('inverter')}
-                className={`rounded-xl p-3.5 text-left transition-all cursor-pointer shadow-sm group ${
-                  selectedCategory === 'inverter'
-                    ? 'bg-blue-500/20 border-2 border-blue-400 text-blue-200 ring-2 ring-blue-400/30'
-                    : 'bg-white/5 hover:bg-white/10 border border-white/10 hover:border-blue-400/40 text-gray-300'
-                }`}
-                id="hero-stat-inverter-avg"
-              >
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-gray-300 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
-                    <Zap className="h-4 w-4 text-blue-400" />
-                    Solar Inverters
-                  </span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-400/20 text-blue-300 font-bold">
-                    Hybrid & On-Grid
-                  </span>
-                </div>
-                <div className="text-base sm:text-lg font-bold text-blue-400 tracking-tight">
-                  {MARKET_SUMMARY.invertersAvg || 'Rs 112,000 – 549,000'}
-                </div>
-              </div>
-
-              {/* 3. Solar Batteries Tab */}
-              <div
-                onClick={() => handleSelectCategory('battery')}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && handleSelectCategory('battery')}
-                className={`rounded-xl p-3.5 text-left transition-all cursor-pointer shadow-sm group ${
-                  selectedCategory === 'battery'
-                    ? 'bg-emerald-500/20 border-2 border-emerald-400 text-emerald-200 ring-2 ring-emerald-400/30'
-                    : 'bg-white/5 hover:bg-white/10 border border-white/10 hover:border-emerald-400/40 text-gray-300'
-                }`}
-                id="hero-stat-battery-avg"
-              >
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-gray-300 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
-                    <BatteryCharging className="h-4 w-4 text-emerald-400" />
-                    Solar Batteries
-                  </span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-300 font-bold">
-                    Lithium & Tubular
-                  </span>
-                </div>
-                <div className="text-base sm:text-lg font-bold text-emerald-400 tracking-tight">
-                  {MARKET_SUMMARY.batteriesAvg || 'Rs 32,000 – 265,500'}
-                </div>
-              </div>
+            {/* Compact 3-stat inline chips */}
+            <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap shrink-0">
+              {[
+                { id:'panel', icon: Sun, color:'text-amber-400', bg:'bg-amber-500/15 border-amber-400/30', val: MARKET_SUMMARY.panelsPerWattAvg || 'Rs 33–44/W', label:'Panels' },
+                { id:'inverter', icon: Zap, color:'text-blue-400', bg:'bg-blue-500/15 border-blue-400/30', val: MARKET_SUMMARY.invertersAvg || 'Rs 112K–549K', label:'Inverters' },
+                { id:'battery', icon: BatteryCharging, color:'text-emerald-400', bg:'bg-emerald-500/15 border-emerald-400/30', val: MARKET_SUMMARY.batteriesAvg || 'Rs 32K–265K', label:'Batteries' },
+              ].map(({ id, icon: Icon, color, bg, val, label }) => (
+                <button
+                  key={id}
+                  id={`hero-stat-${id}-avg`}
+                  onClick={() => handleSelectCategory(id)}
+                  className={`flex items-center gap-2 rounded-xl px-3 py-2 border text-left transition-all cursor-pointer ${bg} hover:brightness-110`}
+                >
+                  <Icon className={`h-3.5 w-3.5 shrink-0 ${color}`} />
+                  <div>
+                    <div className={`text-[10px] font-bold uppercase tracking-wide ${color}`}>{label}</div>
+                    <div className="text-xs font-bold text-white leading-tight">{val}</div>
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
       {/* Main Content Area */}
-      <div className="container-page -mt-6">
+      <div className="container-page mt-4">
 
         {/* ===== PAGE-LEVEL TAB SWITCHER ===== */}
-        <div className="mb-6 flex items-center justify-center">
+        <div className="mb-3 flex items-center justify-center">
           <div className="inline-flex items-center gap-1 rounded-2xl bg-white dark:bg-gray-900 p-1.5 shadow-lg ring-1 ring-gray-200/80 dark:ring-gray-800">
             <button
               id="prices-tab-rates"
@@ -471,7 +374,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         </div>
 
         {/* Top Category Filter Tabs Bar */}
-        <div className="rounded-2xl bg-white dark:bg-gray-900 p-2 shadow-lg ring-1 ring-gray-200/80 dark:ring-gray-800 mb-6">
+        <div className="rounded-2xl bg-white dark:bg-gray-900 p-2 shadow-lg ring-1 ring-gray-200/80 dark:ring-gray-800 mb-4">
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
             {categoryTabs.map((tab) => {
               const Icon = tab.icon;

@@ -184,7 +184,7 @@ export default function InstallationRequestPage({ onBack }) {
         </div>
       </header>
 
-      <main id="main" className="container-page py-8 lg:py-14">
+      <main id="main" className="container-page py-6 lg:py-8">
         <div className="mx-auto max-w-2xl">
           {submittedData ? (
             /* SUCCESS CARD WITH ADMIN EMAIL NOTIFICATION CONFIRMATION */

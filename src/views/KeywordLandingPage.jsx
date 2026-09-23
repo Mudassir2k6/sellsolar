@@ -83,20 +83,20 @@ export default function KeywordLandingPage({ pageKey, onNavigate }) {
   const Icon = data.icon;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 pt-20 sm:pt-24 lg:pt-28">
-      <main className="container-page py-12 lg:py-16">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 pt-20 sm:pt-24">
+      <main className="container-page py-6 sm:py-8">
         <div className="mx-auto max-w-3xl">
-          <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-500 text-white shadow-lg shadow-primary-500/30">
-            <Icon className="h-6 w-6" />
+          <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary-500 text-white shadow-md shadow-primary-500/30">
+            <Icon className="h-5 w-5" />
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
+          <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-3xl">
             {data.h1}
           </h1>
-          <p className="mt-4 text-base leading-relaxed text-gray-600 dark:text-gray-300 sm:text-lg">
+          <p className="mt-2 text-sm leading-relaxed text-gray-600 dark:text-gray-300 sm:text-base">
             {data.lead}
           </p>
 
-          <ul className="mt-8 space-y-3">
+          <ul className="mt-5 space-y-2.5">
             {data.bullets.map((item) => (
               <li
                 key={item}

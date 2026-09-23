@@ -43,11 +43,9 @@ import {
   CreditCard,
   DollarSign,
   Eye,
-  EyeOff,
   Facebook,
   FilePen,
   FileText,
-  Filter,
   Flame,
   Grid,
   Headphones,
@@ -79,7 +77,6 @@ import {
   Star,
   Store,
   Sun,
-  Table,
   Tag,
   Trash2,
   TrendingUp,
@@ -5697,7 +5694,6 @@ function _x({
 }){
   const { settings } = useSiteSettings();
   const calcBanner = settings?.homePageCms?.calculatorBanner;
-  const[calcOpen, setCalcOpen]=useState(false);
   const[e,r]=useState(()=>initialFilters?{...Vu,...initialFilters}:Vu),[n,s]=useState([]),[a,l]=useState(!0),[o,c]=useState(null),[u,d]=useState(0),[h,p]=useState(0),y=useCallback((g,m)=>{
     r(v=>({
       ...v,[g]:m

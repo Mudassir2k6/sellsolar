@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import {
   ArrowLeft,
-  Building2,
   CheckCircle2,
   CircleAlert,
   Home,

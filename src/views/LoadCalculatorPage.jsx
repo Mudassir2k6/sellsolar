@@ -3,17 +3,11 @@ import {
   Sun,
   Zap,
   BatteryCharging,
-  Layers,
   Search,
   ArrowRight,
   ShieldCheck,
-  Clock,
   RotateCcw,
-  SlidersHorizontal,
-  ChevronRight,
   ChevronDown,
-  HelpCircle,
-  Award,
   BarChart3,
   Flame,
   CheckCircle2,
@@ -32,7 +26,6 @@ import {
   Info,
   DollarSign,
   Compass,
-  ArrowUpRight,
   Sliders
 } from 'lucide-react';
 import {
@@ -101,7 +94,6 @@ export default function LoadCalculatorPage({ onNavigate, onSelectCategory }) {
   // System Configuration Options
   const [systemType, setSystemType] = useState('hybrid'); // 'hybrid', 'ongrid', 'offgrid'
   const [batteryType, setBatteryType] = useState('lithium'); // 'lithium', 'tubular', 'none'
-  const [backupHoursNight, setBackupHoursNight] = useState(5); // Night backup desired
   const [panelWattage, setPanelWattage] = useState(585); // 585W TOPCon
   const [electricityTariff, setElectricityTariff] = useState(60); // PKR / kWh
   const [citySunFactor, setCitySunFactor] = useState(5.0); // Sun peak hours

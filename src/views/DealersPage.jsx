@@ -9,19 +9,12 @@ import {
   MessageCircle,
   BadgeCheck,
   Building2,
-  ShieldCheck,
   Star,
-  ExternalLink,
   Sparkles,
-  Award,
   Filter,
-  Layers,
   ArrowRight,
   Sun,
-  CheckCircle2,
-  SlidersHorizontal,
   RefreshCw,
-  Info
 } from 'lucide-react';
 import { CITIES } from '../lib/constants';
 import { supabase } from '../lib/supabase';
@@ -39,7 +32,6 @@ export default function DealersPage({ onNavigate, onBack, hasOuterNavbar = false
   const [selectedSource, setSelectedSource] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [verifiedOnly, setVerifiedOnly] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   // Fetch any live dealers from Supabase profiles and merge with verified seed dealers
   useEffect(() => {
@@ -47,7 +39,6 @@ export default function DealersPage({ onNavigate, onBack, hasOuterNavbar = false
 
     async function loadRemoteDealers() {
       try {
-        setIsLoading(true);
         let query = supabase
           .from('profiles')
           .select('*')
@@ -91,8 +82,6 @@ export default function DealersPage({ onNavigate, onBack, hasOuterNavbar = false
         }
       } catch (err) {
         console.warn('[DealersPage] Supabase load note:', err?.message);
-      } finally {
-        if (isMounted) setIsLoading(false);
       }
     }
 

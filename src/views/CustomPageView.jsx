@@ -10,7 +10,6 @@ import {
   PhoneCall,
   Calculator,
   Tag,
-  ArrowRight,
   Sun,
   Layers,
   Award

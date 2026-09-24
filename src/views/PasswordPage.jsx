@@ -62,14 +62,23 @@ export default function PasswordPage({
   } = useAuth();
   const { showToast } = useToast();
 
-  // If user logged in, default to 'change', otherwise use stepper ('request' | 'verify' | 'new_password')
-  const [mode, setMode] = useState(user ? 'change' : 'forgot');
+  // Mode: if initialMode is 'forgot' or 'reset', mode MUST be 'forgot'
+  const [mode, setMode] = useState(
+    initialMode === 'forgot' || initialMode === 'reset'
+      ? 'forgot'
+      : initialMode === 'change'
+      ? 'change'
+      : user
+      ? 'change'
+      : 'forgot'
+  );
   
   // 3-step state for forgot password flow
   const [step, setStep] = useState(initialMode === 'reset' ? 3 : 1); // 1: Request, 2: Verify, 3: Set New Password
   const [isVerified, setIsVerified] = useState(initialMode === 'reset');
 
-  const [email, setEmail] = useState(user?.email || '');
+  // In forgot password flow, email must ALWAYS be blank so user types their email afresh
+  const [email, setEmail] = useState(initialMode === 'change' ? (user?.email || '') : '');
   const [verificationCode, setVerificationCode] = useState('');
   const [otpDigits, setOtpDigits] = useState(['', '', '', '', '', '']);
   const otpInputRefs = useRef([]);
@@ -90,8 +99,17 @@ export default function PasswordPage({
   const [resendCooldown, setResendCooldown] = useState(0);
 
   useEffect(() => {
-    if (user && initialMode === 'change') {
+    if (initialMode === 'forgot') {
+      setMode('forgot');
+      setStep(1);
+      setEmail(''); // Explicitly blank on mount/open so user types afresh
+      setIsVerified(false);
+      try {
+        sessionStorage.removeItem('sellsolar_reset_otp');
+      } catch {}
+    } else if (user && initialMode === 'change') {
       setMode('change');
+      setEmail(user?.email || '');
     } else if (initialMode === 'reset') {
       setMode('forgot');
       setStep(3);
@@ -630,8 +648,11 @@ export default function PasswordPage({
                   <div className="relative">
                     <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                     <input
+                      id="forgot-email-input"
                       type="email"
                       required
+                      autoFocus
+                      autoComplete="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="you@example.com"
@@ -676,7 +697,15 @@ export default function PasswordPage({
                     </label>
                     <button
                       type="button"
-                      onClick={() => setStep(1)}
+                      onClick={() => {
+                        setStep(1);
+                        setEmail('');
+                        setError(null);
+                        setSuccessMessage(null);
+                        try {
+                          sessionStorage.removeItem('sellsolar_reset_otp');
+                        } catch {}
+                      }}
                       className="text-[11px] text-amber-600 dark:text-amber-400 font-semibold hover:underline"
                     >
                       Change Email

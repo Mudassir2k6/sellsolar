@@ -1365,7 +1365,17 @@ export default function AuthPage({ onSuccess, onBack, onForgotPassword, initialV
                     <div className="mt-1.5 flex justify-end">
                       <button
                         type="button"
-                        onClick={() => (onForgotPassword ? onForgotPassword() : go('forgot'))}
+                        onClick={() => {
+                          setEmail('');
+                          try {
+                            sessionStorage.removeItem('sellsolar_reset_otp');
+                          } catch {}
+                          if (onForgotPassword) {
+                            onForgotPassword();
+                          } else {
+                            go('forgot');
+                          }
+                        }}
                         className="text-xs font-semibold text-amber-600 dark:text-amber-400 hover:underline"
                       >
                         Forgot password?

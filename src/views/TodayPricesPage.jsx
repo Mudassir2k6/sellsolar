@@ -55,6 +55,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
   const [sheetSearchQuery, setSheetSearchQuery] = useState('');
   const [sheetCategory, setSheetCategory] = useState('all'); // 'all' | 'panel' | 'inverter' | 'battery' | 'complete_system' | 'structure_accessories'
   const [sheetFilterStatus, setSheetFilterStatus] = useState('all');
+  const [sheetMobileView, setSheetMobileView] = useState('cards'); // 'cards' | 'table'
 
   // Compact limit toggles to prevent infinite scrolling
   const [isExpandedSheet, setIsExpandedSheet] = useState(false);
@@ -923,7 +924,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                 </div>
 
                 {/* Dynamic Filter Chips per Category */}
-                <div className="flex items-center gap-1.5 overflow-x-auto text-[11px] pb-1 sm:pb-0">
+                <div className="flex items-center gap-1.5 overflow-x-auto text-[11px] pb-1 sm:pb-0 scrollbar-hide">
                   {sheetCategory === 'panel' ? (
                     [
                       { id: 'all', label: 'All Panels' },
@@ -1129,8 +1130,400 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                 </div>
               </div>
 
-              <div className="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800">
-                <table className="w-full text-left text-xs text-gray-700 dark:text-gray-300">
+              {/* Mobile View Mode Switcher */}
+              <div className="flex items-center justify-between mb-3 px-0.5 md:hidden">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[11px] font-bold text-gray-600 dark:text-gray-300">
+                    Mobile View:
+                  </span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded font-semibold bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
+                    {sheetMobileView === 'cards' ? 'Cards View (Fitted)' : 'Full Spreadsheet'}
+                  </span>
+                </div>
+                <div className="inline-flex rounded-lg bg-gray-100 dark:bg-gray-800 p-0.5 text-[11px] font-bold">
+                  <button
+                    type="button"
+                    onClick={() => setSheetMobileView('cards')}
+                    className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
+                      sheetMobileView === 'cards'
+                        ? 'bg-white dark:bg-gray-900 text-amber-600 dark:text-amber-400 shadow-xs'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                    }`}
+                  >
+                    📱 Cards
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSheetMobileView('table')}
+                    className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
+                      sheetMobileView === 'table'
+                        ? 'bg-white dark:bg-gray-900 text-amber-600 dark:text-amber-400 shadow-xs'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                    }`}
+                  >
+                    📊 Table
+                  </button>
+                </div>
+              </div>
+
+              {/* Mobile Cards View (Fitted 100% Responsive, Zero Horizontal Scroll) */}
+              {sheetMobileView === 'cards' && (
+                <div className="md:hidden space-y-2.5 mb-3">
+                  {displayedSheetRates.length === 0 ? (
+                    <div className="p-6 text-center text-gray-500 rounded-xl bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-800 text-xs">
+                      No matching items found in daily {sheetCategory === 'all' ? 'solar' : sheetCategory} rate sheet.
+                    </div>
+                  ) : (
+                    (isExpandedSheet ? displayedSheetRates : displayedSheetRates.slice(0, 8)).map((item, idx) => {
+                      const itemCat = item.itemCategory || sheetCategory;
+
+                      // Panel Card
+                      if (itemCat === 'panel') {
+                        const wattMatch =
+                          (item.capacity && item.capacity.match(/(\d{3,4})\s*W?/i)) ||
+                          (item.model && item.model.match(/(\d{3,4})\s*W/i)) ||
+                          (item.model && item.model.match(/\b(\d{3,4})\b/));
+                        const wattsNum = wattMatch ? parseInt(wattMatch[1], 10) : 585;
+                        const platePrice = Math.round(item.rate * wattsNum);
+
+                        return (
+                          <div
+                            key={idx}
+                            className="rounded-xl border border-gray-200/90 dark:border-gray-800 bg-white dark:bg-gray-900 p-3.5 shadow-2xs space-y-2.5"
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <span className="text-[10px] bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 px-1.5 py-0.5 rounded font-bold uppercase">
+                                    Panel
+                                  </span>
+                                  <span className="font-bold text-sm text-gray-900 dark:text-white">
+                                    {item.brand}
+                                  </span>
+                                  {item.badge && (
+                                    <span
+                                      className={`text-[10px] px-1.5 py-0.5 rounded font-semibold border ${
+                                        item.status === 'down'
+                                          ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30'
+                                          : item.status === 'up'
+                                          ? 'bg-red-500/10 text-red-700 dark:text-red-300 border-red-500/30'
+                                          : 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30'
+                                      }`}
+                                    >
+                                      {item.badge}
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="text-xs text-gray-700 dark:text-gray-300 font-semibold mt-1">
+                                  {item.model}
+                                </div>
+                              </div>
+                              <div className="text-right shrink-0">
+                                <div className="text-base font-extrabold text-amber-600 dark:text-amber-400">
+                                  Rs. {item.rate.toFixed(2)}/W
+                                </div>
+                                <div className="text-[10px] text-gray-500 dark:text-gray-400">
+                                  Prev: Rs. {item.prevRate.toFixed(2)}/W
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-800 text-xs">
+                              <div>
+                                {item.change < 0 ? (
+                                  <span className="inline-flex items-center gap-0.5 text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md text-[11px]">
+                                    <ArrowDownRight className="h-3 w-3" />
+                                    Rs. {Math.abs(item.change).toFixed(2)}/W Drop
+                                  </span>
+                                ) : item.change > 0 ? (
+                                  <span className="inline-flex items-center gap-0.5 text-red-600 dark:text-red-400 font-bold bg-red-50 dark:bg-red-950/40 px-2 py-0.5 rounded-md text-[11px]">
+                                    <TrendingUp className="h-3 w-3" />
+                                    +Rs. {item.change.toFixed(2)}/W
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 text-gray-400 bg-gray-50 dark:bg-gray-800 px-2 py-0.5 rounded-md text-[11px]">
+                                    <Equal className="h-3 w-3" /> Stable
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs font-bold text-gray-900 dark:text-white">
+                                  Rs. {platePrice.toLocaleString()}{' '}
+                                  <span className="text-[10px] text-gray-400 font-normal">/plate</span>
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedCategory('panel');
+                                    setSelectedBrand(item.brand.replace(' Solar', ''));
+                                    setSearchQuery(item.model.split(' ')[0]);
+                                    const target = document.getElementById('catalog-results');
+                                    if (target) target.scrollIntoView({ behavior: 'smooth' });
+                                  }}
+                                  className="text-[11px] font-bold text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-0.5 cursor-pointer"
+                                >
+                                  Stock <ChevronRight className="h-3 w-3" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      // Inverter Card
+                      if (itemCat === 'inverter') {
+                        return (
+                          <div
+                            key={idx}
+                            className="rounded-xl border border-gray-200/90 dark:border-gray-800 bg-white dark:bg-gray-900 p-3.5 shadow-2xs space-y-2.5"
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <span className="text-[10px] bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 px-1.5 py-0.5 rounded font-bold uppercase">
+                                    Inverter
+                                  </span>
+                                  <span className="font-bold text-sm text-gray-900 dark:text-white">
+                                    {item.brand}
+                                  </span>
+                                  {item.badge && (
+                                    <span
+                                      className={`text-[10px] px-1.5 py-0.5 rounded font-semibold border ${
+                                        item.status === 'down'
+                                          ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30'
+                                          : item.status === 'up'
+                                          ? 'bg-red-500/10 text-red-700 dark:text-red-300 border-red-500/30'
+                                          : 'bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/30'
+                                      }`}
+                                    >
+                                      {item.badge}
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="text-xs text-gray-700 dark:text-gray-300 font-semibold mt-1">
+                                  {item.model}
+                                </div>
+                                {item.specs && (
+                                  <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
+                                    {item.specs}
+                                  </div>
+                                )}
+                              </div>
+                              <div className="text-right shrink-0">
+                                <div className="text-base font-extrabold text-blue-600 dark:text-blue-400">
+                                  Rs. {Math.round(item.rate).toLocaleString()}
+                                </div>
+                                {item.prevRate && (
+                                  <div className="text-[10px] text-gray-500 dark:text-gray-400">
+                                    Prev: Rs. {Math.round(item.prevRate).toLocaleString()}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-800 text-xs">
+                              <div>
+                                {item.change < 0 ? (
+                                  <span className="inline-flex items-center gap-0.5 text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md text-[11px]">
+                                    <ArrowDownRight className="h-3 w-3" />
+                                    -Rs. {Math.abs(item.change).toLocaleString()} Drop
+                                  </span>
+                                ) : item.change > 0 ? (
+                                  <span className="inline-flex items-center gap-0.5 text-red-600 dark:text-red-400 font-bold bg-red-50 dark:bg-red-950/40 px-2 py-0.5 rounded-md text-[11px]">
+                                    <TrendingUp className="h-3 w-3" />
+                                    +Rs. {item.change.toLocaleString()}
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 text-gray-400 bg-gray-50 dark:bg-gray-800 px-2 py-0.5 rounded-md text-[11px]">
+                                    <Equal className="h-3 w-3" /> Stable
+                                  </span>
+                                )}
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedCategory('inverter');
+                                  setSelectedBrand(item.brand);
+                                  setSearchQuery(item.model.split(' ')[0]);
+                                  const target = document.getElementById('catalog-results');
+                                  if (target) target.scrollIntoView({ behavior: 'smooth' });
+                                }}
+                                className="text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-0.5 cursor-pointer"
+                              >
+                                Stock <ChevronRight className="h-3 w-3" />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      // Battery Card
+                      if (itemCat === 'battery') {
+                        return (
+                          <div
+                            key={idx}
+                            className="rounded-xl border border-gray-200/90 dark:border-gray-800 bg-white dark:bg-gray-900 p-3.5 shadow-2xs space-y-2.5"
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <span className="text-[10px] bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 px-1.5 py-0.5 rounded font-bold uppercase">
+                                    Battery
+                                  </span>
+                                  <span className="font-bold text-sm text-gray-900 dark:text-white">
+                                    {item.brand}
+                                  </span>
+                                  {item.badge && (
+                                    <span className="text-[10px] px-1.5 py-0.5 rounded font-semibold border bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30">
+                                      {item.badge}
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="text-xs text-gray-700 dark:text-gray-300 font-semibold mt-1">
+                                  {item.model}
+                                </div>
+                                {item.specs && (
+                                  <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
+                                    {item.specs}
+                                  </div>
+                                )}
+                              </div>
+                              <div className="text-right shrink-0">
+                                <div className="text-base font-extrabold text-emerald-600 dark:text-emerald-400">
+                                  Rs. {Math.round(item.rate).toLocaleString()}
+                                </div>
+                                {item.prevRate && (
+                                  <div className="text-[10px] text-gray-500 dark:text-gray-400">
+                                    Prev: Rs. {Math.round(item.prevRate).toLocaleString()}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-800 text-xs">
+                              <div>
+                                {item.change < 0 ? (
+                                  <span className="inline-flex items-center gap-0.5 text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md text-[11px]">
+                                    <ArrowDownRight className="h-3 w-3" />
+                                    -Rs. {Math.abs(item.change).toLocaleString()} Drop
+                                  </span>
+                                ) : item.change > 0 ? (
+                                  <span className="inline-flex items-center gap-0.5 text-red-600 dark:text-red-400 font-bold bg-red-50 dark:bg-red-950/40 px-2 py-0.5 rounded-md text-[11px]">
+                                    <TrendingUp className="h-3 w-3" />
+                                    +Rs. {item.change.toLocaleString()}
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 text-gray-400 bg-gray-50 dark:bg-gray-800 px-2 py-0.5 rounded-md text-[11px]">
+                                    <Equal className="h-3 w-3" /> Stable
+                                  </span>
+                                )}
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedCategory('battery');
+                                  setSelectedBrand(item.brand);
+                                  setSearchQuery(item.model.split(' ')[0]);
+                                  const target = document.getElementById('catalog-results');
+                                  if (target) target.scrollIntoView({ behavior: 'smooth' });
+                                }}
+                                className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-0.5 cursor-pointer"
+                              >
+                                Stock <ChevronRight className="h-3 w-3" />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      // ESS / Complete System / Structure Card
+                      return (
+                        <div
+                          key={idx}
+                          className="rounded-xl border border-gray-200/90 dark:border-gray-800 bg-white dark:bg-gray-900 p-3.5 shadow-2xs space-y-2.5"
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300 px-1.5 py-0.5 rounded font-bold uppercase">
+                                  {itemCat.replace('_', ' ')}
+                                </span>
+                                <span className="font-bold text-sm text-gray-900 dark:text-white">
+                                  {item.brand || item.systemType || 'Equipment'}
+                                </span>
+                                {item.badge && (
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded font-semibold bg-primary-50 dark:bg-primary-950/40 text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800">
+                                    {item.badge}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-xs text-gray-700 dark:text-gray-300 font-semibold mt-1">
+                                {item.model || item.capacity || item.systemType}
+                              </div>
+                              {item.specs && (
+                                <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
+                                  {item.specs}
+                                </div>
+                              )}
+                            </div>
+                            <div className="text-right shrink-0">
+                              <div className="text-base font-extrabold text-primary-600 dark:text-primary-400">
+                                Rs. {Math.round(item.rate).toLocaleString()}{item.unit ? ` ${item.unit}` : ''}
+                              </div>
+                              {item.prevRate && (
+                                <div className="text-[10px] text-gray-500 dark:text-gray-400">
+                                  Prev: Rs. {Math.round(item.prevRate).toLocaleString()}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-800 text-xs">
+                            <div>
+                              {item.change < 0 ? (
+                                <span className="inline-flex items-center gap-0.5 text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md text-[11px]">
+                                  <ArrowDownRight className="h-3 w-3" />
+                                  -Rs. {Math.abs(item.change).toLocaleString()} Drop
+                                </span>
+                              ) : item.change > 0 ? (
+                                <span className="inline-flex items-center gap-0.5 text-red-600 dark:text-red-400 font-bold bg-red-50 dark:bg-red-950/40 px-2 py-0.5 rounded-md text-[11px]">
+                                  <TrendingUp className="h-3 w-3" />
+                                  +Rs. {item.change.toLocaleString()}
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 text-gray-400 bg-gray-50 dark:bg-gray-800 px-2 py-0.5 rounded-md text-[11px]">
+                                  <Equal className="h-3 w-3" /> Stable
+                                </span>
+                              )}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const target = document.getElementById('catalog-results');
+                                if (target) target.scrollIntoView({ behavior: 'smooth' });
+                              }}
+                              className="text-[11px] font-bold text-primary-600 dark:text-primary-400 hover:underline flex items-center gap-0.5 cursor-pointer"
+                            >
+                              View Deals <ChevronRight className="h-3 w-3" />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              )}
+
+              {/* Desktop Table View & Mobile Table Toggle Container */}
+              <div className={`${sheetMobileView === 'cards' ? 'hidden md:block' : 'block'}`}>
+                {sheetMobileView === 'table' && (
+                  <div className="md:hidden flex items-center justify-between px-3 py-1.5 mb-2 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-[11px] text-amber-800 dark:text-amber-300">
+                    <span>👉 Swipe table sideways to see rates, difference & total price</span>
+                    <span className="font-bold">↔</span>
+                  </div>
+                )}
+                <div className="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800 scrollbar-hide">
+                  <table className="w-full text-left text-xs text-gray-700 dark:text-gray-300">
                   <thead className="bg-gray-50 dark:bg-gray-800/90 text-[11px] uppercase tracking-wider text-gray-600 dark:text-gray-400 font-bold border-b border-gray-200 dark:border-gray-800">
                     {sheetCategory === 'panel' ? (
                       <tr>
@@ -1851,6 +2244,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                     )}
                   </tbody>
                 </table>
+              </div>
               </div>
 
               {/* Compact Limit Expand / Collapse Bar */}

@@ -262,7 +262,7 @@ function getPasswordStrength(pass) {
   return { score: 3, text: 'Strong password', color: 'bg-secondary-500', width: 'w-full' };
 }
 
-export default function AuthPage({ onSuccess, onBack, onForgotPassword, initialView = 'login' }) {
+export default function AuthPage({ onSuccess, onBack, onForgotPassword, initialView = 'login', hasOuterNavbar = false, onNavigate }) {
   const { signIn, signInWithGoogle, signUp, resendConfirmationEmail, updatePassword, refreshProfile, completePasswordRecovery, requestPasswordResetOtp } = useAuth();
   const { showToast } = useToast();
   const [view, setView] = useState(initialView);
@@ -889,29 +889,42 @@ export default function AuthPage({ onSuccess, onBack, onForgotPassword, initialV
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 transition-colors">
-      <div className="border-b border-gray-100 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
-        <div className="container-page flex h-16 items-center justify-between">
-          <button type="button" onClick={onBack} className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 shadow-lg shadow-primary-500/30">
-              <Sun className="h-5 w-5 text-white" strokeWidth={2.5} />
-            </div>
-            <span className="text-xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-              Sell<span className="text-primary-500">Solar</span>
-            </span>
-          </button>
-          <button
-            type="button"
-            onClick={onBack}
-            className="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-          >
-            Back to Home
-          </button>
+    <div className={`min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 transition-colors ${hasOuterNavbar ? 'pt-20 lg:pt-24 pb-16' : ''}`}>
+      {!hasOuterNavbar && (
+        <div className="border-b border-gray-100 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
+          <div className="container-page flex h-16 items-center justify-between">
+            <button type="button" onClick={onBack} className="flex items-center gap-2 cursor-pointer">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 shadow-lg shadow-primary-500/30">
+                <Sun className="h-5 w-5 text-white" strokeWidth={2.5} />
+              </div>
+              <span className="text-xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+                Sell<span className="text-primary-500">Solar</span>
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={onBack}
+              className="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white cursor-pointer"
+            >
+              Back to Home
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
-      <div className="container-page flex flex-col items-center justify-center py-12 lg:py-16">
+      <div className={`container-page flex flex-col items-center justify-center ${hasOuterNavbar ? 'py-6 lg:py-10' : 'py-12 lg:py-16'}`}>
         <div className="w-full max-w-md">
+          {hasOuterNavbar && (
+            <div className="mb-4 flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+              <button type="button" onClick={onBack} className="hover:text-primary-600 transition-colors cursor-pointer">
+                Home
+              </button>
+              <span>/</span>
+              <span className="text-gray-900 dark:text-white font-bold">
+                {view === 'signup' ? 'Create Account' : view === 'forgot' ? 'Reset Password' : 'Sign In'}
+              </span>
+            </div>
+          )}
           {(view === 'login' || view === 'signup') && (
             <div className="mb-6 flex rounded-xl bg-gray-100 dark:bg-gray-800 p-1">
               <button

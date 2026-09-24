@@ -52,7 +52,7 @@ const SYSTEM_SIZES = [
 
 const PROPERTY_TYPES = ['Residential', 'Commercial', 'Industrial', 'Agricultural / Farm'];
 
-export default function InstallationRequestPage({ onBack }) {
+export default function InstallationRequestPage({ onBack, onNavigate, hasOuterNavbar = false }) {
   const { user, profile } = useAuth();
   const [fullName, setFullName] = useState(profile?.full_name || '');
   const [city, setCity] = useState(profile?.city || '');
@@ -160,30 +160,39 @@ export default function InstallationRequestPage({ onBack }) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors">
+    <div className={`min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors ${hasOuterNavbar ? 'pt-20 lg:pt-24 pb-16' : ''}`}>
       {/* Sticky Header */}
-      <header className="sticky top-0 z-40 border-b border-gray-200/80 dark:border-gray-800 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-sm">
-        <div className="container-page flex h-16 items-center justify-between">
-          <button type="button" onClick={onBack} className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 shadow-lg shadow-primary-500/30">
-              <Sun className="h-5 w-5 text-white" strokeWidth={2.5} />
-            </div>
-            <span className="text-xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-              Sell<span className="text-primary-500">Solar</span>
-            </span>
-          </button>
-          <button
-            type="button"
-            onClick={onBack}
-            className="flex items-center gap-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/60 shadow-sm transition-all"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Marketplace
-          </button>
-        </div>
-      </header>
+      {!hasOuterNavbar && (
+        <header className="sticky top-0 z-40 border-b border-gray-200/80 dark:border-gray-800 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-sm">
+          <div className="container-page flex h-16 items-center justify-between">
+            <button type="button" onClick={onBack} className="flex items-center gap-2">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 shadow-lg shadow-primary-500/30">
+                <Sun className="h-5 w-5 text-white" strokeWidth={2.5} />
+              </div>
+              <span className="text-xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+                Sell<span className="text-primary-500">Solar</span>
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={onBack}
+              className="flex items-center gap-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/60 shadow-sm transition-all"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Marketplace
+            </button>
+          </div>
+        </header>
+      )}
 
       <main id="main" className="container-page py-6 lg:py-8">
+        <div className="mx-auto max-w-2xl mb-4 flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+          <button type="button" onClick={onBack} className="hover:text-primary-600 transition-colors cursor-pointer">
+            Home
+          </button>
+          <span>/</span>
+          <span className="text-gray-900 dark:text-white font-bold">Request Complete Installation</span>
+        </div>
         <div className="mx-auto max-w-2xl">
           {submittedData ? (
             /* SUCCESS CARD WITH ADMIN EMAIL NOTIFICATION CONFIRMATION */

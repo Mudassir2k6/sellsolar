@@ -57,6 +57,7 @@ export default function PasswordPage({
   initialMode = 'forgot', // 'change' | 'reset' | 'forgot'
   onSuccess,
   onBack,
+  hasOuterNavbar = false,
 }) {
   const {
     user,
@@ -333,33 +334,46 @@ export default function PasswordPage({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50/40 via-white to-slate-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 flex flex-col text-gray-900 dark:text-gray-100">
+    <div className={`min-h-screen bg-gradient-to-br from-amber-50/40 via-white to-slate-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 flex flex-col text-gray-900 dark:text-gray-100 ${hasOuterNavbar ? 'pt-20 lg:pt-24 pb-16' : ''}`}>
       {/* Top Header Navigation */}
-      <header className="sticky top-0 z-40 border-b border-gray-200/80 dark:border-gray-800 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md">
-        <div className="container-page flex h-16 items-center justify-between">
-          <button type="button" onClick={onBack} className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 shadow-md shadow-amber-500/20">
-              <Sun className="h-5 w-5 text-white" strokeWidth={2.5} />
-            </div>
-            <span className="text-xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-              Sell<span className="text-amber-500">Solar</span>
-            </span>
-          </button>
+      {!hasOuterNavbar && (
+        <header className="sticky top-0 z-40 border-b border-gray-200/80 dark:border-gray-800 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md">
+          <div className="container-page flex h-16 items-center justify-between">
+            <button type="button" onClick={onBack} className="flex items-center gap-2 cursor-pointer">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 shadow-md shadow-amber-500/20">
+                <Sun className="h-5 w-5 text-white" strokeWidth={2.5} />
+              </div>
+              <span className="text-xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+                Sell<span className="text-amber-500">Solar</span>
+              </span>
+            </button>
 
-          <button
-            type="button"
-            onClick={onBack}
-            className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Marketplace
-          </button>
-        </div>
-      </header>
+            <button
+              type="button"
+              onClick={onBack}
+              className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Marketplace
+            </button>
+          </div>
+        </header>
+      )}
 
       {/* Main Content Area */}
-      <main className="container-page flex-1 flex flex-col items-center justify-center py-8 sm:py-12">
+      <main className={`container-page flex-1 flex flex-col items-center justify-center ${hasOuterNavbar ? 'py-6 sm:py-8' : 'py-8 sm:py-12'}`}>
         <div className="w-full max-w-md">
+          {hasOuterNavbar && (
+            <div className="mb-4 flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+              <button type="button" onClick={onBack} className="hover:text-amber-600 transition-colors cursor-pointer">
+                Home
+              </button>
+              <span>/</span>
+              <span className="text-gray-900 dark:text-white font-bold">
+                {mode === 'change' ? 'Change Password' : 'Reset Password'}
+              </span>
+            </div>
+          )}
           {/* Honeypot for bot protection */}
           <input
             type="text"

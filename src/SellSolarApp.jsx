@@ -5881,16 +5881,61 @@ export default function App({ initialPathname, initialSlug }){
     className: "flex min-h-screen items-center justify-center bg-white dark:bg-gray-950", children: jsx("div", {
       className: "flex h-12 w-12 animate-spin rounded-full border-4 border-primary-200 dark:border-primary-800 border-t-primary-500"
     })
-  }) : pr ? jsx(PasswordPage, {
-    initialMode: "reset", onSuccess: () => o("home"), onBack: () => o("home")
-  }) : n === "password" || n === "change-password" ? jsx(PasswordPage, {
-    initialMode: t ? "change" : "forgot", onSuccess: () => o(t ? "dashboard" : "home"), onBack: () => o("home")
-  }) : n === "forgot-password" ? jsx(PasswordPage, {
-    initialMode: "forgot", onSuccess: () => o("home"), onBack: () => o("home")
-  }) : n === "reset-password" ? jsx(PasswordPage, {
-    initialMode: "reset", onSuccess: () => o("home"), onBack: () => o("home")
-  }) : n === "login" ? jsx(Bn, {
-    onSuccess: () => o("home"), onBack: () => o("home"), onForgotPassword: () => o("forgot-password")
+  }) : pr ? jsxs("div", {
+    className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
+      onNavigate: handleNavigate, currentPage: "reset-password", onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
+    }), jsx("main", {
+      id: "main",
+      children: jsx(PasswordPage, {
+        initialMode: "reset", onSuccess: () => o("home"), onBack: () => o("home"), hasOuterNavbar: true
+      })
+    }), jsx(hx, {
+      onPostAd: c, onNavigate: handleNavigate
+    })]
+  }) : n === "password" || n === "change-password" ? jsxs("div", {
+    className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
+      onNavigate: handleNavigate, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
+    }), jsx("main", {
+      id: "main",
+      children: jsx(PasswordPage, {
+        initialMode: t ? "change" : "forgot", onSuccess: () => o(t ? "dashboard" : "home"), onBack: () => o("home"), hasOuterNavbar: true
+      })
+    }), jsx(hx, {
+      onPostAd: c, onNavigate: handleNavigate
+    })]
+  }) : n === "forgot-password" ? jsxs("div", {
+    className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
+      onNavigate: handleNavigate, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
+    }), jsx("main", {
+      id: "main",
+      children: jsx(PasswordPage, {
+        initialMode: "forgot", onSuccess: () => o("home"), onBack: () => o("home"), hasOuterNavbar: true
+      })
+    }), jsx(hx, {
+      onPostAd: c, onNavigate: handleNavigate
+    })]
+  }) : n === "reset-password" ? jsxs("div", {
+    className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
+      onNavigate: handleNavigate, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
+    }), jsx("main", {
+      id: "main",
+      children: jsx(PasswordPage, {
+        initialMode: "reset", onSuccess: () => o("home"), onBack: () => o("home"), hasOuterNavbar: true
+      })
+    }), jsx(hx, {
+      onPostAd: c, onNavigate: handleNavigate
+    })]
+  }) : n === "login" ? jsxs("div", {
+    className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
+      onNavigate: handleNavigate, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
+    }), jsx("main", {
+      id: "main",
+      children: jsx(Bn, {
+        onSuccess: () => o("home"), onBack: () => o("home"), onForgotPassword: () => o("forgot-password"), onNavigate: handleNavigate, hasOuterNavbar: true
+      })
+    }), jsx(hx, {
+      onPostAd: c, onNavigate: handleNavigate
+    })]
   }) : n === "dealers" ? jsxs("div", {
     className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
       onNavigate: handleNavigate, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
@@ -5902,8 +5947,17 @@ export default function App({ initialPathname, initialSlug }){
     }), jsx(hx, {
       onPostAd: c, onNavigate: handleNavigate
     })]
-  }) : n === "install" || n === "installation" || n === "request-installation" ? jsx(InstallationRequestPage, {
-    onBack: () => o("home")
+  }) : n === "install" || n === "installation" || n === "request-installation" ? jsxs("div", {
+    className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
+      onNavigate: handleNavigate, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
+    }), jsx("main", {
+      id: "main",
+      children: jsx(InstallationRequestPage, {
+        onNavigate: handleNavigate, onBack: () => o("home"), hasOuterNavbar: true
+      })
+    }), jsx(hx, {
+      onPostAd: c, onNavigate: handleNavigate
+    })]
   }) : n === "calculator" || n === "load-calculator" ? jsxs("div", {
     className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
       onNavigate: handleNavigate, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
@@ -5981,10 +6035,28 @@ export default function App({ initialPathname, initialSlug }){
     })]
   }) : n === "post-ad" ? t ? jsx(yx, {
     onBack: () => o("home"), onPosted: () => o("home")
-  }) : jsx(Bn, {
-    onSuccess: () => o("post-ad"), onBack: () => o("home"), onForgotPassword: () => o("forgot-password")
-  }) : n === "admin" || n === "admin-dashboard" || n === "dashboard" || n === "inbox" ? (!t) ? jsx(Bn, {
-    onSuccess: () => o(n), onBack: () => o("home"), onForgotPassword: () => o("forgot-password")
+  }) : jsxs("div", {
+    className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
+      onNavigate: handleNavigate, currentPage: "login", onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
+    }), jsx("main", {
+      id: "main",
+      children: jsx(Bn, {
+        onSuccess: () => o("post-ad"), onBack: () => o("home"), onForgotPassword: () => o("forgot-password"), onNavigate: handleNavigate, hasOuterNavbar: true
+      })
+    }), jsx(hx, {
+      onPostAd: c, onNavigate: handleNavigate
+    })]
+  }) : n === "admin" || n === "admin-dashboard" || n === "dashboard" || n === "inbox" ? (!t) ? jsxs("div", {
+    className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
+      onNavigate: handleNavigate, currentPage: "login", onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
+    }), jsx("main", {
+      id: "main",
+      children: jsx(Bn, {
+        onSuccess: () => o(n), onBack: () => o("home"), onForgotPassword: () => o("forgot-password"), onNavigate: handleNavigate, hasOuterNavbar: true
+      })
+    }), jsx(hx, {
+      onPostAd: c, onNavigate: handleNavigate
+    })]
   }) : jsx(AdminSuperDashboard, {
     onBack: () => o("home"),
     onNavigateToListing: u,

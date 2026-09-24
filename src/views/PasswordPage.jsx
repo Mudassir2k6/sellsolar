@@ -407,17 +407,55 @@ export default function PasswordPage({
           await updatePassword(newPassword, targetEmail, currentPassword);
         }
       } else {
-        // Forgot password flow
-        if (resetPasswordWithOtp) {
-          await resetPasswordWithOtp(targetEmail, verificationCode.trim(), newPassword);
-        } else if (updatePassword) {
-          await updatePassword(newPassword, targetEmail, verificationCode.trim());
+        // Forgot password flow / Reset password via Email Link or Verified OTP
+        let updated = false;
+
+        // 1. Update password in Supabase Auth directly (valid for recovery session from email link or verified session)
+        if (isSupabaseConfigured()) {
+          try {
+            const { data: sbData, error: sbUpdateErr } = await supabase.auth.updateUser({ password: newPassword });
+            if (!sbUpdateErr && sbData?.user) {
+              updated = true;
+            } else if (!sbUpdateErr) {
+              updated = true;
+            } else {
+              console.warn('Supabase updateUser notice:', sbUpdateErr.message);
+            }
+          } catch (sbErr) {
+            console.warn('Supabase updateUser exception:', sbErr);
+          }
+        }
+
+        // 2. Also update local storage profile/user records for this email
+        try {
+          const users = getStoredUsers();
+          for (const [key, val] of Object.entries(users)) {
+            if (!val) continue;
+            const prof = val.profile || {};
+            const storedEmail = (prof.email || key || '').toLowerCase();
+            if (targetEmail && (storedEmail === targetEmail || key.toLowerCase() === targetEmail)) {
+              val.password = newPassword;
+              updated = true;
+            }
+          }
+          saveStoredUsers(users);
+        } catch {}
+
+        // 3. If updatePassword or resetPasswordWithOtp function available
+        if (!updated && updatePassword) {
+          try {
+            await updatePassword(newPassword, targetEmail, verificationCode.trim() || null);
+            updated = true;
+          } catch (upErr) {
+            if (verificationCode.trim() && resetPasswordWithOtp) {
+              await resetPasswordWithOtp(targetEmail, verificationCode.trim(), newPassword);
+              updated = true;
+            } else {
+              throw upErr;
+            }
+          }
         }
       }
-
-      try {
-        await supabase.auth.updateUser({ password: newPassword });
-      } catch {}
 
       completePasswordRecovery?.();
       setSuccessMessage('Password successfully updated! Redirecting to login...');
@@ -640,9 +678,9 @@ export default function PasswordPage({
               <div className="mb-4 p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 flex items-start gap-2.5 text-xs">
                 <Mail className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
                 <p className="leading-relaxed text-amber-900 dark:text-amber-200">
-                  A 6-digit verification code has been sent to{' '}
+                  Password reset email has been sent to{' '}
                   <span className="font-bold text-gray-900 dark:text-white underline">{email}</span>.
-                  Please check your inbox (or spam folder) and enter the code below to verify your identity.
+                  Click the <strong>Reset password link</strong> in your email inbox (or enter the 6-digit code below) to choose your new password.
                 </p>
               </div>
             )}
@@ -688,7 +726,7 @@ export default function PasswordPage({
                     <LoaderCircle className="h-4 w-4 animate-spin" />
                   ) : (
                     <>
-                      <span>Send 6-Digit Verification Code</span>
+                      <span>Send Password Reset Link / Code</span>
                       <Send className="h-4 w-4" />
                     </>
                   )}

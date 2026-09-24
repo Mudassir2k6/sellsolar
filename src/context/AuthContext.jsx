@@ -822,8 +822,15 @@ export function AuthProvider({ children }) {
       // Update local store
       const users = getStoredUsers();
 
-      // Security verification: If resetting while unauthenticated, verify account identity
-      if (!user) {
+      const isRecoveryVerified =
+        passwordRecovery ||
+        Boolean(
+          typeof window !== 'undefined' &&
+          sessionStorage.getItem('sellsolar_otp_verified')
+        );
+
+      // Security verification: If resetting while unauthenticated and not already verified via email link or OTP, verify credentials
+      if (!user && !isRecoveryVerified) {
         const verifyRes = verifyAccountRecoveryCredentials(cleanTarget, verificationValue, users);
         if (!verifyRes.ok) {
           recordRateLimitAttempt('password_reset', cleanTarget || 'global');

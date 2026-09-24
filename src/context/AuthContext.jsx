@@ -1371,8 +1371,6 @@ export function AuthProvider({ children }) {
       throw new Error('Please enter a valid registered email address.');
     }
 
-    // Check if user exists in local store or Supabase
-    const users = getStoredUsers();
     let userExists = false;
 
     // 1. Check default admin accounts
@@ -1384,28 +1382,7 @@ export function AuthProvider({ children }) {
       userExists = true;
     }
 
-    // 2. Check local users store
-    if (!userExists) {
-      for (const [key, val] of Object.entries(users)) {
-        if (!val) continue;
-        const prof = val.profile || {};
-        const storedEmail = (prof.email || key || '').toLowerCase();
-        const storedUsername = (prof.username || '').toLowerCase();
-        const emailPrefix = storedEmail.split('@')[0]?.toLowerCase();
-
-        if (
-          key.toLowerCase() === cleanMail ||
-          storedEmail === cleanMail ||
-          storedUsername === cleanMail ||
-          (emailPrefix && emailPrefix === cleanMail)
-        ) {
-          userExists = true;
-          break;
-        }
-      }
-    }
-
-    // 3. If not found in local store and Supabase is configured, check Supabase profiles
+    // 2. If Supabase is configured, check database profiles table
     if (!userExists && isSupabaseConfigured()) {
       try {
         const { data } = await supabase
@@ -1418,6 +1395,20 @@ export function AuthProvider({ children }) {
         }
       } catch (sbErr) {
         console.warn('Supabase user existence check:', sbErr);
+      }
+    }
+
+    // 3. Fallback: only if Supabase is NOT configured, check local mock store
+    if (!userExists && !isSupabaseConfigured()) {
+      const users = getStoredUsers();
+      for (const [key, val] of Object.entries(users)) {
+        if (!val) continue;
+        const prof = val.profile || {};
+        const storedEmail = (prof.email || key || '').toLowerCase();
+        if (key.toLowerCase() === cleanMail || storedEmail === cleanMail) {
+          userExists = true;
+          break;
+        }
       }
     }
 
@@ -1437,16 +1428,7 @@ export function AuthProvider({ children }) {
       } catch {}
     }
 
-    // Send OTP via Resend Edge Function (fire-and-forget, reliable delivery)
-    try {
-      fetch('https://zgfycrnmivfybbclflwf.supabase.co/functions/v1/send-reset-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: cleanMail, otp }),
-      }).catch((edgeErr) => console.warn('[SellSolar] Edge fn OTP dispatch warning:', edgeErr));
-    } catch {}
-
-    // Attempt Supabase reset email dispatch (non-blocking)
+    // Dispatch single Supabase reset email (avoid duplicate simultaneous emails)
     if (isSupabaseConfigured()) {
       try {
         const { error: resetErr } = await supabase.auth.resetPasswordForEmail(cleanMail, {
@@ -1463,7 +1445,7 @@ export function AuthProvider({ children }) {
     return {
       success: true,
       email: cleanMail,
-      message: `A 6-digit verification code has been dispatched to ${cleanMail}.`,
+      message: `Password reset instructions have been dispatched to ${cleanMail}.`,
     };
   }, []);
 

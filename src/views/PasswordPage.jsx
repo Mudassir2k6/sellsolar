@@ -315,6 +315,22 @@ export default function PasswordPage({
 
     setBusy(true);
     try {
+      // 1. Check if email exists in database before proceeding
+      if (isSupabaseConfigured()) {
+        const { data: profData } = await supabase
+          .from('profiles')
+          .select('id, email')
+          .eq('email', targetEmail)
+          .maybeSingle();
+
+        const isDefaultAdmin = targetEmail === 'mudassir2k6@gmail.com';
+        if (!profData?.id && !isDefaultAdmin) {
+          setError('Email address does not exist. Please check your email or create a new account.');
+          setBusy(false);
+          return;
+        }
+      }
+
       if (requestPasswordResetOtp) {
         await requestPasswordResetOtp(targetEmail);
       } else if (isSupabaseConfigured()) {
@@ -323,7 +339,7 @@ export default function PasswordPage({
       }
 
       setResendCooldown(60);
-      setSuccessMessage(`A 6-digit verification code has been dispatched to ${targetEmail}.`);
+      setSuccessMessage(`Password reset link and verification code have been dispatched to ${targetEmail}.`);
       setOtpDigits(['', '', '', '', '', '']);
       setVerificationCode('');
       // Smoothly transition to Step 2 (Verify OTP)
@@ -675,13 +691,18 @@ export default function PasswordPage({
 
             {/* Step 2 Security Notice: Dispatched via email only */}
             {mode === 'forgot' && step === 2 && (
-              <div className="mb-4 p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 flex items-start gap-2.5 text-xs">
-                <Mail className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
-                <p className="leading-relaxed text-amber-900 dark:text-amber-200">
-                  Password reset email has been sent to{' '}
-                  <span className="font-bold text-gray-900 dark:text-white underline">{email}</span>.
-                  Click the <strong>Reset password link</strong> in your email inbox (or enter the 6-digit code below) to choose your new password.
-                </p>
+              <div className="mb-4 p-4 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 space-y-2 text-xs">
+                <div className="flex items-start gap-2.5">
+                  <Mail className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
+                  <p className="leading-relaxed text-amber-900 dark:text-amber-200">
+                    Password reset link has been emailed to{' '}
+                    <span className="font-bold text-gray-900 dark:text-white underline">{email}</span>.
+                    Click the <strong>Reset password link</strong> in your email inbox to choose your new password directly.
+                  </p>
+                </div>
+                <div className="pl-6 text-[11px] text-amber-800/80 dark:text-amber-300/80 border-t border-amber-200/60 dark:border-amber-800/60 pt-2">
+                  💡 <strong>Gmail Note:</strong> If Gmail groups previous reset emails together, click the <strong>three dots (&hellip;)</strong> inside the message to reveal the link.
+                </div>
               </div>
             )}
 

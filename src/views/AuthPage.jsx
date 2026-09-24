@@ -737,20 +737,34 @@ export default function AuthPage({ onSuccess, onBack, onForgotPassword, initialV
     }
     setBusy(true);
     try {
-      // Use AuthContext requestPasswordResetOtp which sends OTP via Resend Edge Function
+      if (isSupabaseConfigured()) {
+        const { data: profData } = await supabase
+          .from('profiles')
+          .select('id, email')
+          .eq('email', cleanMail)
+          .maybeSingle();
+
+        const isDefaultAdmin = cleanMail === 'mudassir2k6@gmail.com';
+        if (!profData?.id && !isDefaultAdmin) {
+          setError('Email address does not exist. Please check your email or sign up first.');
+          setBusy(false);
+          return;
+        }
+      }
+
       if (requestPasswordResetOtp) {
         await requestPasswordResetOtp(cleanMail);
       } else if (isSupabaseConfigured()) {
         await supabase.auth.resetPasswordForEmail(cleanMail, {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: `${window.location.origin}/reset-password`,
         });
       }
       showToast({
-        title: 'Password reset code sent!',
-        message: `A 6-digit code has been sent to ${cleanMail}. Check inbox and spam folder.`,
+        title: 'Password reset link sent!',
+        message: `Password reset instructions sent to ${cleanMail}. Check inbox and spam folder.`,
         type: 'success',
       });
-      setInfo(`A 6-digit password reset code has been emailed to ${cleanMail}. Enter it in the "Set New Password" form below (click the button below).`);
+      setInfo(`Password reset instructions have been emailed to ${cleanMail}. Open the email and click the 'Reset password' link to set your new password.`);
     } catch (err) {
       setError(authErrorMessage(err, 'forgot'));
     } finally {

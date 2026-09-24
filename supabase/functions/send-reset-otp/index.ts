@@ -29,13 +29,14 @@ Deno.serve(async (req) => {
       return Response.json({ error: "Invalid verification code" }, { status: 400, headers: corsHeaders });
     }
 
-    // 1. If Resend API Key is set in Supabase Secrets, send rich HTML email
+    // 1. Send via Resend (primary)
     if (resendKey) {
       const emailHtml = `
         <!DOCTYPE html>
         <html>
         <head>
           <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <style>
             body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f8fafc; margin: 0; padding: 24px; }
             .card { max-width: 520px; margin: 0 auto; background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; padding: 32px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
@@ -43,30 +44,35 @@ Deno.serve(async (req) => {
             .title { font-size: 22px; font-weight: 700; color: #0f172a; margin: 0 0 12px 0; }
             .desc { font-size: 14px; color: #475569; line-height: 1.6; margin: 0 0 24px 0; }
             .otp-box { background: #fef3c7; border: 2px dashed #f59e0b; border-radius: 12px; padding: 18px; text-align: center; margin: 24px 0; }
-            .otp-code { font-family: monospace; font-size: 32px; font-weight: 800; letter-spacing: 6px; color: #92400e; }
+            .otp-code { font-family: monospace; font-size: 36px; font-weight: 800; letter-spacing: 8px; color: #92400e; }
+            .expire { font-size: 13px; color: #64748b; text-align: center; margin-bottom: 8px; }
             .warning { font-size: 12px; color: #94a3b8; line-height: 1.5; margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 16px; }
           </style>
         </head>
         <body>
           <div class="card">
             <div class="logo">⚡ SellSolar.pk</div>
-            <h1 class="title">Password Reset Verification Code</h1>
-            <p class="desc">You recently requested to reset your password for your SellSolar account. Use the 6-digit verification code below to complete the reset process:</p>
+            <h1 class="title">Password Reset Code</h1>
+            <p class="desc">You requested a password reset for your SellSolar account. Use the code below to complete the process:</p>
             
             <div class="otp-box">
               <div class="otp-code">${otp}</div>
             </div>
+            <p class="expire">⏱️ Valid for <strong>10 minutes</strong> only.</p>
 
-            <p class="desc">This verification code is valid for <strong>10 minutes</strong>. If you did not request this password reset, you can safely ignore this email — your account remains secure.</p>
+            <p class="desc">If you did not request this password reset, you can safely ignore this email — your account remains secure.</p>
             
             <div class="warning">
-              SellSolar Pakistan — Pakistan's #1 Solar Marketplace & Pricing Directory.<br>
-              Never share this verification code with anyone.
+              SellSolar Pakistan — Pakistan's #1 Solar Marketplace &amp; Pricing Directory.<br>
+              🔒 Never share this code with anyone. SellSolar staff will never ask for it.
             </div>
           </div>
         </body>
         </html>
       `;
+
+      // Use onboarding@resend.dev if no custom domain configured
+      const fromEmail = "SellSolar Security <onboarding@resend.dev>";
 
       const sent = await fetch("https://api.resend.com/emails", {
         method: "POST",
@@ -75,9 +81,9 @@ Deno.serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "SellSolar Security <security@resend.dev>",
+          from: fromEmail,
           to: [to],
-          subject: `${otp} is your SellSolar password reset code`,
+          subject: `${otp} — Your SellSolar password reset code`,
           html: emailHtml,
         }),
       });
@@ -86,15 +92,15 @@ Deno.serve(async (req) => {
       if (sent.ok) {
         return Response.json({ ok: true, provider: "resend", id: payload?.id }, { headers: corsHeaders });
       }
-      console.warn("Resend email dispatch error:", payload);
+      console.warn("Resend email dispatch error:", JSON.stringify(payload));
     }
 
-    // 2. Fallback to Supabase Auth OTP / Reset
+    // 2. Fallback to Supabase Auth Reset Email
     if (supabaseUrl && (serviceKey || anonKey)) {
       try {
         const client = createClient(supabaseUrl, serviceKey || anonKey);
         await client.auth.resetPasswordForEmail(to, {
-          redirectTo: "https://sellsolar.pk/reset-password",
+          redirectTo: "https://sellsolar.pk/",
         });
         return Response.json({ ok: true, provider: "supabase-auth" }, { headers: corsHeaders });
       } catch (err) {

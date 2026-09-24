@@ -259,7 +259,7 @@ function getPasswordStrength(pass) {
 }
 
 export default function AuthPage({ onSuccess, onBack, onForgotPassword, initialView = 'login' }) {
-  const { signIn, signInWithGoogle, signUp, resendConfirmationEmail, updatePassword, refreshProfile, completePasswordRecovery } = useAuth();
+  const { signIn, signInWithGoogle, signUp, resendConfirmationEmail, updatePassword, refreshProfile, completePasswordRecovery, requestPasswordResetOtp } = useAuth();
   const { showToast } = useToast();
   const [view, setView] = useState(initialView);
   const [accountType, setAccountType] = useState('individual');
@@ -724,30 +724,26 @@ export default function AuthPage({ onSuccess, onBack, onForgotPassword, initialV
     const emailInvalid = !cleanMail || !isValidEmail(cleanMail);
     setFieldErrors({ email: emailInvalid });
     if (emailInvalid) {
-      setError('Please enter a valid email address (e.g. you@example.com) to receive the password reset link.');
+      setError('Please enter a valid email address (e.g. you@example.com) to receive the password reset code.');
       focusField('email');
       return;
     }
     setBusy(true);
     try {
-      if (isSupabaseConfigured()) {
-        try {
-          const { error: resetError } = await supabase.auth.resetPasswordForEmail(cleanMail, {
-            redirectTo: `${window.location.origin}/`,
-          });
-          if (resetError) {
-            throw resetError;
-          }
-        } catch (supErr) {
-          throw supErr;
-        }
+      // Use AuthContext requestPasswordResetOtp which sends OTP via Resend Edge Function
+      if (requestPasswordResetOtp) {
+        await requestPasswordResetOtp(cleanMail);
+      } else if (isSupabaseConfigured()) {
+        await supabase.auth.resetPasswordForEmail(cleanMail, {
+          redirectTo: `${window.location.origin}/`,
+        });
       }
       showToast({
-        title: 'Reset email sent',
-        message: `Check ${cleanMail} for the password reset link (inbox and spam).`,
+        title: 'Password reset code sent!',
+        message: `A 6-digit code has been sent to ${cleanMail}. Check inbox and spam folder.`,
         type: 'success',
       });
-      setInfo(`Password reset link sent to ${cleanMail}. Open the email link to verify and set a new password.`);
+      setInfo(`A 6-digit password reset code has been emailed to ${cleanMail}. Enter it in the "Set New Password" form below (click the button below).`);
     } catch (err) {
       setError(authErrorMessage(err, 'forgot'));
     } finally {

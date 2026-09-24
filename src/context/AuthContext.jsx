@@ -1425,6 +1425,15 @@ export function AuthProvider({ children }) {
       } catch {}
     }
 
+    // Send OTP via Resend Edge Function (fire-and-forget, reliable delivery)
+    try {
+      fetch('https://zgfycrnmivfybbclflwf.supabase.co/functions/v1/send-reset-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanMail, otp }),
+      }).catch((edgeErr) => console.warn('[SellSolar] Edge fn OTP dispatch warning:', edgeErr));
+    } catch {}
+
     // Call Supabase reset password to trigger real email delivery
     if (isSupabaseConfigured()) {
       try {

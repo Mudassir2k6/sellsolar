@@ -1479,16 +1479,6 @@ export function AuthProvider({ children }) {
       } catch {}
     }
 
-    // 2. Master test bypass codes for testing / dev convenience
-    if (cleanOtp === '123456' || cleanOtp === '786786') {
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem(
-          'sellsolar_otp_verified',
-          JSON.stringify({ email: cleanMail, timestamp: Date.now(), bypass: true })
-        );
-      }
-      return { success: true, verified: true };
-    }
 
     // 3. Official Supabase OTP verification (type: 'recovery')
     if (isSupabaseConfigured()) {

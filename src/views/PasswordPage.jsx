@@ -173,7 +173,7 @@ export default function PasswordPage({
           token: code,
           type: 'recovery',
         });
-        if (sbErr && code !== '123456' && code !== '786786') {
+        if (sbErr) {
           throw sbErr;
         }
       }
@@ -400,7 +400,7 @@ export default function PasswordPage({
       } else {
         // Forgot password flow
         if (resetPasswordWithOtp) {
-          await resetPasswordWithOtp(targetEmail, verificationCode.trim() || '123456', newPassword);
+          await resetPasswordWithOtp(targetEmail, verificationCode.trim(), newPassword);
         } else if (updatePassword) {
           await updatePassword(newPassword, targetEmail, verificationCode.trim());
         }

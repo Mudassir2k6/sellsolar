@@ -339,9 +339,6 @@ export function verifyAccountRecoveryCredentials(targetIdentifier, verificationC
 
   // 6-digit Email OTP Verification check
   if (cleanVerification.length === 6) {
-    if (cleanVerification === '123456' || cleanVerification === '786786') {
-      return { ok: true, isVerified: true, record: targetRecord };
-    }
     if (typeof window !== 'undefined') {
       try {
         const verifiedRaw = sessionStorage.getItem('sellsolar_otp_verified');

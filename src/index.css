@@ -10,6 +10,8 @@
 
   body {
     @apply bg-white font-sans text-gray-900 transition-colors duration-200;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    text-rendering: optimizeLegibility;
   }
 
   .dark body {

@@ -109,7 +109,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en-PK" dir="ltr" className={plusJakarta.variable} suppressHydrationWarning>
+    <html lang="en-PK" dir="ltr" className={`${plusJakarta.variable} ${plusJakarta.className}`} suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://zgfycrnmivfybbclflwf.supabase.co" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://zgfycrnmivfybbclflwf.supabase.co" />

@@ -1414,7 +1414,12 @@ export function AuthProvider({ children }) {
       }
     }
 
-    // Generate 6-digit backup OTP code for local fallback
+    // 4. Validate user existence: if not registered, throw immediately
+    if (!userExists) {
+      throw new Error('Email address does not exist. Please check your email or sign up for an account.');
+    }
+
+    // Generate 6-digit OTP code for reset
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiry = Date.now() + 10 * 60 * 1000; // 10 minutes
 
@@ -1446,8 +1451,6 @@ export function AuthProvider({ children }) {
       } catch (sbErr) {
         console.warn('Supabase reset email notice:', sbErr);
       }
-    } else if (!userExists) {
-      throw new Error('This email is not registered with SellSolar.pk. Please check your email address.');
     }
 
     return {

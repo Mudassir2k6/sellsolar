@@ -37,6 +37,15 @@ function getPasswordStrength(pass) {
 function passwordUpdateError(err) {
   const raw = err instanceof Error ? err.message : String(err?.message || err || '');
   const message = raw.toLowerCase();
+  if (
+    message.includes('does not exist') ||
+    message.includes('not exist') ||
+    message.includes('not registered') ||
+    message.includes('no account found') ||
+    message.includes('user not found')
+  ) {
+    return 'Email address does not exist. Please check your email or create a new account.';
+  }
   if (err?.code === 'weak_password' || message.includes('weak_password') || message.includes('pwned') || message.includes('password is known')) {
     return 'Please use any other password of at least 8 characters.';
   }

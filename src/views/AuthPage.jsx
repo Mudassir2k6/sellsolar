@@ -73,12 +73,16 @@ function authErrorMessage(error, activeView = 'login') {
 
   // Account not found / not registered check
   if (
+    message.includes('does not exist') ||
+    message.includes('not exist') ||
     message.includes('no account found') ||
     message.includes('user not found') ||
     message.includes('sign up first') ||
     message.includes('not registered')
   ) {
-    return 'No account found with this username or ID. Please sign up first.';
+    return activeView === 'forgot'
+      ? 'Email address does not exist. Please check your email or sign up first.'
+      : 'No account found with this username or ID. Please sign up first.';
   }
 
   // Filter out any raw API key / backend auth internal messages

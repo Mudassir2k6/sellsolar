@@ -578,14 +578,16 @@ export default function PasswordPage({
                     </div>
                   </div>
 
-                  <div className="rounded-xl bg-white/80 dark:bg-gray-900/80 p-3 text-xs text-gray-700 dark:text-gray-300 border border-amber-100 dark:border-amber-900/50 space-y-2">
-                    <p className="font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-1.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                      Click the <strong>Reset password</strong> link in that email to set your new password.
-                    </p>
-                    <p className="text-[11px] text-gray-500 dark:text-gray-400 pl-5">
-                      💡 <strong>Gmail Note:</strong> If Gmail groups previous reset emails together, click the three dots (<strong>&hellip;</strong>) inside the message to reveal the link.
-                    </p>
+                  <div className="rounded-xl bg-white/80 dark:bg-gray-900/80 p-3 text-xs text-gray-700 dark:text-gray-300 border border-amber-100 dark:border-amber-900/50 space-y-2.5">
+                    <div className="font-semibold text-gray-800 dark:text-gray-200 flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                      <span>
+                        Click the <strong className="font-bold text-gray-900 dark:text-white">Reset password</strong> link in that email to set your new password.
+                      </span>
+                    </div>
+                    <div className="text-[11px] leading-relaxed text-gray-600 dark:text-gray-400 pl-6 border-t border-amber-100/60 dark:border-amber-900/30 pt-2">
+                      💡 <strong className="text-gray-800 dark:text-gray-200 font-bold">Gmail Note:</strong> If Gmail groups previous reset emails together, click the <span className="inline-flex items-center font-bold text-red-600 dark:text-red-400 bg-red-100/80 dark:bg-red-950/80 px-1.5 py-0.5 rounded border border-red-300 dark:border-red-800 shadow-xs">three dots (&hellip;)</span> inside the message to reveal the link.
+                    </div>
                   </div>
                 </div>
 

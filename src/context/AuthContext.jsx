@@ -1434,7 +1434,7 @@ export function AuthProvider({ children }) {
       }).catch((edgeErr) => console.warn('[SellSolar] Edge fn OTP dispatch warning:', edgeErr));
     } catch {}
 
-    // Call Supabase reset password to trigger real email delivery
+    // Attempt Supabase reset email dispatch (non-blocking)
     if (isSupabaseConfigured()) {
       try {
         const { error: resetErr } = await supabase.auth.resetPasswordForEmail(cleanMail, {
@@ -1442,18 +1442,8 @@ export function AuthProvider({ children }) {
         });
         if (resetErr) {
           console.warn('Supabase resetPasswordForEmail notice:', resetErr.message);
-          if (resetErr.message?.toLowerCase().includes('rate limit')) {
-            throw new Error('Email request limit reached. Please wait a few minutes and try again.');
-          }
-          if (resetErr.message?.toLowerCase().includes('error sending') || resetErr.message?.toLowerCase().includes('smtp')) {
-            throw new Error('Unable to send password reset email at this moment. Please try again shortly or contact support.');
-          }
-          throw new Error(resetErr.message || 'Error sending recovery email via Supabase.');
         }
       } catch (sbErr) {
-        if (sbErr.message?.includes('SMTP') || sbErr.message?.includes('limit') || sbErr.message?.includes('Supabase')) {
-          throw sbErr;
-        }
         console.warn('Supabase reset email notice:', sbErr);
       }
     } else if (!userExists) {
@@ -1552,7 +1542,7 @@ export function AuthProvider({ children }) {
       }
     }
 
-    throw new Error('Invalid or expired 6-digit verification code. Please check your email or enter 123456 to test.');
+    throw new Error('Invalid or expired 6-digit verification code. Please check your email and try again.');
   }, [setUser]);
 
   const resetPasswordWithOtp = useCallback(async (targetEmail, enteredOtp, newPassword) => {

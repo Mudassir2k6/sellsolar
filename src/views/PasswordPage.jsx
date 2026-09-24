@@ -9,10 +9,8 @@ import {
   LoaderCircle,
   ArrowLeft,
   Mail,
-  ShieldCheck,
   KeyRound,
   Send,
-  Sparkles,
   Smartphone,
   Check,
   RotateCcw,
@@ -21,15 +19,15 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { useAuth, getStoredUsers } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { isValidEmail } from '../lib/auth';
-import { checkRateLimit, isBotHoneypotTriggered, sanitizeText } from '../lib/security';
+import { checkRateLimit, isBotHoneypotTriggered } from '../lib/security';
 
 function getPasswordStrength(pass) {
   if (!pass) return { score: 0, text: '', color: 'bg-gray-200', width: 'w-0' };
-  if (pass.length < 8) return { score: 1, text: 'Too short (min 8 chars)', color: 'bg-error-500', width: 'w-1/3' };
+  if (pass.length < 8) return { score: 1, text: 'Too short (min 8 chars)', color: 'bg-rose-500', width: 'w-1/3' };
   const hasMixed = /[a-z]/.test(pass) && /[A-Z]/.test(pass);
   const hasDigit = /\d/.test(pass);
   if (pass.length >= 10 && hasMixed && hasDigit) {
-    return { score: 3, text: 'Strong password', color: 'bg-secondary-500', width: 'w-full' };
+    return { score: 3, text: 'Strong password', color: 'bg-emerald-500', width: 'w-full' };
   }
   return { score: 2, text: 'Good password', color: 'bg-amber-500', width: 'w-2/3' };
 }
@@ -62,11 +60,8 @@ export default function PasswordPage({
 }) {
   const {
     user,
-    profile,
     updatePassword,
     requestPasswordResetOtp,
-    verifyPasswordResetOtp,
-    resetPasswordWithOtp,
     completePasswordRecovery,
   } = useAuth();
   const { showToast } = useToast();
@@ -82,15 +77,15 @@ export default function PasswordPage({
       : 'forgot'
   );
   
-  // 3-step state for forgot password flow
-  const [step, setStep] = useState(initialMode === 'reset' ? 3 : 1); // 1: Request, 2: Verify, 3: Set New Password
+  // 2-step state for forgot password flow
+  // step 1: Request Reset Link (enter email / confirmation card)
+  // step 2: Set New Password (rendered when opened via email reset link or step 2)
+  const [step, setStep] = useState(initialMode === 'reset' ? 2 : 1);
   const [isVerified, setIsVerified] = useState(initialMode === 'reset');
+  const [emailSent, setEmailSent] = useState(false);
 
-  // In forgot password flow, email must ALWAYS be blank so user types their email afresh
-  const [email, setEmail] = useState(initialMode === 'change' ? (user?.email || '') : '');
-  const [verificationCode, setVerificationCode] = useState('');
-  const [otpDigits, setOtpDigits] = useState(['', '', '', '', '', '']);
-  const otpInputRefs = useRef([]);
+  // In forgot password flow, email is initially blank so user types afresh
+  const [email, setEmail] = useState(initialMode === 'change' ? (user?.email || '') : (user?.email || ''));
   const newPasswordRef = useRef(null);
 
   const [honeypot, setHoneypot] = useState('');
@@ -111,33 +106,21 @@ export default function PasswordPage({
     if (initialMode === 'forgot') {
       setMode('forgot');
       setStep(1);
-      setEmail(''); // Explicitly blank on mount/open so user types afresh
+      setEmailSent(false);
+      setEmail(''); // Explicitly blank on mount so user types afresh
       setIsVerified(false);
-      try {
-        sessionStorage.removeItem('sellsolar_reset_otp');
-      } catch {}
     } else if (user && initialMode === 'change') {
       setMode('change');
       setEmail(user?.email || '');
     } else if (initialMode === 'reset') {
       setMode('forgot');
-      setStep(3);
+      setStep(2);
       setIsVerified(true);
+      if (user?.email) setEmail(user.email);
     }
     setError(null);
     setSuccessMessage(null);
   }, [initialMode, user]);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      const stored = sessionStorage.getItem('sellsolar_reset_otp');
-      if (stored && step > 1) {
-        const parsed = JSON.parse(stored);
-        if (parsed.email && !email) setEmail(parsed.email);
-      }
-    } catch {}
-  }, [email, step]);
 
   useEffect(() => {
     if (resendCooldown > 0) {
@@ -150,11 +133,6 @@ export default function PasswordPage({
   useEffect(() => {
     if (step === 2) {
       const timer = setTimeout(() => {
-        otpInputRefs.current[0]?.focus();
-      }, 150);
-      return () => clearTimeout(timer);
-    } else if (step === 3) {
-      const timer = setTimeout(() => {
         newPasswordRef.current?.focus();
       }, 150);
       return () => clearTimeout(timer);
@@ -163,134 +141,7 @@ export default function PasswordPage({
 
   const strength = getPasswordStrength(newPassword);
 
-  // Auto-verify helper when 6th digit is typed or pasted
-  const triggerAutoVerify = async (candidateCode) => {
-    const code = (candidateCode || otpDigits.join('')).trim();
-    if (!code || code.length !== 6) return;
-
-    setError(null);
-    setSuccessMessage(null);
-    setBusy(true);
-
-    try {
-      const targetEmail = email.trim().toLowerCase();
-      if (verifyPasswordResetOtp) {
-        await verifyPasswordResetOtp(targetEmail, code);
-      } else if (isSupabaseConfigured()) {
-        const { error: sbErr } = await supabase.auth.verifyOtp({
-          email: targetEmail,
-          token: code,
-          type: 'recovery',
-        });
-        if (sbErr) {
-          throw sbErr;
-        }
-      }
-      setVerificationCode(code);
-      setIsVerified(true);
-      setSuccessMessage('Code verified successfully! Please enter your new password.');
-      // Auto transition directly to Step 3 (New Password + Confirm Password)
-      setStep(3);
-    } catch (err) {
-      setError(passwordUpdateError(err));
-      // Focus on last box so user can adjust
-      otpInputRefs.current[5]?.focus();
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const handleDigitChange = (index, val) => {
-    const sanitized = val.replace(/\D/g, '');
-    if (!sanitized) {
-      const next = [...otpDigits];
-      next[index] = '';
-      setOtpDigits(next);
-      setVerificationCode(next.join(''));
-      return;
-    }
-
-    if (sanitized.length > 1) {
-      // User pasted or typed multiple digits in this box
-      const chars = sanitized.slice(0, 6).split('');
-      const next = [...otpDigits];
-      for (let i = 0; i < 6; i++) {
-        if (chars[i]) {
-          next[i] = chars[i];
-        }
-      }
-      setOtpDigits(next);
-      const full = next.join('');
-      setVerificationCode(full);
-      const focusTarget = Math.min(chars.length, 5);
-      otpInputRefs.current[focusTarget]?.focus();
-
-      if (full.length === 6) {
-        triggerAutoVerify(full);
-      }
-      return;
-    }
-
-    // Single digit input
-    const single = sanitized.charAt(sanitized.length - 1);
-    const next = [...otpDigits];
-    next[index] = single;
-    setOtpDigits(next);
-    const full = next.join('');
-    setVerificationCode(full);
-
-    if (single && index < 5) {
-      otpInputRefs.current[index + 1]?.focus();
-    }
-
-    // Auto verify as soon as the 6th digit is typed!
-    if (full.length === 6 && !next.includes('')) {
-      triggerAutoVerify(full);
-    }
-  };
-
-  const handleDigitKeyDown = (index, e) => {
-    if (e.key === 'Backspace') {
-      if (!otpDigits[index] && index > 0) {
-        e.preventDefault();
-        const next = [...otpDigits];
-        next[index - 1] = '';
-        setOtpDigits(next);
-        setVerificationCode(next.join(''));
-        otpInputRefs.current[index - 1]?.focus();
-      }
-    } else if (e.key === 'ArrowLeft' && index > 0) {
-      e.preventDefault();
-      otpInputRefs.current[index - 1]?.focus();
-    } else if (e.key === 'ArrowRight' && index < 5) {
-      e.preventDefault();
-      otpInputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handlePaste = (e) => {
-    e.preventDefault();
-    const pasted = e.clipboardData.getData('text/plain');
-    const digits = pasted.replace(/\D/g, '').slice(0, 6).split('');
-    if (digits.length === 0) return;
-
-    const next = [...otpDigits];
-    digits.forEach((d, i) => {
-      if (i < 6) next[i] = d;
-    });
-    setOtpDigits(next);
-    const full = next.join('');
-    setVerificationCode(full);
-
-    const focusTarget = Math.min(digits.length, 5);
-    otpInputRefs.current[focusTarget]?.focus();
-
-    if (full.length === 6) {
-      triggerAutoVerify(full);
-    }
-  };
-
-  // STEP 1: Send OTP to Email
+  // STEP 1: Send Reset Link to Email
   const handleSendResetEmail = async (e) => {
     e?.preventDefault();
     if (isBotHoneypotTriggered(honeypot)) return;
@@ -339,11 +190,8 @@ export default function PasswordPage({
       }
 
       setResendCooldown(60);
-      setSuccessMessage(`Password reset link and verification code have been dispatched to ${targetEmail}.`);
-      setOtpDigits(['', '', '', '', '', '']);
-      setVerificationCode('');
-      // Smoothly transition to Step 2 (Verify OTP)
-      setStep(2);
+      setEmailSent(true);
+      setSuccessMessage(`Password reset link has been dispatched to ${targetEmail}.`);
     } catch (err) {
       setError(passwordUpdateError(err));
     } finally {
@@ -351,24 +199,7 @@ export default function PasswordPage({
     }
   };
 
-  // STEP 2: Verify OTP
-  const handleVerifyOtp = async (e) => {
-    e?.preventDefault();
-    if (isBotHoneypotTriggered(honeypot)) return;
-    setError(null);
-    setSuccessMessage(null);
-
-    const cleanCode = (verificationCode || otpDigits.join('')).trim();
-
-    if (!cleanCode || cleanCode.length < 6) {
-      setError('Please enter the complete 6-digit verification code.');
-      return;
-    }
-
-    await triggerAutoVerify(cleanCode);
-  };
-
-  // STEP 3 / CHANGE PASSWORD: Set New Password
+  // STEP 2 / CHANGE PASSWORD: Set New Password
   const handleUpdatePassword = async (e) => {
     e?.preventDefault();
     if (isBotHoneypotTriggered(honeypot)) return;
@@ -423,10 +254,10 @@ export default function PasswordPage({
           await updatePassword(newPassword, targetEmail, currentPassword);
         }
       } else {
-        // Forgot password flow / Reset password via Email Link or Verified OTP
+        // Forgot password flow / Reset password via Email Link
         let updated = false;
 
-        // 1. Update password in Supabase Auth directly (valid for recovery session from email link or verified session)
+        // 1. Update password in Supabase Auth directly (valid for recovery session from email link)
         if (isSupabaseConfigured()) {
           try {
             const { data: sbData, error: sbUpdateErr } = await supabase.auth.updateUser({ password: newPassword });
@@ -448,25 +279,29 @@ export default function PasswordPage({
           for (const [key, val] of Object.entries(users)) {
             if (!val) continue;
             const prof = val.profile || {};
-            const storedEmail = (prof.email || key || '').toLowerCase();
-            if (targetEmail && (storedEmail === targetEmail || key.toLowerCase() === targetEmail)) {
-              val.password = newPassword;
+            if (
+              key.toLowerCase() === targetEmail.toLowerCase() ||
+              (prof.email && prof.email.toLowerCase() === targetEmail.toLowerCase())
+            ) {
+              users[key] = {
+                ...val,
+                password: newPassword,
+                updatedAt: new Date().toISOString(),
+              };
               updated = true;
             }
           }
-          saveStoredUsers(users);
+          if (updated) {
+            localStorage.setItem('sellsolar_users', JSON.stringify(users));
+          }
         } catch {}
 
-        // 3. If updatePassword or resetPasswordWithOtp function available
-        if (!updated && updatePassword) {
-          try {
-            await updatePassword(newPassword, targetEmail, verificationCode.trim() || null);
-            updated = true;
-          } catch (upErr) {
-            if (verificationCode.trim() && resetPasswordWithOtp) {
-              await resetPasswordWithOtp(targetEmail, verificationCode.trim(), newPassword);
+        if (!updated) {
+          if (updatePassword) {
+            try {
+              await updatePassword(newPassword, targetEmail);
               updated = true;
-            } else {
+            } catch (upErr) {
               throw upErr;
             }
           }
@@ -566,7 +401,7 @@ export default function PasswordPage({
                     : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
-                Forgot Password Stepper
+                Reset via Email
               </button>
             </div>
           )}
@@ -574,52 +409,30 @@ export default function PasswordPage({
           {/* STEPPER TABS FOR FORGOT PASSWORD */}
           {mode === 'forgot' && (
             <div className="mb-6">
-              <div className="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-gray-100 dark:bg-gray-800 text-center">
+              <div className="grid grid-cols-2 gap-2 p-1 rounded-xl bg-gray-100 dark:bg-gray-800 text-center">
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className={`py-2 px-1 rounded-lg text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
+                  className={`py-2 px-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                     step === 1
                       ? 'bg-white dark:bg-gray-900 text-amber-600 dark:text-amber-400 shadow-xs'
                       : 'text-gray-500 dark:text-gray-400 hover:text-gray-900'
                   }`}
                 >
                   <span className={`w-4 h-4 rounded-full text-[10px] flex items-center justify-center font-black ${
-                    step > 1 ? 'bg-emerald-500 text-white' : step === 1 ? 'bg-amber-500 text-white' : 'bg-gray-300 text-gray-700'
+                    step > 1 ? 'bg-emerald-500 text-white' : 'bg-amber-500 text-white'
                   }`}>
                     {step > 1 ? <Check className="w-2.5 h-2.5 stroke-[3]" /> : '1'}
                   </span>
-                  Request
+                  Request Reset Link
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => email && setStep(2)}
-                  disabled={!email}
-                  className={`py-2 px-1 rounded-lg text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
-                    step === 2
-                      ? 'bg-white dark:bg-gray-900 text-amber-600 dark:text-amber-400 shadow-xs'
-                      : isVerified
-                      ? 'text-emerald-600 dark:text-emerald-400'
-                      : !email
-                      ? 'opacity-40 cursor-not-allowed text-gray-400'
-                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-900'
-                  }`}
-                >
-                  <span className={`w-4 h-4 rounded-full text-[10px] flex items-center justify-center font-black ${
-                    isVerified ? 'bg-emerald-500 text-white' : step === 2 ? 'bg-amber-500 text-white' : 'bg-gray-300 text-gray-700'
-                  }`}>
-                    {isVerified ? <Check className="w-2.5 h-2.5 stroke-[3]" /> : '2'}
-                  </span>
-                  Verify
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => isVerified && setStep(3)}
+                  onClick={() => isVerified && setStep(2)}
                   disabled={!isVerified}
-                  className={`py-2 px-1 rounded-lg text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
-                    step === 3
+                  className={`py-2 px-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                    step === 2
                       ? 'bg-white dark:bg-gray-900 text-amber-600 dark:text-amber-400 shadow-xs'
                       : !isVerified
                       ? 'opacity-40 cursor-not-allowed text-gray-400'
@@ -627,11 +440,11 @@ export default function PasswordPage({
                   }`}
                 >
                   <span className={`w-4 h-4 rounded-full text-[10px] flex items-center justify-center font-black ${
-                    step === 3 ? 'bg-amber-500 text-white' : 'bg-gray-300 text-gray-700'
+                    step === 2 ? 'bg-amber-500 text-white' : 'bg-gray-300 text-gray-700'
                   }`}>
-                    3
+                    2
                   </span>
-                  New Password
+                  Set New Password
                 </button>
               </div>
             </div>
@@ -645,8 +458,6 @@ export default function PasswordPage({
                   <Lock className="h-5 w-5" />
                 ) : step === 1 ? (
                   <Mail className="h-5 w-5" />
-                ) : step === 2 ? (
-                  <ShieldCheck className="h-5 w-5" />
                 ) : (
                   <KeyRound className="h-5 w-5" />
                 )}
@@ -657,18 +468,14 @@ export default function PasswordPage({
                     ? 'Change Password'
                     : step === 1
                     ? 'Reset Password'
-                    : step === 2
-                    ? 'Email Verification'
                     : 'Set New Password'}
                 </h1>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                   {mode === 'change'
                     ? 'Update your account password securely'
                     : step === 1
-                    ? 'Step 1 of 3: Enter your registered account email'
-                    : step === 2
-                    ? 'Step 2 of 3: Enter the 6-digit OTP code'
-                    : 'Step 3 of 3: Choose your new strong password'}
+                    ? 'Step 1 of 2: Enter your registered account email'
+                    : 'Step 2 of 2: Choose your new strong password'}
                 </p>
               </div>
             </div>
@@ -682,32 +489,15 @@ export default function PasswordPage({
             )}
 
             {/* Success Message */}
-            {successMessage && (
+            {successMessage && !emailSent && (
               <div className="mb-4 flex items-start gap-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 p-3.5 text-xs sm:text-sm text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                 <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5 text-emerald-600 dark:text-emerald-400" />
                 <span>{successMessage}</span>
               </div>
             )}
 
-            {/* Step 2 Security Notice: Dispatched via email only */}
-            {mode === 'forgot' && step === 2 && (
-              <div className="mb-4 p-4 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 space-y-2 text-xs">
-                <div className="flex items-start gap-2.5">
-                  <Mail className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
-                  <p className="leading-relaxed text-amber-900 dark:text-amber-200">
-                    Password reset link has been emailed to{' '}
-                    <span className="font-bold text-gray-900 dark:text-white underline">{email}</span>.
-                    Click the <strong>Reset password link</strong> in your email inbox to choose your new password directly.
-                  </p>
-                </div>
-                <div className="pl-6 text-[11px] text-amber-800/80 dark:text-amber-300/80 border-t border-amber-200/60 dark:border-amber-800/60 pt-2">
-                  💡 <strong>Gmail Note:</strong> If Gmail groups previous reset emails together, click the <strong>three dots (&hellip;)</strong> inside the message to reveal the link.
-                </div>
-              </div>
-            )}
-
-            {/* STEP 1: REQUEST VERIFICATION CODE (EMAIL ONLY) */}
-            {mode === 'forgot' && step === 1 && (
+            {/* STEP 1: REQUEST PASSWORD RESET LINK (EMAIL FORM) */}
+            {mode === 'forgot' && step === 1 && !emailSent && (
               <form onSubmit={handleSendResetEmail} className="space-y-4">
                 <div>
                   <label className="mb-1.5 block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
@@ -729,11 +519,11 @@ export default function PasswordPage({
                   </div>
                 </div>
 
-                {/* Notice: SMS Coming Soon */}
+                {/* Verification method info */}
                 <div className="flex items-center gap-2 p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-800 text-xs text-gray-500 dark:text-gray-400">
                   <Smartphone className="h-4 w-4 text-gray-400 shrink-0" />
                   <span>
-                    Verification is currently via <strong>Email</strong>.{' '}
+                    Verification is sent via <strong>Email Link</strong>.{' '}
                     <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-200 dark:bg-gray-700 font-bold uppercase">SMS Later</span>
                   </span>
                 </div>
@@ -741,13 +531,13 @@ export default function PasswordPage({
                 <button
                   type="submit"
                   disabled={busy}
-                  className="w-full py-3 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shadow-md shadow-amber-500/20 disabled:opacity-60 transition-all flex items-center justify-center gap-2"
+                  className="w-full py-3 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shadow-md shadow-amber-500/20 disabled:opacity-60 transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   {busy ? (
                     <LoaderCircle className="h-4 w-4 animate-spin" />
                   ) : (
                     <>
-                      <span>Send Password Reset Link / Code</span>
+                      <span>Send Password Reset Link</span>
                       <Send className="h-4 w-4" />
                     </>
                   )}
@@ -755,71 +545,49 @@ export default function PasswordPage({
               </form>
             )}
 
-            {/* STEP 2: VERIFY 6-DIGIT OTP WITH 6 INDIVIDUAL BOXES */}
-            {mode === 'forgot' && step === 2 && (
-              <form onSubmit={handleVerifyOtp} className="space-y-4">
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                      Enter 6-Digit Verification Code *
-                    </label>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setStep(1);
-                        setEmail('');
-                        setError(null);
-                        setSuccessMessage(null);
-                        try {
-                          sessionStorage.removeItem('sellsolar_reset_otp');
-                        } catch {}
-                      }}
-                      className="text-[11px] text-amber-600 dark:text-amber-400 font-semibold hover:underline"
-                    >
-                      Change Email
-                    </button>
+            {/* STEP 1 CONFIRMATION CARD: LINK SENT TO EMAIL */}
+            {mode === 'forgot' && step === 1 && emailSent && (
+              <div className="space-y-4">
+                <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+                      <Mail className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-gray-900 dark:text-white">
+                        Check Your Email Inbox
+                      </h3>
+                      <p className="text-xs text-gray-600 dark:text-gray-300 mt-0.5 leading-relaxed">
+                        A secure password reset link has been dispatched to{' '}
+                        <strong className="text-amber-600 dark:text-amber-400 font-bold underline">{email}</strong>.
+                      </p>
+                    </div>
                   </div>
 
-                  {/* 6 Individual Code Boxes */}
-                  <div className="grid grid-cols-6 gap-2 sm:gap-2.5 my-3" onPaste={handlePaste}>
-                    {otpDigits.map((digit, idx) => (
-                      <input
-                        key={idx}
-                        ref={(el) => (otpInputRefs.current[idx] = el)}
-                        type="text"
-                        inputMode="numeric"
-                        pattern="[0-9]*"
-                        maxLength={1}
-                        value={digit}
-                        onChange={(e) => handleDigitChange(idx, e.target.value)}
-                        onKeyDown={(e) => handleDigitKeyDown(idx, e)}
-                        disabled={busy}
-                        aria-label={`Code Digit ${idx + 1}`}
-                        className={`h-13 sm:h-15 text-center text-xl sm:text-2xl font-mono font-black rounded-xl border-2 transition-all outline-none shadow-xs ${
-                          digit
-                            ? 'border-amber-500 bg-amber-500/10 text-amber-950 dark:text-amber-100 ring-2 ring-amber-500/20'
-                            : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:border-amber-500 focus:bg-white dark:focus:bg-gray-900 focus:ring-2 focus:ring-amber-500/30'
-                        } ${busy ? 'opacity-60 cursor-wait' : ''}`}
-                      />
-                    ))}
-                  </div>
-
-                  <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">
-                    <span>
-                      Sent to: <strong className="text-gray-700 dark:text-gray-300">{email}</strong>
-                    </span>
+                  <div className="rounded-xl bg-white/80 dark:bg-gray-900/80 p-3 text-xs text-gray-700 dark:text-gray-300 border border-amber-100 dark:border-amber-900/50 space-y-2">
+                    <p className="font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                      Click the <strong>Reset password</strong> link in that email to set your new password.
+                    </p>
+                    <p className="text-[11px] text-gray-500 dark:text-gray-400 pl-5">
+                      💡 <strong>Gmail Note:</strong> If Gmail groups previous reset emails together, click the three dots (<strong>&hellip;</strong>) inside the message to reveal the link.
+                    </p>
                   </div>
                 </div>
 
-                {busy && (
-                  <div className="flex items-center justify-center gap-2 py-1.5 text-xs font-bold text-amber-600 dark:text-amber-400 animate-pulse">
-                    <LoaderCircle className="h-4 w-4 animate-spin" />
-                    <span>Verifying code & preparing new password...</span>
-                  </div>
-                )}
-
                 <div className="flex items-center justify-between text-xs pt-1 border-t border-gray-100 dark:border-gray-800">
-                  <span className="text-gray-500">Didn't receive code?</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmailSent(false);
+                      setError(null);
+                      setSuccessMessage(null);
+                    }}
+                    className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 font-medium hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    Change Email
+                  </button>
+
                   {resendCooldown > 0 ? (
                     <span className="text-gray-400 font-medium">Resend in {resendCooldown}s</span>
                   ) : (
@@ -827,45 +595,41 @@ export default function PasswordPage({
                       type="button"
                       onClick={handleSendResetEmail}
                       disabled={busy}
-                      className="text-amber-600 dark:text-amber-400 font-bold hover:underline flex items-center gap-1"
+                      className="text-amber-600 dark:text-amber-400 font-bold hover:underline flex items-center gap-1 cursor-pointer"
                     >
                       <RotateCcw className="h-3 w-3" />
-                      Resend Code
+                      Resend Reset Link
                     </button>
                   )}
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={busy || otpDigits.join('').length !== 6}
-                  className="w-full py-3 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-md shadow-emerald-500/20 disabled:opacity-60 transition-all flex items-center justify-center gap-2"
-                >
-                  {busy ? (
-                    <LoaderCircle className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <>
-                      <span>Verify Code & Set New Password</span>
-                      <CheckCircle2 className="h-4 w-4" />
-                    </>
-                  )}
-                </button>
-              </form>
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={() => onBack?.()}
+                    className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                    Back to Sign In
+                  </button>
+                </div>
+              </div>
             )}
 
-            {/* STEP 3: SET NEW PASSWORD & CONFIRM PASSWORD (OR CHANGE PASSWORD) */}
-            {((mode === 'forgot' && step === 3) || mode === 'change') && (
+            {/* STEP 2: SET NEW PASSWORD & CONFIRM PASSWORD (OR CHANGE PASSWORD) */}
+            {((mode === 'forgot' && step === 2) || mode === 'change') && (
               <form onSubmit={handleUpdatePassword} className="space-y-4">
-                {/* Verified email banner when arriving from OTP verification */}
-                {mode === 'forgot' && (
+                {/* Account identifier badge */}
+                {mode === 'forgot' && email && (
                   <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 flex items-center justify-between text-xs mb-1">
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                       <span className="text-emerald-900 dark:text-emerald-200 font-medium">
-                        Verified: <strong className="font-bold">{email}</strong>
+                        Account: <strong className="font-bold">{email}</strong>
                       </span>
                     </div>
                     <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-emerald-200 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200">
-                      Code Verified
+                      Link Verified
                     </span>
                   </div>
                 )}
@@ -978,7 +742,7 @@ export default function PasswordPage({
                 <button
                   type="submit"
                   disabled={busy || newPassword.length < 8 || newPassword !== confirmPassword}
-                  className="w-full py-3 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shadow-md shadow-amber-500/20 disabled:opacity-60 transition-all flex items-center justify-center gap-2"
+                  className="w-full py-3 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shadow-md shadow-amber-500/20 disabled:opacity-60 transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   {busy ? (
                     <LoaderCircle className="h-4 w-4 animate-spin" />

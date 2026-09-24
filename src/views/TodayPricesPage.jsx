@@ -15,6 +15,8 @@ import {
   Calculator,
   RotateCcw,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   Award,
   BarChart3,
   Flame,
@@ -36,7 +38,6 @@ import {
 } from '../data/todayPricesData';
 import { getPakistanDateDetails } from '../lib/dateUtils';
 import { formatPrice } from '../lib/constants';
-import DailyMarketRates from '../components/DailyMarketRates';
 
 export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
   const pktDateInfo = useMemo(() => getPakistanDateDetails(), []);
@@ -55,6 +56,11 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
   const [sheetCategory, setSheetCategory] = useState('all'); // 'all' | 'panel' | 'inverter' | 'battery' | 'complete_system' | 'structure_accessories'
   const [sheetFilterStatus, setSheetFilterStatus] = useState('all');
 
+  // Compact limit toggles to prevent infinite scrolling
+  const [isExpandedSheet, setIsExpandedSheet] = useState(false);
+  const [isExpandedCatalog, setIsExpandedCatalog] = useState(false);
+  const [isExpandedGuide, setIsExpandedGuide] = useState(false);
+
   // Synchronized category selector ensuring top filter tabs, daily rate sheet, and product catalog update in unison
   const handleSelectCategory = (catId) => {
     setSelectedCategory(catId);
@@ -62,6 +68,8 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
     setSelectedBrand('');
     setSheetFilterStatus('all');
     setSheetSearchQuery('');
+    setIsExpandedSheet(false);
+    setIsExpandedCatalog(false);
   };
 
   // Calculator state removed — full calculator lives at /calculator
@@ -404,6 +412,49 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
           </div>
         </div>
 
+        {/* Sticky Mobile/Desktop Category Quick-Bar */}
+        <div className="sticky top-16 z-30 -mx-4 sm:mx-0 px-3 sm:px-4 py-2 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-y sm:border sm:rounded-2xl border-gray-200/80 dark:border-gray-800 shadow-xs mb-4">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-hide">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 shrink-0 mr-1 hidden sm:inline-block">
+              Quick Rates:
+            </span>
+            {categoryTabs.map((tab) => {
+              const Icon = tab.icon;
+              const isSelected = selectedCategory === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  id={`sticky-tab-${tab.id}`}
+                  onClick={() => handleSelectCategory(tab.id)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer ${
+                    isSelected
+                      ? tab.activeBg + ' shadow-xs'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+            <div className="h-4 w-px bg-gray-200 dark:bg-gray-700 mx-1 shrink-0" />
+            <a
+              href="#regional-markets"
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold shrink-0 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
+            >
+              <MapPin className="h-3.5 w-3.5 text-rose-500" />
+              <span>Cities</span>
+            </a>
+            <a
+              href="#buying-guide"
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold shrink-0 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
+            >
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
+              <span>Advice</span>
+            </a>
+          </div>
+        </div>
+
         {/* Top Category Filter Tabs Bar */}
         <div className="rounded-2xl bg-white dark:bg-gray-900 p-2 shadow-lg ring-1 ring-gray-200/80 dark:ring-gray-800 mb-4">
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
@@ -464,69 +515,16 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         {/* Daily Rate Sheet Tab Content */}
         {pageTab === 'rates' && (
         <>
-        {/* Daily Market Rates Feed Component */}
-        <div className="mb-6 -mx-4 sm:mx-0">
-          <DailyMarketRates
-            onNavigate={onNavigate}
-            onSelectCategory={(cat) => handleSelectCategory(cat)}
-            compact={true}
-          />
-        </div>
-
-        {/* Islamabad Ready Stock Daily Sheet Verification & Date Comparison */}
-        <div className="rounded-2xl bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-5 sm:p-6 shadow-sm border border-gray-200/90 dark:border-gray-800 mb-8 transition-colors">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 dark:bg-amber-400/10 px-3.5 py-1 text-xs font-bold text-amber-800 dark:text-amber-300 border border-amber-500/30 mb-3 shadow-2xs">
-            <MapPin className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
-            Ready Stock Sheet • Verified Available Stock ({todayDateLabel})
-          </span>
-
-          {/* Category Tabs for the Daily Rate Sheet */}
-          <div className="flex flex-wrap items-center gap-2 mb-4">
-            {categoryTabs.map((tab) => {
-              const TabIcon = tab.icon;
-              const isSheetActive = sheetCategory === tab.id;
-              const sheetData = ISLAMABAD_DAILY_SHEETS[dailySheetDate === 'yesterday' ? 'yesterday' : 'today'];
-              let count = 0;
-              if (tab.id === 'panel') count = (sheetData?.rates || []).length;
-              else if (tab.id === 'inverter') count = (sheetData?.inverterRates || []).length;
-              else if (tab.id === 'battery') count = (sheetData?.batteryRates || []).length;
-              else if (tab.id === 'ess') count = (sheetData?.essRates || []).length;
-              else if (tab.id === 'cables_wiring') count = (sheetData?.cableRates || []).length;
-              else if (tab.id === 'solar_accessories') count = (sheetData?.accessoriesRates || []).length;
-              else if (tab.id === 'complete_system') count = (sheetData?.systemRates || []).length;
-              else if (tab.id === 'structure_accessories') count = (sheetData?.structureRates || []).length;
-              else {
-                count = (sheetData?.rates || []).length +
-                        (sheetData?.inverterRates || []).length +
-                        (sheetData?.batteryRates || []).length +
-                        (sheetData?.essRates || []).length +
-                        (sheetData?.cableRates || []).length +
-                        (sheetData?.accessoriesRates || []).length +
-                        (sheetData?.systemRates || []).length +
-                        (sheetData?.structureRates || []).length;
-              }
-
-              return (
-                <button
-                  key={tab.id}
-                  id={`sheet-tab-${tab.id}`}
-                  onClick={() => handleSelectCategory(tab.id)}
-                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                    isSheetActive
-                      ? tab.activeBg + ' shadow-md'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  <TabIcon className="h-4 w-4" />
-                  <span>{tab.label}</span>
-                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                    isSheetActive ? 'bg-white/25 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                  }`}>
-                    {count}
-                  </span>
-                </button>
-              );
-            })}
+        {/* Verified Live Daily Trade Sheet & Date Comparison */}
+        <div id="live-rate-sheet" className="rounded-2xl bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-5 sm:p-6 shadow-sm border border-gray-200/90 dark:border-gray-800 mb-8 transition-colors">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 dark:bg-amber-400/10 px-3.5 py-1 text-xs font-bold text-amber-800 dark:text-amber-300 border border-amber-500/30 shadow-2xs">
+              <MapPin className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+              Verified Ready Stock Sheet • Twin Cities Hub ({todayDateLabel})
+            </span>
+            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 font-semibold">
+              <span>Showing {displayedSheetRates.length} total items</span>
+            </div>
           </div>
 
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200 dark:border-gray-800 pb-4">
@@ -1301,7 +1299,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                         </td>
                       </tr>
                     ) : (
-                      displayedSheetRates.map((item, idx) => {
+                      (isExpandedSheet ? displayedSheetRates : displayedSheetRates.slice(0, 8)).map((item, idx) => {
                         const itemCat = item.itemCategory || sheetCategory;
 
                         // 1. Panel row
@@ -1854,6 +1852,26 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                   </tbody>
                 </table>
               </div>
+
+              {/* Compact Limit Expand / Collapse Bar */}
+              {displayedSheetRates.length > 8 && (
+                <div className="p-3 bg-gray-50/90 dark:bg-gray-800/60 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between flex-wrap gap-2">
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    Showing <span className="font-bold text-gray-900 dark:text-white">{isExpandedSheet ? displayedSheetRates.length : Math.min(8, displayedSheetRates.length)}</span> of <span className="font-bold text-gray-900 dark:text-white">{displayedSheetRates.length}</span> items in {sheetCategory === 'all' ? 'All Rates' : sheetCategory}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsExpandedSheet(!isExpandedSheet)}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-gray-900 hover:bg-amber-50 dark:hover:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-700/80 shadow-2xs transition-all cursor-pointer"
+                  >
+                    {isExpandedSheet ? (
+                      <>Show Top 8 Popular Only <ChevronUp className="h-3.5 w-3.5 text-amber-500" /></>
+                    ) : (
+                      <>View All {displayedSheetRates.length} Items ({displayedSheetRates.length - 8} more) <ChevronDown className="h-3.5 w-3.5 text-amber-500" /></>
+                    )}
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
@@ -2027,20 +2045,37 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
             </button>
           </div>
         ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {filteredItems.map((item) => (
-              <PriceCard
-                key={item.id}
-                item={item}
-                onExploreMarket={() => {
-                  if (onSelectCategory) {
-                    onSelectCategory(item.category);
-                  } else {
-                    onNavigate('home');
-                  }
-                }}
-              />
-            ))}
+          <div>
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {(isExpandedCatalog ? filteredItems : filteredItems.slice(0, 9)).map((item) => (
+                <PriceCard
+                  key={item.id}
+                  item={item}
+                  onExploreMarket={() => {
+                    if (onSelectCategory) {
+                      onSelectCategory(item.category);
+                    } else {
+                      onNavigate('home');
+                    }
+                  }}
+                />
+              ))}
+            </div>
+            {filteredItems.length > 9 && (
+              <div className="mt-6 text-center">
+                <button
+                  type="button"
+                  onClick={() => setIsExpandedCatalog(!isExpandedCatalog)}
+                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs sm:text-sm bg-white dark:bg-gray-900 hover:bg-amber-50 dark:hover:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-700 shadow-2xs transition-all cursor-pointer"
+                >
+                  {isExpandedCatalog ? (
+                    <>Show Top 9 Products Only <ChevronUp className="h-4 w-4 text-amber-500" /></>
+                  ) : (
+                    <>View All {filteredItems.length} Products ({filteredItems.length - 9} More) <ChevronDown className="h-4 w-4 text-amber-500" /></>
+                  )}
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-200">
@@ -2060,7 +2095,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {filteredItems.map((item) => (
+                  {(isExpandedCatalog ? filteredItems : filteredItems.slice(0, 9)).map((item) => (
                     <tr key={item.id} className="hover:bg-gray-50/80 transition-colors">
                       <td className="px-5 py-4">
                         <div className="font-bold text-gray-900">{item.model}</div>
@@ -2139,6 +2174,21 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                 </tbody>
               </table>
             </div>
+            {filteredItems.length > 9 && (
+              <div className="p-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800 text-center">
+                <button
+                  type="button"
+                  onClick={() => setIsExpandedCatalog(!isExpandedCatalog)}
+                  className="inline-flex items-center gap-2 px-6 py-2 rounded-xl font-bold text-xs bg-white dark:bg-gray-900 hover:bg-amber-50 dark:hover:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-700 shadow-2xs transition-all cursor-pointer"
+                >
+                  {isExpandedCatalog ? (
+                    <>Show Top 9 Products Only <ChevronUp className="h-4 w-4 text-amber-500" /></>
+                  ) : (
+                    <>View All {filteredItems.length} Products ({filteredItems.length - 9} More) <ChevronDown className="h-4 w-4 text-amber-500" /></>
+                  )}
+                </button>
+              </div>
+            )}
           </div>
         )}
           </>
@@ -2168,22 +2218,22 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         </section>
 
         {/* ================= CITY MARKET RATES BENCHMARK ================= */}
-        <section className="mt-16">
-          <div className="mb-6 flex flex-col sm:flex-row sm:items-end sm:justify-between">
+        <section id="regional-markets" className="mt-12 scroll-mt-24">
+          <div className="mb-4 flex flex-col sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-primary-600 mb-1">
+              <div className="text-xs font-bold uppercase tracking-wider text-primary-600 dark:text-primary-400 mb-0.5">
                 Regional Hubs
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
+              <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white">
                 Major Solar Markets in Pakistan
               </h2>
             </div>
-            <p className="text-xs text-gray-500 mt-1 sm:mt-0">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 sm:mt-0">
               Prices vary by ±1-2% depending on freight and wholesaler stock
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
             {MARKET_SUMMARY.cities.map((city) => (
               <div
                 key={city.name}
@@ -2194,25 +2244,25 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                     onNavigate('home');
                   }
                 }}
-                className="group rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-200/80 hover:shadow-md hover:ring-primary-400 cursor-pointer transition-all flex flex-col justify-between"
+                className="group rounded-2xl bg-white dark:bg-gray-900 p-4 shadow-xs ring-1 ring-gray-200/80 dark:ring-gray-800 hover:shadow-md hover:ring-primary-400 cursor-pointer transition-all flex flex-col justify-between"
               >
                 <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2 font-bold text-gray-900 text-base group-hover:text-primary-600 transition-colors">
-                      <MapPin className="h-4 w-4 text-primary-600" />
+                  <div className="flex items-center justify-between mb-1.5">
+                    <div className="flex items-center gap-2 font-bold text-gray-900 dark:text-white text-sm sm:text-base group-hover:text-primary-600 transition-colors">
+                      <MapPin className="h-4 w-4 text-primary-600 dark:text-primary-400" />
                       {city.name}
                     </div>
-                    <span className="rounded-full bg-primary-50 px-2.5 py-0.5 text-[11px] font-bold text-primary-700">
+                    <span className="rounded-full bg-primary-50 dark:bg-primary-950/60 px-2 py-0.5 text-[10px] font-bold text-primary-700 dark:text-primary-300 border border-primary-200/50 dark:border-primary-800/50">
                       {city.rateStatus}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500 mb-3">Main Hub: {city.market}</p>
-                  <div className="flex items-center justify-between border-t border-gray-100 pt-3 text-xs">
-                    <span className="text-gray-500">Panel Rate Avg:</span>
-                    <span className="font-extrabold text-gray-900">Rs 34.5 – 37.5 / W</span>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Main Hub: {city.market}</p>
+                  <div className="flex items-center justify-between border-t border-gray-100 dark:border-gray-800 pt-2 text-xs">
+                    <span className="text-gray-500 dark:text-gray-400">Panel Rate Avg:</span>
+                    <span className="font-extrabold text-gray-900 dark:text-white">Rs 34.5 – 37.5 / W</span>
                   </div>
                 </div>
-                <div className="mt-3 pt-2 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-primary-600 group-hover:text-primary-700">
+                <div className="mt-2.5 pt-2 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs font-semibold text-primary-600 dark:text-primary-400 group-hover:text-primary-700">
                   <span>Browse {city.name} Ads</span>
                   <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
                 </div>
@@ -2222,53 +2272,65 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         </section>
 
         {/* ================= BUYING GUIDE & TIPS ================= */}
-        <section className="mt-16 rounded-3xl bg-white p-6 sm:p-10 shadow-sm ring-1 ring-gray-200">
-          <div className="max-w-2xl">
-            <div className="text-xs font-bold uppercase tracking-wider text-primary-600 mb-1">
-              Buyer's Advice
+        <section id="buying-guide" className="mt-12 rounded-3xl bg-white dark:bg-gray-900 p-5 sm:p-8 shadow-xs ring-1 ring-gray-200/80 dark:ring-gray-800 scroll-mt-24">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-800 pb-4">
+            <div>
+              <div className="text-xs font-bold uppercase tracking-wider text-primary-600 dark:text-primary-400 mb-0.5">
+                Buyer's Advice
+              </div>
+              <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white">
+                Tips for Buying Solar Equipment in Pakistan
+              </h2>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
-              Tips for Buying Solar Equipment in Pakistan
-            </h2>
-            <p className="mt-2 text-sm text-gray-500">
-              Ensure you get genuine A-grade Tier-1 equipment and avoid counterfeits or B-grade stock.
-            </p>
+            <button
+              type="button"
+              onClick={() => setIsExpandedGuide(!isExpandedGuide)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors self-start sm:self-auto cursor-pointer"
+            >
+              {isExpandedGuide ? (
+                <>Collapse Tips <ChevronUp className="h-3.5 w-3.5" /></>
+              ) : (
+                <>Expand 3 Tips <ChevronDown className="h-3.5 w-3.5" /></>
+              )}
+            </button>
           </div>
 
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="rounded-2xl bg-gray-50 p-5">
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
-                <ShieldCheck className="h-5 w-5" />
+          {isExpandedGuide && (
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="rounded-2xl bg-gray-50 dark:bg-gray-800/60 p-4 border border-gray-100 dark:border-gray-800">
+                <div className="mb-2.5 flex h-9 w-9 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400">
+                  <ShieldCheck className="h-4 w-4" />
+                </div>
+                <h3 className="font-bold text-xs sm:text-sm text-gray-900 dark:text-white">Verify QR Codes & Barcodes</h3>
+                <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                  Genuine Longi, Jinko, and Canadian Solar panels have embossed barcodes embedded inside
+                  the glass layer. Scan using official brand apps.
+                </p>
               </div>
-              <h3 className="font-bold text-sm text-gray-900">Verify QR Codes & Barcodes</h3>
-              <p className="mt-2 text-xs text-gray-500 leading-relaxed">
-                Genuine Longi, Jinko, and Canadian Solar panels have embossed barcodes embedded inside
-                the glass layer. Scan using official brand apps.
-              </p>
-            </div>
 
-            <div className="rounded-2xl bg-gray-50 p-5">
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 text-blue-700">
-                <Award className="h-5 w-5" />
+              <div className="rounded-2xl bg-gray-50 dark:bg-gray-800/60 p-4 border border-gray-100 dark:border-gray-800">
+                <div className="mb-2.5 flex h-9 w-9 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400">
+                  <Award className="h-4 w-4" />
+                </div>
+                <h3 className="font-bold text-xs sm:text-sm text-gray-900 dark:text-white">N-Type TOPCon vs Mono PERC</h3>
+                <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                  N-Type TOPCon panels deliver 3-5% more energy during Pakistan's peak 45°C summer heat
+                  compared to older P-type Mono PERC plates.
+                </p>
               </div>
-              <h3 className="font-bold text-sm text-gray-900">N-Type TOPCon vs Mono PERC</h3>
-              <p className="mt-2 text-xs text-gray-500 leading-relaxed">
-                N-Type TOPCon panels deliver 3-5% more energy during Pakistan's peak 45°C summer heat
-                compared to older P-type Mono PERC plates.
-              </p>
-            </div>
 
-            <div className="rounded-2xl bg-gray-50 p-5">
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
-                <CheckCircle2 className="h-5 w-5" />
+              <div className="rounded-2xl bg-gray-50 dark:bg-gray-800/60 p-4 border border-gray-100 dark:border-gray-800">
+                <div className="mb-2.5 flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400">
+                  <CheckCircle2 className="h-4 w-4" />
+                </div>
+                <h3 className="font-bold text-xs sm:text-sm text-gray-900 dark:text-white">Lithium vs Tubular Battery</h3>
+                <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                  While LiFePO4 lithium batteries cost more upfront, their 10+ year lifespan (6,000
+                  cycles) makes them 40% cheaper over time than tubular batteries.
+                </p>
               </div>
-              <h3 className="font-bold text-sm text-gray-900">Lithium vs Tubular Battery</h3>
-              <p className="mt-2 text-xs text-gray-500 leading-relaxed">
-                While LiFePO4 lithium batteries cost more upfront, their 10+ year lifespan (6,000
-                cycles) makes them 40% cheaper over time than tubular batteries.
-              </p>
             </div>
-          </div>
+          )}
 
           {/* Quick Actions & Navigation Bar */}
           <div className="mt-8 pt-6 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3">

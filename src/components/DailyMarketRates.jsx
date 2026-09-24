@@ -657,6 +657,17 @@ export default function DailyMarketRates({ onNavigate, onSelectCategory, compact
                 {onNavigate && (
                   <button
                     type="button"
+                    onClick={() => onNavigate('verification')}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/60 transition-all cursor-pointer"
+                  >
+                    <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                    <span>Tier-1 Verification</span>
+                  </button>
+                )}
+
+                {onNavigate && (
+                  <button
+                    type="button"
                     onClick={() => onNavigate('prices')}
                     className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-primary-600 hover:bg-primary-700 text-white shadow-xs transition-all cursor-pointer"
                   >

@@ -10,6 +10,7 @@ import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
 import AuthPage from './views/AuthPage';
 import PasswordPage from './views/PasswordPage';
 import TodayPricesPage from './views/TodayPricesPage';
+import Tier1VerificationPage from './views/Tier1VerificationPage';
 import DailyMarketRates from './components/DailyMarketRates';
 import LoadCalculatorPage from './views/LoadCalculatorPage';
 import SolarLoadCalculator from './components/SolarLoadCalculator';
@@ -232,6 +233,11 @@ function Xy({
       page: 'dealers',
     },
     {
+      label: 'Tier-1 Verification',
+      page: 'verification',
+      isVerify: true,
+    },
+    {
       label: 'Request Complete Installation',
       page: 'install',
       isInstall: true,
@@ -307,6 +313,11 @@ function Xy({
                       onClick: () => h('dealers'),
                       className: 'hover:text-white transition-colors cursor-pointer',
                       children: 'Verified Dealers',
+                    }),
+                    jsx('button', {
+                      onClick: () => h('verification'),
+                      className: 'hover:text-emerald-400 text-emerald-400/90 font-semibold transition-colors cursor-pointer flex items-center gap-1',
+                      children: 'Tier-1 Verification',
                     }),
                   ],
                 }),
@@ -434,6 +445,29 @@ function Xy({
                       jsx('span', {
                         className: 'whitespace-nowrap',
                         children: 'Calculator',
+                      }),
+                    ],
+                  }),
+                }),
+                jsx('button', {
+                  onClick: () => h('verification'),
+                  className: `hidden lg:flex items-center gap-1.5 rounded-lg px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                    e === 'verification' || e === 'tier-1-verification' || e === 'panel-verification'
+                      ? 'bg-emerald-600 text-white shadow-xs shadow-emerald-600/20'
+                      : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60'
+                  }`,
+                  children: jsxs(Fragment, {
+                    children: [
+                      jsx(ShieldCheck, {
+                        className: `h-4 w-4 shrink-0 ${
+                          e === 'verification' || e === 'tier-1-verification' || e === 'panel-verification'
+                            ? 'text-white'
+                            : 'text-emerald-600 dark:text-emerald-400'
+                        }`,
+                      }),
+                      jsx('span', {
+                        className: 'whitespace-nowrap',
+                        children: 'Tier-1 Check',
                       }),
                     ],
                   }),
@@ -1030,6 +1064,33 @@ function Xy({
                                       jsx('span', {
                                         children:
                                           'Solar Load & System Calculator',
+                                      }),
+                                    ],
+                                  }),
+                                  jsx(ChevronRight, {
+                                    className: 'h-4 w-4 text-gray-400',
+                                  }),
+                                ],
+                              }),
+                              // Tier-1 Panels Verification
+                              jsxs('button', {
+                                onClick: () => h('verification'),
+                                className: `w-full flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-semibold transition-all cursor-pointer ${
+                                  e === 'verification' || e === 'tier-1-verification' || e === 'panel-verification'
+                                    ? 'bg-emerald-600 text-white font-bold'
+                                    : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
+                                }`,
+                                children: [
+                                  jsxs('div', {
+                                    className: 'flex items-center gap-2.5',
+                                    children: [
+                                      jsx(ShieldCheck, {
+                                        className:
+                                          'h-4.5 w-4.5 text-emerald-500',
+                                      }),
+                                      jsx('span', {
+                                        children:
+                                          'Tier-1 Panels Verification',
                                       }),
                                     ],
                                   }),
@@ -2251,6 +2312,7 @@ const FOOTER_PAGES_KEYS = [
 const ux={
   "Solar Marketplace":[
     { label: "Today's Solar Rates", page: "prices" },
+    { label: "Tier-1 Panels Verification", page: "verification" },
     { label: "Solar Panels", page: "solar-panels" },
     { label: "Solar Inverter", page: "solar-inverter" },
     { label: "Solar Batteries", page: "solar-batteries" },
@@ -2258,6 +2320,7 @@ const ux={
     { label: "Verified Dealers", page: "dealers" }
   ],
   "Tools & Services":[
+    { label: "Tier-1 Authenticity Check", page: "verification" },
     { label: "Solar Load Calculator", page: "calculator" },
     { label: "Turnkey Installation", page: "install" },
     { label: "How It Works", page: "how-it-works" },
@@ -5536,20 +5599,27 @@ function BrandLogosRow({ onSelectBrand }) {
     { name: "Knox Solar", short: "Knox", color: "from-purple-600 to-purple-800" }
   ];
   return jsx("section", {
-    className: "bg-white dark:bg-gray-950 py-4 border-b border-gray-200/60 dark:border-gray-800 transition-colors",
+    className: "bg-white dark:bg-gray-950 py-1.5 sm:py-2 border-b border-gray-200/60 dark:border-gray-800 transition-colors",
     children: jsx("div", {
       className: "container-page",
       children: jsxs("div", {
-        className: "flex flex-col gap-3",
+        className: "flex items-center gap-1.5 sm:gap-2.5",
         children: [
-          jsx("h3", { className: "text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider", children: "Top Brands" }),
+          jsxs("span", {
+            className: "text-[10px] sm:text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 flex items-center gap-1 shrink-0",
+            children: [
+              jsx(Award, { className: "h-3 w-3 text-primary-500 shrink-0" }),
+              jsx("span", { className: "hidden xs:inline", children: "Top" }),
+              "Brands:"
+            ]
+          }),
           jsx("div", {
-            className: "flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-2 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8",
+            className: "grid grid-cols-6 gap-1 sm:gap-1.5 flex-1 min-w-0",
             children: brands.map(b => jsxs("button", {
               onClick: () => onSelectBrand(b.name),
-              className: `shrink-0 snap-start h-14 sm:h-16 w-28 sm:w-32 rounded-xl bg-gradient-to-br ${b.color} flex items-center justify-center shadow-sm hover:scale-105 hover:shadow-md transition-all cursor-pointer`,
+              className: `h-6 sm:h-7.5 w-full rounded-md bg-gradient-to-br ${b.color} flex items-center justify-center shadow-2xs hover:opacity-90 active:scale-95 transition-all cursor-pointer px-0.5`,
               children: [
-                jsx("span", { className: "text-white font-black text-base sm:text-lg tracking-tight", children: b.short })
+                jsx("span", { className: "text-white font-bold text-[9px] sm:text-xs tracking-tight truncate", children: b.short })
               ]
             }, b.name))
           })
@@ -5856,6 +5926,17 @@ export default function App({ initialPathname, initialSlug }){
         onNavigate: handleNavigate, onSelectCategory: cat => {
           handleGlobalSearchSubmit(typeof cat === 'object' ? cat : { category: cat });
         }
+      })
+    }), jsx(hx, {
+      onPostAd: c, onNavigate: handleNavigate
+    })]
+  }) : n === "verification" || n === "tier-1-verification" || n === "panel-verification" || n === "tier1-verification" ? jsxs("div", {
+    className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
+      onNavigate: handleNavigate, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
+    }), jsx("main", {
+      id: "main",
+      children: jsx(Tier1VerificationPage, {
+        onNavigate: handleNavigate
       })
     }), jsx(hx, {
       onPostAd: c, onNavigate: handleNavigate

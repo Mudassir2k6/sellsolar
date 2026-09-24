@@ -12,6 +12,8 @@ export default function EmailContactModal({
   recipientEmail: propRecipientEmail,
   defaultSubject = 'SellSolar Inquiry',
   onNavigateToContactForm,
+  defaultName = '',
+  defaultContact = '',
 }) {
   const { settings } = useSiteSettings();
   const recipientEmail = propRecipientEmail || settings?.supportEmail || 'info@sellsolar.pk';
@@ -24,11 +26,17 @@ export default function EmailContactModal({
   const [submittedTicket, setSubmittedTicket] = useState(null);
 
   // Form State
-  const [formName, setFormName] = useState('');
-  const [formContact, setFormContact] = useState(''); // Email or phone
+  const [formName, setFormName] = useState(defaultName || '');
+  const [formContact, setFormContact] = useState(defaultContact || ''); // Email or phone
   const [formSubject, setFormSubject] = useState(defaultSubject);
   const [formMessage, setFormMessage] = useState('');
   const [formError, setFormError] = useState('');
+
+  React.useEffect(() => {
+    if (defaultName && !formName) setFormName(defaultName);
+    if (defaultContact && !formContact) setFormContact(defaultContact);
+    if (defaultSubject && formSubject === 'SellSolar Inquiry') setFormSubject(defaultSubject);
+  }, [defaultName, defaultContact, defaultSubject, isOpen]);
 
   if (!isOpen) return null;
 

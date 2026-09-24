@@ -21,6 +21,7 @@ import {
   Filter,
   Boxes,
   Wrench,
+  Cable,
   ArrowDownRight,
   Equal,
   Users,
@@ -122,12 +123,30 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
     },
     {
       id: 'structure_accessories',
-      label: 'Structures & Wire',
-      sublabel: 'GI Frames & Cables',
+      label: 'Structures & Mounts',
+      sublabel: 'GI Frames & Channel',
       icon: Wrench,
       count: SOLAR_PRICES_DATA.filter((i) => i.category === 'structure_accessories').length,
       color: 'text-slate-600',
       activeBg: 'bg-slate-700 text-white',
+    },
+    {
+      id: 'cables_wiring',
+      label: 'Cables & Wiring',
+      sublabel: 'Fast & Pakistan Cables',
+      icon: Cable,
+      count: SOLAR_PRICES_DATA.filter((i) => i.category === 'cables_wiring').length,
+      color: 'text-amber-700',
+      activeBg: 'bg-amber-700 text-white',
+    },
+    {
+      id: 'solar_accessories',
+      label: 'Protection & BOS',
+      sublabel: 'Breakers, SPDs, DB Box',
+      icon: ShieldCheck,
+      count: SOLAR_PRICES_DATA.filter((i) => i.category === 'solar_accessories').length,
+      color: 'text-sky-600',
+      activeBg: 'bg-sky-600 text-white',
     },
   ];
 
@@ -205,6 +224,10 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
       activeData = (sheet?.essRates || []).map((i) => ({ ...i, itemCategory: 'ess' }));
     } else if (sheetCategory === 'complete_system') {
       activeData = (sheet?.systemRates || []).map((i) => ({ ...i, itemCategory: 'complete_system' }));
+    } else if (sheetCategory === 'cables_wiring') {
+      activeData = (sheet?.cableRates || []).map((i) => ({ ...i, itemCategory: 'cables_wiring' }));
+    } else if (sheetCategory === 'solar_accessories') {
+      activeData = (sheet?.accessoriesRates || []).map((i) => ({ ...i, itemCategory: 'solar_accessories' }));
     } else if (sheetCategory === 'structure_accessories') {
       activeData = (sheet?.structureRates || []).map((i) => ({ ...i, itemCategory: 'structure_accessories' }));
     } else if (sheetCategory === 'panel') {
@@ -216,6 +239,8 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         ...(sheet?.inverterRates || []).map((i) => ({ ...i, itemCategory: 'inverter' })),
         ...(sheet?.batteryRates || []).map((i) => ({ ...i, itemCategory: 'battery' })),
         ...(sheet?.essRates || []).map((i) => ({ ...i, itemCategory: 'ess' })),
+        ...(sheet?.cableRates || []).map((i) => ({ ...i, itemCategory: 'cables_wiring' })),
+        ...(sheet?.accessoriesRates || []).map((i) => ({ ...i, itemCategory: 'solar_accessories' })),
         ...(sheet?.systemRates || []).map((i) => ({ ...i, itemCategory: 'complete_system' })),
         ...(sheet?.structureRates || []).map((i) => ({ ...i, itemCategory: 'structure_accessories' })),
       ];
@@ -232,27 +257,36 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         if (sheetFilterStatus === 'canadian' && !item.brand.toLowerCase().includes('canadian')) return false;
         if (sheetFilterStatus === 'ja' && !item.brand.toLowerCase().includes('ja')) return false;
         if (sheetFilterStatus === 'astronergy' && !item.brand.toLowerCase().includes('astronergy')) return false;
-        if (sheetFilterStatus === 'aiko' && !item.brand.toLowerCase().includes('aiko')) return false;
+        if (sheetFilterStatus === 'korean' && !item.brand.toLowerCase().includes('korean')) return false;
+        if (sheetFilterStatus === 'osda' && !item.brand.toLowerCase().includes('osda')) return false;
+        if (sheetFilterStatus === 'tcl' && !item.brand.toLowerCase().includes('tcl')) return false;
         if (sheetFilterStatus === 'lefn' && !item.brand.toLowerCase().includes('lefn')) return false;
       } else if (sheetCategory === 'inverter') {
-        if (sheetFilterStatus === 'hybrid' && !item.type?.toLowerCase().includes('hybrid')) return false;
-        if (sheetFilterStatus === 'ongrid' && !item.type?.toLowerCase().includes('on-grid') && !item.type?.toLowerCase().includes('grid-tied') && !item.type?.toLowerCase().includes('string')) return false;
+        if (sheetFilterStatus === 'goodwe' && !item.brand.toLowerCase().includes('goodwe')) return false;
+        if (sheetFilterStatus === 'zapher' && !item.brand.toLowerCase().includes('zapher')) return false;
+        if (sheetFilterStatus === 'xenon' && !item.brand.toLowerCase().includes('xenon') && !item.brand.toLowerCase().includes('xynex')) return false;
+        if (sheetFilterStatus === 'krypton' && !item.brand.toLowerCase().includes('krypton')) return false;
         if (sheetFilterStatus === 'itel' && !item.brand.toLowerCase().includes('itel')) return false;
         if (sheetFilterStatus === 'inverex' && !item.brand.toLowerCase().includes('inverex')) return false;
-        if (sheetFilterStatus === 'knox' && !item.brand.toLowerCase().includes('knox')) return false;
-        if (sheetFilterStatus === 'fronus' && !item.brand.toLowerCase().includes('fronus')) return false;
-        if (sheetFilterStatus === 'growatt' && !item.brand.toLowerCase().includes('growatt')) return false;
-        if (sheetFilterStatus === 'huawei' && !item.brand.toLowerCase().includes('huawei')) return false;
-        if (sheetFilterStatus === 'solis' && !item.brand.toLowerCase().includes('solis')) return false;
+        if (sheetFilterStatus === 'hybrid' && !item.type?.toLowerCase().includes('hybrid')) return false;
+        if (sheetFilterStatus === 'ongrid' && !item.type?.toLowerCase().includes('on-grid') && !item.type?.toLowerCase().includes('grid-tied') && !item.type?.toLowerCase().includes('string')) return false;
       } else if (sheetCategory === 'battery') {
-        if (sheetFilterStatus === 'lithium' && !item.type?.toLowerCase().includes('lithium') && !item.type?.toLowerCase().includes('lifepo4')) return false;
+        if (sheetFilterStatus === 'goodwe' && !item.brand.toLowerCase().includes('goodwe')) return false;
+        if (sheetFilterStatus === 'lithium' && !item.type?.toLowerCase().includes('lithium') && !item.type?.toLowerCase().includes('lifepo4') && !item.brand?.toLowerCase().includes('lithium')) return false;
         if (sheetFilterStatus === 'tubular' && !item.type?.toLowerCase().includes('tubular')) return false;
         if (sheetFilterStatus === 'itel' && !item.brand.toLowerCase().includes('itel')) return false;
         if (sheetFilterStatus === 'narada' && !item.brand.toLowerCase().includes('narada')) return false;
-        if (sheetFilterStatus === 'pylontech' && !item.brand.toLowerCase().includes('pylontech')) return false;
-        if (sheetFilterStatus === 'phoenix' && !item.brand.toLowerCase().includes('phoenix')) return false;
-        if (sheetFilterStatus === 'osaka' && !item.brand.toLowerCase().includes('osaka')) return false;
-        if (sheetFilterStatus === 'inverex' && !item.brand.toLowerCase().includes('inverex')) return false;
+      } else if (sheetCategory === 'cables_wiring') {
+        if (sheetFilterStatus === 'fast' && !item.brand.toLowerCase().includes('fast')) return false;
+        if (sheetFilterStatus === 'pakistan' && !item.brand.toLowerCase().includes('pakistan')) return false;
+        if (sheetFilterStatus === 'mci' && !item.brand.toLowerCase().includes('mci')) return false;
+        if (sheetFilterStatus === 'jukai' && !item.brand.toLowerCase().includes('jukai')) return false;
+      } else if (sheetCategory === 'solar_accessories') {
+        if (sheetFilterStatus === 'chint' && !item.brand.toLowerCase().includes('chint') && !item.model.toLowerCase().includes('chint')) return false;
+        if (sheetFilterStatus === 'cnc' && !item.brand.toLowerCase().includes('cnc') && !item.model.toLowerCase().includes('cnc')) return false;
+        if (sheetFilterStatus === 'tomzen' && !item.brand.toLowerCase().includes('tomzen') && !item.model.toLowerCase().includes('tomz')) return false;
+        if (sheetFilterStatus === 'breaker' && !item.type?.toLowerCase().includes('breaker') && !item.type?.toLowerCase().includes('mcb')) return false;
+        if (sheetFilterStatus === 'spd' && !item.type?.toLowerCase().includes('surge') && !item.type?.toLowerCase().includes('spd')) return false;
       } else if (sheetCategory === 'ess') {
         if (sheetFilterStatus === 'powertank' && !item.model?.toLowerCase().includes('power tank') && !item.model?.toLowerCase().includes('powertank')) return false;
         if (sheetFilterStatus === 'cabinet' && !item.model?.toLowerCase().includes('all-in-one') && !item.type?.toLowerCase().includes('all-in-one') && !item.model?.toLowerCase().includes('8kwh')) return false;
@@ -268,10 +302,12 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         if (sheetFilterStatus === 'panel' && item.itemCategory !== 'panel') return false;
         if (sheetFilterStatus === 'inverter' && item.itemCategory !== 'inverter') return false;
         if (sheetFilterStatus === 'battery' && item.itemCategory !== 'battery') return false;
+        if (sheetFilterStatus === 'cables_wiring' && item.itemCategory !== 'cables_wiring') return false;
+        if (sheetFilterStatus === 'solar_accessories' && item.itemCategory !== 'solar_accessories') return false;
         if (sheetFilterStatus === 'ess' && item.itemCategory !== 'ess') return false;
+        if (sheetFilterStatus === 'goodwe' && !item.brand.toLowerCase().includes('goodwe')) return false;
         if (sheetFilterStatus === 'itel' && !item.brand.toLowerCase().includes('itel')) return false;
         if (sheetFilterStatus === 'system' && item.itemCategory !== 'complete_system') return false;
-        if (sheetFilterStatus === 'structure' && item.itemCategory !== 'structure_accessories') return false;
       }
 
       if (!sheetSearchQuery) return true;
@@ -455,6 +491,8 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
               else if (tab.id === 'inverter') count = (sheetData?.inverterRates || []).length;
               else if (tab.id === 'battery') count = (sheetData?.batteryRates || []).length;
               else if (tab.id === 'ess') count = (sheetData?.essRates || []).length;
+              else if (tab.id === 'cables_wiring') count = (sheetData?.cableRates || []).length;
+              else if (tab.id === 'solar_accessories') count = (sheetData?.accessoriesRates || []).length;
               else if (tab.id === 'complete_system') count = (sheetData?.systemRates || []).length;
               else if (tab.id === 'structure_accessories') count = (sheetData?.structureRates || []).length;
               else {
@@ -462,6 +500,8 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                         (sheetData?.inverterRates || []).length +
                         (sheetData?.batteryRates || []).length +
                         (sheetData?.essRates || []).length +
+                        (sheetData?.cableRates || []).length +
+                        (sheetData?.accessoriesRates || []).length +
                         (sheetData?.systemRates || []).length +
                         (sheetData?.structureRates || []).length;
               }
@@ -509,6 +549,10 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                   ? 'Solar Batteries — Lithium LiFePO4 & Tall Tubular Benchmarks'
                   : sheetCategory === 'ess'
                   ? 'ESS & Storage — Power Tanks & Integrated Cabinet Benchmarks'
+                  : sheetCategory === 'cables_wiring'
+                  ? 'Solar DC Cables & Wiring — Pure Copper XLPO Benchmarks'
+                  : sheetCategory === 'solar_accessories'
+                  ? 'Protection & Solar Accessories — Breakers, SPDs & Enclosures'
                   : sheetCategory === 'complete_system'
                   ? 'Turnkey Solar Systems — Residential & Commercial Packages'
                   : sheetCategory === 'structure_accessories'
@@ -524,11 +568,15 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                   ? `Wholesale ready stock trade sheet (${todayDateLabel}) for Lithium Iron Phosphate (LiFePO4) & Deep Cycle Tubular batteries.`
                   : sheetCategory === 'ess'
                   ? `Wholesale ready stock trade sheet (${todayDateLabel}) for portable power stations, Itel Power Tanks, and all-in-one ESS cabinets.`
+                  : sheetCategory === 'cables_wiring'
+                  ? `Wholesale trade rates (${todayDateLabel}) for pure copper double-insulated DC solar wire (Fast, Pakistan Cables, MCI).`
+                  : sheetCategory === 'solar_accessories'
+                  ? `Wholesale trade rates (${todayDateLabel}) for DC/AC breakers, surge protectors (Chint, CNC, Tomzen), and earthing kits.`
                   : sheetCategory === 'complete_system'
                   ? `Turnkey solar setup benchmarks (${todayDateLabel}) including Tier-1 plates, inverters, and net-metering.`
                   : sheetCategory === 'structure_accessories'
                   ? `Wholesale trade rates (${todayDateLabel}) for heavy GI structures, pure copper DC wire, and surge protections.`
-                  : `Comprehensive live rate sheet (${todayDateLabel}) across panels, inverters, batteries, ESS storage, complete systems, and balance of systems.`}
+                  : `Comprehensive live rate sheet (${todayDateLabel}) across panels, inverters, batteries, ESS storage, cables, protection, and complete systems.`}
               </p>
             </div>
 
@@ -565,6 +613,36 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                 Compare Jump
               </button>
             </div>
+          </div>
+
+          {/* Tier-1 Verification Callout */}
+          <div className="my-4 p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-emerald-950/70 via-gray-900 to-gray-900 border border-emerald-500/30 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-white">
+            <div className="flex items-start gap-3">
+              <div className="h-9 w-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/30">
+                <ShieldCheck className="h-5 w-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h4 className="text-xs sm:text-sm font-bold text-white">
+                    Tier 1 Solar Panels Official Verification
+                  </h4>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
+                    9 Official Portals
+                  </span>
+                </div>
+                <p className="text-[11px] sm:text-xs text-gray-300 mt-0.5">
+                  Verify serial numbers & barcodes directly with Canadian Solar, Jinko, LONGi, JA Solar, Astronergy, Trina, Sunova, Huasun, and Yingli.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => onNavigate && onNavigate('verification')}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-colors shrink-0 shadow-sm cursor-pointer"
+            >
+              <ShieldCheck className="h-3.5 w-3.5" />
+              <span>Verify Barcodes & Links</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </button>
           </div>
 
           {/* Quick Summary Highlights - Dynamic based on category */}
@@ -852,13 +930,15 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                     [
                       { id: 'all', label: 'All Panels' },
                       { id: 'changed', label: 'Rate Changed' },
-                      { id: 'jinko', label: 'Jinko' },
+                      { id: 'canadian', label: 'Canadian Solar' },
+                      { id: 'jinko', label: 'Jinko Solar' },
                       { id: 'longi', label: 'LONGi' },
-                      { id: 'canadian', label: 'Canadian' },
                       { id: 'ja', label: 'JA Solar' },
                       { id: 'astronergy', label: 'Astronergy' },
+                      { id: 'korean', label: 'Korean' },
+                      { id: 'osda', label: 'OSDA' },
                       { id: 'lefn', label: 'LEFN' },
-                      { id: 'aiko', label: 'Aiko' },
+                      { id: 'tcl', label: 'TCL' },
                     ].map((f) => (
                       <button
                         key={f.id}
@@ -876,15 +956,13 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                     [
                       { id: 'all', label: 'All Inverters' },
                       { id: 'changed', label: 'Rate Changed' },
+                      { id: 'goodwe', label: 'GoodWe HV/LV' },
+                      { id: 'zapher', label: 'Zapher IP66' },
+                      { id: 'xenon', label: 'Xenon / Xynex' },
+                      { id: 'krypton', label: 'Krypton IP20' },
+                      { id: 'itel', label: 'Itel Hybrid' },
                       { id: 'hybrid', label: 'Hybrid' },
                       { id: 'ongrid', label: 'On-Grid' },
-                      { id: 'itel', label: 'Itel Hybrid' },
-                      { id: 'inverex', label: 'Inverex' },
-                      { id: 'knox', label: 'Knox' },
-                      { id: 'fronus', label: 'Fronus' },
-                      { id: 'growatt', label: 'Growatt' },
-                      { id: 'huawei', label: 'Huawei' },
-                      { id: 'solis', label: 'Solis' },
                     ].map((f) => (
                       <button
                         key={f.id}
@@ -902,14 +980,11 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                     [
                       { id: 'all', label: 'All Batteries' },
                       { id: 'changed', label: 'Rate Changed' },
-                      { id: 'lithium', label: 'Lithium (LiFePO4)' },
-                      { id: 'tubular', label: 'Tall Tubular' },
+                      { id: 'lithium', label: 'Lithium (IP20/IP54)' },
+                      { id: 'goodwe', label: 'GoodWe HV/LV' },
                       { id: 'itel', label: 'Itel Lithium' },
                       { id: 'narada', label: 'Narada' },
-                      { id: 'pylontech', label: 'Pylontech' },
-                      { id: 'phoenix', label: 'Phoenix' },
-                      { id: 'osaka', label: 'Osaka' },
-                      { id: 'inverex', label: 'Inverex' },
+                      { id: 'tubular', label: 'Tall Tubular' },
                     ].map((f) => (
                       <button
                         key={f.id}
@@ -917,6 +992,49 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                         className={`px-2.5 py-1 rounded-md whitespace-nowrap font-medium transition-colors cursor-pointer ${
                           sheetFilterStatus === f.id
                             ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-bold'
+                            : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                        }`}
+                      >
+                        {f.label}
+                      </button>
+                    ))
+                  ) : sheetCategory === 'cables_wiring' ? (
+                    [
+                      { id: 'all', label: 'All DC Cables' },
+                      { id: 'changed', label: 'Rate Changed' },
+                      { id: 'fast', label: 'Fast Cables' },
+                      { id: 'pakistan', label: 'Pakistan Cables' },
+                      { id: 'mci', label: 'MCI Cables' },
+                      { id: 'jukai', label: 'JUKAI' },
+                    ].map((f) => (
+                      <button
+                        key={f.id}
+                        onClick={() => setSheetFilterStatus(f.id)}
+                        className={`px-2.5 py-1 rounded-md whitespace-nowrap font-medium transition-colors cursor-pointer ${
+                          sheetFilterStatus === f.id
+                            ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 font-bold'
+                            : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                        }`}
+                      >
+                        {f.label}
+                      </button>
+                    ))
+                  ) : sheetCategory === 'solar_accessories' ? (
+                    [
+                      { id: 'all', label: 'All Protection' },
+                      { id: 'changed', label: 'Rate Changed' },
+                      { id: 'chint', label: 'Chint' },
+                      { id: 'cnc', label: 'CNC' },
+                      { id: 'tomzen', label: 'Tomzen' },
+                      { id: 'breaker', label: 'Breakers (MCB)' },
+                      { id: 'spd', label: 'SPDs Surge Guard' },
+                    ].map((f) => (
+                      <button
+                        key={f.id}
+                        onClick={() => setSheetFilterStatus(f.id)}
+                        className={`px-2.5 py-1 rounded-md whitespace-nowrap font-medium transition-colors cursor-pointer ${
+                          sheetFilterStatus === f.id
+                            ? 'bg-sky-100 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 font-bold'
                             : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                         }`}
                       >
@@ -964,7 +1082,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                     ))
                   ) : sheetCategory === 'structure_accessories' ? (
                     [
-                      { id: 'all', label: 'All BOS Items' },
+                      { id: 'all', label: 'All Structures' },
                       { id: 'changed', label: 'Rate Changed' },
                       { id: 'structure', label: 'GI Structure' },
                       { id: 'cable', label: 'DC Cable' },
@@ -990,10 +1108,12 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                       { id: 'panel', label: 'Panels' },
                       { id: 'inverter', label: 'Inverters' },
                       { id: 'battery', label: 'Batteries' },
+                      { id: 'cables_wiring', label: 'Cables & Wiring' },
+                      { id: 'solar_accessories', label: 'Accessories' },
                       { id: 'ess', label: 'ESS / Storage' },
+                      { id: 'goodwe', label: 'GoodWe' },
                       { id: 'itel', label: 'Itel' },
                       { id: 'system', label: 'Complete Systems' },
-                      { id: 'structure', label: 'Structures & Wire' },
                     ].map((f) => (
                       <button
                         key={f.id}
@@ -1104,6 +1224,34 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                         </th>
                         <th className="px-3 py-2.5">Difference</th>
                         <th className="px-3 py-2.5">Total Price (Est.)</th>
+                        <th className="px-3 py-2.5 text-right">Action</th>
+                      </tr>
+                    ) : sheetCategory === 'cables_wiring' ? (
+                      <tr>
+                        <th className="px-3.5 py-2.5">Brand & Cable Spec</th>
+                        <th className="px-3 py-2.5">Conductor & Size</th>
+                        <th className="px-3 py-2.5">
+                          {dailySheetDate === 'yesterday'
+                            ? `${yesterdayDateLabel} Rate (Per M)`
+                            : `${todayDateLabel} Ready Rate (Per M)`}
+                        </th>
+                        <th className="px-3 py-2.5">Previous Rate</th>
+                        <th className="px-3 py-2.5">Difference</th>
+                        <th className="px-3 py-2.5">Coil / Meter Rate</th>
+                        <th className="px-3 py-2.5 text-right">Action</th>
+                      </tr>
+                    ) : sheetCategory === 'solar_accessories' ? (
+                      <tr>
+                        <th className="px-3.5 py-2.5">Brand & Switchgear</th>
+                        <th className="px-3 py-2.5">Model & Ratings</th>
+                        <th className="px-3 py-2.5">
+                          {dailySheetDate === 'yesterday'
+                            ? `${yesterdayDateLabel} Unit Rate`
+                            : `${todayDateLabel} Wholesale Rate`}
+                        </th>
+                        <th className="px-3 py-2.5">Previous Rate</th>
+                        <th className="px-3 py-2.5">Difference</th>
+                        <th className="px-3 py-2.5">Warranty & Spec</th>
                         <th className="px-3 py-2.5 text-right">Action</th>
                       </tr>
                     ) : sheetCategory === 'structure_accessories' ? (
@@ -1632,8 +1780,14 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                           >
                             <td className="px-3.5 py-2.5 font-bold text-gray-900 dark:text-white flex flex-wrap items-center gap-1.5">
                               {sheetCategory === 'all' && (
-                                <span className="text-[10px] bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 px-1.5 py-0.5 rounded font-bold">
-                                  BOS
+                                <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
+                                  item.itemCategory === 'cables_wiring'
+                                    ? 'bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-200'
+                                    : item.itemCategory === 'solar_accessories'
+                                    ? 'bg-sky-100 dark:bg-sky-900/50 text-sky-800 dark:text-sky-200'
+                                    : 'bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200'
+                                }`}>
+                                  {item.itemCategory === 'cables_wiring' ? 'Cable' : item.itemCategory === 'solar_accessories' ? 'Accessory' : 'Structure'}
                                 </span>
                               )}
                               <span>{item.brand}</span>
@@ -1648,10 +1802,10 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                               <div className="text-[11px] text-gray-500 dark:text-gray-400">{item.capacity} • {item.type}</div>
                             </td>
                             <td className="px-3 py-2.5 font-bold text-slate-800 dark:text-slate-200">
-                              Rs. {item.rate.toLocaleString()}
+                              Rs. {item.rate.toLocaleString()} {item.itemCategory === 'cables_wiring' || item.unit === 'per_meter' ? '/ Meter' : ''}
                             </td>
                             <td className="px-3 py-2.5 text-gray-600 dark:text-gray-300">
-                              Rs. {item.prevRate.toLocaleString()}
+                              Rs. {item.prevRate.toLocaleString()} {item.itemCategory === 'cables_wiring' || item.unit === 'per_meter' ? '/ Meter' : ''}
                             </td>
                             <td className="px-3 py-2.5">
                               {item.change < 0 ? (
@@ -1672,16 +1826,16 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                             </td>
                             <td className="px-3 py-2.5">
                               <div className="font-bold text-gray-900 dark:text-white">
-                                Rs. {item.rate.toLocaleString()}
+                                Rs. {item.rate.toLocaleString()} {item.itemCategory === 'cables_wiring' || item.unit === 'per_meter' ? '/ Meter' : ''}
                               </div>
                               <div className="text-[10px] text-gray-500 dark:text-gray-400">
-                                {item.warranty || '25-Yr Rust Resistance'}
+                                {item.warranty || (item.itemCategory === 'cables_wiring' ? '25-Yr Outdoor Rating' : '2-Yr Replacement')}
                               </div>
                             </td>
                             <td className="px-3 py-2.5 text-right">
                               <button
                                 onClick={() => {
-                                  setSelectedCategory('structure_accessories');
+                                  setSelectedCategory(item.itemCategory || 'cables_wiring');
                                   setSelectedBrand(item.brand);
                                   setSearchQuery(item.brand);
                                   const target = document.getElementById('catalog-results');

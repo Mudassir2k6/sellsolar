@@ -1,0 +1,144 @@
+import json
+import re
+
+# 1. Sheet rates
+rates_panel = [
+  {"brand": "Canadian Solar", "model": "585W", "rate": 41.50, "prevRate": 41.60, "change": -0.10, "status": "down", "badge": "TOPCon Bifacial"},
+  {"brand": "Canadian Solar", "model": "625W", "rate": 41.50, "prevRate": 41.75, "change": -0.25, "status": "down", "badge": "625W High Yield"},
+  {"brand": "Jinko Solar", "model": "585W", "rate": 39.75, "prevRate": 41.25, "change": -1.50, "status": "down", "badge": "Tiger Neo N-Type"},
+  {"brand": "Jinko Solar", "model": "645W", "rate": 41.25, "prevRate": 41.50, "change": -0.25, "status": "down", "badge": "Delivery Ready"},
+  {"brand": "LONGi", "model": "645W x10 BF", "rate": 43.50, "prevRate": 43.25, "change": 0.25, "status": "up", "badge": "Hi-MO X10 In-Demand"},
+  {"brand": "Inverex", "model": "620W", "rate": 42.50, "prevRate": 42.50, "change": 0, "status": "new", "badge": "With Warranty Card", "warranty": "Official Warranty Card Included"},
+  {"brand": "JA Solar", "model": "585W", "rate": 38.50, "prevRate": 38.60, "change": -0.10, "status": "down", "badge": "DeepBlue 4.0 Pro"},
+  {"brand": "JA Solar", "model": "605W", "rate": 39.50, "prevRate": 39.75, "change": -0.25, "status": "down"},
+  {"brand": "Astronergy", "model": "590W", "rate": 38.25, "prevRate": 38.25, "change": 0, "status": "stable", "badge": "Astro 590W"},
+  {"brand": "Astronergy", "model": "620W", "rate": 39.00, "prevRate": 39.00, "change": 0, "status": "stable"},
+  {"brand": "Astronergy", "model": "720W", "rate": 39.00, "prevRate": 39.00, "change": 0, "status": "stable", "badge": "720W Heavy Plate"},
+  {"brand": "Korean", "model": "585W", "rate": 38.00, "prevRate": 37.00, "change": 1.00, "status": "up", "badge": "N-Type Ready"},
+  {"brand": "Korean", "model": "670W (ABC)", "rate": 40.60, "prevRate": 40.60, "change": 0, "status": "new", "badge": "ABC Tech High Yield"},
+  {"brand": "Korean", "model": "715W", "rate": 37.75, "prevRate": 38.00, "change": -0.25, "status": "down"},
+  {"brand": "OSDA", "model": "585W", "rate": 36.00, "prevRate": 36.75, "change": -0.75, "status": "down", "badge": "Budget Pick"},
+  {"brand": "LEFN", "model": "640W", "rate": 33.50, "prevRate": 33.00, "change": 0.50, "status": "up", "badge": "Lowest Rate in PK"},
+  {"brand": "TCL", "model": "720W", "rate": 38.25, "prevRate": 38.25, "change": 0, "status": "new", "badge": "TCL Solar 720W High Power"}
+]
+
+rates_inverter = [
+  {"brand": "GoodWe", "model": "GOODWE 15 KW HV INVERTER - ET MODEL", "capacity": "15.0 kW High Voltage", "type": "High Voltage (HV) 3-Phase Hybrid", "rate": 625000, "prevRate": 625000, "change": 0, "status": "new", "badge": "ET Model HV 15kW", "warranty": "5 Years Official Warranty"},
+  {"brand": "GoodWe", "model": "GOODWE 30 KW HV INVERTER - ET MODEL", "capacity": "30.0 kW High Voltage", "type": "High Voltage (HV) 3-Phase Hybrid", "rate": 1020000, "prevRate": 1020000, "change": 0, "status": "new", "badge": "ET Model HV 30kW", "warranty": "5 Years Official Warranty"},
+  {"brand": "GoodWe", "model": "GOODWE 50 KW HV INVERTER", "capacity": "50.0 kW High Voltage", "type": "Commercial High Voltage Hybrid", "rate": 1335000, "prevRate": 1335000, "change": 0, "status": "new", "badge": "Commercial 50kW HV", "warranty": "5 Years Official Warranty"},
+  {"brand": "GoodWe", "model": "GOODWE 100 KW HV INVERTER", "capacity": "100.0 kW High Voltage", "type": "Heavy Industrial HV Inverter", "rate": None, "prevRate": None, "change": 0, "status": "new", "badge": "Call for Rate", "warranty": "5 Years Official Warranty", "note": "Market Inquire / Booking"},
+  {"brand": "GoodWe", "model": "GoodWe 15KW Hybrid 3-Phase Low Voltage", "capacity": "15.0 kW Low Voltage", "type": "3-Phase LV Hybrid (48V)", "rate": 595000, "prevRate": 595000, "change": 0, "status": "new", "badge": "15kW LV 3-Phase", "warranty": "5 Years Official Warranty"},
+  {"brand": "Xenon", "model": "Xenon 6KW Hybrid IP65/66", "capacity": "6.0 kW", "type": "Hybrid IP65/66 Single Phase", "rate": 202000, "prevRate": 205000, "change": -3000, "status": "down", "badge": "IP65/66 Protected", "warranty": "5 Years Warranty"},
+  {"brand": "Xynex", "model": "Xynex 8KW Hybrid IP65/66", "capacity": "8.0 kW", "type": "Hybrid IP65/66 Dual MPPT", "rate": 318000, "prevRate": 318000, "change": 0, "status": "new", "badge": "IP65/66 High Yield", "warranty": "5 Years Warranty"},
+  {"brand": "Xynex", "model": "Xynex 10KW Hybrid IP65/66", "capacity": "10.0 kW", "type": "Hybrid IP65/66 3-Phase/Dual", "rate": 355000, "prevRate": 355000, "change": 0, "status": "new", "badge": "IP65/66 Heavy Duty", "warranty": "5 Years Warranty"},
+  {"brand": "Zapher", "model": "Zapher 6.6KW IP66 Hybrid", "capacity": "6.6 kW", "type": "Single Phase Hybrid IP66", "rate": 192000, "prevRate": 195000, "change": -3000, "status": "down", "badge": "IP66 Heavy Weather", "warranty": "5 Years Replacement"},
+  {"brand": "Zapher", "model": "Zapher 9.2KW IP66 Hybrid", "capacity": "9.2 kW", "type": "Single Phase High Output IP66", "rate": 295000, "prevRate": 295000, "change": 0, "status": "new", "badge": "IP66 Dual AC", "warranty": "5 Years Replacement"},
+  {"brand": "Zapher", "model": "Zapher 11.2KW IP66 Hybrid", "capacity": "11.2 kW", "type": "Single Phase High PV IP66", "rate": 333000, "prevRate": 333000, "change": 0, "status": "new", "badge": "IP66 11.2kW Monster", "warranty": "5 Years Replacement"},
+  {"brand": "Zapher", "model": "Zapher 12KW 3P IP66 Hybrid", "capacity": "12.0 kW (3-Phase)", "type": "Three Phase Hybrid IP66", "rate": 485000, "prevRate": 485000, "change": 0, "status": "new", "badge": "12kW 3-Phase IP66", "warranty": "5 Years Warranty"},
+  {"brand": "Zapher", "model": "Zapher 15KW 3P IP66 Hybrid", "capacity": "15.0 kW (3-Phase)", "type": "Three Phase Hybrid IP66", "rate": 585000, "prevRate": 585000, "change": 0, "status": "new", "badge": "15kW 3-Phase IP66", "warranty": "5 Years Warranty"},
+  {"brand": "Zapher", "model": "Zapher 20KW 3P IP66 Hybrid", "capacity": "20.0 kW (3-Phase)", "type": "Commercial Hybrid IP66", "rate": 750000, "prevRate": 750000, "change": 0, "status": "new", "badge": "20kW 3-Phase Commercial", "warranty": "5 Years Warranty"},
+  {"brand": "Zapher", "model": "Zapher 30KW 3P IP66 Hybrid", "capacity": "30.0 kW (3-Phase)", "type": "Commercial Hybrid IP66", "rate": 965000, "prevRate": 965000, "change": 0, "status": "new", "badge": "30kW 3-Phase IP66", "warranty": "5 Years Warranty"},
+  {"brand": "Zapher", "model": "Zapher 50KW 3P IP66 Hybrid", "capacity": "50.0 kW (3-Phase)", "type": "Industrial Hybrid IP66", "rate": 1295000, "prevRate": 1295000, "change": 0, "status": "new", "badge": "50kW IP-66 Flagship", "warranty": "5 Years Warranty"},
+  {"brand": "Krypton", "model": "Krypton Eco 4.5KW IP20", "capacity": "4.5 kW", "type": "Solar Hybrid IP20", "rate": 112000, "prevRate": 112000, "change": 0, "status": "stable", "badge": "Budget 4.5kW Eco", "warranty": "2 Years Standard"},
+  {"brand": "Krypton", "model": "Krypton Eco 6.2KW IP20", "capacity": "6.2 kW", "type": "Solar Hybrid IP20", "rate": 101000, "prevRate": 105000, "change": -4000, "status": "down", "badge": "Best Value 6.2kW", "warranty": "2 Years Standard"},
+  {"brand": "Krypton", "model": "Krypton 6.2KW IP20", "capacity": "6.2 kW", "type": "Solar Hybrid IP20 Pure Sine", "rate": 136000, "prevRate": 136000, "change": 0, "status": "stable", "badge": "Standard 6.2kW", "warranty": "2 Years Standard"},
+  {"brand": "Krypton", "model": "Krypton 6.5KW IP20", "capacity": "6.5 kW", "type": "Solar Hybrid IP20 High Surge", "rate": 155000, "prevRate": 155000, "change": 0, "status": "new", "badge": "6.5kW High Surge", "warranty": "2 Years Standard"},
+  {"brand": "Krypton", "model": "Krypton 8.0KW IP20", "capacity": "8.0 kW", "type": "Solar Hybrid IP20 Dual MPPT", "rate": 175000, "prevRate": 175000, "change": 0, "status": "stable", "badge": "8kW Dual MPPT", "warranty": "2 Years Standard"},
+  {"brand": "Krypton", "model": "Krypton 8.5KW IP20", "capacity": "8.5 kW", "type": "Solar Hybrid IP20", "rate": 245000, "prevRate": 245000, "change": 0, "status": "new", "badge": "8.5kW Heavy Inverter", "warranty": "3 Years Standard"},
+  {"brand": "Krypton", "model": "Krypton 10KW IP20", "capacity": "10.0 kW", "type": "Solar Hybrid IP20 48V", "rate": 252000, "prevRate": 255000, "change": -3000, "status": "down", "badge": "10kW High Capacity", "warranty": "3 Years Standard"},
+  {"brand": "Krypton", "model": "Krypton 11.5KW IP20", "capacity": "11.5 kW", "type": "Solar Hybrid IP20 Heavy Duty", "rate": 262000, "prevRate": 262000, "change": 0, "status": "new", "badge": "11.5kW Flagship IP20", "warranty": "3 Years Standard"},
+  {"brand": "Itel", "model": "1.6kw PV-3200 Hybrid IP54", "capacity": "1.6 kW (PV 3200)", "type": "Hybrid IP54 (Single Source)", "rate": 44000, "prevRate": 44000, "change": 0, "status": "stable", "badge": "Single Source Ready", "warranty": "3-Year Replacement Warranty", "note": "Works on single source as well"},
+  {"brand": "Itel", "model": "3KW Pro PV-4500 Hybrid IP54", "capacity": "3.0 kW (PV 4500)", "type": "Hybrid IP54 Pro", "rate": 78000, "prevRate": 78000, "change": 0, "status": "stable", "badge": "Best Value 3kW", "warranty": "3-Year Replacement Warranty", "note": "Works on single source as well"},
+  {"brand": "Itel", "model": "4KW Pro PV-6000 Hybrid IP54", "capacity": "4.0 kW (PV 6000)", "type": "Hybrid IP54 Pro", "rate": 112000, "prevRate": 113000, "change": -1000, "status": "down", "badge": "Works Single Source", "warranty": "3-Year Replacement Warranty", "note": "Works on single source as well"},
+  {"brand": "Itel", "model": "6KW Pro PV-8000 Hybrid IP54", "capacity": "6.0 kW (PV 8000)", "type": "Hybrid IP54 Pro", "rate": 137000, "prevRate": 138000, "change": -1000, "status": "down", "badge": "Works Single Source", "warranty": "3-Year Replacement Warranty", "note": "Works on single source as well"},
+  {"brand": "Itel", "model": "8KW PV-16000 Hybrid IP54", "capacity": "8.0 kW (PV 16000)", "type": "Hybrid IP54 High PV", "rate": 194000, "prevRate": 194000, "change": 0, "status": "new", "badge": "Booking 26-09-2026", "warranty": "3-Year Replacement Warranty", "note": "Booking delivery 26-09-2026. Works on single source"},
+  {"brand": "Itel", "model": "12KW PV-16000 Hybrid IP54", "capacity": "12.0 kW (PV 16000)", "type": "Hybrid IP54 High PV Commercial", "rate": 264000, "prevRate": 264000, "change": 0, "status": "new", "badge": "Booking 26-09-2026", "warranty": "3-Year Replacement Warranty", "note": "Booking delivery 26-09-2026. Works on single source"},
+  {"brand": "Itel", "model": "6.6KW PV-13000 Single Phase IP66", "capacity": "6.6 kW (PV 13000)", "type": "Hybrid IP66 Single Phase", "rate": 194000, "prevRate": 194000, "change": 0, "status": "stable", "badge": "IP66 All-Weather", "warranty": "5-Year Replacement Warranty"},
+  {"brand": "Itel", "model": "8KW PV-16000 3-Phase IP66", "capacity": "8.0 kW (PV 16000)", "type": "Hybrid IP66 3-Phase", "rate": 380000, "prevRate": 380000, "change": 0, "status": "stable", "badge": "IP66 3-Phase Heavy", "warranty": "5-Year Replacement Warranty"},
+  {"brand": "Inverex", "model": "Nitrox 6kW Single Phase 48V", "capacity": "6.0 kW", "type": "Hybrid On/Off-Grid", "rate": 266000, "prevRate": 266000, "change": 0, "status": "stable", "badge": "Pakistan #1 Hybrid", "warranty": "5 Yrs Replacement"},
+  {"brand": "Inverex", "model": "Nitrox 10kW Three Phase", "capacity": "10.0 kW", "type": "Hybrid 3-Phase", "rate": 465000, "prevRate": 460000, "change": 5000, "status": "up", "badge": "Heavy Residential", "warranty": "5 Yrs Replacement"},
+  {"brand": "Inverex", "model": "Nitrox 12kW Commercial", "capacity": "12.0 kW", "type": "Hybrid 3-Phase Commercial", "rate": 549000, "prevRate": 549000, "change": 0, "status": "stable", "badge": "Commercial Grade", "warranty": "5 Yrs Warranty"},
+  {"brand": "Huawei", "model": "SUN2000-10KTL-M1 (10kW 3-Phase)", "capacity": "10.0 kW", "type": "Smart String On-Grid", "rate": 323000, "prevRate": 318000, "change": 5000, "status": "up", "badge": "AI Smart AFCI", "warranty": "5 / 10 Yrs Warranty"}
+]
+
+rates_battery = [
+  {"brand": "GoodWe", "model": "GoodWe 05-Kwh HV Lithium Battery", "capacity": "5.0 kWh High Voltage", "type": "High Voltage (HV) LiFePO4", "rate": 255000, "prevRate": 255000, "change": 0, "status": "new", "badge": "05-kWh HV Module", "warranty": "10 Years Official Warranty", "note": "Modular High Voltage Stack"},
+  {"brand": "GoodWe", "model": "GoodWe BDU (Battery Disconnect Unit)", "capacity": "Master BMS & Safety Disconnect", "type": "High Voltage Master Control BDU", "rate": 305000, "prevRate": 305000, "change": 0, "status": "new", "badge": "HV Master Control BDU", "warranty": "10 Years Official Warranty", "note": "BDU for GoodWe HV Stacks"},
+  {"brand": "GoodWe", "model": "GoodWe 16KWh IP65 Battery (Low Voltage)", "capacity": "16.0 kWh (48V Low Voltage)", "type": "Outdoor IP65 Low Voltage LiFePO4", "rate": 580000, "prevRate": 580000, "change": 0, "status": "new", "badge": "16kWh IP65 Outdoor", "warranty": "10 Years Official Warranty", "note": "Low Voltage 48V High Capacity"},
+  {"brand": "Lithium", "model": "25.6V 100Ah 3.0 IP20", "capacity": "25.6V 100Ah (2.56 kWh)", "type": "Lithium LiFePO4 IP20", "rate": 127000, "prevRate": 127000, "change": 0, "status": "new", "badge": "5-Yr Repl + 10-Yr Serv", "warranty": "5-Year Replacement + 10-Year Service"},
+  {"brand": "Lithium", "model": "25.6V 100Ah 3.1 IP20", "capacity": "25.6V 100Ah (2.56 kWh)", "type": "Lithium LiFePO4 IP20 v3.1", "rate": 130000, "prevRate": 130000, "change": 0, "status": "new", "badge": "5-Yr Repl + 10-Yr Serv", "warranty": "5-Year Replacement + 10-Year Service"},
+  {"brand": "Lithium", "model": "51.2V 100Ah 6.0 IP20", "capacity": "51.2V 100Ah (5.12 kWh)", "type": "Lithium LiFePO4 IP20 v6.0", "rate": 218000, "prevRate": 218000, "change": 0, "status": "new", "badge": "5.12kWh Best Value", "warranty": "5-Year Replacement + 10-Year Service"},
+  {"brand": "Lithium", "model": "51.2V 100Ah 6.11 IP20", "capacity": "51.2V 100Ah (5.12 kWh)", "type": "Lithium LiFePO4 IP20 v6.11", "rate": 227000, "prevRate": 227000, "change": 0, "status": "new", "badge": "Smart BMS v6.11", "warranty": "5-Year Replacement + 10-Year Service"},
+  {"brand": "Lithium", "model": "51.2V 200Ah IP20", "capacity": "51.2V 200Ah (10.24 kWh)", "type": "Lithium LiFePO4 IP20", "rate": 435000, "prevRate": 435000, "change": 0, "status": "new", "badge": "10.24kWh Mega Bank", "warranty": "5-Year Replacement + 10-Year Service"},
+  {"brand": "Lithium", "model": "51.2V 314Ah IP20", "capacity": "51.2V 314Ah (16.0 kWh)", "type": "Lithium LiFePO4 IP20 Heavy", "rate": 575000, "prevRate": 575000, "change": 0, "status": "new", "badge": "16kWh Commercial Bank", "warranty": "5-Year Replacement + 10-Year Service"},
+  {"brand": "Lithium", "model": "51.2V 628Ah IP20", "capacity": "51.2V 628Ah (32.15 kWh)", "type": "Lithium LiFePO4 IP20 Industrial", "rate": 1100000, "prevRate": 1100000, "change": 0, "status": "new", "badge": "32kWh Heavy Industrial", "warranty": "5-Year Replacement + 10-Year Service"},
+  {"brand": "Lithium", "model": "25.6V 100Ah IP54", "capacity": "25.6V 100Ah (2.56 kWh)", "type": "Lithium LiFePO4 IP54 Weatherproof", "rate": 135000, "prevRate": 135000, "change": 0, "status": "new", "badge": "IP54 Weatherproof", "warranty": "5-Year Replacement + 10-Year Service"},
+  {"brand": "Lithium", "model": "51.2V 100Ah IP54", "capacity": "51.2V 100Ah (5.12 kWh)", "type": "Lithium LiFePO4 IP54 Weatherproof", "rate": 230000, "prevRate": 230000, "change": 0, "status": "new", "badge": "IP54 Weatherproof", "warranty": "5-Year Replacement + 10-Year Service"},
+  {"brand": "Itel", "model": "Itel IP-20 Lithium 12V 100Ah", "capacity": "12V 100Ah (1.28 kWh)", "type": "Lithium LiFePO4 (IP20)", "rate": 56500, "prevRate": 58000, "change": -1500, "status": "down", "badge": "12V Lithium 100Ah", "warranty": "5-Year Replacement Warranty"},
+  {"brand": "Itel", "model": "Itel IP-20 Lithium 25V 100Ah", "capacity": "25V 100Ah (2.56 kWh)", "type": "Lithium LiFePO4 (IP20)", "rate": 123000, "prevRate": 124000, "change": -1000, "status": "down", "badge": "25V 100Ah Lithium", "warranty": "5-Year Replacement Warranty"},
+  {"brand": "Itel", "model": "Itel IP-20 Lithium 51V 100Ah", "capacity": "51V 100Ah (5.12 kWh)", "type": "Lithium LiFePO4 (IP20)", "rate": 218000, "prevRate": 220000, "change": -2000, "status": "down", "badge": "5.12kWh Best Seller", "warranty": "5-Year Replacement Warranty"},
+  {"brand": "Itel", "model": "Itel IP-20 Lithium 51V 200Ah", "capacity": "51V 200Ah (10.24 kWh)", "type": "Lithium LiFePO4 (IP20)", "rate": 445000, "prevRate": 450000, "change": -5000, "status": "down", "badge": "10.24kWh High Bank", "warranty": "5-Year Replacement Warranty"},
+  {"brand": "Itel", "model": "Itel IP-20 Lithium 51V 314Ah", "capacity": "51V 314Ah (16.0 kWh)", "type": "Lithium LiFePO4 (IP20)", "rate": 585000, "prevRate": 590000, "change": -5000, "status": "down", "badge": "16kWh Commercial Bank", "warranty": "5-Year Replacement Warranty"},
+  {"brand": "Phoenix", "model": "TX 2500 Tubular (230Ah)", "capacity": "12V 230Ah (27 Plates)", "type": "Tall Tubular Deep Cycle", "rate": 51500, "prevRate": 50000, "change": 1500, "status": "up", "badge": "Top Tubular 27-Plates", "warranty": "1 Year Replacement"},
+  {"brand": "Phoenix", "model": "TX 1800 Tubular (185Ah)", "capacity": "12V 185Ah (21 Plates)", "type": "Tall Tubular Deep Cycle", "rate": 41500, "prevRate": 41500, "change": 0, "status": "stable", "badge": "Best Value Tubular", "warranty": "1 Year Replacement"}
+]
+
+rates_ess = [
+  {"brand": "Itel", "model": "Power Tank 500W / 1KWh", "capacity": "500W Output / 1kWh LiFePO4", "type": "Portable ESS / Solar Generator", "rate": 66000, "prevRate": 65000, "change": 1000, "status": "up", "badge": "Portable Power Tank", "warranty": "3-Year Replacement Warranty"},
+  {"brand": "Itel", "model": "3.6KW + 8KWh ESS All-in-One", "capacity": "3.6kW Inverter + 8kWh Storage", "type": "All-in-One Energy Storage Cabinet", "rate": None, "prevRate": None, "change": 0, "status": "new", "badge": "Call for Rate", "warranty": "5-Year Replacement Warranty", "note": "Integrated All-in-One Cabinet"},
+  {"brand": "Itel", "model": "Battery Management Unit - BMU", "capacity": "High Voltage Master Control", "type": "BMU Master Control Unit", "rate": 230000, "prevRate": 230000, "change": 0, "status": "new", "badge": "HV Master BMU", "warranty": "5-Year Replacement Warranty"}
+]
+
+rates_cable = [
+  {"brand": "Fast Cables", "model": "4mm² Pure Copper DC Solar Cable", "capacity": "1500V DC Tinned Pure Copper", "type": "TUV Certified XLPO Double Insulated", "rate": 225, "prevRate": 225, "change": 0, "status": "stable", "badge": "TUV Certified", "warranty": "25 Yrs UV Rating"},
+  {"brand": "Fast Cables", "model": "6mm² Pure Copper DC Solar Cable", "capacity": "1500V DC Tinned Pure Copper", "type": "TUV Certified XLPO Double Insulated", "rate": 310, "prevRate": 310, "change": 0, "status": "stable", "badge": "Low Resistance", "warranty": "25 Yrs UV Rating"},
+  {"brand": "Pakistan Cables", "model": "4mm² DC Double Insulated XLPO", "capacity": "1500V DC Tinned Copper", "type": "TUV Certified Double Insulated", "rate": 235, "prevRate": 235, "change": 0, "status": "stable", "badge": "Pure Copper 99.9%", "warranty": "25 Yrs UV Life"},
+  {"brand": "Pakistan Cables", "model": "6mm² DC Double Insulated XLPO", "capacity": "1500V DC Tinned Copper", "type": "TUV Certified Double Insulated", "rate": 325, "prevRate": 325, "change": 0, "status": "stable", "badge": "Low Loss Heavy Gauge", "warranty": "25 Yrs UV Life"},
+  {"brand": "MCI Cables", "model": "4mm² / 6mm² Tinned Copper Solar Wire", "capacity": "1500V DC Rating", "type": "Flame Retardant DC Cable", "rate": 215, "prevRate": 215, "change": 0, "status": "stable", "badge": "MCI Quality Copper", "warranty": "25 Yrs UV Life"},
+  {"brand": "JUKAI", "model": "4mm² / 6mm² Solar Photovoltaic Cable", "capacity": "1500V DC TUV Standard", "type": "Cross-Linked Polyolefin Insulated", "rate": 195, "prevRate": 195, "change": 0, "status": "new", "badge": "Cost Effective", "warranty": "20 Yrs Outdoor Life"}
+]
+
+rates_accessories = [
+  {"brand": "Chint", "model": "Chint 2P 1000V DC Circuit Breaker (16A / 32A / 63A)", "capacity": "1000V DC, 20kA Breaking", "type": "DC Photovoltaic MCB", "rate": 2600, "prevRate": 2600, "change": 0, "status": "stable", "badge": "Genuine Chint", "warranty": "2 Years Replacement"},
+  {"brand": "Chint", "model": "Chint 4P 400V AC Circuit Breaker (32A / 63A)", "capacity": "400V AC 3-Phase Protection", "type": "AC Grid Isolation MCB", "rate": 3850, "prevRate": 3850, "change": 0, "status": "stable", "badge": "3-Phase Ready", "warranty": "2 Years Replacement"},
+  {"brand": "Chint", "model": "Chint DC Surge Protective Device (SPD 1000V 40kA)", "capacity": "1000V DC 40kA Class II", "type": "DC Lightning Surge Arrester", "rate": 3950, "prevRate": 3950, "change": 0, "status": "stable", "badge": "Lightning Protection", "warranty": "2 Years Replacement"},
+  {"brand": "CNC", "model": "CNC 2P DC Breaker (550V / 1000V 32A/63A)", "capacity": "1000V DC Double Pole", "type": "Solar DC Disconnect MCB", "rate": 2100, "prevRate": 2100, "change": 0, "status": "stable", "badge": "Economical DC Gear", "warranty": "2 Years Warranty"},
+  {"brand": "CNC", "model": "CNC DC SPD 1000V 40kA Surge Arrester", "capacity": "1000V DC 40kA Protection", "type": "Plug-in Module Surge Device", "rate": 3200, "prevRate": 3200, "change": 0, "status": "stable", "badge": "Surge Protection", "warranty": "2 Years Warranty"},
+  {"brand": "Tomzen", "model": "Tomzen 2P DC Breaker & Disconnect (32A / 63A)", "capacity": "1000V DC Double Pole", "type": "PV String Disconnect MCB", "rate": 2350, "prevRate": 2350, "change": 0, "status": "stable", "badge": "Tomzn Original", "warranty": "2 Years Warranty"},
+  {"brand": "Tomzen", "model": "Tomzen DC SPD 1000V 40kA Surge Protector", "capacity": "1000V DC Lightning Surge", "type": "Class C Surge Protector", "rate": 3400, "prevRate": 3400, "change": 0, "status": "stable", "badge": "Tomzn Original", "warranty": "2 Years Warranty"},
+  {"brand": "Tomzen", "model": "Tomzen Digital Voltage & Current Protector (Auto Reset 63A)", "capacity": "230V AC 63A Adjustable", "type": "Over/Under Voltage & Amp Guard", "rate": 3800, "prevRate": 3800, "change": 0, "status": "stable", "badge": "Digital Protection", "warranty": "2 Years Warranty"},
+  {"brand": "Protection DB", "model": "IP65 Waterproof Distribution Box (8 / 12 / 18 Way)", "capacity": "Holds 8 to 18 Poles", "type": "UV Resistant Transparent Door DB", "rate": 4500, "prevRate": 4500, "change": 0, "status": "stable", "badge": "IP65 Waterproof", "warranty": "5 Years Anti-UV"},
+  {"brand": "Earthing", "model": "Pure Copper Earthing Rod 10ft + Bentonite Chemical Kit", "capacity": "10-Feet Solid Copper Rod", "type": "Grounding Earth Pit Kit", "rate": 18500, "prevRate": 18500, "change": 0, "status": "stable", "badge": "Below 2-Ohm Guarantee", "warranty": "10 Years Life"},
+  {"brand": "Connectors", "model": "Genuine MC4 Solar Connectors (Pair IP68 Waterproof)", "capacity": "1500V DC 30A Flame Retardant", "type": "Male/Female Tool-lock Connectors", "rate": 250, "prevRate": 250, "change": 0, "status": "stable", "badge": "IP68 Waterproof", "warranty": "25 Yrs Outdoor"}
+]
+
+rates_system = [
+  {"brand": "Turnkey Packages", "model": "3.2kW Hybrid Residential System", "capacity": "3.2 kW (5-7 Units/Day)", "type": "Hybrid System (Panels + Inverter + Battery)", "rate": 395000, "prevRate": 395000, "change": 0, "status": "stable", "badge": "3-5 Marla Home", "warranty": "5 Yrs Inverter / 12 Yrs Panels"},
+  {"brand": "Turnkey Packages", "model": "5kW / 6kW Hybrid Home System", "capacity": "6.0 kW (22-26 Units/Day)", "type": "Net-Metering + Battery Backup", "rate": 790000, "prevRate": 790000, "change": 0, "status": "stable", "badge": "5-10 Marla Home", "warranty": "5 Yrs Inverter / 25 Yrs Panels"},
+  {"brand": "Turnkey Packages", "model": "10kW Three-Phase Net Metering", "capacity": "10.0 kW (40-45 Units/Day)", "type": "Grid-Tied Net Metering", "rate": 1280000, "prevRate": 1290000, "change": -10000, "status": "down", "badge": "1 Kanal Home", "warranty": "5 Yrs Inverter / 25 Yrs Panels"},
+  {"brand": "Turnkey Packages", "model": "15kW Commercial Net-Metering", "capacity": "15.0 kW (60-70 Units/Day)", "type": "Three Phase Commercial", "rate": 1920000, "prevRate": 1920000, "change": 0, "status": "stable", "badge": "Commercial Plaza", "warranty": "5 Yrs Inverter / 25 Yrs Panels"},
+  {"brand": "Turnkey Packages", "model": "20kW Industrial Net-Metering", "capacity": "20.0 kW (80-95 Units/Day)", "type": "Heavy Duty On-Grid", "rate": 2480000, "prevRate": 2500000, "change": -20000, "status": "down", "badge": "Factory / Farmhouse", "warranty": "5 Yrs Inverter / 25 Yrs Panels"}
+]
+
+rates_structure = [
+  {"brand": "GI Elevated", "model": "L2 Galvanized Elevated Frame (Custom)", "capacity": "Fits 2-4 Panels (14-Gauge)", "type": "Elevated Roof Structure", "rate": 7200, "prevRate": 7200, "change": 0, "status": "stable", "badge": "High Wind Tested", "warranty": "10 Yrs Anti-Rust"},
+  {"brand": "GI Elevated", "model": "L3 Galvanized Heavy Elevated P1/P2", "capacity": "Fits 3-6 Panels (12-Gauge)", "type": "Heavy Duty Walkway GI", "rate": 8500, "prevRate": 8500, "change": 0, "status": "stable", "badge": "Walkway Frame", "warranty": "15 Yrs Anti-Rust"}
+]
+
+sheet_obj = {
+  "date": "24-September-2026",
+  "label": "24-Sep-2026 (Today)",
+  "rates": rates_panel,
+  "inverterRates": rates_inverter,
+  "batteryRates": rates_battery,
+  "essRates": rates_ess,
+  "cableRates": rates_cable,
+  "accessoriesRates": rates_accessories,
+  "systemRates": rates_system,
+  "structureRates": rates_structure
+}
+
+with open("scripts/sheet_today.json", "w", encoding="utf-8") as f:
+    json.dump(sheet_obj, f, indent=2)
+
+print("Exported sheet_today.json successfully!")

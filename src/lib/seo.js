@@ -52,6 +52,24 @@ export const PAGE_SEO = {
     path: '/install',
     robots: INDEXABLE,
   },
+  verification: {
+    title: 'Tier 1 Solar Panels Verification Pakistan | Official Manufacturer Portals',
+    description:
+      'Verify serial numbers and barcode authenticity for Tier-1 solar panels: Canadian Solar, Jinko, LONGi, JA Solar, Astronergy, Trina, Sunova, Huasun, and Yingli.',
+    path: '/verification',
+    robots: INDEXABLE,
+    keywords:
+      'Tier 1 solar panel verification, Canadian Solar serial check, Jinko authenticity portal, LONGi barcode verify, JA Solar warranty check, Trina Solar query, Sunova Pakistan',
+  },
+  'tier-1-verification': {
+    title: 'Tier 1 Solar Panels Verification Pakistan | Official Manufacturer Portals',
+    description:
+      'Verify serial numbers and barcode authenticity for Tier-1 solar panels: Canadian Solar, Jinko, LONGi, JA Solar, Astronergy, Trina, Sunova, Huasun, and Yingli.',
+    path: '/tier-1-verification',
+    robots: INDEXABLE,
+    keywords:
+      'Tier 1 solar panel verification, Canadian Solar serial check, Jinko authenticity portal, LONGi barcode verify, JA Solar warranty check, Trina Solar query',
+  },
   'used-solar': {
     title: 'Used Solar for Sale Pakistan | Panels Inverters Batteries',
     description:
@@ -263,6 +281,9 @@ export const PAGE_SEO = {
 const PAGE_ALIASES = {
   'today-prices': 'prices',
   'load-calculator': 'calculator',
+  'tier-1-verification': 'verification',
+  'panel-verification': 'verification',
+  'tier1-verification': 'verification',
   'change-password': 'password',
   'about-us': 'about',
   'help-center': 'help',
@@ -307,6 +328,10 @@ export function parseLocation(pathname = '/', hash = '') {
     '/today-prices': 'prices',
     '/calculator': 'calculator',
     '/load-calculator': 'calculator',
+    '/verification': 'verification',
+    '/tier-1-verification': 'verification',
+    '/tier1-verification': 'verification',
+    '/panel-verification': 'verification',
     '/dealers': 'dealers',
     '/install': 'install',
     '/installation': 'install',

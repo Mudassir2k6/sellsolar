@@ -48,6 +48,7 @@ import {
 import { sendContactMessage } from '../services/inboxService';
 import EmailContactModal from '../components/EmailContactModal';
 import { useSiteSettings } from '../context/SiteSettingsContext';
+import { useAuth } from '../context/AuthContext';
 
 // Navigation groups definition
 export const FOOTER_PAGES = {
@@ -1765,6 +1766,8 @@ function HelpCenterContent({ onNavigate }) {
 
 function ContactUsContent() {
   const { settings } = useSiteSettings();
+  const { user, profile } = useAuth();
+
   const supportEmail = settings?.supportEmail || 'info@sellsolar.pk';
   const salesEmail = settings?.salesEmail || 'support@sellsolar.pk';
   const supportPhone = settings?.supportPhone || '+92 300 1234567';
@@ -1778,13 +1781,64 @@ function ContactUsContent() {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedSummary, setCopiedSummary] = useState(false);
   const [emailModalOpen, setEmailModalOpen] = useState(false);
+
+  // Auto-fill from authenticated user, profile, or localStorage so it is never empty
+  const getInitialName = () => {
+    return (
+      profile?.full_name ||
+      user?.user_metadata?.full_name ||
+      user?.name ||
+      (typeof window !== 'undefined' ? localStorage.getItem('sellsolar_last_contact_name') || '' : '')
+    );
+  };
+
+  const getInitialEmail = () => {
+    return (
+      user?.email ||
+      profile?.email ||
+      (typeof window !== 'undefined' ? localStorage.getItem('sellsolar_last_contact_email') || '' : '')
+    );
+  };
+
+  const getInitialPhone = () => {
+    return (
+      profile?.phone ||
+      (typeof window !== 'undefined' ? localStorage.getItem('sellsolar_last_contact_phone') || '' : '')
+    );
+  };
+
   const [form, setForm] = useState({
-    name: '',
-    email: '',
-    phone: '',
+    name: getInitialName(),
+    email: getInitialEmail(),
+    phone: getInitialPhone(),
     subject: 'General Inquiry',
     message: ''
   });
+
+  // When user or profile loads asynchronously, ensure fields get auto-filled if still empty
+  useEffect(() => {
+    const loadedName = profile?.full_name || user?.user_metadata?.full_name || user?.name || '';
+    const loadedEmail = user?.email || profile?.email || '';
+    const loadedPhone = profile?.phone || '';
+
+    setForm((prev) => {
+      let changed = false;
+      const updated = { ...prev };
+      if (!updated.name && loadedName) {
+        updated.name = loadedName;
+        changed = true;
+      }
+      if (!updated.email && loadedEmail) {
+        updated.email = loadedEmail;
+        changed = true;
+      }
+      if (!updated.phone && loadedPhone) {
+        updated.phone = loadedPhone;
+        changed = true;
+      }
+      return changed ? updated : prev;
+    });
+  }, [user, profile]);
 
   const handleCopyEmail = async (emailText = supportEmail) => {
     try {
@@ -1817,6 +1871,14 @@ function ContactUsContent() {
     e.preventDefault();
     setSubmitting(true);
     try {
+      if (typeof window !== 'undefined') {
+        try {
+          if (form.name) localStorage.setItem('sellsolar_last_contact_name', form.name);
+          if (form.email) localStorage.setItem('sellsolar_last_contact_email', form.email);
+          if (form.phone) localStorage.setItem('sellsolar_last_contact_phone', form.phone);
+        } catch {}
+      }
+
       const res = await sendContactMessage({
         name: form.name,
         email: form.email,
@@ -1847,6 +1909,8 @@ function ContactUsContent() {
         onClose={() => setEmailModalOpen(false)}
         recipientEmail={supportEmail}
         defaultSubject="Inquiry via SellSolar.pk Contact Desk"
+        defaultName={form.name}
+        defaultContact={form.email || form.phone}
       />
 
       <div className="rounded-3xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 sm:p-10 shadow-sm">
@@ -2073,7 +2137,13 @@ function ContactUsContent() {
               onClick={() => {
                 setSubmitted(false);
                 setSubmissionLinks(null);
-                setForm({ name: '', email: '', phone: '', subject: 'General Inquiry', message: '' });
+                setForm({
+                  name: getInitialName(),
+                  email: getInitialEmail(),
+                  phone: getInitialPhone(),
+                  subject: 'General Inquiry',
+                  message: ''
+                });
               }}
               className="btn-secondary text-xs px-5 py-2.5 mt-3"
             >
@@ -2084,10 +2154,22 @@ function ContactUsContent() {
           <form onSubmit={handleSubmit} className="space-y-4 text-xs">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">Your Name *</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label htmlFor="contact-name-input" className="font-bold text-gray-700 dark:text-gray-300 block">
+                    Your Name *
+                  </label>
+                  {form.name && (
+                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                      <Check className="h-3 w-3" /> Auto-filled
+                    </span>
+                  )}
+                </div>
                 <input
+                  id="contact-name-input"
+                  name="name"
                   type="text"
                   required
+                  autoComplete="name"
                   placeholder="e.g. Tariq Mehmood"
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}

@@ -455,9 +455,204 @@ export const TURNKEY_INSTALL_PROMO_IMAGE = toSvgDataUri(`
 </svg>
 `);
 
+export const CABLES_WIRING_IMAGE = toSvgDataUri(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="cableBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16"/>
+      <stop offset="100%" stop-color="#1e1e38"/>
+    </linearGradient>
+    <linearGradient id="copperGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ea580c"/>
+      <stop offset="50%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#c2410c"/>
+    </linearGradient>
+    <linearGradient id="tinGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#94a3b8"/>
+      <stop offset="50%" stop-color="#e2e8f0"/>
+      <stop offset="100%" stop-color="#64748b"/>
+    </linearGradient>
+    <linearGradient id="redSheath" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#dc2626"/>
+      <stop offset="100%" stop-color="#991b1b"/>
+    </linearGradient>
+    <linearGradient id="blackSheath" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="600" fill="url(#cableBg)"/>
+  <circle cx="400" cy="270" r="230" fill="#ea580c" opacity="0.1"/>
+
+  <!-- Cable Coils Graphic -->
+  <g transform="translate(180, 70)">
+    <!-- Red Cable Coil (Positive DC) -->
+    <ellipse cx="140" cy="180" rx="140" ry="110" fill="none" stroke="url(#redSheath)" stroke-width="26"/>
+    <ellipse cx="140" cy="180" rx="110" ry="85" fill="none" stroke="url(#redSheath)" stroke-width="22"/>
+    <ellipse cx="140" cy="180" rx="80" ry="60" fill="none" stroke="url(#redSheath)" stroke-width="20"/>
+
+    <!-- Black Cable Coil (Negative DC) -->
+    <ellipse cx="300" cy="240" rx="140" ry="110" fill="none" stroke="url(#blackSheath)" stroke-width="26"/>
+    <ellipse cx="300" cy="240" rx="110" ry="85" fill="none" stroke="url(#blackSheath)" stroke-width="22"/>
+    <ellipse cx="300" cy="240" rx="80" ry="60" fill="none" stroke="url(#blackSheath)" stroke-width="20"/>
+
+    <!-- Cut Cable Ends Showing Pure Tinned Copper Strands -->
+    <g transform="translate(390, 80) rotate(-35)">
+      <rect x="0" y="0" width="130" height="34" rx="17" fill="url(#redSheath)" stroke="#f87171" stroke-width="2"/>
+      <rect x="90" y="5" width="40" height="24" rx="12" fill="#ffffff" opacity="0.8"/>
+      <rect x="110" y="7" width="55" height="20" rx="4" fill="url(#copperGrad)"/>
+      <rect x="135" y="8" width="45" height="18" rx="2" fill="url(#tinGrad)"/>
+    </g>
+
+    <g transform="translate(20, 290) rotate(25)">
+      <rect x="0" y="0" width="130" height="34" rx="17" fill="url(#blackSheath)" stroke="#64748b" stroke-width="2"/>
+      <rect x="90" y="5" width="40" height="24" rx="12" fill="#ffffff" opacity="0.8"/>
+      <rect x="110" y="7" width="55" height="20" rx="4" fill="url(#copperGrad)"/>
+      <rect x="135" y="8" width="45" height="18" rx="2" fill="url(#tinGrad)"/>
+    </g>
+  </g>
+
+  <!-- Spec & Brand Badges -->
+  <g transform="translate(60, 510)">
+    <rect width="250" height="46" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+    <text x="24" y="28" fill="#f97316" font-family="system-ui, sans-serif" font-size="14" font-weight="bold">Fast • Pakistan Cables • MCI</text>
+  </g>
+
+  <g transform="translate(480, 510)">
+    <rect width="260" height="46" rx="10" fill="#065f46" stroke="#10b981" stroke-width="1.5"/>
+    <text x="24" y="28" fill="#34d399" font-family="system-ui, sans-serif" font-size="14" font-weight="bold">4mm² &amp; 6mm² TUV DC XLPO</text>
+  </g>
+</svg>
+`);
+
+export const SOLAR_ACCESSORIES_IMAGE = toSvgDataUri(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="accBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16"/>
+      <stop offset="100%" stop-color="#141f2e"/>
+    </linearGradient>
+    <linearGradient id="dbBoxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </linearGradient>
+    <linearGradient id="chintBlue" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0369a1"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="600" fill="url(#accBg)"/>
+  <circle cx="400" cy="270" r="230" fill="#0284c7" opacity="0.1"/>
+
+  <!-- IP65 Distribution Box & Breaker Gear -->
+  <g transform="translate(180, 70)">
+    <!-- DB Enclosure Base -->
+    <rect x="0" y="0" width="440" height="380" rx="20" fill="url(#dbBoxGrad)" stroke="#64748b" stroke-width="4"/>
+    <rect x="18" y="18" width="404" height="344" rx="14" fill="#0f172a" stroke="#334155" stroke-width="2"/>
+
+    <!-- DIN Rail -->
+    <rect x="35" y="180" width="370" height="24" fill="#94a3b8" rx="3"/>
+
+    <!-- CHINT / TOMZN DC 2P Breaker -->
+    <g transform="translate(60, 110)">
+      <rect width="70" height="150" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+      <rect x="10" y="10" width="50" height="30" rx="4" fill="url(#chintBlue)"/>
+      <text x="35" y="28" fill="#ffffff" font-family="sans-serif" font-size="9" font-weight="900" text-anchor="middle">CHINT</text>
+      <!-- Switch Lever -->
+      <rect x="22" y="65" width="26" height="45" rx="5" fill="#dc2626"/>
+      <circle cx="35" cy="85" r="4" fill="#ffffff"/>
+      <text x="35" y="138" fill="#0f172a" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle">2P 32A DC</text>
+    </g>
+
+    <!-- DC SPD Surge Protector -->
+    <g transform="translate(145, 110)">
+      <rect width="70" height="150" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+      <rect x="10" y="10" width="50" height="25" rx="3" fill="#ea580c"/>
+      <text x="35" y="26" fill="#ffffff" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle">TOMZN</text>
+      <!-- SPD Status Windows (Green=OK) -->
+      <rect x="18" y="55" width="34" height="22" rx="4" fill="#22c55e" stroke="#15803d"/>
+      <text x="35" y="70" fill="#ffffff" font-family="sans-serif" font-size="8" font-weight="bold" text-anchor="middle">1000V</text>
+      <text x="35" y="138" fill="#0f172a" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle">DC SPD 40kA</text>
+    </g>
+
+    <!-- AC 4P Breaker -->
+    <g transform="translate(230, 110)">
+      <rect width="95" height="150" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+      <rect x="10" y="10" width="75" height="25" rx="3" fill="#0284c7"/>
+      <text x="47" y="26" fill="#ffffff" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle">AC 4P 63A</text>
+      <rect x="35" y="65" width="25" height="45" rx="5" fill="#15803d"/>
+      <text x="47" y="138" fill="#0f172a" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle">4P 400V</text>
+    </g>
+
+    <!-- Voltage / Ampere Digital Protector -->
+    <g transform="translate(340, 110)">
+      <rect width="65" height="150" rx="8" fill="#020617" stroke="#334155" stroke-width="2"/>
+      <rect x="8" y="25" width="49" height="50" rx="6" fill="#090d16" stroke="#1e293b"/>
+      <text x="32" y="48" fill="#ef4444" font-family="monospace" font-size="16" font-weight="bold" text-anchor="middle">230</text>
+      <text x="32" y="66" fill="#22c55e" font-family="monospace" font-size="14" font-weight="bold" text-anchor="middle">16.4</text>
+      <text x="32" y="138" fill="#94a3b8" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle">V/A Meter</text>
+    </g>
+  </g>
+
+  <!-- Spec Badges -->
+  <g transform="translate(60, 510)">
+    <rect width="280" height="46" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+    <text x="24" y="28" fill="#38bdf8" font-family="system-ui, sans-serif" font-size="14" font-weight="bold">CHINT • CNC • TOMZN Switchgear</text>
+  </g>
+
+  <g transform="translate(460, 510)">
+    <rect width="280" height="46" rx="10" fill="#065f46" stroke="#10b981" stroke-width="1.5"/>
+    <text x="24" y="28" fill="#34d399" font-family="system-ui, sans-serif" font-size="14" font-weight="bold">Distribution Boxes &amp; Surge SPDs</text>
+  </g>
+</svg>
+`);
+
 export function getEquipmentFallbackImage(category: string, title?: string): string {
   const t = (title || '').toLowerCase();
   const cat = (category || '').toLowerCase();
+
+  if (
+    cat === 'cables_wiring' ||
+    cat.includes('cable') ||
+    cat.includes('wire') ||
+    t.includes('cable') ||
+    t.includes('wire') ||
+    t.includes('fast cables') ||
+    t.includes('pakistan cable') ||
+    t.includes('mci cable') ||
+    t.includes('jukai') ||
+    t.includes('newage') ||
+    t.includes('xlpo') ||
+    t.includes('xlpe') ||
+    t.includes('4mm') ||
+    t.includes('6mm')
+  ) {
+    return CABLES_WIRING_IMAGE;
+  }
+
+  if (
+    cat === 'solar_accessories' ||
+    cat.includes('accessori') ||
+    t.includes('breaker') ||
+    t.includes('spd') ||
+    t.includes('chint') ||
+    t.includes('tomzen') ||
+    t.includes('tomzn') ||
+    t.includes('cnc') ||
+    t.includes('mccb') ||
+    t.includes('fuse') ||
+    t.includes('distribution box') ||
+    t.includes('copper rod') ||
+    t.includes('earthing') ||
+    t.includes('lightning arrester') ||
+    t.includes('mc4') ||
+    t.includes('protector') ||
+    t.includes('changeover')
+  ) {
+    return SOLAR_ACCESSORIES_IMAGE;
+  }
 
   if (
     cat.includes('battery') ||

@@ -233,7 +233,7 @@ function Xy({
       page: 'dealers',
     },
     {
-      label: 'Tier-1 Verification',
+      label: 'Verify Solar Plates',
       page: 'verification',
       isVerify: true,
     },
@@ -317,7 +317,7 @@ function Xy({
                     jsx('button', {
                       onClick: () => h('verification'),
                       className: 'hover:text-emerald-400 text-emerald-400/90 font-semibold transition-colors cursor-pointer flex items-center gap-1',
-                      children: 'Tier-1 Verification',
+                      children: 'Verify Solar Plates',
                     }),
                   ],
                 }),
@@ -467,7 +467,7 @@ function Xy({
                       }),
                       jsx('span', {
                         className: 'whitespace-nowrap',
-                        children: 'Tier-1 Check',
+                        children: 'Verify Solar Plates',
                       }),
                     ],
                   }),
@@ -1090,7 +1090,7 @@ function Xy({
                                       }),
                                       jsx('span', {
                                         children:
-                                          'Tier-1 Panels Verification',
+                                          'Verify Solar Plates',
                                       }),
                                     ],
                                   }),
@@ -2312,7 +2312,7 @@ const FOOTER_PAGES_KEYS = [
 const ux={
   "Solar Marketplace":[
     { label: "Today's Solar Rates", page: "prices" },
-    { label: "Tier-1 Panels Verification", page: "verification" },
+    { label: "Verify Solar Plates", page: "verification" },
     { label: "Solar Panels", page: "solar-panels" },
     { label: "Solar Inverter", page: "solar-inverter" },
     { label: "Solar Batteries", page: "solar-batteries" },
@@ -2320,7 +2320,7 @@ const ux={
     { label: "Verified Dealers", page: "dealers" }
   ],
   "Tools & Services":[
-    { label: "Tier-1 Authenticity Check", page: "verification" },
+    { label: "Verify Solar Plates", page: "verification" },
     { label: "Solar Load Calculator", page: "calculator" },
     { label: "Turnkey Installation", page: "install" },
     { label: "How It Works", page: "how-it-works" },

@@ -5282,7 +5282,7 @@ export default function AdminSuperDashboard({
                         value={profileForm.fullName}
                         onChange={(e) => setProfileForm({ ...profileForm, fullName: e.target.value })}
                         className="input-field text-xs"
-                        placeholder="e.g. Mudassir Solar"
+                        placeholder="e.g. Solar Solutions"
                       />
                     </div>
 

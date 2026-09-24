@@ -1443,10 +1443,10 @@ export function AuthProvider({ children }) {
         if (resetErr) {
           console.warn('Supabase resetPasswordForEmail notice:', resetErr.message);
           if (resetErr.message?.toLowerCase().includes('rate limit')) {
-            throw new Error('Supabase email limit exceeded. Please wait a few minutes, or use test code 123456.');
+            throw new Error('Email request limit reached. Please wait a few minutes and try again.');
           }
           if (resetErr.message?.toLowerCase().includes('error sending') || resetErr.message?.toLowerCase().includes('smtp')) {
-            throw new Error('SMTP Error from Supabase: Unable to send email. In Supabase SMTP Settings, ensure Sender Email is "onboarding@resend.dev" and Username is "resend". (Or enter test code 123456).');
+            throw new Error('Unable to send password reset email at this moment. Please try again shortly or contact support.');
           }
           throw new Error(resetErr.message || 'Error sending recovery email via Supabase.');
         }

@@ -105,12 +105,12 @@ export default function PasswordPage({
     if (typeof window === 'undefined') return;
     try {
       const stored = sessionStorage.getItem('sellsolar_reset_otp');
-      if (stored) {
+      if (stored && step > 1) {
         const parsed = JSON.parse(stored);
         if (parsed.email && !email) setEmail(parsed.email);
       }
     } catch {}
-  }, [email]);
+  }, [email, step]);
 
   useEffect(() => {
     if (resendCooldown > 0) {
@@ -634,7 +634,7 @@ export default function PasswordPage({
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="e.g. mudassir2k6@gmail.com"
+                      placeholder="you@example.com"
                       className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all outline-none"
                     />
                   </div>
@@ -707,12 +707,9 @@ export default function PasswordPage({
                     ))}
                   </div>
 
-                  <div className="flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400 mt-1">
+                  <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">
                     <span>
                       Sent to: <strong className="text-gray-700 dark:text-gray-300">{email}</strong>
-                    </span>
-                    <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
-                      Test Code: <span className="font-mono font-bold">123456</span>
                     </span>
                   </div>
                 </div>

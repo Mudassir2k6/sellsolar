@@ -448,13 +448,16 @@ export default function AuthPage({ onSuccess, onBack, onForgotPassword, initialV
     }`.trim();
 
   const go = (next) => {
+    setEmail('');
+    setPassword('');
+    setConfirmPassword('');
+    setVerificationCode('');
+    setError(null);
+    setInfo(null);
+    setFieldErrors({});
+    setFieldErrorMessages({});
     if (next === 'signup') {
       clearSignupFields();
-    } else {
-      setError(null);
-      setInfo(null);
-      setFieldErrors({});
-      setFieldErrorMessages({});
     }
     setView(next);
     setTimeout(() => {
@@ -1250,7 +1253,7 @@ export default function AuthPage({ onSuccess, onBack, onForgotPassword, initialV
                     }}
                     onBlur={() => setEmailTouched(true)}
                     onKeyDown={(e) => handleFieldKeyDown(e, 'resetEmail')}
-                    placeholder="e.g. naveedms1253@gmail.com or username"
+                    placeholder="you@example.com or username"
                     icon={Mail}
                     error={fieldErrors.email ? 'Registered email or username is required.' : null}
                     helperText="🔑 Enter the email address or username registered with your account."
@@ -1277,7 +1280,7 @@ export default function AuthPage({ onSuccess, onBack, onForgotPassword, initialV
                         focusField('password');
                       }
                     }}
-                    placeholder="e.g. 03001234567, 35201-1234567-1, or Admin PIN"
+                    placeholder="e.g. 03001234567 or 35201-1234567-1"
                     icon={ShieldCheck}
                     error={fieldErrors.verificationCode ? 'Please enter your registered mobile number or CNIC to verify ownership.' : null}
                     helperText="🔒 Anti-Hack Protection: Required to confirm you are the true owner of this account."

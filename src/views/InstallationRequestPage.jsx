@@ -18,7 +18,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { digitsOnlyPhone, isValidPhone, normalizePhone } from '../lib/auth';
 import { CITIES } from '../lib/constants';
-import { submitInstallationRequest, ADMIN_NOTIFICATION_EMAIL } from '../lib/installation';
+import { submitInstallationRequest } from '../lib/installation';
 
 const PAKISTAN_CITIES = [
   ...CITIES,
@@ -560,12 +560,11 @@ export default function InstallationRequestPage({ onBack, onNavigate, hasOuterNa
                   />
                 </div>
 
-                {/* Admin Email Notification Notice */}
+                {/* Engineering Notification Notice */}
                 <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-800/40 p-3.5 text-xs text-gray-600 dark:text-gray-400 flex items-center gap-2.5">
                   <Mail className="h-4 w-4 shrink-0 text-primary-600 dark:text-primary-400" />
                   <span>
-                    Saving this request will automatically send a real-time lead notification to the admin email:{' '}
-                    <strong className="text-gray-900 dark:text-gray-200">{ADMIN_NOTIFICATION_EMAIL}</strong>.
+                    Saving this request will automatically dispatch a real-time lead notification to our certified solar engineering team.
                   </span>
                 </div>
 
@@ -579,17 +578,17 @@ export default function InstallationRequestPage({ onBack, onNavigate, hasOuterNa
                 <button
                   type="submit"
                   disabled={busy}
-                  className="btn-primary w-full py-3.5 text-base font-bold shadow-lg shadow-primary-500/25 flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="btn-primary w-full py-3.5 text-base font-bold shadow-lg shadow-primary-500/25 flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
                 >
                   {busy ? (
                     <>
                       <LoaderCircle className="h-5 w-5 animate-spin" />
-                      Saving Request & Notifying Admin...
+                      Request Submitting...
                     </>
                   ) : (
                     <>
                       <Wrench className="h-5 w-5" />
-                      Submit & Notify Admin
+                      Request Submit
                     </>
                   )}
                 </button>

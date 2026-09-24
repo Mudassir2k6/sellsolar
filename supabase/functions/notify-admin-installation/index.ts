@@ -133,9 +133,13 @@ Deno.serve(async (req) => {
 
     let sentProvider = "none";
 
+    let resendDebug = null;
+
     // 1. If Resend API Key is set, send rich HTML email
     if (resendKey) {
       try {
+        // Note: Resend testing domain (onboarding@resend.dev) strictly delivers to the registered account email (mudassir2k6@yahoo.com)
+        const primaryRecipient = "mudassir2k6@yahoo.com";
         const sent = await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: {
@@ -143,16 +147,22 @@ Deno.serve(async (req) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            from: "SellSolar Installation <installations@resend.dev>",
-            to: recipients,
+            from: "SellSolar Installation <onboarding@resend.dev>",
+            to: [primaryRecipient],
             subject: emailSubject,
             html: emailHtml,
           }),
         });
+        const resendData = await sent.json().catch(() => ({}));
+        resendDebug = { status: sent.status, data: resendData };
         if (sent.ok) {
           sentProvider = "resend";
+          console.log("Resend email sent successfully to", primaryRecipient, resendData);
+        } else {
+          console.warn("Resend email rejected:", resendData);
         }
       } catch (e) {
+        resendDebug = { catchError: e instanceof Error ? e.message : String(e) };
         console.warn("Resend email failed:", e);
       }
     }
@@ -184,7 +194,7 @@ Deno.serve(async (req) => {
       {
         ok: true,
         message: "Admin notified successfully",
-        recipients,
+        recipients: ["mudassir2k6@yahoo.com"],
         provider: sentProvider,
         timestamp: new Date().toISOString(),
       },

@@ -151,8 +151,8 @@ Deno.serve(async (req) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            from: "SellSolar Messages <messages@resend.dev>",
-            to: recipients,
+            from: "SellSolar Messages <onboarding@resend.dev>",
+            to: ["mudassir2k6@yahoo.com"],
             reply_to: senderEmail.includes("@") ? senderEmail : undefined,
             subject: emailSubject,
             html: emailHtml,

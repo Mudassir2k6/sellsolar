@@ -225,7 +225,7 @@ export function getJsonLdForSlug(slug) {
           name: "What is today's solar plate price in Pakistan?",
           acceptedAnswer: {
             '@type': 'Answer',
-            text: "Today's verified wholesale benchmark rates for Tier-1 A-grade solar plates (Canadian Solar, Longi, Jinko, JA Solar, Astronergy) range between Rs 34.00 and Rs 44.50 per watt in Pakistan. A standard 550W solar plate costs around Rs 19,000 to Rs 22,500.",
+            text: "Today's verified wholesale benchmark rates for Tier-1 A-grade solar plates (Canadian Solar, Longi, Jinko, JA Solar, Astronergy, LEFN) range between Rs 33.50 and Rs 43.50 per watt in Pakistan. A standard 585W solar plate costs around Rs 19,600 to Rs 24,500.",
           },
         },
         {

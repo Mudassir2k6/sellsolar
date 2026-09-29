@@ -14,9 +14,9 @@ const NOINDEX = 'noindex,nofollow';
 
 export const PAGE_SEO = {
   home: {
-    title: 'Used Solar Plates, Inverters & Batteries for Sale in Pakistan | SellSolar',
+    title: 'Solar Plates, Inverters & Batteries in Pakistan | SellSolar',
     description:
-      "Pakistan's #1 used solar marketplace. Buy & sell used solar plates, second-hand hybrid inverters, and solar batteries. Check daily solar plate prices, verify Tier-1 plates, and post free used solar ads.",
+      "Pakistan's #1 solar marketplace. Buy & sell new and used solar plates, hybrid inverters, and solar batteries. Check daily solar plate prices, verify Tier-1 plates, and post free solar ads.",
     path: '/',
     robots: INDEXABLE,
     keywords:

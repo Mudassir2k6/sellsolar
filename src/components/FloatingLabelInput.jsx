@@ -33,11 +33,18 @@ const FloatingLabelInput = forwardRef(function FloatingLabelInput(
     helperText,
     className = '',
     inputClassName = '',
+    autoFocus = false,
     ...rest
   },
   ref
 ) {
-  const [isFocused, setIsFocused] = useState(false);
+  const [isFocused, setIsFocused] = useState(Boolean(autoFocus));
+
+  React.useEffect(() => {
+    if (autoFocus) {
+      setIsFocused(true);
+    }
+  }, [autoFocus]);
 
   const stringVal = value !== undefined && value !== null ? String(value) : '';
   const hasValue = stringVal.length > 0;
@@ -152,8 +159,9 @@ const FloatingLabelInput = forwardRef(function FloatingLabelInput(
             maxLength={maxLength}
             inputMode={inputMode}
             pattern={pattern}
+            autoFocus={autoFocus}
             placeholder={isFloating ? placeholder : ''}
-            className={`w-full bg-transparent text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none transition-all ${
+            className={`w-full bg-transparent text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 caret-amber-500 focus:outline-none transition-all ${
               label ? 'pt-5 pb-1.5' : 'py-2.5'
             } ${hasLeftIcon ? 'pl-10' : 'pl-3.5'} ${
               hasRightElement ? 'pr-11' : 'pr-3.5'

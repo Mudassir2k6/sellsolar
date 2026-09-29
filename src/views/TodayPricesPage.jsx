@@ -373,13 +373,17 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         if (sheetFilterStatus === 'jinko' && !item.brand.toLowerCase().includes('jinko')) return false;
         if (sheetFilterStatus === 'longi' && !item.brand.toLowerCase().includes('longi')) return false;
         if (sheetFilterStatus === 'canadian' && !item.brand.toLowerCase().includes('canadian')) return false;
+        if (sheetFilterStatus === 'inverex' && !item.brand.toLowerCase().includes('inverex')) return false;
         if (sheetFilterStatus === 'ja' && !item.brand.toLowerCase().includes('ja')) return false;
         if (sheetFilterStatus === 'astronergy' && !item.brand.toLowerCase().includes('astronergy')) return false;
         if (sheetFilterStatus === 'korean' && !item.brand.toLowerCase().includes('korean')) return false;
+        if (sheetFilterStatus === 'aiko' && !item.brand.toLowerCase().includes('aiko')) return false;
         if (sheetFilterStatus === 'osda' && !item.brand.toLowerCase().includes('osda')) return false;
         if (sheetFilterStatus === 'tcl' && !item.brand.toLowerCase().includes('tcl')) return false;
         if (sheetFilterStatus === 'lefn' && !item.brand.toLowerCase().includes('lefn')) return false;
       } else if (sheetCategory === 'inverter') {
+        if (sheetFilterStatus === 'lcd' && !item.brand.toLowerCase().includes('lcd') && !item.model.toLowerCase().includes('lcd')) return false;
+        if (sheetFilterStatus === 'solis' && !item.brand.toLowerCase().includes('solis') && !item.model.toLowerCase().includes('solis')) return false;
         if (sheetFilterStatus === 'goodwe' && !item.brand.toLowerCase().includes('goodwe')) return false;
         if (sheetFilterStatus === 'zapher' && !item.brand.toLowerCase().includes('zapher')) return false;
         if (sheetFilterStatus === 'xenon' && !item.brand.toLowerCase().includes('xenon') && !item.brand.toLowerCase().includes('xynex')) return false;
@@ -389,6 +393,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         if (sheetFilterStatus === 'hybrid' && !item.type?.toLowerCase().includes('hybrid')) return false;
         if (sheetFilterStatus === 'ongrid' && !item.type?.toLowerCase().includes('on-grid') && !item.type?.toLowerCase().includes('grid-tied') && !item.type?.toLowerCase().includes('string')) return false;
       } else if (sheetCategory === 'battery') {
+        if (sheetFilterStatus === 'zilo' && !item.brand.toLowerCase().includes('zilo')) return false;
         if (sheetFilterStatus === 'goodwe' && !item.brand.toLowerCase().includes('goodwe')) return false;
         if (sheetFilterStatus === 'lithium' && !item.type?.toLowerCase().includes('lithium') && !item.type?.toLowerCase().includes('lifepo4') && !item.brand?.toLowerCase().includes('lithium')) return false;
         if (sheetFilterStatus === 'tubular' && !item.type?.toLowerCase().includes('tubular')) return false;
@@ -775,54 +780,54 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
               <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
                 <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Canadian Solar Stock</span>
                 <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 41.60 – 41.75/W</span>
+                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 41.25 – 41.50/W</span>
                 </div>
-                <span className="text-[10px] text-gray-500 dark:text-gray-400">585W (Rs. 41.60) • 625W (Rs. 41.75)</span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">585W (Rs. 41.50) • 625W (Rs. 41.25)</span>
               </div>
 
               <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
                 <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Jinko Solar & LONGi</span>
                 <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 41.25 – 43.25/W</span>
+                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 39.75 – 43.50/W</span>
                 </div>
-                <span className="text-[10px] text-gray-500 dark:text-gray-400">Jinko 585W (41.25) • 645W (41.50 Deliv 15/09) • X10 (43.25)</span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">Jinko 585W (39.75) • 645W (41.00) • X10 (43.50)</span>
               </div>
 
               <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
                 <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">LEFN 640W Best Value</span>
                 <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400">Rs. 33.00/W</span>
+                  <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400">Rs. 33.50/W</span>
                   <span className="inline-flex items-center text-[10px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 px-1.5 py-0.5 rounded">
                     Lowest in PK
                   </span>
                 </div>
-                <span className="text-[10px] text-gray-500 dark:text-gray-400">Fresh container arrivals • Rs. 4.00/W drop</span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">Fresh container arrivals • Lowest rate in PK</span>
               </div>
 
               <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
                 <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Astronergy & JA Solar</span>
                 <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 38.60 – 39.75/W</span>
+                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 38.25 – 39.00/W</span>
                 </div>
-                <span className="text-[10px] text-gray-500 dark:text-gray-400">JA 585W (38.60) • JA 605W (39.75) • Astro 620W/720W (39.00)</span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">JA 625W (38.25) • JA 585W (38.75) • Astro 590W/720W (39.00)</span>
               </div>
             </div>
           ) : sheetCategory === 'inverter' ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 my-4">
               <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
-                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Inverex Nitrox Hybrids</span>
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">LCD Series & Solis Plus</span>
                 <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-base font-extrabold text-blue-600 dark:text-blue-400">Rs. 266k – 549k</span>
+                  <span className="text-base font-extrabold text-blue-600 dark:text-blue-400">Rs. 195k – 745k</span>
                 </div>
-                <span className="text-[10px] text-gray-500 dark:text-gray-400">6kW Single Phase • 10kW 3P (+5k) • 12kW Commercial</span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">LCD 6kW (195k) • Solis 6kW+ (207k) • 12kW SP (410k)</span>
               </div>
 
               <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
-                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Knox & Fronus Value</span>
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Inverex Nitrox Hybrids</span>
                 <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 112k – 272k</span>
+                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 266k – 549k</span>
                 </div>
-                <span className="text-[10px] text-gray-500 dark:text-gray-400">Knox 6kW IP65 (186k) • Fronus 8.2kW PV9200 (233k)</span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">6kW Single Phase • 10kW 3P (+5k) • 12kW Commercial</span>
               </div>
 
               <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
@@ -834,17 +839,33 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
               </div>
 
               <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
-                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Huawei Smart Tier-1</span>
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">GoodWe HV & Zapher IP66</span>
                 <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 323k – 440k</span>
+                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 192k – 1.33M</span>
                 </div>
-                <span className="text-[10px] text-gray-500 dark:text-gray-400">SUN2000-10KTL AFCI (+5k) • 20KTL Commercial String</span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">Zapher 6.6k IP66 (192k) • GoodWe 15k HV (625k)</span>
               </div>
             </div>
           ) : sheetCategory === 'battery' ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 my-4">
               <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
-                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Lithium LiFePO4 (5.12kWh)</span>
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Zilo Energy (PK 🇵🇰)</span>
+                <div className="flex items-baseline gap-2 mt-0.5">
+                  <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400">Rs. 65k – 580k</span>
+                </div>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">12V Cube (65k) • 5kW Nexa (225k) • 16kW (580k)</span>
+              </div>
+
+              <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Lithium IP-20 & IP-65</span>
+                <div className="flex items-baseline gap-2 mt-0.5">
+                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 257k – 720k</span>
+                </div>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">5kW Lithium IP-20 (257k) • 16kW IP-65 (720k)</span>
+              </div>
+
+              <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Narada & Pylontech</span>
                 <div className="flex items-baseline gap-2 mt-0.5">
                   <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400">Rs. 238,500 – 258k</span>
                 </div>
@@ -991,7 +1012,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                 <div className="flex items-baseline gap-2 mt-0.5">
                   <span className="text-base font-extrabold text-amber-600 dark:text-amber-400">Rs. 33.00 – 44.50/W</span>
                 </div>
-                <span className="text-[10px] text-gray-600 dark:text-gray-400">LEFN 640W (33.00) • Jinko (41.25) • Canadian (41.60)</span>
+                <span className="text-[10px] text-gray-600 dark:text-gray-400">LEFN 640W (33.50) • Jinko 585W (39.75) • Canadian (41.25)</span>
               </div>
 
               <div className="rounded-xl bg-blue-50/60 dark:bg-blue-950/20 border border-blue-200/80 dark:border-blue-800/40 p-3.5">
@@ -1057,9 +1078,11 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                       { id: 'canadian', label: 'Canadian Solar' },
                       { id: 'jinko', label: 'Jinko Solar' },
                       { id: 'longi', label: 'LONGi' },
+                      { id: 'inverex', label: 'Inverex' },
                       { id: 'ja', label: 'JA Solar' },
                       { id: 'astronergy', label: 'Astronergy' },
                       { id: 'korean', label: 'Korean' },
+                      { id: 'aiko', label: 'Aiko (Rawat)' },
                       { id: 'osda', label: 'OSDA' },
                       { id: 'lefn', label: 'LEFN' },
                       { id: 'tcl', label: 'TCL' },
@@ -1080,11 +1103,14 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                     [
                       { id: 'all', label: 'All Inverters' },
                       { id: 'changed', label: 'Rate Changed' },
+                      { id: 'lcd', label: 'LCD Series' },
+                      { id: 'solis', label: 'Solis Plus' },
                       { id: 'goodwe', label: 'GoodWe HV/LV' },
                       { id: 'zapher', label: 'Zapher IP66' },
                       { id: 'xenon', label: 'Xenon / Xynex' },
                       { id: 'krypton', label: 'Krypton IP20' },
                       { id: 'itel', label: 'Itel Hybrid' },
+                      { id: 'inverex', label: 'Inverex' },
                       { id: 'hybrid', label: 'Hybrid' },
                       { id: 'ongrid', label: 'On-Grid' },
                     ].map((f) => (
@@ -1104,7 +1130,8 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                     [
                       { id: 'all', label: 'All Batteries' },
                       { id: 'changed', label: 'Rate Changed' },
-                      { id: 'lithium', label: 'Lithium (IP20/IP54)' },
+                      { id: 'zilo', label: 'Zilo Energy (PK 🇵🇰)' },
+                      { id: 'lithium', label: 'Lithium (IP20/IP65)' },
                       { id: 'goodwe', label: 'GoodWe HV/LV' },
                       { id: 'itel', label: 'Itel Lithium' },
                       { id: 'narada', label: 'Narada' },

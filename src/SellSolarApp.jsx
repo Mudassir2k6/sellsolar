@@ -21,6 +21,7 @@ import KeywordLandingPage, { KEYWORD_LANDING_KEYS } from './views/KeywordLanding
 import EmailContactModal from './components/EmailContactModal';
 import { applyPageSeo, parseLocation, pageToPath } from './lib/seo';
 import { getInboxMessages } from './services/inboxService';
+import { MARKET_SUMMARY } from './data/todayPricesData';
 import {
   ArrowLeft,
   ArrowRight,
@@ -280,13 +281,19 @@ function Xy({
                       className: 'animate-ticker font-semibold text-gray-300 flex items-center gap-3',
                       children: [
                         jsxs('span', { className: 'flex items-center gap-1', children: [jsx(TrendingUp, { className: 'h-3.5 w-3.5 text-primary-400' }), "LIVE RATES:"] }),
-                        jsxs('span', { className: 'text-emerald-400', children: ['🟢 Longi 585W: Rs 38.50/W'] }),
+                        jsxs('span', { className: 'text-emerald-400', children: ['🟢 JA Solar 625W: Rs 38.00/W (Deliv 30/09)'] }),
                         jsx('span', { className: 'text-gray-700', children: '|' }),
-                        jsxs('span', { className: 'text-emerald-400', children: ['🟢 Jinko 585W: Rs 40.00/W'] }),
+                        jsxs('span', { className: 'text-emerald-400', children: ['🟢 Jinko 585W: Rs 39.75/W'] }),
                         jsx('span', { className: 'text-gray-700', children: '|' }),
-                        jsxs('span', { className: 'text-amber-400', children: ['🟡 Inverex 6kW: Rs 266,000'] }),
+                        jsxs('span', { className: 'text-emerald-400', children: ['🟢 Canadian 625W: Rs 41.25/W'] }),
                         jsx('span', { className: 'text-gray-700', children: '|' }),
-                        jsxs('span', { className: 'text-emerald-400', children: ['🟢 Tubular 230Ah: Rs 51,500'] }),
+                        jsxs('span', { className: 'text-amber-400', children: ['🟡 LCD Series 6kW: Rs 195k'] }),
+                        jsx('span', { className: 'text-gray-700', children: '|' }),
+                        jsxs('span', { className: 'text-sky-400', children: ['⭕ Solis 6kW+: Rs 207k'] }),
+                        jsx('span', { className: 'text-gray-700', children: '|' }),
+                        jsxs('span', { className: 'text-emerald-400', children: ['🟢 Zilo Nexa (PK 🇵🇰): Rs 65k–580k'] }),
+                        jsx('span', { className: 'text-gray-700', children: '|' }),
+                        jsxs('span', { className: 'text-emerald-400', children: ['🟢 LEFN 640W: Rs 33.50/W'] }),
                       ]
                     })
                   ]
@@ -336,48 +343,44 @@ function Xy({
             // Brand Logo
             jsxs('button', {
               onClick: () => h('home'),
-              className: 'flex items-center gap-2 sm:gap-2.5 shrink-0 select-none cursor-pointer group text-left',
+              className: 'flex items-center gap-2.5 sm:gap-3 shrink-0 select-none cursor-pointer group text-left',
               title: "SellSolar - Pakistan's #1 Used Solar Marketplace",
               children: [
-                settings?.logoUrl
-                  ? jsx('img', {
-                      src: settings.logoUrl,
-                      alt: settings.siteTitle || 'SellSolar',
-                      className: 'h-8 sm:h-9 max-w-[140px] sm:max-w-[180px] object-contain',
-                    })
-                  : jsxs(Fragment, {
+                jsx('div', {
+                  className:
+                    'flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-2xl bg-amber-400 text-white shadow-md shadow-amber-500/25 shrink-0 group-hover:scale-105 transition-transform',
+                  children: settings?.logoUrl
+                    ? jsx('img', {
+                        src: settings.logoUrl,
+                        alt: settings.siteTitle || 'SellSolar',
+                        className: 'h-6 w-6 object-contain',
+                      })
+                    : jsx(Sun, {
+                        className: 'h-5 w-5 sm:h-5.5 sm:w-5.5 text-white',
+                        strokeWidth: 2.6,
+                      }),
+                }),
+                jsxs('div', {
+                  className: 'flex flex-col justify-center leading-tight',
+                  children: [
+                    jsxs('span', {
+                      className:
+                        'text-xl sm:text-2xl font-black tracking-tight text-gray-900 dark:text-white leading-none flex items-center',
                       children: [
-                        jsx('div', {
-                          className:
-                            'flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl bg-amber-400 text-white shadow-md shadow-amber-500/20 shrink-0 group-hover:scale-105 transition-transform',
-                          children: jsx(Sun, {
-                            className: 'h-4.5 w-4.5 sm:h-5 sm:w-5 text-white',
-                            strokeWidth: 2.6,
-                          }),
-                        }),
-                        jsxs('div', {
-                          className: 'flex flex-col justify-center leading-tight',
-                          children: [
-                            jsxs('span', {
-                              className:
-                                'text-lg sm:text-xl font-black tracking-tight text-gray-900 dark:text-white leading-none',
-                              children: [
-                                'Sell',
-                                jsx('span', {
-                                  className: 'text-amber-500',
-                                  children: 'Solar',
-                                }),
-                              ],
-                            }),
-                            jsx('span', {
-                              className:
-                                'hidden 2xl:block text-[9px] font-bold text-gray-500 dark:text-gray-400 tracking-tight leading-none mt-0.5 max-w-[210px] truncate',
-                              children: "Pakistan's #1 Used Solar Marketplace",
-                            }),
-                          ],
+                        'Sell',
+                        jsx('span', {
+                          className: 'text-amber-500',
+                          children: 'Solar',
                         }),
                       ],
                     }),
+                    jsx('span', {
+                      className:
+                        'block text-[11px] sm:text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-tight leading-none mt-1 whitespace-nowrap',
+                      children: settings?.headerTagline || "Pakistan's #1 Used Solar Marketplace",
+                    }),
+                  ],
+                }),
               ],
             }),
 
@@ -909,7 +912,7 @@ function Xy({
                               jsx('p', {
                                 className:
                                   'text-xs text-gray-500 dark:text-gray-400 mt-0.5',
-                                children: "Pakistan's #1 Used Solar Marketplace",
+                                children: settings?.headerTagline || "Pakistan's #1 Used Solar Marketplace",
                               }),
                             ],
                           }),
@@ -1327,7 +1330,7 @@ function Xy({
                         className: 'flex items-center justify-center gap-1.5 text-xs font-bold text-gray-700 dark:text-gray-300',
                         children: [
                           jsx(BadgeCheck, { className: 'h-4 w-4 text-amber-500 shrink-0' }),
-                          jsx('span', { children: "Pakistan's #1 Used Solar Marketplace" }),
+                          jsx('span', { children: settings?.headerTagline || "Pakistan's #1 Used Solar Marketplace" }),
                         ],
                       }),
                       jsx('p', {
@@ -1506,7 +1509,7 @@ function nx({
                   np?jsxs("button",{
                     onClick:np,className:"inline-flex items-center gap-1 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/60 px-2.5 py-1 text-[11px] font-bold text-amber-800 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/60 transition-all shadow-2xs cursor-pointer",children:[
                       jsx(Zap,{ className:"h-3 w-3 fill-amber-500 text-amber-500" }),
-                      "Today's Rates (Rs 34-42/W)",
+                      "Today's Rates (" + (MARKET_SUMMARY?.panelsPerWattAvg || "Rs 33.50 – 43.50 / W") + ")",
                       jsx(ArrowRight,{ className:"h-2.5 w-2.5" })
                     ]
                   }):null,
@@ -1724,7 +1727,7 @@ function nx({
                   },
                   {
                     label: "Daily Rates",
-                    sub: "Rs 34-42/W Live",
+                    sub: (MARKET_SUMMARY?.panelsPerWattAvg ? `${MARKET_SUMMARY.panelsPerWattAvg} Live` : "Rs 33.50 – 43.50/W Live"),
                     icon: TrendingUp,
                     action: np || (() => {
                       const el = document.getElementById("daily-market-rates");
@@ -2485,7 +2488,7 @@ function hx({
                   /* Primary Slogan & Tagline */
                   jsx("h3", {
                     className: "mt-4 text-base sm:text-lg font-black text-white tracking-tight leading-snug",
-                    children: "Pakistan's #1 Used Solar Marketplace"
+                    children: settings?.headerTagline || "Pakistan's #1 Used Solar Marketplace"
                   }),
                   jsx("p", {
                     className: "mt-1.5 text-xs sm:text-sm text-gray-300 font-medium leading-relaxed",

@@ -419,6 +419,15 @@ export default function AuthPage({ onSuccess, onBack, onForgotPassword, initialV
     }, 100);
   }, [initialView]);
 
+  useEffect(() => {
+    if (view === 'signup') {
+      const timer = setTimeout(() => {
+        fullNameRef.current?.focus();
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [view]);
+
   const clearSignupFields = () => {
     setAccountType('individual');
     setShowPassword(false);
@@ -1159,6 +1168,7 @@ export default function AuthPage({ onSuccess, onBack, onForgotPassword, initialV
                     id="signup-fullname-input"
                     label="Full Name"
                     required
+                    autoFocus
                     value={fullName}
                     onChange={(e) => {
                       setFullName(e.target.value);

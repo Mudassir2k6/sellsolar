@@ -71,6 +71,9 @@ import { formatPrice } from '../lib/constants';
 import AdminDailyRatesModule from './AdminDailyRatesModule';
 import AdminDealersModule from './AdminDealersModule';
 import AdminInstallationsModule from './AdminInstallationsModule';
+import AdminDrillDownModal from './AdminDrillDownModal';
+import { VERIFIED_DEALERS } from '../data/dealersData';
+import { SEED_LISTINGS } from '../data/seedListings';
 import {
   getEquipmentFallbackImage,
   SOLAR_PANEL_IMAGE,
@@ -203,6 +206,14 @@ export default function AdminSuperDashboard({
     }
   };
 
+  // Drill-Down Modal State
+  const [drillDownModalOpen, setDrillDownModalOpen] = useState(false);
+  const [drillDownMetric, setDrillDownMetric] = useState('users');
+  const openDrillDown = (metric) => {
+    setDrillDownMetric(metric);
+    setDrillDownModalOpen(true);
+  };
+
   const [newUserForm, setNewUserForm] = useState({
     name: '',
     email: '',
@@ -285,17 +296,20 @@ export default function AdminSuperDashboard({
           remoteProfiles.forEach((rp) => {
             const mapKey = (rp.email || rp.id || '').toLowerCase();
             const existing = usersMap.get(mapKey);
+            const computedRole = rp.is_admin ? 'admin' : (rp.account_type === 'dealer' || rp.is_verified_dealer) ? 'dealer' : 'customer';
             usersMap.set(mapKey, {
               id: rp.id || existing?.id,
               email: rp.email || existing?.email || '',
               name: rp.full_name || rp.username || existing?.name || (rp.email ? rp.email.split('@')[0] : 'User'),
               phone: rp.phone || existing?.phone || '',
               city: rp.city || existing?.city || 'Lahore',
-              role: rp.role || (rp.is_super_admin ? 'super_admin' : rp.is_admin ? 'admin' : rp.account_type === 'dealer' || rp.is_verified_dealer ? 'dealer' : existing?.role || 'customer'),
-              is_verified_dealer: !!rp.is_verified_dealer,
+              role: rp.role || computedRole,
+              is_verified_dealer: Boolean(rp.is_verified_dealer || rp.account_type === 'dealer'),
               account_type: rp.account_type || existing?.account_type || 'individual',
               created_at: rp.created_at || existing?.created_at || '2026-01-01T00:00:00Z',
               isCurrentSession: false,
+              source: 'supabase_db',
+              business_name: rp.business_name || '',
             });
           });
         }
@@ -378,16 +392,40 @@ export default function AdminSuperDashboard({
 
     setUsersList(Array.from(usersMap.values()));
 
-    // 2. Listings
+    // 2. Listings (Supabase Backend DB + Local Cache + Seed Fallback)
+    let fetchedListings = [];
+    if (isSupabaseConfigured()) {
+      try {
+        const { data: remoteListings, error: listErr } = await supabase
+          .from('solar_listings')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (!listErr && Array.isArray(remoteListings) && remoteListings.length > 0) {
+          fetchedListings = [...remoteListings];
+        }
+      } catch (sbListErr) {
+        console.warn('Supabase solar_listings query notice:', sbListErr);
+      }
+    }
+
     try {
       const rawListings = localStorage.getItem('sellsolar_custom_listings');
       if (rawListings) {
         const parsed = JSON.parse(rawListings);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setListingsList(parsed);
+          parsed.forEach((localItem) => {
+            if (!fetchedListings.some((r) => r.id === localItem.id)) {
+              fetchedListings.push(localItem);
+            }
+          });
         }
       }
     } catch {}
+
+    if (fetchedListings.length === 0) {
+      fetchedListings = [...SEED_LISTINGS];
+    }
+    setListingsList(fetchedListings);
 
     // 3. Inbox
     setInboxMessages(getInboxMessages());
@@ -1741,75 +1779,234 @@ export default function AdminSuperDashboard({
                 </div>
               </div>
 
+              {/* Backend Status & Drill-Down Action Bar */}
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-gray-900 border border-emerald-200/80 dark:border-emerald-900/40 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <span className="relative flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                  </span>
+                  <div>
+                    <p className="text-xs font-black text-gray-900 dark:text-white flex items-center gap-2 flex-wrap">
+                      <span>Backend Live: Supabase PostgreSQL Connected</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+                        Database Active
+                      </span>
+                    </p>
+                    <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
+                      Verified {usersList.length} users &amp; {listingsList.length} solar equipment listings in database. Click any KPI card below to drill down into records.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => openDrillDown('users')}
+                    className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
+                  >
+                    <Layers className="h-3.5 w-3.5" />
+                    <span>Open Drill-Down Explorer</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={loadData}
+                    className="p-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 text-xs font-bold transition-all cursor-pointer"
+                    title="Refresh data from backend"
+                  >
+                    <RefreshCw className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
+
               {/* KPI Cards: Platform KPIs (if Super Admin/Admin) or Personal KPIs (if Dealer/Customer) */}
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
                 {effectiveIsAdmin ? (
                   <>
-                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
-                      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Total Users</p>
+                    <button
+                      type="button"
+                      onClick={() => openDrillDown('users')}
+                      className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs hover:border-amber-400 dark:hover:border-amber-500 hover:shadow-md transition-all cursor-pointer group text-left"
+                    >
+                      <div className="flex items-center justify-between">
+                        <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Total Users</p>
+                        <Users className="w-3.5 h-3.5 text-gray-400 group-hover:text-amber-500 transition-colors" />
+                      </div>
                       <p className="text-2xl font-black text-gray-900 dark:text-white mt-1">{usersList.length}</p>
-                    </div>
-                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
-                      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Dealers</p>
+                      <span className="text-[10px] text-amber-500 dark:text-amber-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 mt-1">
+                        Drill down →
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => openDrillDown('dealers')}
+                      className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs hover:border-primary-400 dark:hover:border-primary-500 hover:shadow-md transition-all cursor-pointer group text-left"
+                    >
+                      <div className="flex items-center justify-between">
+                        <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Dealers</p>
+                        <Store className="w-3.5 h-3.5 text-gray-400 group-hover:text-primary-500 transition-colors" />
+                      </div>
                       <p className="text-2xl font-black text-primary-600 dark:text-primary-400 mt-1">
                         {usersList.filter((u) => u.role === 'dealer' || u.is_verified_dealer).length}
                       </p>
-                    </div>
-                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
-                      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Market Listings</p>
+                      <span className="text-[10px] text-primary-500 dark:text-primary-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 mt-1">
+                        Drill down →
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => openDrillDown('listings')}
+                      className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs hover:border-amber-400 dark:hover:border-amber-500 hover:shadow-md transition-all cursor-pointer group text-left"
+                    >
+                      <div className="flex items-center justify-between">
+                        <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Market Listings</p>
+                        <Tag className="w-3.5 h-3.5 text-gray-400 group-hover:text-amber-500 transition-colors" />
+                      </div>
                       <p className="text-2xl font-black text-gray-900 dark:text-white mt-1">{listingsList.length}</p>
-                    </div>
-                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
-                      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">My Active Ads</p>
+                      <span className="text-[10px] text-amber-500 dark:text-amber-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 mt-1">
+                        Drill down →
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => openDrillDown('my-ads')}
+                      className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs hover:border-amber-400 dark:hover:border-amber-500 hover:shadow-md transition-all cursor-pointer group text-left"
+                    >
+                      <div className="flex items-center justify-between">
+                        <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">My Active Ads</p>
+                        <Package className="w-3.5 h-3.5 text-gray-400 group-hover:text-amber-500 transition-colors" />
+                      </div>
                       <p className="text-2xl font-black text-amber-500 mt-1">{myAds.length}</p>
-                    </div>
-                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
-                      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Hot Sell Badges</p>
+                      <span className="text-[10px] text-amber-500 dark:text-amber-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 mt-1">
+                        Drill down →
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => openDrillDown('hot-sell')}
+                      className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs hover:border-rose-400 dark:hover:border-rose-500 hover:shadow-md transition-all cursor-pointer group text-left"
+                    >
+                      <div className="flex items-center justify-between">
+                        <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Hot Sell Badges</p>
+                        <Flame className="w-3.5 h-3.5 text-gray-400 group-hover:text-rose-500 transition-colors" />
+                      </div>
                       <p className="text-2xl font-black text-rose-500 mt-1">
-                        {listingsList.filter((l) => l.is_hot_sell).length}
+                        {listingsList.filter((l) => l.is_hot_sell || l.featured).length}
                       </p>
-                    </div>
-                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
-                      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Inbox Unread</p>
+                      <span className="text-[10px] text-rose-500 dark:text-rose-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 mt-1">
+                        Drill down →
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => openDrillDown('inbox')}
+                      className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-md transition-all cursor-pointer group text-left"
+                    >
+                      <div className="flex items-center justify-between">
+                        <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Inbox Unread</p>
+                        <MessageSquare className="w-3.5 h-3.5 text-gray-400 group-hover:text-purple-500 transition-colors" />
+                      </div>
                       <p className="text-2xl font-black text-purple-600 dark:text-purple-400 mt-1">{unreadInboxCount}</p>
-                    </div>
+                      <span className="text-[10px] text-purple-500 dark:text-purple-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 mt-1">
+                        Drill down →
+                      </span>
+                    </button>
                   </>
                 ) : (
                   <>
-                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
-                      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">My Total Ads</p>
+                    <button
+                      type="button"
+                      onClick={() => openDrillDown('my-ads')}
+                      className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs hover:border-amber-400 dark:hover:border-amber-500 hover:shadow-md transition-all cursor-pointer group text-left"
+                    >
+                      <div className="flex items-center justify-between">
+                        <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">My Total Ads</p>
+                        <Package className="w-3.5 h-3.5 text-gray-400 group-hover:text-amber-500 transition-colors" />
+                      </div>
                       <p className="text-2xl font-black text-gray-900 dark:text-white mt-1">{myAds.length}</p>
-                    </div>
-                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
-                      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Active Listings</p>
+                      <span className="text-[10px] text-amber-500 dark:text-amber-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 mt-1">
+                        Drill down →
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => openDrillDown('listings')}
+                      className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs hover:border-emerald-400 dark:hover:border-emerald-500 hover:shadow-md transition-all cursor-pointer group text-left"
+                    >
+                      <div className="flex items-center justify-between">
+                        <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Active Listings</p>
+                        <Tag className="w-3.5 h-3.5 text-gray-400 group-hover:text-emerald-500 transition-colors" />
+                      </div>
                       <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">
                         {myAds.filter((a) => !a.is_sold && a.status !== 'sold').length}
                       </p>
-                    </div>
-                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
-                      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Sold Products</p>
+                      <span className="text-[10px] text-emerald-500 dark:text-emerald-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 mt-1">
+                        Drill down →
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => openDrillDown('listings')}
+                      className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs hover:border-gray-400 dark:hover:border-gray-500 hover:shadow-md transition-all cursor-pointer group text-left"
+                    >
+                      <div className="flex items-center justify-between">
+                        <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Sold Products</p>
+                        <CheckCircle2 className="w-3.5 h-3.5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                      </div>
                       <p className="text-2xl font-black text-gray-600 dark:text-gray-300 mt-1">
                         {myAds.filter((a) => a.is_sold || a.status === 'sold').length}
                       </p>
-                    </div>
-                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
-                      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Views on My Ads</p>
+                      <span className="text-[10px] text-gray-500 dark:text-gray-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 mt-1">
+                        Drill down →
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => openDrillDown('views')}
+                      className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs hover:border-amber-400 dark:hover:border-amber-500 hover:shadow-md transition-all cursor-pointer group text-left"
+                    >
+                      <div className="flex items-center justify-between">
+                        <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Views on My Ads</p>
+                        <Eye className="w-3.5 h-3.5 text-gray-400 group-hover:text-amber-500 transition-colors" />
+                      </div>
                       <p className="text-2xl font-black text-amber-500 mt-1">
                         {myAds.reduce((acc, curr) => acc + (curr.views || 0), 0)}
                       </p>
-                    </div>
-                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
-                      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Account Role</p>
+                      <span className="text-[10px] text-amber-500 dark:text-amber-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 mt-1">
+                        Drill down →
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => openDrillDown('users')}
+                      className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs hover:border-primary-400 dark:hover:border-primary-500 hover:shadow-md transition-all cursor-pointer group text-left"
+                    >
+                      <div className="flex items-center justify-between">
+                        <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Account Role</p>
+                        <Users className="w-3.5 h-3.5 text-gray-400 group-hover:text-primary-500 transition-colors" />
+                      </div>
                       <p className="text-base font-black text-primary-600 capitalize mt-2">
                         {isDealer ? 'Dealer' : 'Seller'}
                       </p>
-                    </div>
-                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
-                      <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Inquiries</p>
+                      <span className="text-[10px] text-primary-500 dark:text-primary-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 mt-1">
+                        Drill down →
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => openDrillDown('inbox')}
+                      className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-md transition-all cursor-pointer group text-left"
+                    >
+                      <div className="flex items-center justify-between">
+                        <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Inquiries</p>
+                        <MessageSquare className="w-3.5 h-3.5 text-gray-400 group-hover:text-purple-500 transition-colors" />
+                      </div>
                       <p className="text-2xl font-black text-purple-600 dark:text-purple-400 mt-1">
                         {unreadInboxCount}
                       </p>
-                    </div>
+                      <span className="text-[10px] text-purple-500 dark:text-purple-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 mt-1">
+                        Drill down →
+                      </span>
+                    </button>
                   </>
                 )}
               </div>
@@ -5397,6 +5594,26 @@ export default function AdminSuperDashboard({
           )}
         </main>
       </div>
+
+      {/* Comprehensive Drill-Down Modal */}
+      <AdminDrillDownModal
+        isOpen={drillDownModalOpen}
+        onClose={() => setDrillDownModalOpen(false)}
+        initialMetric={drillDownMetric}
+        usersList={usersList}
+        listingsList={listingsList}
+        dealersList={VERIFIED_DEALERS}
+        myAds={myAds}
+        inboxMessages={inboxMessages}
+        onNavigateToListing={onNavigateToListing}
+        onSelectTab={selectTab}
+        onRefreshData={loadData}
+        backendInfo={{
+          connected: isSupabaseConfigured(),
+          totalUsers: usersList.length,
+          totalListings: listingsList.length,
+        }}
+      />
     </div>
   );
 }

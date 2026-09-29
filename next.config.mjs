@@ -12,16 +12,14 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  transpilePackages: ['lucide-react'],
   serverExternalPackages: ['@supabase/supabase-js'],
-  reactStrictMode: true,
-  trailingSlash: false,
-  outputFileTracingRoot: __dirname,
-  compiler: {
-    removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
-  },
   experimental: {
     optimizePackageImports: ['lucide-react'],
+  },
+  reactStrictMode: true,
+  trailingSlash: false,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
   },
 };
 

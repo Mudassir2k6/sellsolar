@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   Calculator,
   RotateCcw,
+  ChevronLeft,
   ChevronRight,
   ChevronDown,
   ChevronUp,
@@ -39,6 +40,114 @@ import {
 import { getPakistanDateDetails } from '../lib/dateUtils';
 import { formatPrice } from '../lib/constants';
 
+function PaginationControls({
+  currentPage,
+  totalPages,
+  totalItems,
+  pageSize,
+  onPageChange,
+  targetScrollId,
+  itemLabel = 'items',
+}) {
+  if (totalItems <= pageSize) return null;
+
+  const startIdx = (currentPage - 1) * pageSize + 1;
+  const endIdx = Math.min(currentPage * pageSize, totalItems);
+
+  const getPageNumbers = () => {
+    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+    if (currentPage <= 4) return [1, 2, 3, 4, 5, '...', totalPages];
+    if (currentPage >= totalPages - 3) return [1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+    return [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
+  };
+
+  const handlePageClick = (page) => {
+    if (page < 1 || page > totalPages || page === currentPage) return;
+    onPageChange(page);
+    if (targetScrollId && typeof document !== 'undefined') {
+      const el = document.getElementById(targetScrollId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  };
+
+  const pages = getPageNumbers();
+
+  return (
+    <div className="p-3.5 sm:p-4 bg-gray-50/90 dark:bg-gray-800/60 border-t border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-3 flex-wrap">
+      {/* Items count summary */}
+      <div className="text-xs text-gray-500 dark:text-gray-400 font-medium text-center sm:text-left">
+        Showing <span className="font-bold text-gray-900 dark:text-white">{startIdx}</span> to{' '}
+        <span className="font-bold text-gray-900 dark:text-white">{endIdx}</span> of{' '}
+        <span className="font-bold text-gray-900 dark:text-white">{totalItems}</span> {itemLabel}
+        <span className="hidden xs:inline"> • Page <span className="font-bold text-gray-900 dark:text-white">{currentPage}</span> of <span className="font-bold text-gray-900 dark:text-white">{totalPages}</span></span>
+      </div>
+
+      {/* Navigation buttons: Previous, Page Numbers, Next */}
+      <div className="flex items-center gap-1.5 flex-wrap justify-center">
+        {/* Previous Button */}
+        <button
+          type="button"
+          onClick={() => handlePageClick(currentPage - 1)}
+          disabled={currentPage <= 1}
+          aria-label="Previous Page"
+          className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+            currentPage <= 1
+              ? 'text-gray-400 dark:text-gray-600 bg-gray-100/60 dark:bg-gray-800/30 cursor-not-allowed border border-gray-200/50 dark:border-gray-800/60'
+              : 'text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-900 hover:bg-amber-50 dark:hover:bg-amber-950/40 hover:text-amber-700 dark:hover:text-amber-300 border border-gray-300 dark:border-gray-700 shadow-2xs cursor-pointer active:scale-95'
+          }`}
+        >
+          <ChevronLeft className="h-3.5 w-3.5" />
+          <span>Previous</span>
+        </button>
+
+        {/* Page Numbers */}
+        <div className="flex items-center gap-1">
+          {pages.map((p, idx) =>
+            p === '...' ? (
+              <span key={`ellipsis-${idx}`} className="px-1.5 text-xs font-bold text-gray-400 dark:text-gray-500 select-none">
+                …
+              </span>
+            ) : (
+              <button
+                key={`page-btn-${p}`}
+                type="button"
+                onClick={() => handlePageClick(p)}
+                aria-label={`Page ${p}`}
+                aria-current={p === currentPage ? 'page' : undefined}
+                className={`h-7 min-w-7 px-2 flex items-center justify-center rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  p === currentPage
+                    ? 'bg-amber-500 text-slate-950 shadow-xs ring-1 ring-amber-500 font-extrabold'
+                    : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-amber-50 dark:hover:bg-amber-950/40 hover:text-amber-700 dark:hover:text-amber-300 border border-gray-200 dark:border-gray-700 active:scale-95'
+                }`}
+              >
+                {p}
+              </button>
+            )
+          )}
+        </div>
+
+        {/* Next Button */}
+        <button
+          type="button"
+          onClick={() => handlePageClick(currentPage + 1)}
+          disabled={currentPage >= totalPages}
+          aria-label="Next Page"
+          className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+            currentPage >= totalPages
+              ? 'text-gray-400 dark:text-gray-600 bg-gray-100/60 dark:bg-gray-800/30 cursor-not-allowed border border-gray-200/50 dark:border-gray-800/60'
+              : 'text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-900 hover:bg-amber-50 dark:hover:bg-amber-950/40 hover:text-amber-700 dark:hover:text-amber-300 border border-gray-300 dark:border-gray-700 shadow-2xs cursor-pointer active:scale-95'
+          }`}
+        >
+          <span>Next</span>
+          <ChevronRight className="h-3.5 w-3.5" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
   const pktDateInfo = useMemo(() => getPakistanDateDetails(), []);
   const todayDateLabel = pktDateInfo.shortDate; // e.g. "11-Sep-2026"
@@ -57,9 +166,9 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
   const [sheetFilterStatus, setSheetFilterStatus] = useState('all');
   const [sheetMobileView, setSheetMobileView] = useState('cards'); // 'cards' | 'table'
 
-  // Compact limit toggles to prevent infinite scrolling
-  const [isExpandedSheet, setIsExpandedSheet] = useState(false);
-  const [isExpandedCatalog, setIsExpandedCatalog] = useState(false);
+  // Pagination state for Daily Rate Sheet & Catalog
+  const [sheetCurrentPage, setSheetCurrentPage] = useState(1);
+  const [catalogCurrentPage, setCatalogCurrentPage] = useState(1);
   const [isExpandedGuide, setIsExpandedGuide] = useState(false);
 
   // Synchronized category selector ensuring top filter tabs, daily rate sheet, and product catalog update in unison
@@ -69,8 +178,8 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
     setSelectedBrand('');
     setSheetFilterStatus('all');
     setSheetSearchQuery('');
-    setIsExpandedSheet(false);
-    setIsExpandedCatalog(false);
+    setSheetCurrentPage(1);
+    setCatalogCurrentPage(1);
   };
 
   // Calculator state removed — full calculator lives at /calculator
@@ -331,7 +440,23 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
     });
   }, [dailySheetDate, sheetCategory, sheetFilterStatus, sheetSearchQuery]);
 
+  // Pagination calculations for Daily Rate Sheet (Wholesale Trade Sheet)
+  const sheetPageSize = 10;
+  const totalSheetPages = Math.max(1, Math.ceil(displayedSheetRates.length / sheetPageSize));
+  const safeSheetPage = Math.min(sheetCurrentPage, totalSheetPages);
+  const paginatedSheetRates = useMemo(() => {
+    const start = (safeSheetPage - 1) * sheetPageSize;
+    return displayedSheetRates.slice(start, start + sheetPageSize);
+  }, [displayedSheetRates, safeSheetPage, sheetPageSize]);
 
+  // Pagination calculations for Product Catalog
+  const catalogPageSize = 9;
+  const totalCatalogPages = Math.max(1, Math.ceil(filteredItems.length / catalogPageSize));
+  const safeCatalogPage = Math.min(catalogCurrentPage, totalCatalogPages);
+  const paginatedCatalogItems = useMemo(() => {
+    const start = (safeCatalogPage - 1) * catalogPageSize;
+    return filteredItems.slice(start, start + catalogPageSize);
+  }, [filteredItems, safeCatalogPage, catalogPageSize]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-20 pt-20 text-gray-900 dark:text-gray-100 transition-colors">
@@ -1174,7 +1299,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                       No matching items found in daily {sheetCategory === 'all' ? 'solar' : sheetCategory} rate sheet.
                     </div>
                   ) : (
-                    (isExpandedSheet ? displayedSheetRates : displayedSheetRates.slice(0, 8)).map((item, idx) => {
+                    paginatedSheetRates.map((item, idx) => {
                       const itemCat = item.itemCategory || sheetCategory;
 
                       // Panel Card
@@ -1692,7 +1817,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                         </td>
                       </tr>
                     ) : (
-                      (isExpandedSheet ? displayedSheetRates : displayedSheetRates.slice(0, 8)).map((item, idx) => {
+                      paginatedSheetRates.map((item, idx) => {
                         const itemCat = item.itemCategory || sheetCategory;
 
                         // 1. Panel row
@@ -2247,25 +2372,16 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
               </div>
               </div>
 
-              {/* Compact Limit Expand / Collapse Bar */}
-              {displayedSheetRates.length > 8 && (
-                <div className="p-3 bg-gray-50/90 dark:bg-gray-800/60 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between flex-wrap gap-2">
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
-                    Showing <span className="font-bold text-gray-900 dark:text-white">{isExpandedSheet ? displayedSheetRates.length : Math.min(8, displayedSheetRates.length)}</span> of <span className="font-bold text-gray-900 dark:text-white">{displayedSheetRates.length}</span> items in {sheetCategory === 'all' ? 'All Rates' : sheetCategory}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setIsExpandedSheet(!isExpandedSheet)}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-gray-900 hover:bg-amber-50 dark:hover:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-700/80 shadow-2xs transition-all cursor-pointer"
-                  >
-                    {isExpandedSheet ? (
-                      <>Show Top 8 Popular Only <ChevronUp className="h-3.5 w-3.5 text-amber-500" /></>
-                    ) : (
-                      <>View All {displayedSheetRates.length} Items ({displayedSheetRates.length - 8} more) <ChevronDown className="h-3.5 w-3.5 text-amber-500" /></>
-                    )}
-                  </button>
-                </div>
-              )}
+              {/* Pagination Controls for Daily Rate Sheet */}
+              <PaginationControls
+                currentPage={safeSheetPage}
+                totalPages={totalSheetPages}
+                totalItems={displayedSheetRates.length}
+                pageSize={sheetPageSize}
+                onPageChange={setSheetCurrentPage}
+                targetScrollId="live-rate-sheet"
+                itemLabel={`items in ${sheetCategory === 'all' ? 'All Rates' : sheetCategory}`}
+              />
             </div>
           )}
 
@@ -2441,7 +2557,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         ) : viewMode === 'grid' ? (
           <div>
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {(isExpandedCatalog ? filteredItems : filteredItems.slice(0, 9)).map((item) => (
+              {paginatedCatalogItems.map((item) => (
                 <PriceCard
                   key={item.id}
                   item={item}
@@ -2455,21 +2571,18 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                 />
               ))}
             </div>
-            {filteredItems.length > 9 && (
-              <div className="mt-6 text-center">
-                <button
-                  type="button"
-                  onClick={() => setIsExpandedCatalog(!isExpandedCatalog)}
-                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs sm:text-sm bg-white dark:bg-gray-900 hover:bg-amber-50 dark:hover:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-700 shadow-2xs transition-all cursor-pointer"
-                >
-                  {isExpandedCatalog ? (
-                    <>Show Top 9 Products Only <ChevronUp className="h-4 w-4 text-amber-500" /></>
-                  ) : (
-                    <>View All {filteredItems.length} Products ({filteredItems.length - 9} More) <ChevronDown className="h-4 w-4 text-amber-500" /></>
-                  )}
-                </button>
-              </div>
-            )}
+            {/* Pagination Controls for Catalog Grid */}
+            <div className="mt-6 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-xs">
+              <PaginationControls
+                currentPage={safeCatalogPage}
+                totalPages={totalCatalogPages}
+                totalItems={filteredItems.length}
+                pageSize={catalogPageSize}
+                onPageChange={setCatalogCurrentPage}
+                targetScrollId="catalog-results"
+                itemLabel="solar products"
+              />
+            </div>
           </div>
         ) : (
           <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-200">
@@ -2489,7 +2602,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {(isExpandedCatalog ? filteredItems : filteredItems.slice(0, 9)).map((item) => (
+                  {paginatedCatalogItems.map((item) => (
                     <tr key={item.id} className="hover:bg-gray-50/80 transition-colors">
                       <td className="px-5 py-4">
                         <div className="font-bold text-gray-900">{item.model}</div>
@@ -2568,21 +2681,16 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                 </tbody>
               </table>
             </div>
-            {filteredItems.length > 9 && (
-              <div className="p-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800 text-center">
-                <button
-                  type="button"
-                  onClick={() => setIsExpandedCatalog(!isExpandedCatalog)}
-                  className="inline-flex items-center gap-2 px-6 py-2 rounded-xl font-bold text-xs bg-white dark:bg-gray-900 hover:bg-amber-50 dark:hover:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-700 shadow-2xs transition-all cursor-pointer"
-                >
-                  {isExpandedCatalog ? (
-                    <>Show Top 9 Products Only <ChevronUp className="h-4 w-4 text-amber-500" /></>
-                  ) : (
-                    <>View All {filteredItems.length} Products ({filteredItems.length - 9} More) <ChevronDown className="h-4 w-4 text-amber-500" /></>
-                  )}
-                </button>
-              </div>
-            )}
+            {/* Pagination Controls for Catalog Table */}
+            <PaginationControls
+              currentPage={safeCatalogPage}
+              totalPages={totalCatalogPages}
+              totalItems={filteredItems.length}
+              pageSize={catalogPageSize}
+              onPageChange={setCatalogCurrentPage}
+              targetScrollId="catalog-results"
+              itemLabel="solar products"
+            />
           </div>
         )}
           </>

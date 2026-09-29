@@ -1,7 +1,7 @@
 export const CATEGORIES = {
-  panel: 'Solar Panels',
-  inverter: 'Inverters',
-  battery: 'Batteries',
+  panel: 'Solar Plates / Panels',
+  inverter: 'Solar Inverters',
+  battery: 'Solar Batteries',
   complete_system: 'Complete Systems',
   ess: 'Energy Storage (ESS)',
   structure_accessories: 'Structures & Accessories',

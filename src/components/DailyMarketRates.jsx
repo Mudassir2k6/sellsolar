@@ -633,10 +633,10 @@ export default function DailyMarketRates({ onNavigate, onSelectCategory, compact
                   </span>
                 </div>
                 <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
-                  National Solar Equipment Market Rates
+                  Solar Plates, Inverters & Batteries Market Rates Today
                 </h2>
                 <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mt-1 max-w-2xl">
-                  Daily wholesale trade benchmarks for standard 550W Tier-1 panels, hybrid inverters, and lithium/tubular battery types across Pakistan.
+                  Daily wholesale benchmarks for Tier-1 solar plates (550W, 585W, 645W), hybrid inverters (3kW–10kW), and lithium / tubular solar batteries across Pakistan.
                 </p>
               </div>
 

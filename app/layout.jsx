@@ -12,9 +12,9 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 const SITE_URL = 'https://sellsolar.pk';
-const TITLE = 'Solar Price, Used Solar & Inverters Pakistan | SellSolar';
+const TITLE = 'Solar Plates Price in Pakistan, Inverters & Solar Batteries | SellSolar';
 const DESCRIPTION =
-  'Sell & buy used solar panels, inverters and batteries in Pakistan. Check solar price today and find verified sellers in Lahore, Karachi and Islamabad.';
+  "Pakistan's #1 solar marketplace. Check daily solar plate price in Pakistan, live solar panel rates per watt, solar inverters & batteries. Buy and sell new or used solar plates, inverters, and complete systems.";
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),
@@ -24,13 +24,30 @@ export const metadata = {
   },
   description: DESCRIPTION,
   keywords: [
-    'solar Pakistan',
-    'solar price Pakistan',
-    'used solar',
-    'used solar panels',
+    'solar plates',
+    'solar plate price in Pakistan',
+    'solar plate',
+    'solar plates rate today',
+    'solar panel price Pakistan',
     'solar inverter price',
+    'solar invertor Pakistan',
     'solar batteries',
-    'lithium battery Pakistan',
+    'solar battries',
+    'lithium battery for solar',
+    'tubular battery Pakistan',
+    'solar price today',
+    'solar plates Lahore',
+    'solar plates Karachi',
+    'solar plates Islamabad',
+    'solar system price in Pakistan',
+    'used solar plates',
+    'used solar panels',
+    'used solar Pakistan',
+    'Tier 1 solar plates',
+    'Longi solar plate price',
+    'Jinko solar plates',
+    'Canadian solar plates',
+    'Inverex inverter price',
     'sell solar',
     'buy solar',
     'solar marketplace Pakistan',

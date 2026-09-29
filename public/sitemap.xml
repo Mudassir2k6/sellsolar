@@ -4,55 +4,67 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://sellsolar.pk/</loc>
-    <lastmod>2026-09-16</lastmod>
+    <lastmod>2026-09-29</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="en-PK" href="https://sellsolar.pk/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://sellsolar.pk/" />
     <image:image>
       <image:loc>https://sellsolar.pk/og-image.jpg</image:loc>
-      <image:title>SellSolar Pakistan Solar Marketplace</image:title>
+      <image:title>SellSolar Pakistan Solar Plates, Inverters &amp; Batteries Marketplace</image:title>
     </image:image>
   </url>
   <url>
-    <loc>https://sellsolar.pk/solar-price</loc>
-    <lastmod>2026-09-16</lastmod>
+    <loc>https://sellsolar.pk/prices</loc>
+    <lastmod>2026-09-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.99</priority>
+  </url>
+  <url>
+    <loc>https://sellsolar.pk/solar-plates</loc>
+    <lastmod>2026-09-29</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.98</priority>
   </url>
   <url>
-    <loc>https://sellsolar.pk/prices</loc>
-    <lastmod>2026-09-16</lastmod>
+    <loc>https://sellsolar.pk/solar-price</loc>
+    <lastmod>2026-09-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.98</priority>
+  </url>
+  <url>
+    <loc>https://sellsolar.pk/solar-panels</loc>
+    <lastmod>2026-09-29</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.97</priority>
   </url>
   <url>
-    <loc>https://sellsolar.pk/used-solar</loc>
-    <lastmod>2026-09-16</lastmod>
+    <loc>https://sellsolar.pk/solar-inverter</loc>
+    <lastmod>2026-09-29</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.96</priority>
   </url>
   <url>
-    <loc>https://sellsolar.pk/solar-inverter</loc>
-    <lastmod>2026-09-16</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.95</priority>
-  </url>
-  <url>
     <loc>https://sellsolar.pk/solar-batteries</loc>
-    <lastmod>2026-09-16</lastmod>
+    <lastmod>2026-09-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.96</priority>
+  </url>
+  <url>
+    <loc>https://sellsolar.pk/used-solar</loc>
+    <lastmod>2026-09-29</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
   </url>
   <url>
-    <loc>https://sellsolar.pk/solar-panels</loc>
-    <lastmod>2026-09-16</lastmod>
+    <loc>https://sellsolar.pk/verification</loc>
+    <lastmod>2026-09-29</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.95</priority>
   </url>
   <url>
     <loc>https://sellsolar.pk/calculator</loc>
-    <lastmod>2026-09-16</lastmod>
+    <lastmod>2026-09-29</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.93</priority>
   </url>

@@ -1416,13 +1416,14 @@ function nx({
   }, []);
 
   const popularSearches = [
+    "Solar Plates Price",
+    "550W Solar Plates",
+    "Solar Inverter",
+    "Lithium Battery",
     "Longi 585W",
     "Inverex 6kW",
-    "Canadian Solar TopCon",
-    "Crown 3.2kW",
-    "Narada 48V",
-    "10kW On-Grid",
-    "Jinko 580W"
+    "Used Solar Plates",
+    "10kW System"
   ];
 
   const handlePopularClick = (term) => {
@@ -1468,11 +1469,11 @@ function nx({
               }),
               jsx("h1",{
                 className:"text-balance text-xl xs:text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white leading-tight",
-                children: heroCms?.heading || "Sell & Buy Used Solar Panels in Pakistan"
+                children: heroCms?.heading || "Solar Plates, Inverters & Batteries in Pakistan"
               }),
               jsx("p",{
                 className:"mx-auto mt-1 sm:mt-1.5 max-w-xl text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed",
-                children: heroCms?.subheading || "Search 500+ verified used and new solar panels, inverters and batteries across Pakistan at live market rates."
+                children: heroCms?.subheading || "Check live solar plate prices, buy & sell new or used solar plates, hybrid inverters, and lithium batteries across Pakistan."
               }),
               (nc||np||nd)&&jsxs("div",{
                 className:"mt-2.5 flex flex-wrap items-center justify-center gap-2",children:[
@@ -1825,7 +1826,7 @@ function nx({
 }
 
 const sx=[{
-  value:"panel",icon:Sun,desc:"Monocrystalline & TopCon panels",gradient:"from-primary-500 to-primary-600",count:"240+ Ads"
+  value:"panel",icon:Sun,desc:"Solar plates & TopCon panels",gradient:"from-primary-500 to-primary-600",count:"240+ Ads"
 },{
   value:"inverter",icon:Zap,desc:"Hybrid, off-grid & on-grid inverters",gradient:"from-accent-500 to-accent-600",count:"150+ Ads"
 },{
@@ -2312,9 +2313,10 @@ const FOOTER_PAGES_KEYS = [
 const ux={
   "Solar Marketplace":[
     { label: "Today's Solar Rates", page: "prices" },
+    { label: "Solar Plates Price", page: "prices" },
     { label: "Verify Solar Plates", page: "verification" },
-    { label: "Solar Panels", page: "solar-panels" },
-    { label: "Solar Inverter", page: "solar-inverter" },
+    { label: "Solar Plates & Panels", page: "solar-panels" },
+    { label: "Solar Inverters", page: "solar-inverter" },
     { label: "Solar Batteries", page: "solar-batteries" },
     { label: "Used Solar Deals", page: "used-solar" },
     { label: "Verified Dealers", page: "dealers" }
@@ -2528,9 +2530,50 @@ function hx({
             ]
           }),
 
-          /* Solar Cities Strip */
+          /* Popular Keywords & Solar Equipment Strip */
           jsxs("div", {
             className: "mt-10 pt-6 border-t border-gray-800/60",
+            children: [
+              jsxs("div", {
+                className: "text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2.5 flex items-center gap-1.5",
+                children: [
+                  jsx(Sun, { className: "h-3.5 w-3.5 text-amber-400" }),
+                  "Popular Solar Searches & Categories in Pakistan:"
+                ]
+              }),
+              jsx("div", {
+                className: "flex flex-wrap gap-1.5",
+                children: [
+                  { label: "Solar Plates Price in Pakistan", page: "prices" },
+                  { label: "Solar Plates Rate Today", page: "prices" },
+                  { label: "Tier-1 Solar Plates", page: "solar-panels" },
+                  { label: "550W Solar Plates", page: "solar-panels" },
+                  { label: "Solar Inverter Price", page: "solar-inverter" },
+                  { label: "Hybrid Solar Inverter", page: "solar-inverter" },
+                  { label: "Lithium Battery for Solar", page: "solar-batteries" },
+                  { label: "Tubular Solar Battery", page: "solar-batteries" },
+                  { label: "Used Solar Plates", page: "used-solar" },
+                  { label: "Used Solar Inverters", page: "used-solar" },
+                  { label: "Solar Load Calculator", page: "calculator" },
+                  { label: "Tier 1 Verification", page: "verification" }
+                ].map((item, kIdx) =>
+                  jsx("a", {
+                    href: `/${item.page}`,
+                    onClick: (ev) => {
+                      ev.preventDefault();
+                      handleNav(item.page);
+                    },
+                    className: "px-2.5 py-1 rounded-lg text-xs bg-gray-900 hover:bg-gray-800 text-gray-300 hover:text-amber-400 border border-gray-800/80 transition-all cursor-pointer",
+                    children: item.label
+                  }, `popular-kw-${kIdx}`)
+                )
+              })
+            ]
+          }),
+
+          /* Solar Cities Strip */
+          jsxs("div", {
+            className: "mt-6 pt-4 border-t border-gray-800/40",
             children: [
               jsxs("div", {
                 className: "text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2.5 flex items-center gap-1.5",
@@ -2546,7 +2589,7 @@ function hx({
                     type: "button",
                     onClick: () => handleNav("home"),
                     className: "px-2.5 py-1 rounded-lg text-xs bg-gray-900 hover:bg-gray-800 text-gray-300 hover:text-primary-400 border border-gray-800/80 transition-all cursor-pointer",
-                    children: city
+                    children: `Solar Plates in ${city}`
                   }, `city-tag-${city}-${cIdx}`)
                 )
               })

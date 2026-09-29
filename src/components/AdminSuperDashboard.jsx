@@ -4610,7 +4610,7 @@ export default function AdminSuperDashboard({
                         type="text"
                         value={cmsForm.topBannerText || ''}
                         onChange={(e) => setCmsForm({ ...cmsForm, topBannerText: e.target.value })}
-                        placeholder="Pakistan's #1 Solar Marketplace — Verified Dealers & Daily Price Benchmark"
+                        placeholder="Pakistan's #1 Used Solar Marketplace — Verified Dealers & Daily Price Benchmark"
                         className="input-field text-xs"
                       />
                     </div>

@@ -109,7 +109,7 @@ export function getGlobalJsonLd() {
         name: 'Pakistan',
       },
       description:
-        'Pakistan premier solar marketplace. Check live solar plates price in Pakistan, buy and sell used or new solar panels, hybrid inverters, and lithium solar batteries.',
+        "Pakistan's #1 used solar marketplace. Check live solar plates price in Pakistan, buy and sell used or new solar panels, hybrid inverters, and lithium solar batteries.",
     },
     {
       '@context': 'https://schema.org',

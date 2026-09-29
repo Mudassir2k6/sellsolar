@@ -8,9 +8,9 @@ const SITE_SETTINGS_KEY = 'sellsolar_site_settings';
 export const DEFAULT_SITE_SETTINGS = {
   // Brand & Headings
   siteTitle: 'SellSolar.pk',
-  tagline: "Pakistan's #1 Solar Marketplace & Daily Price Benchmark",
-  heroHeading: 'Buy & Sell Solar Equipment at Live Market Rates',
-  heroSubheading: 'Compare verified solar panel, inverter & battery listings across Lahore, Karachi, Islamabad & 30+ cities in Pakistan.',
+  tagline: "Pakistan's #1 Used Solar Marketplace & Daily Price Benchmark",
+  heroHeading: 'Buy & Sell Used Solar Plates, Inverters & Batteries in Pakistan',
+  heroSubheading: 'Pakistan\'s dedicated marketplace to buy & sell used solar plates, second-hand inverters, and solar batteries at live market prices across Pakistan.',
   logoUrl: '',
   logoText: 'SellSolar',
   faviconUrl: '/favicon.ico',
@@ -18,11 +18,11 @@ export const DEFAULT_SITE_SETTINGS = {
 
   // Top Announcement Bar
   topBannerEnabled: true,
-  topBannerText: "Pakistan's #1 Solar Marketplace — Verified Dealers & Daily Price Benchmark",
+  topBannerText: "Pakistan's #1 Used Solar Marketplace — Verified Dealers & Daily Price Benchmark",
   topBannerLink: '/prices',
 
   // Footer & Content
-  footerAboutText: "Pakistan's leading online marketplace dedicated exclusively to solar equipment, verified dealer inventories, and live market pricing benchmarks.",
+  footerAboutText: "Pakistan's #1 Used Solar Marketplace. Buy and sell used and new solar plates, on-grid & hybrid inverters, and lithium batteries with total confidence.",
   copyrightText: '© 2026 SellSolar Pakistan. All rights reserved.',
 
   // Contact Info
@@ -57,9 +57,9 @@ export const DEFAULT_SITE_SETTINGS = {
   // Dynamic Visual CMS content for Home Page (Cards, Hero, Text, Images)
   homePageCms: {
     hero: {
-      badgeText: "⚡ Pakistan's #1 Solar Directory",
-      heading: 'Buy & Sell Solar Equipment at Live Market Rates',
-      subheading: 'Compare verified solar panel, inverter & battery listings across Lahore, Karachi, Islamabad & 30+ cities in Pakistan.',
+      badgeText: "Pakistan's #1 Used Solar Marketplace",
+      heading: 'Buy & Sell Used Solar Plates, Inverters & Batteries in Pakistan',
+      subheading: 'Pakistan\'s dedicated marketplace to buy & sell used solar plates, second-hand inverters, and solar batteries at live market prices across Pakistan.',
       searchPlaceholder: 'Search panels, inverters, batteries or cities (e.g. Longi, Solis, Lahore)...',
       primaryCtaText: 'Post a Free Ad',
       primaryCtaLink: 'post-ad',

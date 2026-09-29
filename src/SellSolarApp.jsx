@@ -897,7 +897,7 @@ function Xy({
                               jsx('p', {
                                 className:
                                   'text-xs text-gray-500 dark:text-gray-400 mt-0.5',
-                                children: "Pakistan's Premier Solar Marketplace",
+                                children: "Pakistan's #1 Used Solar Marketplace",
                               }),
                             ],
                           }),
@@ -1315,7 +1315,7 @@ function Xy({
                         className: 'flex items-center justify-center gap-1.5 text-xs font-bold text-gray-700 dark:text-gray-300',
                         children: [
                           jsx(BadgeCheck, { className: 'h-4 w-4 text-amber-500 shrink-0' }),
-                          jsx('span', { children: "Pakistan's #1 Solar Marketplace" }),
+                          jsx('span', { children: "Pakistan's #1 Used Solar Marketplace" }),
                         ],
                       }),
                       jsx('p', {
@@ -2363,7 +2363,7 @@ function hx({
   const supportPhoneStr = String(supportPhone);
   const officeAddress = settings?.headOfficeAddress || "Sector G-7, Blue Area, Islamabad, Pakistan";
   const copyrightText = settings?.copyrightText || "© 2026 SellSolar Pakistan. All rights reserved.";
-  const aboutText = settings?.footerAboutText || "Pakistan's #1 marketplace for solar panels, on-grid & hybrid inverters, lithium batteries, and turnkey solar installations. Buy and sell with total confidence.";
+  const aboutText = settings?.footerAboutText || "Pakistan's #1 Used Solar Marketplace. Buy and sell used and new solar plates, on-grid & hybrid inverters, and lithium batteries with total confidence.";
 
   const rawWa = String(settings?.whatsAppNumber || "923001234567").replace(/\D/g, "");
   const waUrl = `https://wa.me/${rawWa}?text=${encodeURIComponent("Assalam-o-Alaikum, I am inquiring about solar equipment on SellSolar.pk")}`;

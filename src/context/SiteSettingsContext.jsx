@@ -8,7 +8,7 @@ const SITE_SETTINGS_KEY = 'sellsolar_site_settings';
 export const DEFAULT_SITE_SETTINGS = {
   // Brand & Headings
   siteTitle: 'SellSolar.pk',
-  tagline: "Pakistan's #1 Used Solar Marketplace & Daily Price Benchmark",
+  tagline: "Pakistan's #1 Used Solar Marketplace — Buy and Sell Solar Panels, Inverters, Batteries and Systems",
   heroHeading: 'Buy & Sell Used Solar Plates, Inverters & Batteries in Pakistan',
   heroSubheading: 'Pakistan\'s dedicated marketplace to buy & sell used solar plates, second-hand inverters, and solar batteries at live market prices across Pakistan.',
   logoUrl: '',
@@ -18,11 +18,11 @@ export const DEFAULT_SITE_SETTINGS = {
 
   // Top Announcement Bar
   topBannerEnabled: true,
-  topBannerText: "Pakistan's #1 Used Solar Marketplace — Verified Dealers & Daily Price Benchmark",
+  topBannerText: "Pakistan's #1 Used Solar Marketplace — Buy and Sell Solar Panels, Inverters, Batteries and Systems",
   topBannerLink: '/prices',
 
   // Footer & Content
-  footerAboutText: "Pakistan's #1 Used Solar Marketplace. Buy and sell used and new solar plates, on-grid & hybrid inverters, and lithium batteries with total confidence.",
+  footerAboutText: "Pakistan's #1 Used Solar Marketplace. Buy and sell used and new solar panels, inverters, batteries, and complete systems with total confidence.",
   copyrightText: '© 2026 SellSolar Pakistan. All rights reserved.',
 
   // Contact Info

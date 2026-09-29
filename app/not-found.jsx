@@ -44,7 +44,7 @@ export default function NotFound() {
                 SellSolar<span className="text-amber-500">.pk</span>
               </span>
               <span className="hidden sm:inline-block ml-2 px-2 py-0.5 text-[10px] font-bold rounded bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300">
-                Pakistan&apos;s Solar Marketplace
+                Pakistan&apos;s #1 Used Solar Marketplace
               </span>
             </div>
           </Link>
@@ -334,7 +334,7 @@ export default function NotFound() {
       {/* Footer */}
       <footer className="w-full border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-6 text-center text-xs text-slate-500 dark:text-slate-400">
         <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p>© {new Date().getFullYear()} SellSolar.pk • Pakistan&apos;s Dedicated Solar Marketplace</p>
+          <p>© {new Date().getFullYear()} SellSolar.pk • Pakistan&apos;s #1 Used Solar Marketplace</p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link href="/" className="hover:underline">Home</Link>
             <Link href="/prices" className="hover:underline">Prices</Link>

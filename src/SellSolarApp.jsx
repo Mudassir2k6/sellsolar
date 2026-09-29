@@ -335,7 +335,8 @@ function Xy({
             // Brand Logo
             jsxs('button', {
               onClick: () => h('home'),
-              className: 'flex items-center gap-2 shrink-0 select-none cursor-pointer',
+              className: 'flex items-center gap-2 sm:gap-2.5 shrink-0 select-none cursor-pointer group text-left',
+              title: "SellSolar - Pakistan's #1 Used Solar Marketplace",
               children: [
                 settings?.logoUrl
                   ? jsx('img', {
@@ -347,20 +348,30 @@ function Xy({
                       children: [
                         jsx('div', {
                           className:
-                            'flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 shadow-md shadow-primary-500/25 shrink-0',
+                            'flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl bg-amber-400 text-white shadow-md shadow-amber-500/20 shrink-0 group-hover:scale-105 transition-transform',
                           children: jsx(Sun, {
-                            className: 'h-4 w-4 sm:h-5 sm:w-5 text-white',
-                            strokeWidth: 2.5,
+                            className: 'h-4.5 w-4.5 sm:h-5 sm:w-5 text-white',
+                            strokeWidth: 2.6,
                           }),
                         }),
-                        jsxs('span', {
-                          className:
-                            'text-lg sm:text-xl font-black tracking-tight text-gray-900 dark:text-white',
+                        jsxs('div', {
+                          className: 'flex flex-col justify-center leading-tight',
                           children: [
-                            'Sell',
+                            jsxs('span', {
+                              className:
+                                'text-lg sm:text-xl font-black tracking-tight text-gray-900 dark:text-white leading-none',
+                              children: [
+                                'Sell',
+                                jsx('span', {
+                                  className: 'text-amber-500',
+                                  children: 'Solar',
+                                }),
+                              ],
+                            }),
                             jsx('span', {
-                              className: 'text-primary-500',
-                              children: 'Solar',
+                              className:
+                                'hidden 2xl:block text-[9px] font-bold text-gray-500 dark:text-gray-400 tracking-tight leading-none mt-0.5 max-w-[210px] truncate',
+                              children: "Pakistan's #1 Used Solar Marketplace",
                             }),
                           ],
                         }),
@@ -798,12 +809,12 @@ function Xy({
                       'sticky top-0 z-20 flex items-center justify-between px-4 py-3 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-gray-100 dark:border-gray-800/80',
                     children: [
                       jsxs('div', {
-                        className: 'flex items-center gap-2',
+                        className: 'flex items-center gap-2.5',
                         children: [
                           jsx('div', {
                             className:
-                              'flex h-6 w-6 items-center justify-center rounded-lg bg-amber-500/15 dark:bg-amber-400/15 text-amber-600 dark:text-amber-400',
-                            children: jsx(Sun, { className: 'h-3.5 w-3.5', strokeWidth: 2.5 }),
+                              'flex h-7 w-7 items-center justify-center rounded-xl bg-amber-400 text-white shadow-xs shrink-0',
+                            children: jsx(Sun, { className: 'h-4 w-4 text-white', strokeWidth: 2.6 }),
                           }),
                           jsxs('span', {
                             className:
@@ -1317,6 +1328,10 @@ function Xy({
                           jsx(BadgeCheck, { className: 'h-4 w-4 text-amber-500 shrink-0' }),
                           jsx('span', { children: "Pakistan's #1 Used Solar Marketplace" }),
                         ],
+                      }),
+                      jsx('p', {
+                        className: 'text-[10px] text-gray-500 dark:text-gray-400 font-medium',
+                        children: 'Buy and Sell Solar Panels, Inverters, Batteries and Systems',
                       }),
                       jsx('p', {
                         className:
@@ -2419,33 +2434,37 @@ function hx({
               jsxs("div", {
                 className: "sm:col-span-2",
                 children: [
+                  /* Brand Logo */
                   jsxs("div", {
-                    className: "flex items-center gap-2.5",
+                    className: "flex items-center gap-3",
                     children: [
                       jsx("div", {
-                        className: "flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary-400 via-primary-500 to-amber-500 shadow-sm shadow-primary-500/30",
-                        children: jsx(Sun, { className: "h-5 w-5 text-white", strokeWidth: 2.5 })
+                        className: "flex h-11 w-11 items-center justify-center rounded-2xl bg-amber-400 shadow-md shadow-amber-500/20 shrink-0",
+                        children: jsx(Sun, { className: "h-6 w-6 text-white", strokeWidth: 2.6 })
                       }),
-                      jsxs("div", {
+                      jsxs("span", {
+                        className: "text-2xl font-black text-white tracking-tight",
                         children: [
-                          jsxs("span", {
-                            className: "text-xl font-black text-white tracking-tight",
-                            children: [
-                              "Sell",
-                              jsx("span", { className: "text-primary-400", children: "Solar" }),
-                              jsx("span", { className: "text-xs text-amber-400 font-bold ml-1", children: ".pk" })
-                            ]
-                          }),
-                          jsx("p", {
-                            className: "text-[10px] text-gray-400 font-semibold tracking-wide",
-                            children: "پاکستان کا سب سے بڑا سولر پلیٹ فارم"
-                          })
+                          "Sell",
+                          jsx("span", { className: "text-amber-400", children: "Solar" }),
+                          jsx("span", { className: "text-xs text-amber-400/80 font-bold ml-1", children: ".pk" })
                         ]
                       })
                     ]
                   }),
+
+                  /* Primary Slogan & Tagline */
+                  jsx("h3", {
+                    className: "mt-4 text-base sm:text-lg font-black text-white tracking-tight leading-snug",
+                    children: "Pakistan's #1 Used Solar Marketplace"
+                  }),
                   jsx("p", {
-                    className: "mt-4 max-w-sm text-xs sm:text-sm text-gray-400 leading-relaxed",
+                    className: "mt-1.5 text-xs sm:text-sm text-gray-300 font-medium leading-relaxed",
+                    children: "Buy and Sell Solar Panels, Inverters, Batteries and Systems"
+                  }),
+
+                  jsx("p", {
+                    className: "mt-3 max-w-sm text-xs text-gray-400 leading-relaxed",
                     children: aboutText
                   }),
 

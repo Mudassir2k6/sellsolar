@@ -72,6 +72,7 @@ import AdminDailyRatesModule from './AdminDailyRatesModule';
 import AdminDealersModule from './AdminDealersModule';
 import AdminInstallationsModule from './AdminInstallationsModule';
 import AdminDrillDownModal from './AdminDrillDownModal';
+import { getStoredInstallationRequests } from '../lib/installation';
 import { VERIFIED_DEALERS } from '../data/dealersData';
 import { SEED_LISTINGS } from '../data/seedListings';
 import {
@@ -213,6 +214,25 @@ export default function AdminSuperDashboard({
     setDrillDownMetric(metric);
     setDrillDownModalOpen(true);
   };
+
+  // Installation Leads live tracking for notification badge
+  const [installationRequests, setInstallationRequests] = useState([]);
+  useEffect(() => {
+    const loadLeads = () => {
+      try {
+        setInstallationRequests(getStoredInstallationRequests());
+      } catch (e) {}
+    };
+    loadLeads();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('sellsolar_installation_updated', loadLeads);
+      return () => window.removeEventListener('sellsolar_installation_updated', loadLeads);
+    }
+  }, []);
+
+  const pendingLeadsCount = useMemo(() => {
+    return installationRequests.filter((r) => r.status === 'pending').length;
+  }, [installationRequests]);
 
   const [newUserForm, setNewUserForm] = useState({
     name: '',
@@ -1369,6 +1389,23 @@ export default function AdminSuperDashboard({
 
             <button
               type="button"
+              onClick={() => selectTab('installation-leads')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 transition-colors flex items-center gap-1.5 ${
+                activeTab === 'installation-leads'
+                  ? 'bg-indigo-600 text-white shadow-xs'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+              }`}
+            >
+              <span>Installation Leads</span>
+              {pendingLeadsCount > 0 && (
+                <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-red-600 text-white animate-pulse">
+                  {pendingLeadsCount}
+                </span>
+              )}
+            </button>
+
+            <button
+              type="button"
               onClick={() => selectTab('pages')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 transition-colors ${
                 activeTab === 'pages'
@@ -1624,6 +1661,16 @@ export default function AdminSuperDashboard({
                   <Wrench className="h-4 w-4 text-indigo-500" />
                   <span>Installation Leads</span>
                 </div>
+                {pendingLeadsCount > 0 ? (
+                  <span className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-black rounded-full bg-red-600 text-white shadow-xs animate-pulse">
+                    <span className="h-1.5 w-1.5 rounded-full bg-white animate-ping" />
+                    {pendingLeadsCount} New
+                  </span>
+                ) : (
+                  <span className="text-[10px] text-gray-400 font-mono">
+                    {installationRequests.length}
+                  </span>
+                )}
               </button>
             )}
 
@@ -2137,9 +2184,16 @@ export default function AdminSuperDashboard({
 
                   <div className="p-5 rounded-2xl border border-indigo-200 dark:border-indigo-900/60 bg-indigo-50/40 dark:bg-indigo-950/20 flex flex-col justify-between">
                     <div>
-                      <h3 className="font-bold text-sm text-indigo-950 dark:text-indigo-200 flex items-center gap-2">
-                        <Wrench className="h-4 w-4 text-indigo-600" />
-                        Installation Leads
+                      <h3 className="font-bold text-sm text-indigo-950 dark:text-indigo-200 flex items-center justify-between">
+                        <span className="flex items-center gap-2">
+                          <Wrench className="h-4 w-4 text-indigo-600" />
+                          Installation Leads
+                        </span>
+                        {pendingLeadsCount > 0 && (
+                          <span className="px-2 py-0.5 text-[10px] font-black rounded-full bg-red-600 text-white animate-pulse">
+                            {pendingLeadsCount} New
+                          </span>
+                        )}
                       </h3>
                       <p className="text-xs text-indigo-800/80 dark:text-indigo-300 mt-1">
                         Review customer site surveys, EPC requests, tracking codes, and WhatsApp dispatch.
@@ -2148,9 +2202,14 @@ export default function AdminSuperDashboard({
                     <button
                       type="button"
                       onClick={() => setActiveTab('installation-leads')}
-                      className="mt-4 px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white transition-colors"
+                      className="mt-4 px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white transition-colors flex items-center justify-between"
                     >
-                      View Installation Leads
+                      <span>View Installation Leads</span>
+                      {pendingLeadsCount > 0 && (
+                        <span className="px-1.5 py-0.5 rounded-full text-[10px] font-black bg-red-500 text-white">
+                          {pendingLeadsCount} Pending
+                        </span>
+                      )}
                     </button>
                   </div>
                 </div>

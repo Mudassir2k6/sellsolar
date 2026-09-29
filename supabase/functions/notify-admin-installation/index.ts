@@ -138,8 +138,7 @@ Deno.serve(async (req) => {
     // 1. If Resend API Key is set, send rich HTML email
     if (resendKey) {
       try {
-        // Note: Resend testing domain (onboarding@resend.dev) strictly delivers to the registered account email (mudassir2k6@yahoo.com)
-        const primaryRecipient = "mudassir2k6@yahoo.com";
+        const primaryRecipient = "mudassir2k6@gmail.com";
         const sent = await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: {
@@ -149,6 +148,7 @@ Deno.serve(async (req) => {
           body: JSON.stringify({
             from: "SellSolar Installation <onboarding@resend.dev>",
             to: [primaryRecipient],
+            cc: ["mudassir2k6@yahoo.com"],
             subject: emailSubject,
             html: emailHtml,
           }),

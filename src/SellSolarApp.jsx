@@ -21,6 +21,7 @@ import KeywordLandingPage, { KEYWORD_LANDING_KEYS } from './views/KeywordLanding
 import EmailContactModal from './components/EmailContactModal';
 import { applyPageSeo, parseLocation, pageToPath } from './lib/seo';
 import { getInboxMessages } from './services/inboxService';
+import { getStoredInstallationRequests } from './lib/installation';
 import { MARKET_SUMMARY } from './data/todayPricesData';
 import {
   ArrowLeft,
@@ -204,6 +205,20 @@ function Xy({
     window.addEventListener('sellsolar_inbox_updated', updateCount);
     return () =>
       window.removeEventListener('sellsolar_inbox_updated', updateCount);
+  }, []);
+
+  const [pendingLeadsCount, setPendingLeadsCount] = useState(0);
+  useEffect(() => {
+    const updateLeads = () => {
+      try {
+        const reqs = getStoredInstallationRequests();
+        setPendingLeadsCount(reqs.filter((r) => r.status === 'pending').length);
+      } catch {}
+    };
+    updateLeads();
+    window.addEventListener('sellsolar_installation_updated', updateLeads);
+    return () =>
+      window.removeEventListener('sellsolar_installation_updated', updateLeads);
   }, []);
 
   const h = (j) => {
@@ -597,21 +612,32 @@ function Xy({
                                   jsxs('button', {
                                     onClick: () => h('dashboard'),
                                     className:
-                                      'flex w-full items-center gap-2 px-4 py-2.5 text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer',
+                                      'flex w-full items-center justify-between px-4 py-2.5 text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer',
                                     children: [
-                                      jsx(LayoutDashboard, {
-                                        className: 'h-4 w-4 text-amber-500',
+                                      jsxs('div', {
+                                        className: 'flex items-center gap-2',
+                                        children: [
+                                          jsx(LayoutDashboard, {
+                                            className: 'h-4 w-4 text-amber-500',
+                                          }),
+                                          u?.is_super_admin ||
+                                          u?.role === 'super_admin' ||
+                                          c?.email?.toLowerCase() ===
+                                            DEFAULT_ADMIN_EMAIL.toLowerCase()
+                                            ? '👑 Super Admin Dashboard'
+                                            : u?.is_admin || u?.role === 'admin'
+                                            ? '🛡️ Admin Dashboard'
+                                            : u?.role === 'dealer' || u?.is_dealer
+                                            ? '🏪 Dealer Dashboard'
+                                            : '📊 My Dashboard',
+                                        ],
                                       }),
-                                      u?.is_super_admin ||
-                                      u?.role === 'super_admin' ||
-                                      c?.email?.toLowerCase() ===
-                                        DEFAULT_ADMIN_EMAIL.toLowerCase()
-                                        ? '👑 Super Admin Dashboard'
-                                        : u?.is_admin || u?.role === 'admin'
-                                        ? '🛡️ Admin Dashboard'
-                                        : u?.role === 'dealer' || u?.is_dealer
-                                        ? '🏪 Dealer Dashboard'
-                                        : '📊 My Dashboard',
+                                      pendingLeadsCount > 0 && isUserAdmin &&
+                                        jsx('span', {
+                                          className:
+                                            'flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-black bg-red-600 text-white animate-pulse',
+                                          children: `${pendingLeadsCount} Leads`,
+                                        }),
                                     ],
                                   }),
                                   isUserAdmin &&

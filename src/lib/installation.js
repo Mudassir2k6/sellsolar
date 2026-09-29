@@ -234,6 +234,31 @@ export async function submitInstallationRequest({
       saved_at: new Date().toISOString(),
     });
     localStorage.setItem('sellsolar_install_requests', JSON.stringify(existing.slice(0, 50)));
+
+    // Save to v2 storage used by Admin Dashboard & Installation Leads module
+    const cityCode = (safeCity.slice(0, 3) || 'PK').toUpperCase();
+    const trackingCode = `SOL-${cityCode}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const newLeadRecord = {
+      trackingCode,
+      fullName: safeFullName,
+      phone: cleanPhone,
+      city: safeCity,
+      address: safeAddress,
+      systemCapacityKw: parseFloat(safeSystemSize) || 10,
+      systemType: safePropertyType.toLowerCase().includes('hybrid') ? 'hybrid_storage' : 'on_grid_net_metering',
+      monthlyBill: 0,
+      roofType: safePropertyType,
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+      notes: safeNotes || `System Requirement: ${safeSystemSize}`,
+    };
+
+    const existingV2 = getStoredInstallationRequests();
+    const updatedV2 = [newLeadRecord, ...existingV2.filter((x) => x.trackingCode !== trackingCode)];
+    localStorage.setItem('sellsolar_install_requests_v2', JSON.stringify(updatedV2.slice(0, 100)));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('sellsolar_installation_updated'));
+    }
   } catch (e) {}
 
   // 2. Trigger Admin Email Notification
@@ -287,7 +312,7 @@ export async function submitInstallationRequest({
       subject: `⚡ Turnkey Installation Request: ${safeSystemSize} (${safeCity})`,
       message: `Customer: ${safeFullName}\nPhone: ${cleanPhone}\nCity: ${safeCity}\nProperty: ${safePropertyType}\nSystem Size: ${safeSystemSize}\nAddress: ${safeAddress}\n\nClient Notes:\n${safeNotes || 'None'}`,
       category: 'Installation Request',
-      recipientEmail: 'info@sellsolar.pk',
+      recipientEmail: ADMIN_NOTIFICATION_EMAIL,
     });
   } catch (inboxErr) {
     console.warn('Unified inbox lead sync warning:', inboxErr);

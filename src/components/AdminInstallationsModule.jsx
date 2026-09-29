@@ -29,7 +29,13 @@ import { CITIES, formatPrice } from '../lib/constants';
 
 export default function AdminInstallationsModule() {
   const { showToast } = useToast();
-  const [requests, setRequests] = useState([]);
+  const [requests, setRequests] = useState(() => {
+    try {
+      return getStoredInstallationRequests();
+    } catch {
+      return [];
+    }
+  });
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [cityFilter, setCityFilter] = useState('all');

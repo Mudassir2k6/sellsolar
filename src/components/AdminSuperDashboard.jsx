@@ -216,7 +216,13 @@ export default function AdminSuperDashboard({
   };
 
   // Installation Leads live tracking for notification badge
-  const [installationRequests, setInstallationRequests] = useState([]);
+  const [installationRequests, setInstallationRequests] = useState(() => {
+    try {
+      return getStoredInstallationRequests();
+    } catch {
+      return [];
+    }
+  });
   useEffect(() => {
     const loadLeads = () => {
       try {
@@ -1658,16 +1664,16 @@ export default function AdminSuperDashboard({
                 }`}
               >
                 <div className="flex items-center gap-2.5">
-                  <Wrench className="h-4 w-4 text-indigo-500" />
+                  <Wrench className={`h-4 w-4 ${activeTab === 'installation-leads' ? 'text-white' : 'text-indigo-500'}`} />
                   <span>Installation Leads</span>
                 </div>
                 {pendingLeadsCount > 0 ? (
-                  <span className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-black rounded-full bg-red-600 text-white shadow-xs animate-pulse">
+                  <span className="flex items-center gap-1.5 px-2 py-0.5 text-[10px] font-black rounded-full bg-red-600 text-white shadow-xs animate-pulse ring-1 ring-white/50">
                     <span className="h-1.5 w-1.5 rounded-full bg-white animate-ping" />
                     {pendingLeadsCount} New
                   </span>
                 ) : (
-                  <span className="text-[10px] text-gray-400 font-mono">
+                  <span className={`text-[10px] font-mono ${activeTab === 'installation-leads' ? 'text-indigo-200' : 'text-gray-400'}`}>
                     {installationRequests.length}
                   </span>
                 )}

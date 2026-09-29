@@ -404,7 +404,7 @@ Calculated at SellSolar.pk`;
     <div id="solar-load-calculator-component" className={`w-full ${className}`}>
       {/* Optional Hero Header */}
       {showHeroBanner && (
-        <div className="mb-6 rounded-2xl bg-gradient-to-br from-gray-900 via-gray-850 to-primary-950 p-6 sm:p-8 text-white shadow-lg border border-gray-800">
+        <div className="mb-6 rounded-2xl bg-gradient-to-br from-gray-900 via-gray-900 to-primary-950 p-6 sm:p-8 text-white shadow-lg border border-gray-800">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full bg-primary-500/20 border border-primary-400/30 px-3 py-1 text-xs font-bold text-primary-300 mb-2">

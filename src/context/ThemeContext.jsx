@@ -31,10 +31,26 @@ export function ThemeProvider({ children }) {
     if (theme === 'dark') {
       root.classList.add('dark');
       document.body.classList.add('dark');
+      root.style.colorScheme = 'dark';
     } else {
       root.classList.remove('dark');
       document.body.classList.remove('dark');
+      root.style.colorScheme = 'light';
     }
+
+    // Dynamically synchronize theme-color meta for iOS Safari status bar
+    try {
+      let metaTheme = document.querySelector('meta[name="theme-color"]');
+      if (!metaTheme) {
+        metaTheme = document.createElement('meta');
+        metaTheme.name = 'theme-color';
+        document.head.appendChild(metaTheme);
+      }
+      metaTheme.setAttribute('content', theme === 'dark' ? '#090d16' : '#ffffff');
+    } catch {
+      // ignore
+    }
+
     try {
       localStorage.setItem('sellsolar_theme', theme);
     } catch {

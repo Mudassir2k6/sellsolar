@@ -776,7 +776,7 @@ export default function DailyMarketRates({ onNavigate, onSelectCategory, compact
                 {ratesData.slice(0, 4).map((bench) => (
                   <div
                     key={bench.id}
-                    className="p-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-850/60 hover:border-primary-400 transition-all flex items-center justify-between gap-3"
+                    className="p-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-900/80 hover:border-primary-400 transition-all flex items-center justify-between gap-3"
                   >
                     <div className="min-w-0">
                       <div className="text-xs font-bold text-gray-900 dark:text-white truncate">
@@ -816,7 +816,7 @@ export default function DailyMarketRates({ onNavigate, onSelectCategory, compact
                 </div>
               )}
               {/* Filtering and Controls Bar */}
-          <div className="p-4 sm:p-5 border-b border-gray-100 dark:border-gray-800/80 bg-gray-50/50 dark:bg-gray-850/50 flex flex-col md:flex-row md:items-center justify-between gap-3.5">
+          <div className="p-4 sm:p-5 border-b border-gray-100 dark:border-gray-800/80 bg-gray-50/50 dark:bg-gray-900/80 flex flex-col md:flex-row md:items-center justify-between gap-3.5">
             {/* Category Filter Tabs */}
             <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
               <button
@@ -1019,7 +1019,7 @@ export default function DailyMarketRates({ onNavigate, onSelectCategory, compact
           <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
             <table className="w-full text-left text-xs border-collapse min-w-[700px]">
               <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-850/80 text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider text-[11px]">
+                <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-900/80 text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider text-[11px]">
                   <th className="py-3 px-4">Component & Specification</th>
                   <th className="py-3 px-3">Category</th>
                   <th className="py-3 px-3">
@@ -1234,7 +1234,7 @@ export default function DailyMarketRates({ onNavigate, onSelectCategory, compact
           )}
 
           {/* Footer note with disclaimer & last update info */}
-          <div className="p-3.5 sm:p-4 bg-gray-50 dark:bg-gray-850/80 border-t border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs text-gray-500 dark:text-gray-400">
+          <div className="p-3.5 sm:p-4 bg-gray-50 dark:bg-gray-900/80 border-t border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs text-gray-500 dark:text-gray-400">
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
               <span>

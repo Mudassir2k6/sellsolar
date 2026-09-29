@@ -885,7 +885,7 @@ function Xy({
                       })
                     : jsxs('div', {
                         className:
-                          'p-4 bg-gray-50 dark:bg-gray-850/60 border-b border-gray-200/70 dark:border-gray-800 flex items-center justify-between',
+                          'p-4 bg-gray-50 dark:bg-gray-900/90 border-b border-gray-200/70 dark:border-gray-800 flex items-center justify-between',
                         children: [
                           jsxs('div', {
                             children: [
@@ -1138,7 +1138,7 @@ function Xy({
                             children: 'Display Preferences',
                           }),
                           jsxs('div', {
-                            className: 'flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-850/60 border border-gray-200/60 dark:border-gray-800',
+                            className: 'flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200/60 dark:border-gray-800',
                             children: [
                               jsx('span', {
                                 className: 'text-sm font-medium text-gray-700 dark:text-gray-300',
@@ -1309,7 +1309,7 @@ function Xy({
                   // 5. Professional Trust & Customer Support Notice (No exposed raw phone/WhatsApp)
                   jsxs('div', {
                     className:
-                      'mt-auto p-4 bg-gray-50/90 dark:bg-gray-850/60 border-t border-gray-200/60 dark:border-gray-800 text-center space-y-1',
+                      'mt-auto p-4 bg-gray-50/90 dark:bg-gray-900 border-t border-gray-200/60 dark:border-gray-800 text-center space-y-1',
                     children: [
                       jsxs('div', {
                         className: 'flex items-center justify-center gap-1.5 text-xs font-bold text-gray-700 dark:text-gray-300',
@@ -1505,7 +1505,7 @@ function nx({
             className:"mx-auto mt-3.5 sm:mt-4 max-w-4xl",children:jsxs("div",{
               className:"card overflow-hidden border border-gray-200/90 dark:border-gray-800 shadow-xl dark:bg-gray-900",children:[
                 jsx("div",{
-                  className:"flex gap-1 overflow-x-auto border-b border-gray-200 dark:border-gray-800 p-1.5 sm:p-2 scrollbar-hide bg-gray-50/70 dark:bg-gray-850/60",children:Zy.map(s=>{
+                  className:"flex gap-1 overflow-x-auto border-b border-gray-200 dark:border-gray-800 p-1.5 sm:p-2 scrollbar-hide bg-gray-50/70 dark:bg-gray-900/90",children:Zy.map(s=>{
                     const a=s.icon,l=t.category===s.value;
                     return jsxs("button",{
                       onClick:()=>e("category",s.value),className:`flex shrink-0 items-center gap-1.5 sm:gap-2 rounded-lg px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-bold transition-all ${
@@ -1627,7 +1627,7 @@ function nx({
                   ]
                 }),
                 jsxs("div",{
-                  className:"border-t border-gray-200/70 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-850/50 px-3.5 py-2 text-xs flex flex-wrap items-center gap-1.5",children:[
+                  className:"border-t border-gray-200/70 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-900/90 px-3.5 py-2 text-xs flex flex-wrap items-center gap-1.5",children:[
                     jsx("span",{ className:"font-bold text-gray-500 dark:text-gray-400 text-[11px] mr-1", children:"Popular:" }),
                     popularSearches.map(term=>jsx("button",{
                       type:"button",onClick:()=>handlePopularClick(term),className:"rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2 py-0.5 text-[11px] font-medium text-gray-700 dark:text-gray-300 hover:border-primary-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors shadow-2xs",children:term
@@ -1714,7 +1714,7 @@ function nx({
                     ? "bg-primary-500 text-white border-primary-600 shadow-xs"
                     : cat.highlight
                     ? "bg-amber-500/10 hover:bg-amber-500/20 text-amber-900 dark:text-amber-200 border-amber-300/80 dark:border-amber-800"
-                    : "bg-white dark:bg-gray-850 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700 shadow-2xs"
+                    : "bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-800 shadow-2xs"
                 }`,
                 children: [
                   jsx("div", {
@@ -1799,7 +1799,7 @@ function nx({
           jsxs("button", {
             type: "button",
             onClick: item.action,
-            className: "group flex items-center gap-2.5 p-2.5 sm:p-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-850 hover:border-primary-400 dark:hover:border-primary-600 hover:shadow-xs transition-all text-left w-full cursor-pointer",
+            className: "group flex items-center gap-2.5 p-2.5 sm:p-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-primary-400 dark:hover:border-primary-600 hover:shadow-xs transition-all text-left w-full cursor-pointer",
             children: [
               jsx("div", {
                 className: `flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${item.color} text-white shadow-xs`,
@@ -2266,7 +2266,7 @@ function lx({
                 visibleCount < t.length ? jsxs("button",{
                   type:"button",
                   onClick:()=>setVisibleCount(prev=>Math.min(prev+8, t.length)),
-                  className:"btn bg-white dark:bg-gray-850 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-300 dark:border-gray-700 px-5 py-2.5 text-xs sm:text-sm font-bold shadow-xs hover:border-primary-500 transition-all flex items-center gap-2",
+                  className:"btn bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-300 dark:border-gray-700 px-5 py-2.5 text-xs sm:text-sm font-bold shadow-xs hover:border-primary-500 transition-all flex items-center gap-2",
                   children:[
                     `Load Next 8 Equipment (${t.length - visibleCount} more)`,
                     jsx(ChevronDown,{ className:"h-4 w-4 text-primary-500" })
@@ -3524,7 +3524,7 @@ function yx({
             type:"button",
             onClick:()=>y("profile"),
             title:"Edit Profile",
-            className:"w-full text-left mb-3 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-850 p-3 border border-gray-200 dark:border-gray-700/60 hover:border-primary-300 dark:hover:border-primary-600 hover:shadow-sm transition-all cursor-pointer group",
+            className:"w-full text-left mb-3 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 p-3 border border-gray-200 dark:border-gray-700/60 hover:border-primary-300 dark:hover:border-primary-600 hover:shadow-sm transition-all cursor-pointer group",
             children:[jsxs("div",{
               className:"flex items-center gap-3",children:[jsx("div",{
                 className:"flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 shadow-md group-hover:scale-105 transition-transform",children:jsx("span",{

@@ -9,6 +9,9 @@ export default {
         mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', '"Liberation Mono"', '"Courier New"', 'monospace'],
       },
       colors: {
+        gray: {
+          850: '#172033',
+        },
         primary: {
           50: '#fefce8',
           100: '#fef9c3',

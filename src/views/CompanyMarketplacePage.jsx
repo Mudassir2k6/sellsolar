@@ -636,7 +636,7 @@ function CareersContent({ onNavigate }) {
           {jobs.map((job) => (
             <div
               key={job.id}
-              className="p-5 rounded-2xl border border-gray-200 dark:border-gray-800 hover:border-primary-400 dark:hover:border-primary-500 transition-all group flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-gray-50/50 dark:bg-gray-850/40"
+              className="p-5 rounded-2xl border border-gray-200 dark:border-gray-800 hover:border-primary-400 dark:hover:border-primary-500 transition-all group flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-gray-50/50 dark:bg-gray-900/80"
             >
               <div>
                 <div className="flex flex-wrap items-center gap-2">
@@ -954,7 +954,7 @@ function PressContent({ onNavigate }) {
         </p>
 
         {/* Media Kit Contact */}
-        <div className="mt-8 p-5 rounded-2xl bg-gray-50 dark:bg-gray-850/60 border border-gray-200 dark:border-gray-800 flex flex-wrap items-center justify-between gap-4">
+        <div className="mt-8 p-5 rounded-2xl bg-gray-50 dark:bg-gray-900/80 border border-gray-200 dark:border-gray-800 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h4 className="font-bold text-xs text-gray-900 dark:text-white">Media Inquiries & Interview Requests</h4>
             <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
@@ -1200,7 +1200,7 @@ function BuySolarContent({ onNavigate }) {
             <div
               key={idx}
               onClick={() => onNavigate && onNavigate('home')}
-              className="cursor-pointer p-5 rounded-2xl border border-gray-200 dark:border-gray-800 hover:border-primary-500 hover:shadow-sm transition-all group bg-gray-50/50 dark:bg-gray-850/40"
+              className="cursor-pointer p-5 rounded-2xl border border-gray-200 dark:border-gray-800 hover:border-primary-500 hover:shadow-sm transition-all group bg-gray-50/50 dark:bg-gray-900/80"
             >
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-100 dark:bg-primary-950 text-primary-600 dark:text-primary-400 group-hover:scale-110 transition-transform">
@@ -1300,7 +1300,7 @@ function SellSolarContent({ onNavigate, onPostAd }) {
       <div className="rounded-3xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 sm:p-8 shadow-sm space-y-6">
         <h2 className="text-xl font-black text-gray-900 dark:text-white">4 Easy Steps to Sell on SellSolar</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="p-5 rounded-2xl bg-gray-50 dark:bg-gray-850/40 border border-gray-100 dark:border-gray-800 text-left">
+          <div className="p-5 rounded-2xl bg-gray-50 dark:bg-gray-900/80 border border-gray-100 dark:border-gray-800 text-left">
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-950 text-primary-600 dark:text-primary-400 font-extrabold text-sm mb-3">
               01
             </span>
@@ -1310,7 +1310,7 @@ function SellSolarContent({ onNavigate, onPostAd }) {
             </p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-gray-50 dark:bg-gray-850/40 border border-gray-100 dark:border-gray-800 text-left">
+          <div className="p-5 rounded-2xl bg-gray-50 dark:bg-gray-900/80 border border-gray-100 dark:border-gray-800 text-left">
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-950 text-primary-600 dark:text-primary-400 font-extrabold text-sm mb-3">
               02
             </span>
@@ -1320,7 +1320,7 @@ function SellSolarContent({ onNavigate, onPostAd }) {
             </p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-gray-50 dark:bg-gray-850/40 border border-gray-100 dark:border-gray-800 text-left">
+          <div className="p-5 rounded-2xl bg-gray-50 dark:bg-gray-900/80 border border-gray-100 dark:border-gray-800 text-left">
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-950 text-primary-600 dark:text-primary-400 font-extrabold text-sm mb-3">
               03
             </span>
@@ -1330,7 +1330,7 @@ function SellSolarContent({ onNavigate, onPostAd }) {
             </p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-gray-50 dark:bg-gray-850/40 border border-gray-100 dark:border-gray-800 text-left">
+          <div className="p-5 rounded-2xl bg-gray-50 dark:bg-gray-900/80 border border-gray-100 dark:border-gray-800 text-left">
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-950 text-primary-600 dark:text-primary-400 font-extrabold text-sm mb-3">
               04
             </span>
@@ -1723,7 +1723,7 @@ function HelpCenterContent({ onNavigate }) {
             return (
               <div
                 key={idx}
-                className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-850/30 overflow-hidden transition-colors"
+                className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/80 overflow-hidden transition-colors"
               >
                 <button
                   type="button"

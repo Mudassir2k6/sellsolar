@@ -10,8 +10,40 @@ if (!fs.existsSync(outDir)) {
   process.exit(1);
 }
 
+// Cache and preserve previous chunks to prevent ChunkLoadError (404) for active tabs
+const distChunksDir = path.join(distDir, '_next', 'static', 'chunks');
+const preservedChunks = new Map();
+if (fs.existsSync(distChunksDir)) {
+  try {
+    const files = fs.readdirSync(distChunksDir);
+    for (const f of files) {
+      const fullPath = path.join(distChunksDir, f);
+      if (fs.statSync(fullPath).isFile() && f.endsWith('.js')) {
+        preservedChunks.set(f, fs.readFileSync(fullPath));
+      }
+    }
+  } catch (e) {
+    console.warn('[deploy] Could not read previous chunks:', e.message);
+  }
+}
+
 fs.rmSync(distDir, { recursive: true, force: true });
 fs.cpSync(outDir, distDir, { recursive: true });
+
+// Restore previous chunks that are not overwritten by new build
+if (preservedChunks.size > 0 && fs.existsSync(distChunksDir)) {
+  let restored = 0;
+  for (const [filename, content] of preservedChunks.entries()) {
+    const dest = path.join(distChunksDir, filename);
+    if (!fs.existsSync(dest)) {
+      fs.writeFileSync(dest, content);
+      restored++;
+    }
+  }
+  if (restored > 0) {
+    console.log(`[deploy] Preserved ${restored} previous chunks to eliminate ChunkLoadErrors.`);
+  }
+}
 
 // Explicitly ensure _headers and _redirects are in dist/
 const publicDir = path.join(root, 'public');

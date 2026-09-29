@@ -35,9 +35,12 @@ export function slugToPageKey(slug) {
 }
 
 export function buildMetadataForSlug(slug) {
-  const key = canonicalPage(slugToPageKey(slug));
+  const rawKey = slug && slug.length > 0 ? slug[0] : 'home';
+  const aliasKey = canonicalPage(slugToPageKey(slug));
+  const key = PAGE_SEO[rawKey] ? rawKey : aliasKey;
   const meta = PAGE_SEO[key] || PAGE_SEO.home;
-  const path = meta.path || '/';
+  const currentPath = slug && slug.length > 0 ? `/${slug.join('/')}` : '/';
+  const path = meta.path || currentPath;
   const title = meta.title;
   const description = meta.description;
   const noindex = (meta.robots || '').includes('noindex');
@@ -128,9 +131,12 @@ export function getGlobalJsonLd() {
 
 export function getJsonLdForSlug(slug) {
   const globalSchemas = getGlobalJsonLd();
-  const key = canonicalPage(slugToPageKey(slug));
+  const rawKey = slug && slug.length > 0 ? slug[0] : 'home';
+  const aliasKey = canonicalPage(slugToPageKey(slug));
+  const key = PAGE_SEO[rawKey] ? rawKey : aliasKey;
   const meta = PAGE_SEO[key] || PAGE_SEO.home;
-  const path = meta.path || '/';
+  const currentPath = slug && slug.length > 0 ? `/${slug.join('/')}` : '/';
+  const path = meta.path || currentPath;
   const url = `${SITE_URL}${path}`;
 
   const schemas = [...globalSchemas];

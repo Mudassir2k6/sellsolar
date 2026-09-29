@@ -119,6 +119,51 @@ export const PAGE_SEO = {
     keywords:
       'solar plates, solar plate, solar plates price in Pakistan, solar panels Pakistan, used solar plates, solar plate price, Tier 1 solar plates',
   },
+  'solar-plates': {
+    title: 'Solar Plates for Sale in Pakistan | Used & New Solar Plates Prices',
+    description:
+      'Browse verified used and new solar plates for sale in Pakistan. Compare Longi, Canadian Solar, Jinko, and JA Solar plates across Lahore, Karachi, and Islamabad.',
+    path: '/solar-plates',
+    robots: INDEXABLE,
+    keywords:
+      'solar plates, solar plates for sale, used solar plates, buy solar plates Pakistan, second hand solar plates, Tier 1 solar plates, solar plate price in Pakistan',
+  },
+  'solar-plate': {
+    title: 'Solar Plate Prices & Models in Pakistan | Used & New Solar Plates',
+    description:
+      'Compare solar plate models, specifications, and prices (550W - 610W) in Pakistan. Buy and sell verified used solar plates on SellSolar.',
+    path: '/solar-plate',
+    robots: INDEXABLE,
+    keywords:
+      'solar plate, solar plate price in Pakistan, solar plate price, 550w solar plate, used solar plate, solar plate rates today',
+  },
+  'solar-plates-price': {
+    title: 'Solar Plates Price in Pakistan Today | Live Rates Per Watt & Panel Cost',
+    description:
+      'Daily updated solar plates price in Pakistan today. Live per-watt rates for Tier-1 solar panels (Canadian Solar, Longi, Jinko, JA Solar) for 5kW to 20kW setups.',
+    path: '/solar-plates-price',
+    robots: INDEXABLE,
+    keywords:
+      'solar plates price in Pakistan, solar plate price in Pakistan, solar plates rate today, solar plate price, plates price, solar panel price Pakistan, Tier 1 solar plates price',
+  },
+  'today-prices': {
+    title: 'Today Solar Rates in Pakistan | Live Solar Plates & Inverter Prices',
+    description:
+      'Today live solar rates in Pakistan: panel PKR/watt, on-grid and hybrid inverters, and lithium battery prices updated daily for budget planning.',
+    path: '/today-prices',
+    robots: INDEXABLE,
+    keywords:
+      'today solar rates, solar rates today Pakistan, solar plate price in Pakistan today, solar rate today, live solar rates Pakistan',
+  },
+  'load-calculator': {
+    title: 'Calculate Solar Load Free in Pakistan | Solar System Load Calculator',
+    description:
+      'Calculate solar load in Pakistan free. Calculate your home appliances kW load, required solar plates count, inverter kW size, and battery backup.',
+    path: '/load-calculator',
+    robots: INDEXABLE,
+    keywords:
+      'calculate solar load, solar load calculator, calculate solar system load, solar load calculator Pakistan, how to calculate solar load, calculate home solar load',
+  },
   login: {
     title: 'Login or Create Account | SellSolar',
     description: 'Sign in to SellSolar to post solar ads, save listings and manage your dealer profile.',
@@ -308,6 +353,9 @@ const PAGE_ALIASES = {
 };
 
 export function canonicalPage(page) {
+  if (PAGE_SEO && PAGE_SEO[page]) {
+    return page;
+  }
   return PAGE_ALIASES[page] || page;
 }
 

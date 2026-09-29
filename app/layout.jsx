@@ -94,6 +94,12 @@ export const metadata = {
       'x-default': '/',
     },
   },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || 'SellSolar_Google_Search_Console_Verify',
+    other: {
+      'msvalidate.01': [process.env.NEXT_PUBLIC_BING_VERIFICATION || 'SellSolar_Bing_Webmaster_Verify'],
+    },
+  },
   openGraph: {
     type: 'website',
     locale: 'en_PK',

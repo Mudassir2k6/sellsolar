@@ -1,5 +1,7 @@
 import SellSolarClient from '../sellsolar-client';
 import { buildMetadataForSlug, getJsonLdForSlug } from '@/lib/seo-next';
+import SeoCrawlerFallback from '@/components/SeoCrawlerFallback';
+import { PAGE_SEO, canonicalPage } from '@/lib/seo';
 
 const STATIC_SLUGS = [
   [],
@@ -72,6 +74,8 @@ export default async function CatchAllPage({ params }) {
   const slugArray = resolved?.slug || [];
   const pathname = slugArray.length > 0 ? `/${slugArray.join('/')}` : '/';
   const jsonLd = getJsonLdForSlug(slugArray);
+  const rawKey = slugArray.length > 0 ? slugArray[0] : 'home';
+  const meta = PAGE_SEO[rawKey] || PAGE_SEO[canonicalPage(rawKey)] || PAGE_SEO.home;
 
   return (
     <>
@@ -79,6 +83,8 @@ export default async function CatchAllPage({ params }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      {/* Search Crawler Static Content (Immediately indexed by Googlebot, Bingbot, Yahoo, and DuckDuckGo without requiring JS execution) */}
+      <SeoCrawlerFallback slug={slugArray} meta={meta} />
       <SellSolarClient
         key={pathname}
         initialPathname={pathname}

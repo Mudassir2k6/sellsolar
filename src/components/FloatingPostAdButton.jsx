@@ -17,7 +17,7 @@ export default function FloatingPostAdButton({ onPostAd, className = '' }) {
         <CirclePlus className="h-4 w-4 sm:h-5 sm:w-5 text-white stroke-[2.5]" />
       </span>
       <span className="font-extrabold tracking-wide whitespace-nowrap text-white text-xs sm:text-sm drop-shadow-xs">
-        Post Ad
+        Sell Used Solar
       </span>
       <span className="inline-flex items-center gap-0.5 rounded-full bg-white/25 px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white">
         <Sparkles className="h-2.5 w-2.5 text-amber-200" />

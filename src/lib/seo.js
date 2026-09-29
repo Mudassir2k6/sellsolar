@@ -14,13 +14,13 @@ const NOINDEX = 'noindex,nofollow';
 
 export const PAGE_SEO = {
   home: {
-    title: 'Solar Plates Price in Pakistan, Inverters & Solar Batteries | SellSolar',
+    title: 'Used Solar Plates, Inverters & Batteries for Sale in Pakistan | SellSolar',
     description:
-      "Pakistan's #1 solar marketplace. Check daily solar plate price in Pakistan, live solar panel rates per watt, solar inverters & batteries. Buy and sell new or used solar plates, inverters, and complete systems.",
+      "Pakistan's #1 dedicated marketplace to buy & sell used solar plates, second-hand hybrid inverters, and solar batteries. Check daily solar plate prices, verify Tier-1 plates, and post free used solar ads.",
     path: '/',
     robots: INDEXABLE,
     keywords:
-      'solar plates, solar plate price in Pakistan, solar plate, solar plates rate today, solar panels Pakistan, solar inverter, solar invertor, solar batteries, solar battries, solar authorised dealer, calculate solar load, solar price today, used solar plates, sell solar Pakistan',
+      'used solar, used solar plates, used solar for sale, sell used solar, buy used solar, second hand solar plates, used solar inverters, used solar batteries, used solar Pakistan, solar plates, solar plate price in Pakistan, solar inverter, solar batteries, solar authorised dealer, calculate solar load, SellSolar',
   },
   prices: {
     title: 'Solar Plate Price in Pakistan Today | Live Solar Panels, Inverters & Batteries Rates',

@@ -12,9 +12,9 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 const SITE_URL = 'https://sellsolar.pk';
-const TITLE = 'Solar Plates Price in Pakistan, Inverters & Solar Batteries | SellSolar';
+const TITLE = 'Used Solar Plates, Inverters & Batteries for Sale in Pakistan | SellSolar';
 const DESCRIPTION =
-  "Pakistan's #1 solar marketplace. Check daily solar plate price in Pakistan, live solar panel rates per watt, solar inverters & batteries. Buy and sell new or used solar plates, inverters, and complete systems.";
+  "Pakistan's #1 dedicated marketplace to buy & sell used solar plates, second-hand hybrid inverters, and solar batteries. Check daily solar plate prices, verify Tier-1 plates, and post free used solar ads.";
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),
@@ -24,6 +24,17 @@ export const metadata = {
   },
   description: DESCRIPTION,
   keywords: [
+    'used solar',
+    'used solar plates',
+    'used solar for sale',
+    'sell used solar',
+    'buy used solar',
+    'used solar panels Pakistan',
+    'used solar inverter',
+    'used solar batteries',
+    'second hand solar plates',
+    'used solar system for sale',
+    'used solar Pakistan',
     'solar plates',
     'solar plate price in Pakistan',
     'solar plate',

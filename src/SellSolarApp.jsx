@@ -1416,16 +1416,15 @@ function nx({
   }, []);
 
   const popularSearches = [
+    "Used Solar Plates",
+    "Used Solar Inverters",
     "Solar Plates Price",
+    "Sell Used Solar",
     "Calculate Solar Load",
     "Solar Authorised Dealers",
     "550W Solar Plates",
-    "Solar Inverter",
-    "Lithium Battery",
-    "Longi 585W",
     "Inverex 6kW",
-    "Used Solar Plates",
-    "10kW System"
+    "Used Batteries"
   ];
 
   const handlePopularClick = (term) => {
@@ -1466,16 +1465,16 @@ function nx({
               jsxs("div",{
                 className:"mb-2 inline-flex items-center gap-1.5 rounded-full bg-primary-50 dark:bg-primary-950/60 border border-primary-200/80 dark:border-primary-800/60 px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold text-primary-700 dark:text-primary-300 shadow-2xs",children:[
                   jsx(TrendingUp,{ className:"h-3 w-3 text-primary-600 dark:text-primary-400" }),
-                  heroCms?.badgeText || "Pakistan's #1 Solar Marketplace"
+                  heroCms?.badgeText || "Pakistan's #1 Marketplace to Buy & Sell Used Solar"
                 ]
               }),
               jsx("h1",{
                 className:"text-balance text-xl xs:text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white leading-tight",
-                children: heroCms?.heading || "Solar Plates, Inverters & Batteries in Pakistan"
+                children: heroCms?.heading || "Buy & Sell Used Solar Plates, Inverters & Batteries in Pakistan"
               }),
               jsx("p",{
                 className:"mx-auto mt-1 sm:mt-1.5 max-w-xl text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed",
-                children: heroCms?.subheading || "Check live solar plate prices, buy & sell new or used solar plates, hybrid inverters, and lithium batteries across Pakistan."
+                children: heroCms?.subheading || "Pakistan's dedicated marketplace to buy and sell used solar plates, second-hand inverters, and solar batteries at live market prices. Post free ads or find verified deals across Pakistan."
               }),
               (nc||np||nd)&&jsxs("div",{
                 className:"mt-2.5 flex flex-wrap items-center justify-center gap-2",children:[
@@ -1765,9 +1764,9 @@ function nx({
   const items = [
     {
       id: 'sell',
-      title: 'Post Free Solar Ad',
-      desc: 'Sell used/new solar panels, inverters or batteries',
-      cta: 'Post Ad Free',
+      title: 'Sell Used Solar (Post Free Ad)',
+      desc: 'Sell used solar plates, inverters & batteries fast',
+      cta: 'Sell Used Solar',
       icon: CirclePlus,
       color: 'from-amber-500 to-amber-600',
       action: () => onPostAd && onPostAd()

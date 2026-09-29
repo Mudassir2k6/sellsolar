@@ -70,7 +70,7 @@ export default function MobileBottomNav({
             <PlusCircle className="h-6 w-6 stroke-[2.3]" />
           </div>
           <span className="text-[10px] font-extrabold text-gray-800 dark:text-gray-200 mt-0.5 leading-none">
-            Post Ad
+            Sell Used
           </span>
         </button>
 

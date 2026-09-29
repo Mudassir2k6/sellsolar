@@ -1417,6 +1417,8 @@ function nx({
 
   const popularSearches = [
     "Solar Plates Price",
+    "Calculate Solar Load",
+    "Solar Authorised Dealers",
     "550W Solar Plates",
     "Solar Inverter",
     "Lithium Battery",
@@ -2545,6 +2547,8 @@ function hx({
                 className: "flex flex-wrap gap-1.5",
                 children: [
                   { label: "Solar Plates Price in Pakistan", page: "prices" },
+                  { label: "Solar Authorised Dealers", page: "dealers" },
+                  { label: "Calculate Solar Load", page: "calculator" },
                   { label: "Solar Plates Rate Today", page: "prices" },
                   { label: "Tier-1 Solar Plates", page: "solar-panels" },
                   { label: "550W Solar Plates", page: "solar-panels" },

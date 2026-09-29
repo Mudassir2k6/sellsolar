@@ -507,7 +507,7 @@ https://sellsolar.pk/calculator`;
                 Pakistan Solar Sizing & Energy Audit Engine
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-                Solar Load & Capacity <span className="text-primary-500">Calculator</span>
+                Calculate Solar Load in <span className="text-primary-500">Pakistan</span>
               </h1>
               <p className="mt-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
                 Calculate your exact required solar capacity in <strong className="text-gray-900 dark:text-white">kW</strong>, number of solar plates, battery backup, and turnkey installation budget for Pakistan.

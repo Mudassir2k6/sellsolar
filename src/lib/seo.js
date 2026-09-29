@@ -7,7 +7,7 @@ export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.jpg`;
 export const DEFAULT_OG_IMAGE_WIDTH = '1200';
 export const DEFAULT_OG_IMAGE_HEIGHT = '630';
 export const DEFAULT_KEYWORDS =
-  'solar plates, solar plate price in Pakistan, solar plate, solar plates rate today, solar panel price Pakistan, solar inverter price, solar invertor Pakistan, solar batteries, solar battries, lithium battery Pakistan, tubular battery price, solar price today, solar marketplace Pakistan, used solar plates, used solar panels, Tier 1 solar plates, Longi, Jinko, Canadian Solar, Inverex';
+  'solar authorised dealer, solar authorized dealers Pakistan, calculate solar load, solar load calculator, solar plates, solar plate price in Pakistan, solar plate, solar plates rate today, solar panel price Pakistan, solar inverter price, solar invertor Pakistan, solar batteries, solar battries, lithium battery Pakistan, tubular battery price, solar price today, solar marketplace Pakistan, used solar plates, used solar panels, Tier 1 solar plates, Longi, Jinko, Canadian Solar, Inverex';
 
 const INDEXABLE = 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1';
 const NOINDEX = 'noindex,nofollow';
@@ -20,7 +20,7 @@ export const PAGE_SEO = {
     path: '/',
     robots: INDEXABLE,
     keywords:
-      'solar plates, solar plate price in Pakistan, solar plate, solar plates rate today, solar panels Pakistan, solar inverter, solar invertor, solar batteries, solar battries, solar price today, used solar plates, sell solar Pakistan',
+      'solar plates, solar plate price in Pakistan, solar plate, solar plates rate today, solar panels Pakistan, solar inverter, solar invertor, solar batteries, solar battries, solar authorised dealer, calculate solar load, solar price today, used solar plates, sell solar Pakistan',
   },
   prices: {
     title: 'Solar Plate Price in Pakistan Today | Live Solar Panels, Inverters & Batteries Rates',
@@ -32,20 +32,22 @@ export const PAGE_SEO = {
       'solar plate price in Pakistan, solar plates rate today, solar price Pakistan, solar panel price, solar inverter price, solar battery price, solar rate today Pakistan, Longi solar plate price, Jinko solar plate rate, plates price',
   },
   calculator: {
-    title: 'Solar Load Calculator Pakistan | Solar Plates, Inverter & Battery Size',
+    title: 'Calculate Solar Load Pakistan | Solar System, Plates & Inverter Calculator',
     description:
-      'Free Pakistan solar load calculator. Enter fans, lights and ACs to calculate solar plates needed, inverter size kW, and battery backup hours.',
+      'Calculate solar load free in Pakistan. Enter home appliances (fans, lights, inverter ACs) to calculate total kW load, required solar plates count, and battery backup.',
     path: '/calculator',
     robots: INDEXABLE,
     keywords:
-      'solar load calculator Pakistan, solar plate calculator, how many solar plates do I need, solar system size, inverter size calculator, solar calculator',
+      'calculate solar load, solar load calculator, calculate solar system load, solar load calculator Pakistan, how to calculate solar load, calculate solar plates needed, inverter size calculator',
   },
   dealers: {
-    title: 'Verified Solar Dealers Pakistan | SellSolar',
+    title: 'Solar Authorised Dealers in Pakistan | Verified Equipment Sellers',
     description:
-      'Browse verified solar equipment dealers across Pakistan. Find trusted sellers of Longi, Jinko, Inverex and Homage products in your city.',
+      'Find verified solar authorised dealers and certified distributors across Pakistan. Trusted sellers of Longi, Jinko, Canadian Solar, Inverex, and Growatt in Lahore, Karachi, Islamabad.',
     path: '/dealers',
     robots: INDEXABLE,
+    keywords:
+      'solar authorised dealer, solar authorized dealers Pakistan, verified solar dealers, solar distributors Pakistan, Longi authorised dealer, Jinko dealer, Inverex distributor',
   },
   install: {
     title: 'Solar Installation Request | SellSolar',

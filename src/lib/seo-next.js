@@ -165,7 +165,7 @@ export function getJsonLdForSlug(slug) {
     schemas.push({
       '@context': 'https://schema.org',
       '@type': 'WebApplication',
-      name: 'SellSolar Pakistan Solar Load, Solar Plates & System Calculator',
+      name: 'Calculate Solar Load & System Size in Pakistan - SellSolar',
       url,
       applicationCategory: 'UtilityApplication',
       operatingSystem: 'All',
@@ -176,7 +176,38 @@ export function getJsonLdForSlug(slug) {
         priceCurrency: 'PKR',
       },
       description:
-        'Accurately calculate household appliance wattage, required solar inverter size, solar plates count, and battery backup requirements in Pakistan.',
+        'Calculate solar load for home in Pakistan. Calculate total appliance wattage, required solar plates count (550W/585W), inverter capacity in kW, and lithium battery backup.',
+    });
+    schemas.push({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'How do I calculate solar load for my home in Pakistan?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Add up the running wattage of all your household appliances (fans 75W–85W, LED lights 10W–18W, 1.5-ton inverter AC 1200W–1800W, refrigerator 250W). Divide total watts by 1,000 to get required continuous kW, and add a 25% safety margin to determine your ideal solar inverter and solar plates system size.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How many solar plates are needed for a 5kW or 10kW solar system in Pakistan?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'For a 5kW solar system, you need approximately 9 to 10 Tier-1 550W/585W solar plates. For a 10kW system, you need 18 to 20 solar plates producing approximately 40 to 45 units (kWh) per sunny day.',
+          },
+        },
+      ],
+    });
+  } else if (key === 'dealers') {
+    schemas.push({
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: 'Solar Authorised Dealers & Distributors in Pakistan',
+      description: 'Directory of certified and verified solar equipment dealers for Longi, Jinko, Canadian Solar, Inverex, and Growatt across Lahore, Karachi, Islamabad, Rawalpindi, and Multan.',
+      itemListOrder: 'https://schema.org/ItemListOrderAscending',
+      numberOfItems: '80',
     });
   } else if (key === 'prices') {
     schemas.push({

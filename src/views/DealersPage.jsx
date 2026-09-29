@@ -190,7 +190,7 @@ export default function DealersPage({ onNavigate, onBack, hasOuterNavbar = false
               Pakistan Solar Dealer & Importer Directory
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
-              Verified Solar Dealers in <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-amber-600">Pakistan</span>
+              Solar Authorised Dealers in <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-amber-600">Pakistan</span>
             </h1>
             <p className="mt-1.5 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
               Find verified solar equipment dealers, wholesalers, and certified distributors in each major city. Every business is verified with valid commercial market address, phone/WhatsApp, and Tier-1 brand authorizations.

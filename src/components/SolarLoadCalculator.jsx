@@ -412,7 +412,7 @@ Calculated at SellSolar.pk`;
                 Pakistan Solar Sizing & Sizing Engine
               </div>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                Solar Load <span className="text-primary-400">Calculator</span>
+                Calculate Solar Load & <span className="text-primary-400">System Capacity</span>
               </h2>
               <p className="mt-1.5 text-xs sm:text-sm text-gray-300 max-w-2xl leading-relaxed">
                 Add your household appliances and adjust wattages to estimate your exact required solar system capacity in <strong className="text-white">kW</strong>, panel counts, inverter sizing, and estimated monthly unit savings.

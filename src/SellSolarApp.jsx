@@ -34,6 +34,7 @@ import {
   Calendar,
   ChartColumn,
   ChevronDown,
+  ChevronLeft,
   ChevronRight,
   CircleAlert,
   CircleCheck,
@@ -1442,6 +1443,15 @@ function nx({
     "Used Batteries"
   ];
 
+  const categoryScrollRef = useRef(null);
+
+  const scrollCategoryTrack = (direction) => {
+    if (categoryScrollRef.current) {
+      const scrollAmount = direction === "left" ? -220 : 220;
+      categoryScrollRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    }
+  };
+
   const handlePopularClick = (term) => {
     e("query", term);
     setTimeout(() => {
@@ -1654,106 +1664,125 @@ function nx({
               ]
             })
           }),
-          jsx("div",{
-            className:"mx-auto mt-3.5 max-w-4xl",children:jsx("div",{
-              className:"flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pb-1.5 scrollbar-none",children:[
-                {
-                  label: "Solar Panels",
-                  sub: "550W & N-Type",
-                  icon: Sun,
-                  action: () => {
-                    e("category", "panel");
-                    const el = document.getElementById("listings");
-                    el && el.scrollIntoView({ behavior: "smooth", block: "start" });
+          jsxs("div",{
+            className:"relative mx-auto mt-3.5 max-w-4xl lg:max-w-5xl px-0",
+            children:[
+              jsx("button",{
+                type:"button",
+                onClick:()=>scrollCategoryTrack("left"),
+                className:"lg:hidden absolute -left-2 sm:-left-3 top-1/2 -translate-y-1/2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-95 transition-all cursor-pointer",
+                "aria-label":"Scroll left",
+                children:jsx(ChevronLeft,{ className:"h-4 w-4" })
+              }),
+              jsx("div",{
+                ref:categoryScrollRef,
+                className:"flex items-center gap-1.5 sm:gap-2 overflow-x-auto py-1 px-3 sm:px-2 scrollbar-none scroll-smooth lg:grid lg:grid-cols-7 lg:gap-2 lg:overflow-visible lg:px-0",
+                children:[
+                  {
+                    label: "Solar Panels",
+                    sub: "550W & N-Type",
+                    icon: Sun,
+                    action: () => {
+                      e("category", "panel");
+                      const el = document.getElementById("listings");
+                      el && el.scrollIntoView({ behavior: "smooth", block: "start" });
+                    },
+                    active: t.category === "panel"
                   },
-                  active: t.category === "panel"
-                },
-                {
-                  label: "Inverters",
-                  sub: "Hybrid & On-Grid",
-                  icon: Zap,
-                  action: () => {
-                    e("category", "inverter");
-                    const el = document.getElementById("listings");
-                    el && el.scrollIntoView({ behavior: "smooth", block: "start" });
+                  {
+                    label: "Inverters",
+                    sub: "Hybrid & On-Grid",
+                    icon: Zap,
+                    action: () => {
+                      e("category", "inverter");
+                      const el = document.getElementById("listings");
+                      el && el.scrollIntoView({ behavior: "smooth", block: "start" });
+                    },
+                    active: t.category === "inverter"
                   },
-                  active: t.category === "inverter"
-                },
-                {
-                  label: "Batteries",
-                  sub: "Lithium & Tubular",
-                  icon: BatteryCharging,
-                  action: () => {
-                    e("category", "battery");
-                    const el = document.getElementById("listings");
-                    el && el.scrollIntoView({ behavior: "smooth", block: "start" });
+                  {
+                    label: "Batteries",
+                    sub: "Lithium & Tubular",
+                    icon: BatteryCharging,
+                    action: () => {
+                      e("category", "battery");
+                      const el = document.getElementById("listings");
+                      el && el.scrollIntoView({ behavior: "smooth", block: "start" });
+                    },
+                    active: t.category === "battery"
                   },
-                  active: t.category === "battery"
-                },
-                {
-                  label: "Complete Systems",
-                  sub: "5kW to 20kW+",
-                  icon: Boxes,
-                  action: () => {
-                    e("category", "complete_system");
-                    const el = document.getElementById("listings");
-                    el && el.scrollIntoView({ behavior: "smooth", block: "start" });
+                  {
+                    label: "Complete Systems",
+                    sub: "5kW to 20kW+",
+                    icon: Boxes,
+                    action: () => {
+                      e("category", "complete_system");
+                      const el = document.getElementById("listings");
+                      el && el.scrollIntoView({ behavior: "smooth", block: "start" });
+                    },
+                    active: t.category === "complete_system"
                   },
-                  active: t.category === "complete_system"
-                },
-                {
-                  label: "Daily Rates",
-                  sub: "Rs 34-42/W Live",
-                  icon: TrendingUp,
-                  action: np || (() => {
-                    const el = document.getElementById("daily-market-rates");
-                    el && el.scrollIntoView({ behavior: "smooth", block: "start" });
-                  }),
-                  highlight: true
-                },
-                {
-                  label: "Solar Calculator",
-                  sub: "Find System kW",
-                  icon: Calculator,
-                  action: nc
-                },
-                {
-                  label: "Verified Dealers",
-                  sub: "80+ Certified",
-                  icon: Store,
-                  action: nd
-                }
-              ].map(cat => jsxs("button", {
-                type: "button",
-                onClick: cat.action,
-                className: `flex items-center gap-2 px-3 py-1.5 sm:py-2 rounded-xl text-left border transition-all shrink-0 cursor-pointer ${
-                  cat.active
-                    ? "bg-primary-500 text-white border-primary-600 shadow-xs"
-                    : cat.highlight
-                    ? "bg-amber-500/10 hover:bg-amber-500/20 text-amber-900 dark:text-amber-200 border-amber-300/80 dark:border-amber-800"
-                    : "bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-800 shadow-2xs"
-                }`,
-                children: [
-                  jsx("div", {
-                    className: `h-7 w-7 sm:h-8 sm:w-8 rounded-lg flex items-center justify-center shrink-0 ${
-                      cat.active
-                        ? "bg-white/20 text-white"
-                        : cat.highlight
-                        ? "bg-amber-500 text-white"
-                        : "bg-primary-50 dark:bg-primary-950/60 text-primary-600 dark:text-primary-400"
-                    }`,
-                    children: jsx(cat.icon, { className: "h-3.5 w-3.5 sm:h-4 sm:w-4" })
-                  }),
-                  jsxs("div", {
-                    className: "min-w-0 pr-1",
-                    children: [
-                      jsx("div", { className: `text-[11px] sm:text-xs font-bold leading-tight ${cat.active ? "text-white" : ""}`, children: cat.label }),
-                      jsx("div", { className: `text-[9px] sm:text-[10px] leading-tight ${cat.active ? "text-white/80" : "text-gray-500 dark:text-gray-400"}`, children: cat.sub })
-                    ]
-                  })
-                ]
-              }, cat.label))
-            })
+                  {
+                    label: "Daily Rates",
+                    sub: "Rs 34-42/W Live",
+                    icon: TrendingUp,
+                    action: np || (() => {
+                      const el = document.getElementById("daily-market-rates");
+                      el && el.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }),
+                    highlight: true
+                  },
+                  {
+                    label: "Solar Calculator",
+                    sub: "Find System kW",
+                    icon: Calculator,
+                    action: nc
+                  },
+                  {
+                    label: "Verified Dealers",
+                    sub: "80+ Certified",
+                    icon: Store,
+                    action: nd
+                  }
+                ].map(cat => jsxs("button", {
+                  type: "button",
+                  onClick: cat.action,
+                  className: `flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 sm:py-2 rounded-xl text-left border transition-all shrink-0 lg:shrink min-w-0 w-auto lg:w-full cursor-pointer ${
+                    cat.active
+                      ? "bg-primary-500 text-white border-primary-600 shadow-xs"
+                      : cat.highlight
+                      ? "bg-amber-500/10 hover:bg-amber-500/20 text-amber-900 dark:text-amber-200 border-amber-300/80 dark:border-amber-800"
+                      : "bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-800 shadow-2xs"
+                  }`,
+                  children: [
+                    jsx("div", {
+                      className: `h-7 w-7 sm:h-8 sm:w-8 rounded-lg flex items-center justify-center shrink-0 ${
+                        cat.active
+                          ? "bg-white/20 text-white"
+                          : cat.highlight
+                          ? "bg-amber-500 text-white"
+                          : "bg-primary-50 dark:bg-primary-950/60 text-primary-600 dark:text-primary-400"
+                      }`,
+                      children: jsx(cat.icon, { className: "h-3.5 w-3.5 sm:h-4 sm:w-4" })
+                    }),
+                    jsxs("div", {
+                      className: "min-w-0 flex-1 overflow-hidden pr-0.5",
+                      children: [
+                        jsx("div", { className: `text-[11px] sm:text-xs font-bold leading-tight truncate ${cat.active ? "text-white" : ""}`, children: cat.label }),
+                        jsx("div", { className: `text-[9px] sm:text-[10px] leading-tight truncate ${cat.active ? "text-white/80" : "text-gray-500 dark:text-gray-400"}`, children: cat.sub })
+                      ]
+                    })
+                  ]
+                }, cat.label))
+              }),
+              jsx("button",{
+                type:"button",
+                onClick:()=>scrollCategoryTrack("right"),
+                className:"lg:hidden absolute -right-2 sm:-right-3 top-1/2 -translate-y-1/2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-95 transition-all cursor-pointer",
+                "aria-label":"Scroll right",
+                children:jsx(ChevronRight,{ className:"h-4 w-4" })
+              })
+            ]
           }),
           jsx("div",{
             className:"mx-auto mt-4 sm:mt-5 grid max-w-4xl grid-cols-2 gap-2.5 sm:gap-3.5 sm:grid-cols-4",children:[{

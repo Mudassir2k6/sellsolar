@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Component } from 'react';
 import {
   LayoutDashboard,
   Users,
@@ -138,6 +138,62 @@ export const SYSTEM_PAGES = [
   { path: '/cookies', title: 'Cookie Policy', category: 'Legal', description: 'Details about cookies and tracking technologies used on SellSolar' },
   { path: '/disclaimer', title: 'Disclaimer', category: 'Legal', description: 'Marketplace liability disclaimers, price volatility, and third-party links' },
 ];
+
+class TabErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, errorInfo) {
+    console.error('TabErrorBoundary caught:', error, errorInfo);
+  }
+  componentDidUpdate(prevProps) {
+    if (prevProps.activeTab !== this.props.activeTab && this.state.hasError) {
+      this.setState({ hasError: false, error: null });
+    }
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="rounded-2xl border border-amber-200 dark:border-amber-800 bg-amber-50/60 dark:bg-amber-950/30 p-8 text-center space-y-4 my-6">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
+            <CircleAlert className="h-6 w-6" />
+          </div>
+          <div>
+            <h3 className="text-base font-bold text-gray-900 dark:text-white">
+              Temporary Issue in this Section
+            </h3>
+            <p className="mt-1 text-xs text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+              This tab encountered an unexpected state. You can retry loading this section or return to Overview.
+            </p>
+          </div>
+          <div className="flex items-center justify-center gap-2 pt-2">
+            <button
+              type="button"
+              onClick={() => this.setState({ hasError: false, error: null })}
+              className="btn-primary text-xs px-4 py-2 cursor-pointer"
+            >
+              Retry Section
+            </button>
+            {this.props.onReset && (
+              <button
+                type="button"
+                onClick={this.props.onReset}
+                className="btn-secondary text-xs px-4 py-2 cursor-pointer"
+              >
+                Go to Overview
+              </button>
+            )}
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 export default function AdminSuperDashboard({
   onBack,
@@ -1577,6 +1633,7 @@ export default function AdminSuperDashboard({
     );
   });
 
+
   // Merged Pages List (System default pages + custom page overrides)
   const allPagesList = useMemo(() => {
     const customMap = new Map();
@@ -2405,6 +2462,7 @@ export default function AdminSuperDashboard({
 
         {/* Content Area */}
         <main className="flex-1 min-w-0 p-3 sm:p-6 lg:p-8 overflow-y-auto">
+          <TabErrorBoundary activeTab={activeTab} onReset={() => selectTab('dashboard')}>
           {/* TAB 1: DASHBOARD / OVERVIEW */}
           {activeTab === 'dashboard' && (
             <div className="space-y-6">
@@ -6570,6 +6628,7 @@ export default function AdminSuperDashboard({
               </div>
             </div>
           )}
+          </TabErrorBoundary>
         </main>
       </div>
 

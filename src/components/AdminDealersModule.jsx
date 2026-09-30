@@ -69,8 +69,9 @@ export default function AdminDealersModule() {
   }, []);
 
   const filteredDealers = useMemo(() => {
-    return dealers.filter((d) => {
-      if (selectedCity !== 'all' && d.city?.toLowerCase() !== selectedCity.toLowerCase()) {
+    return (dealers || []).filter((d) => {
+      if (!d) return false;
+      if (selectedCity !== 'all' && (d.city || '').toLowerCase() !== selectedCity.toLowerCase()) {
         return false;
       }
       if (selectedSource !== 'all' && (d.registration_source || 'ai_curated') !== selectedSource) {
@@ -78,10 +79,10 @@ export default function AdminDealersModule() {
       }
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
-        const matchName = d.full_name?.toLowerCase().includes(q);
-        const matchBiz = d.business_name?.toLowerCase().includes(q);
-        const matchPhone = d.phone?.includes(q);
-        const matchCity = d.city?.toLowerCase().includes(q);
+        const matchName = (d.full_name || '').toLowerCase().includes(q);
+        const matchBiz = (d.business_name || '').toLowerCase().includes(q);
+        const matchPhone = (d.phone || '').includes(q);
+        const matchCity = (d.city || '').toLowerCase().includes(q);
         if (!matchName && !matchBiz && !matchPhone && !matchCity) return false;
       }
       return true;

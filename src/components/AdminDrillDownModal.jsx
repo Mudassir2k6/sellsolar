@@ -161,10 +161,10 @@ export default function AdminDrillDownModal({
         if (!searchQuery) return true;
         const q = searchQuery.toLowerCase();
         return (
-          u.name?.toLowerCase().includes(q) ||
-          u.email?.toLowerCase().includes(q) ||
-          u.phone?.toLowerCase().includes(q) ||
-          u.city?.toLowerCase().includes(q)
+          (u.name || '').toLowerCase().includes(q) ||
+          (u.email || '').toLowerCase().includes(q) ||
+          (u.phone || '').includes(q) ||
+          (u.city || '').toLowerCase().includes(q)
         );
       })
       .sort((a, b) => {
@@ -174,17 +174,18 @@ export default function AdminDrillDownModal({
   }, [usersList, filterCategory, searchQuery, sortBy]);
 
   const filteredDealers = useMemo(() => {
-    return dealersList
+    return (dealersList || [])
       .filter((d) => {
-        if (filterCategory !== 'all' && d.city?.toLowerCase() !== filterCategory.toLowerCase()) return false;
+        if (!d) return false;
+        if (filterCategory !== 'all' && (d.city || '').toLowerCase() !== filterCategory.toLowerCase()) return false;
         if (!searchQuery) return true;
         const q = searchQuery.toLowerCase();
         return (
-          d.business_name?.toLowerCase().includes(q) ||
-          d.full_name?.toLowerCase().includes(q) ||
-          d.city?.toLowerCase().includes(q) ||
-          d.phone?.includes(q) ||
-          d.business_address?.toLowerCase().includes(q)
+          (d.business_name || '').toLowerCase().includes(q) ||
+          (d.full_name || '').toLowerCase().includes(q) ||
+          (d.city || '').toLowerCase().includes(q) ||
+          (d.phone || '').includes(q) ||
+          (d.business_address || '').toLowerCase().includes(q)
         );
       })
       .sort((a, b) => {

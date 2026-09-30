@@ -75,10 +75,10 @@ export default function AdminDailyRatesModule() {
     const q = searchQuery.toLowerCase();
     return list.filter(
       (item) =>
-        item.brand?.toLowerCase().includes(q) ||
-        item.model?.toLowerCase().includes(q) ||
-        item.type?.toLowerCase().includes(q) ||
-        item.capacity?.toLowerCase().includes(q)
+        String(item?.brand || '').toLowerCase().includes(q) ||
+        String(item?.model || '').toLowerCase().includes(q) ||
+        String(item?.type || '').toLowerCase().includes(q) ||
+        String(item?.capacity || '').toLowerCase().includes(q)
     );
   }, [sheetData, activeCategory, searchQuery]);
 

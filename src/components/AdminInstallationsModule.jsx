@@ -51,16 +51,17 @@ export default function AdminInstallationsModule() {
   }, []);
 
   const filteredRequests = useMemo(() => {
-    return requests.filter((req) => {
+    return (requests || []).filter((req) => {
+      if (!req) return false;
       if (statusFilter !== 'all' && req.status !== statusFilter) return false;
-      if (cityFilter !== 'all' && req.city?.toLowerCase() !== cityFilter.toLowerCase()) return false;
+      if (cityFilter !== 'all' && (req.city || '').toLowerCase() !== cityFilter.toLowerCase()) return false;
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
-        const matchName = req.fullName?.toLowerCase().includes(q);
-        const matchPhone = req.phone?.includes(q);
-        const matchCity = req.city?.toLowerCase().includes(q);
-        const matchType = req.systemType?.toLowerCase().includes(q);
-        const matchTracking = req.trackingCode?.toLowerCase().includes(q);
+        const matchName = (req.fullName || '').toLowerCase().includes(q);
+        const matchPhone = (req.phone || '').includes(q);
+        const matchCity = (req.city || '').toLowerCase().includes(q);
+        const matchType = (req.systemType || '').toLowerCase().includes(q);
+        const matchTracking = (req.trackingCode || '').toLowerCase().includes(q);
         if (!matchName && !matchPhone && !matchCity && !matchType && !matchTracking) return false;
       }
       return true;

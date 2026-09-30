@@ -72,13 +72,36 @@ export class ErrorBoundary extends Component {
                   : 'A brief connection interrupt occurred while loading. Please refresh to continue.'}
               </p>
             </div>
-            <button
-              type="button"
-              onClick={this.handleReload}
-              className="btn-primary w-full py-3 rounded-xl text-sm font-bold shadow-md cursor-pointer transition-all active:scale-95"
-            >
-              Reload Page
-            </button>
+            <div className="flex flex-col gap-2 pt-1">
+              <button
+                type="button"
+                onClick={this.handleReload}
+                className="btn-primary w-full py-3 rounded-xl text-sm font-bold shadow-md cursor-pointer transition-all active:scale-95"
+              >
+                Reload Page
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    window.location.href = '/';
+                  }
+                }}
+                className="btn-secondary w-full py-2.5 rounded-xl text-xs font-bold cursor-pointer"
+              >
+                Go to Marketplace Home
+              </button>
+            </div>
+            {this.state.error?.message && !this.state.isChunkError && (
+              <details className="text-left text-[11px] text-gray-400 bg-gray-50 dark:bg-gray-800/50 p-2.5 rounded-xl border border-gray-100 dark:border-gray-800">
+                <summary className="cursor-pointer font-mono font-semibold text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                  Diagnostic Information
+                </summary>
+                <p className="mt-1 font-mono text-[10px] break-all text-rose-600 dark:text-rose-400">
+                  {String(this.state.error.message)}
+                </p>
+              </details>
+            )}
           </div>
         </div>
       );

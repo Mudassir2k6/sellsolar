@@ -2923,8 +2923,8 @@ function yx({
         }
       }
     } catch {}
-    return isSignedIn ? (r?.phone || '03001234567') : '';
-  }, [r, seller, isSignedIn]);
+    return r?.phone || '';
+  }, [r, seller]);
 
   useEffect(() => {
     if (isSignedIn) {
@@ -2936,9 +2936,9 @@ function yx({
     }
   }, [isSignedIn, resolvedName, resolvedPhone]);
 
-  // When signed in, Name and Mobile Number are permanently locked from the start and completely non-editable
+  // When signed in, Name is locked. Mobile Number is locked only if the user already has one.
   const isNameLocked = Boolean(isSignedIn);
-  const isPhoneLocked = Boolean(isSignedIn);
+  const isPhoneLocked = Boolean(isSignedIn && resolvedPhone && resolvedPhone.trim().length > 0);
 
   const [fieldErrors, setFieldErrors] = useState({});
   const titleInputRef = useRef(null);

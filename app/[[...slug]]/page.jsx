@@ -21,6 +21,7 @@ const STATIC_SLUGS = [
   ['dashboard'],
   ['admin'],
   ['admin-dashboard'],
+  ['inbox'],
   ['password'],
   ['forgot-password'],
   ['reset-password'],

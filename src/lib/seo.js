@@ -330,6 +330,12 @@ export const PAGE_SEO = {
     path: '/disclaimer',
     robots: INDEXABLE,
   },
+  inbox: {
+    title: 'Admin Inbox | SellSolar Pakistan',
+    description: 'Admin message inquiries and notifications.',
+    path: '/inbox',
+    robots: NOINDEX,
+  },
 };
 
 const PAGE_ALIASES = {

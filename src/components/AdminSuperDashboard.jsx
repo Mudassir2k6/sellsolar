@@ -1816,7 +1816,7 @@ export default function AdminSuperDashboard({
                   >
                     <div className="flex items-center gap-2">
                       <MessageSquare className="h-3.5 w-3.5 text-purple-500" />
-                      <span>Unified Inbox</span>
+                      <span>Inbox</span>
                     </div>
                     {unreadInboxCount > 0 && (
                       <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-rose-500 text-white font-black">
@@ -2929,7 +2929,7 @@ export default function AdminSuperDashboard({
                 <div>
                   <h1 className="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-2">
                     <Mail className="h-6 w-6 text-amber-500" />
-                    Unified Inbox (info@sellsolar.pk)
+                    Inbox (info@sellsolar.pk)
                   </h1>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     Customer contact messages, dealer inquiries, and direct responses.

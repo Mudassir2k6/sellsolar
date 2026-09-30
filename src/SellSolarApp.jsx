@@ -474,7 +474,7 @@ function Xy({
                       }),
                       jsx('span', {
                         className: 'whitespace-nowrap',
-                        children: 'Calculator',
+                        children: 'Load Calculator',
                       }),
                     ],
                   }),

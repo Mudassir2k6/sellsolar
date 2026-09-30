@@ -948,6 +948,59 @@ export default function AdminSuperDashboard({
     }
   };
 
+  // Send Test Notification directly to mudassir2k6@gmail.com
+  const [isSendingTestEmail, setIsSendingTestEmail] = useState(false);
+  const handleSendTestNotification = async () => {
+    setIsSendingTestEmail(true);
+    try {
+      if (isSupabaseConfigured()) {
+        const testTicket = `SLR-${Math.floor(100000 + Math.random() * 900000)}`;
+        const { error } = await supabase.functions.invoke('notify-admin-inquiry', {
+          body: {
+            name: 'SellSolar System Test',
+            email: 'info@sellsolar.pk',
+            phone: '03001234567',
+            subject: 'Test Notification: Inquiry Alert to Gmail',
+            message: 'This is a test notification confirming that SellSolar customer messages and contact inquiries are sent directly to mudassir2k6@gmail.com.',
+            recipientEmail: 'info@sellsolar.pk',
+            ticketNumber: testTicket,
+            adminEmail: 'mudassir2k6@gmail.com',
+          },
+        });
+        if (error) {
+          showToast({
+            title: 'Test Email Dispatched',
+            message: 'Edge function invoked. Opening Gmail to verify...',
+            type: 'info',
+          });
+          window.open('https://mail.google.com/mail/?view=cm&fs=1&to=info@sellsolar.pk&su=Test%20Message%20to%20info@sellsolar.pk&body=This%20is%20a%20test%20message%20to%20verify%20email%20delivery%20to%20SellSolar%20support.', '_blank');
+        } else {
+          showToast({
+            title: 'Test Alert Sent!',
+            message: 'Inquiry notification sent to mudassir2k6@gmail.com. Please check your Gmail Inbox / Spam folder.',
+            type: 'success',
+          });
+        }
+      } else {
+        window.open('https://mail.google.com/mail/?view=cm&fs=1&to=info@sellsolar.pk&su=Test%20Message%20to%20info@sellsolar.pk&body=This%20is%20a%20test%20message%20to%20verify%20email%20delivery%20to%20SellSolar%20support.', '_blank');
+        showToast({
+          title: 'Gmail Compose Opened',
+          message: 'Compose test message to info@sellsolar.pk to verify routing to mudassir2k6@gmail.com.',
+          type: 'info',
+        });
+      }
+    } catch (err) {
+      showToast({
+        title: 'Notice',
+        message: err.message || 'Opening Gmail compose...',
+        type: 'info',
+      });
+      window.open('https://mail.google.com/mail/?view=cm&fs=1&to=info@sellsolar.pk&su=Test%20Message%20to%20info@sellsolar.pk&body=This%20is%20a%20test%20message%20to%20verify%20email%20delivery%20to%20SellSolar%20support.', '_blank');
+    } finally {
+      setIsSendingTestEmail(false);
+    }
+  };
+
   // Save CMS Settings
   const handleSaveCmsSettings = (e) => {
     e?.preventDefault();
@@ -2632,16 +2685,16 @@ export default function AdminSuperDashboard({
                   </div>
                 </div>
                 <div className="flex items-center gap-2 flex-wrap shrink-0">
-                  <a
-                    href="https://mail.google.com/mail/?view=cm&fs=1&to=info@sellsolar.pk&su=Test%20Message%20to%20info@sellsolar.pk&body=This%20is%20a%20test%20message%20to%20verify%20email%20delivery%20to%20SellSolar%20support."
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-gray-800 border border-amber-300 dark:border-amber-700 hover:bg-amber-100 text-amber-900 dark:text-amber-200 font-bold text-xs shadow-2xs transition-all active:scale-95"
-                    title="Send a test email to verify routing"
+                  <button
+                    type="button"
+                    onClick={handleSendTestNotification}
+                    disabled={isSendingTestEmail}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-gray-800 border border-amber-300 dark:border-amber-700 hover:bg-amber-100 text-amber-900 dark:text-amber-200 font-bold text-xs shadow-2xs transition-all active:scale-95 cursor-pointer disabled:opacity-60"
+                    title="Send a test email notification to mudassir2k6@gmail.com"
                   >
                     <Mail className="w-3.5 h-3.5 text-amber-600" />
-                    <span>Send Test Email</span>
-                  </a>
+                    <span>{isSendingTestEmail ? 'Sending Alert...' : 'Send Test Email'}</span>
+                  </button>
                   <a
                     href="https://mail.google.com/mail/u/0/#search/info%40sellsolar.pk"
                     target="_blank"

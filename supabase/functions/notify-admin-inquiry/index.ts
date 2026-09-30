@@ -144,6 +144,7 @@ Deno.serve(async (req) => {
     let sentProvider = "none";
     if (resendKey) {
       try {
+        const primaryRecipient = "mudassir2k6@gmail.com";
         const sent = await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: {
@@ -152,14 +153,19 @@ Deno.serve(async (req) => {
           },
           body: JSON.stringify({
             from: "SellSolar Messages <onboarding@resend.dev>",
-            to: ["mudassir2k6@yahoo.com"],
+            to: [primaryRecipient],
+            cc: ["mudassir2k6@yahoo.com"],
             reply_to: senderEmail.includes("@") ? senderEmail : undefined,
             subject: emailSubject,
             html: emailHtml,
           }),
         });
+        const resendData = await sent.json().catch(() => ({}));
         if (sent.ok) {
           sentProvider = "resend";
+          console.log("Resend inquiry email sent successfully to", primaryRecipient, resendData);
+        } else {
+          console.warn("Resend inquiry email rejected:", resendData);
         }
       } catch (e) {
         console.warn("Resend email failed:", e);

@@ -391,7 +391,7 @@ function Xy({
                     }),
                     jsx('span', {
                       className:
-                        'hidden 2xl:block text-[11px] sm:text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-tight leading-none mt-1 whitespace-nowrap',
+                        'block text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 tracking-tight leading-none mt-1 whitespace-nowrap',
                       children: settings?.headerTagline || "Pakistan's #1 Used Solar Marketplace",
                     }),
                   ],

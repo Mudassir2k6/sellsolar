@@ -226,10 +226,14 @@ export default function AdminSuperDashboard({
   const [userRoleFilter, setUserRoleFilter] = useState('all'); // 'all' | 'super_admin' | 'admin' | 'dealer' | 'customer'
   const [isAddingUser, setIsAddingUser] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [quickNavDropdownOpen, setQuickNavDropdownOpen] = useState(false);
 
   const selectTab = (tabId) => {
     setActiveTab(tabId);
     setMobileMenuOpen(false);
+    setUserDropdownOpen(false);
+    setQuickNavDropdownOpen(false);
     if (typeof window !== 'undefined' && window.innerWidth < 768) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -1521,9 +1525,9 @@ export default function AdminSuperDashboard({
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
-          <div className="min-w-0 truncate">
+          <div className="min-w-0">
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <span className="text-base sm:text-lg font-black tracking-tight text-gray-900 dark:text-white shrink-0">
+              <span className="text-base sm:text-lg font-black tracking-tight text-gray-900 dark:text-white shrink-0 leading-none">
                 Sell<span className="text-amber-500">Solar</span>
               </span>
               <span className={`px-2 sm:px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-wider truncate max-w-[130px] sm:max-w-none ${
@@ -1544,38 +1548,270 @@ export default function AdminSuperDashboard({
                   : '👤 Dashboard'}
               </span>
             </div>
+            <p className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 tracking-tight leading-none mt-1 whitespace-nowrap">
+              {settings?.headerTagline || "Pakistan's #1 Used Solar Marketplace"}
+            </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 sm:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-2.5">
           {onPostAd && (
             <button
               type="button"
               onClick={onPostAd}
-              className="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-xs transition-colors shrink-0"
+              className="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-xs transition-colors shrink-0 cursor-pointer"
             >
               <PlusCircle className="h-3.5 w-3.5" />
               <span>Post Ad</span>
             </button>
           )}
 
-          <div className="hidden md:block text-right">
-            <p className="text-xs font-bold text-gray-900 dark:text-white">{user?.email || DEFAULT_ADMIN_EMAIL}</p>
-            <p className="text-[10px] text-gray-400 capitalize">
-              {effectiveIsSuperAdmin
-                ? 'Super Administrator'
-                : effectiveIsAdmin
-                ? 'Administrator'
-                : isDealer
-                ? 'Solar Dealer Store'
-                : 'Verified User'}
-            </p>
+          {/* User Account / Profile Dropdown */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => {
+                setUserDropdownOpen((prev) => !prev);
+                setQuickNavDropdownOpen(false);
+              }}
+              className="flex items-center gap-1.5 sm:gap-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50/90 dark:bg-gray-850 px-2 sm:px-2.5 py-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer shrink-0"
+              title="User Account Menu"
+            >
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 text-xs font-black text-white shadow-2xs shrink-0">
+                {(profile?.full_name || user?.user_metadata?.full_name || userEmail || 'A').charAt(0).toUpperCase()}
+              </div>
+              <div className="hidden md:block text-left leading-tight">
+                <p className="text-xs font-bold text-gray-900 dark:text-white truncate max-w-[140px]">
+                  {profile?.full_name || userEmail.split('@')[0]}
+                </p>
+                <p className="text-[10px] text-gray-400 capitalize">
+                  {effectiveIsSuperAdmin
+                    ? 'Super Administrator'
+                    : effectiveIsAdmin
+                    ? 'Administrator'
+                    : isDealer
+                    ? 'Solar Dealer'
+                    : 'Verified User'}
+                </p>
+              </div>
+              <ChevronDown className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+            </button>
+
+            {userDropdownOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setUserDropdownOpen(false)}
+                />
+                <div className="absolute right-0 mt-2 w-64 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-2 shadow-2xl z-50 animate-in fade-in duration-150">
+                  <div className="px-3 py-2.5 border-b border-gray-100 dark:border-gray-800 mb-1">
+                    <p className="text-xs font-bold text-gray-900 dark:text-white truncate">
+                      {profile?.full_name || user?.user_metadata?.full_name || 'Admin User'}
+                    </p>
+                    <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate font-mono">
+                      {userEmail || DEFAULT_ADMIN_EMAIL}
+                    </p>
+                    <span className="mt-1 inline-block text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">
+                      {effectiveIsSuperAdmin ? '👑 Super Admin' : effectiveIsAdmin ? '🛡️ Admin' : '👤 User'}
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => selectTab('dashboard')}
+                    className="flex w-full items-center gap-2 px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
+                  >
+                    <LayoutDashboard className="h-3.5 w-3.5 text-amber-500" />
+                    <span>Dashboard Overview</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => selectTab('my-ads')}
+                    className="flex w-full items-center justify-between px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Package className="h-3.5 w-3.5 text-blue-500" />
+                      <span>My Solar Ads</span>
+                    </div>
+                    <span className="text-[10px] text-gray-400 font-mono">({myAds.length})</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => selectTab('inbox')}
+                    className="flex w-full items-center justify-between px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2">
+                      <MessageSquare className="h-3.5 w-3.5 text-purple-500" />
+                      <span>Unified Inbox</span>
+                    </div>
+                    {unreadInboxCount > 0 && (
+                      <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-rose-500 text-white font-black">
+                        {unreadInboxCount}
+                      </span>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => selectTab('profile')}
+                    className="flex w-full items-center gap-2 px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
+                  >
+                    <User className="h-3.5 w-3.5 text-emerald-500" />
+                    <span>My Profile & Security</span>
+                  </button>
+
+                  {effectiveIsAdmin && (
+                    <button
+                      type="button"
+                      onClick={() => selectTab('settings')}
+                      className="flex w-full items-center gap-2 px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
+                    >
+                      <Settings className="h-3.5 w-3.5 text-slate-500" />
+                      <span>Website Settings & CMS</span>
+                    </button>
+                  )}
+
+                  {onChangePassword && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUserDropdownOpen(false);
+                        onChangePassword();
+                      }}
+                      className="flex w-full items-center gap-2 px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
+                    >
+                      <Lock className="h-3.5 w-3.5 text-amber-500" />
+                      <span>Change Password</span>
+                    </button>
+                  )}
+
+                  <div className="border-t border-gray-100 dark:border-gray-800 my-1 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUserDropdownOpen(false);
+                        if (signOut) signOut();
+                        else onBack();
+                      }}
+                      className="flex w-full items-center gap-2 px-3 py-2 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg cursor-pointer"
+                    >
+                      <LogOut className="h-3.5 w-3.5" />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Quick Marketplace Menu Dropdown */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => {
+                setQuickNavDropdownOpen((prev) => !prev);
+                setUserDropdownOpen(false);
+              }}
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 text-xs font-bold text-gray-700 dark:text-gray-200 transition-colors shadow-2xs cursor-pointer shrink-0"
+              title="Marketplace Menu"
+            >
+              <Menu className="h-4 w-4 text-amber-500 shrink-0" />
+              <span className="hidden sm:inline">Menu</span>
+              <ChevronDown className="h-3 w-3 text-gray-400 shrink-0" />
+            </button>
+
+            {quickNavDropdownOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setQuickNavDropdownOpen(false)}
+                />
+                <div className="absolute right-0 mt-2 w-64 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-2 shadow-2xl z-50 animate-in fade-in duration-150">
+                  <div className="px-3 py-2 border-b border-gray-100 dark:border-gray-800 mb-1">
+                    <p className="text-xs font-bold text-gray-900 dark:text-white">Marketplace Menu</p>
+                    <p className="text-[10px] text-gray-400">Direct navigation across platform</p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setQuickNavDropdownOpen(false);
+                      onBack();
+                    }}
+                    className="flex w-full items-center gap-2.5 px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
+                  >
+                    <Sun className="h-4 w-4 text-amber-500" />
+                    <span>Solar Marketplace Home</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => selectTab('daily-rates')}
+                    className="flex w-full items-center gap-2.5 px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
+                  >
+                    <DollarSign className="h-4 w-4 text-emerald-500" />
+                    <span>Today's Daily Rates</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => selectTab('dealers-directory')}
+                    className="flex w-full items-center gap-2.5 px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
+                  >
+                    <Store className="h-4 w-4 text-primary-500" />
+                    <span>Solar Dealers Directory</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => selectTab('installation-leads')}
+                    className="flex w-full items-center gap-2.5 px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
+                  >
+                    <Wrench className="h-4 w-4 text-indigo-500" />
+                    <span>Installation Requests</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => selectTab('inbox')}
+                    className="flex w-full items-center justify-between px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <MessageSquare className="h-4 w-4 text-purple-500" />
+                      <span>Unified Inbox</span>
+                    </div>
+                    {unreadInboxCount > 0 && (
+                      <span className="px-1.5 py-0.5 rounded-full text-[9px] bg-rose-500 text-white font-black">
+                        {unreadInboxCount}
+                      </span>
+                    )}
+                  </button>
+
+                  {onPostAd && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setQuickNavDropdownOpen(false);
+                        onPostAd();
+                      }}
+                      className="flex w-full items-center gap-2.5 px-3 py-2 text-xs font-semibold text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 rounded-lg cursor-pointer"
+                    >
+                      <PlusCircle className="h-4 w-4 text-amber-500" />
+                      <span>Post a New Ad</span>
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
           </div>
 
           <button
             type="button"
             onClick={onBack}
-            className="btn-secondary text-xs px-2 sm:px-3 py-1.5 shrink-0"
+            className="btn-secondary text-xs px-2 sm:px-3 py-1.5 shrink-0 cursor-pointer"
+            title="Back to Marketplace"
           >
             <span className="hidden sm:inline">Marketplace ↗</span>
             <span className="sm:hidden">Exit</span>

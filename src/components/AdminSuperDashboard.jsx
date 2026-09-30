@@ -1577,11 +1577,11 @@ export default function AdminSuperDashboard({
     try {
       if (updateProfile) {
         await updateProfile({
-          full_name: profileForm.fullName,
+          fullName: profileForm.fullName,
           phone: profileForm.phone,
           city: profileForm.city,
-          business_name: profileForm.businessName,
-          showroom_address: profileForm.showroomAddress,
+          businessName: profileForm.businessName,
+          businessAddress: profileForm.showroomAddress,
         });
       }
       showToast({
@@ -6446,13 +6446,24 @@ export default function AdminSuperDashboard({
                       <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
                         City
                       </label>
-                      <input
-                        type="text"
+                      <select
                         value={profileForm.city}
                         onChange={(e) => setProfileForm({ ...profileForm, city: e.target.value })}
                         className="input-field text-xs"
-                        placeholder="e.g. Lahore"
-                      />
+                      >
+                        <option value="">Select City...</option>
+                        <option value="Lahore">Lahore</option>
+                        <option value="Karachi">Karachi</option>
+                        <option value="Islamabad">Islamabad</option>
+                        <option value="Rawalpindi">Rawalpindi</option>
+                        <option value="Faisalabad">Faisalabad</option>
+                        <option value="Multan">Multan</option>
+                        <option value="Peshawar">Peshawar</option>
+                        <option value="Quetta">Quetta</option>
+                        <option value="Gujranwala">Gujranwala</option>
+                        <option value="Sialkot">Sialkot</option>
+                        <option value="Other">Other</option>
+                      </select>
                     </div>
                   </div>
 

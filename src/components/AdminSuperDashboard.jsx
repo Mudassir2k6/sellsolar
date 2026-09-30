@@ -284,13 +284,12 @@ export default function AdminSuperDashboard({
   const [isAddingUser, setIsAddingUser] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  const [quickNavDropdownOpen, setQuickNavDropdownOpen] = useState(false);
+
 
   const selectTab = (tabId) => {
     setActiveTab(tabId);
     setMobileMenuOpen(false);
     setUserDropdownOpen(false);
-    setQuickNavDropdownOpen(false);
     if (typeof window !== 'undefined' && window.innerWidth < 768) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -1746,7 +1745,6 @@ export default function AdminSuperDashboard({
               type="button"
               onClick={() => {
                 setUserDropdownOpen((prev) => !prev);
-                setQuickNavDropdownOpen(false);
               }}
               className="flex items-center gap-1.5 sm:gap-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50/90 dark:bg-gray-850 px-2 sm:px-2.5 py-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer shrink-0"
               title="User Account Menu"
@@ -1880,119 +1878,6 @@ export default function AdminSuperDashboard({
             )}
           </div>
 
-          {/* Quick Marketplace Menu Dropdown */}
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => {
-                setQuickNavDropdownOpen((prev) => !prev);
-                setUserDropdownOpen(false);
-              }}
-              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 text-xs font-bold text-gray-700 dark:text-gray-200 transition-colors shadow-2xs cursor-pointer shrink-0"
-              title="Marketplace Menu"
-            >
-              <Menu className="h-4 w-4 text-amber-500 shrink-0" />
-              <span className="hidden sm:inline">Menu</span>
-              <ChevronDown className="h-3 w-3 text-gray-400 shrink-0" />
-            </button>
-
-            {quickNavDropdownOpen && (
-              <>
-                <div
-                  className="fixed inset-0 z-40"
-                  onClick={() => setQuickNavDropdownOpen(false)}
-                />
-                <div className="absolute right-0 mt-2 w-64 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-2 shadow-2xl z-50 animate-in fade-in duration-150">
-                  <div className="px-3 py-2 border-b border-gray-100 dark:border-gray-800 mb-1">
-                    <p className="text-xs font-bold text-gray-900 dark:text-white">Marketplace Menu</p>
-                    <p className="text-[10px] text-gray-400">Direct navigation across platform</p>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setQuickNavDropdownOpen(false);
-                      onBack();
-                    }}
-                    className="flex w-full items-center gap-2.5 px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
-                  >
-                    <Sun className="h-4 w-4 text-amber-500" />
-                    <span>Solar Marketplace Home</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => selectTab('my-ads')}
-                    className="flex w-full items-center gap-2.5 px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
-                  >
-                    <Package className="h-4 w-4 text-blue-500" />
-                    <span>My Solar Ads</span>
-                  </button>
-
-                  {effectiveIsAdmin && (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => selectTab('daily-rates')}
-                        className="flex w-full items-center gap-2.5 px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
-                      >
-                        <DollarSign className="h-4 w-4 text-emerald-500" />
-                        <span>Today's Daily Rates</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => selectTab('dealers-directory')}
-                        className="flex w-full items-center gap-2.5 px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
-                      >
-                        <Store className="h-4 w-4 text-primary-500" />
-                        <span>Solar Dealers Directory</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => selectTab('installation-leads')}
-                        className="flex w-full items-center gap-2.5 px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
-                      >
-                        <Wrench className="h-4 w-4 text-indigo-500" />
-                        <span>Installation Requests</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => selectTab('inbox')}
-                        className="flex w-full items-center justify-between px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <MessageSquare className="h-4 w-4 text-purple-500" />
-                          <span>Unified Inbox</span>
-                        </div>
-                        {unreadInboxCount > 0 && (
-                          <span className="px-1.5 py-0.5 rounded-full text-[9px] bg-rose-500 text-white font-black">
-                            {unreadInboxCount}
-                          </span>
-                        )}
-                      </button>
-                    </>
-                  )}
-
-                  {onPostAd && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setQuickNavDropdownOpen(false);
-                        onPostAd();
-                      }}
-                      className="flex w-full items-center gap-2.5 px-3 py-2 text-xs font-semibold text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 rounded-lg cursor-pointer"
-                    >
-                      <PlusCircle className="h-4 w-4 text-amber-500" />
-                      <span>Post a New Ad</span>
-                    </button>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
 
           <button
             type="button"

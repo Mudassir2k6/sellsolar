@@ -1922,46 +1922,59 @@ export default function AdminSuperDashboard({
 
                   <button
                     type="button"
-                    onClick={() => selectTab('daily-rates')}
+                    onClick={() => selectTab('my-ads')}
                     className="flex w-full items-center gap-2.5 px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
                   >
-                    <DollarSign className="h-4 w-4 text-emerald-500" />
-                    <span>Today's Daily Rates</span>
+                    <Package className="h-4 w-4 text-blue-500" />
+                    <span>My Solar Ads</span>
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => selectTab('dealers-directory')}
-                    className="flex w-full items-center gap-2.5 px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
-                  >
-                    <Store className="h-4 w-4 text-primary-500" />
-                    <span>Solar Dealers Directory</span>
-                  </button>
+                  {effectiveIsAdmin && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => selectTab('daily-rates')}
+                        className="flex w-full items-center gap-2.5 px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
+                      >
+                        <DollarSign className="h-4 w-4 text-emerald-500" />
+                        <span>Today's Daily Rates</span>
+                      </button>
 
-                  <button
-                    type="button"
-                    onClick={() => selectTab('installation-leads')}
-                    className="flex w-full items-center gap-2.5 px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
-                  >
-                    <Wrench className="h-4 w-4 text-indigo-500" />
-                    <span>Installation Requests</span>
-                  </button>
+                      <button
+                        type="button"
+                        onClick={() => selectTab('dealers-directory')}
+                        className="flex w-full items-center gap-2.5 px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
+                      >
+                        <Store className="h-4 w-4 text-primary-500" />
+                        <span>Solar Dealers Directory</span>
+                      </button>
 
-                  <button
-                    type="button"
-                    onClick={() => selectTab('inbox')}
-                    className="flex w-full items-center justify-between px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <MessageSquare className="h-4 w-4 text-purple-500" />
-                      <span>Unified Inbox</span>
-                    </div>
-                    {unreadInboxCount > 0 && (
-                      <span className="px-1.5 py-0.5 rounded-full text-[9px] bg-rose-500 text-white font-black">
-                        {unreadInboxCount}
-                      </span>
-                    )}
-                  </button>
+                      <button
+                        type="button"
+                        onClick={() => selectTab('installation-leads')}
+                        className="flex w-full items-center gap-2.5 px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
+                      >
+                        <Wrench className="h-4 w-4 text-indigo-500" />
+                        <span>Installation Requests</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => selectTab('inbox')}
+                        className="flex w-full items-center justify-between px-3 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <MessageSquare className="h-4 w-4 text-purple-500" />
+                          <span>Unified Inbox</span>
+                        </div>
+                        {unreadInboxCount > 0 && (
+                          <span className="px-1.5 py-0.5 rounded-full text-[9px] bg-rose-500 text-white font-black">
+                            {unreadInboxCount}
+                          </span>
+                        )}
+                      </button>
+                    </>
+                  )}
 
                   {onPostAd && (
                     <button

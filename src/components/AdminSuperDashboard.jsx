@@ -1877,17 +1877,6 @@ export default function AdminSuperDashboard({
               </>
             )}
           </div>
-
-
-          <button
-            type="button"
-            onClick={onBack}
-            className="btn-secondary text-xs px-2 sm:px-3 py-1.5 shrink-0 cursor-pointer"
-            title="Back to Marketplace"
-          >
-            <span className="hidden sm:inline">Marketplace ↗</span>
-            <span className="sm:hidden">Exit</span>
-          </button>
         </div>
       </header>
 

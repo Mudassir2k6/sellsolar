@@ -164,12 +164,12 @@ export function getAnalyticsSummary(listings = []) {
     } catch {}
   }
 
-  // Calculate views and inquiries for listings
+  // Calculate views and inquiries for listings based on real activity
   const enrichedListings = (listings || []).map((item) => {
     const trackedViews = productViewsMap[item.id] || 0;
-    const baseViews = item.views_count || item.views || Math.floor(Math.random() * 40) + 15;
+    const baseViews = item.views_count || item.views || 0;
     const totalViews = baseViews + trackedViews;
-    const trackedInq = (productInquiriesMap[item.id] && productInquiriesMap[item.id].total) || Math.floor(totalViews * 0.12);
+    const trackedInq = (productInquiriesMap[item.id] && productInquiriesMap[item.id].total) || item.inquiries_count || 0;
 
     return {
       ...item,

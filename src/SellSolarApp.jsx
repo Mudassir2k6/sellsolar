@@ -110,7 +110,7 @@ import { SiteSettingsProvider, useSiteSettings } from './context/SiteSettingsCon
 import FloatingWhatsAppWidget from './components/FloatingWhatsAppWidget';
 import MobileBottomNav from './components/MobileBottomNav';
 import AdminSuperDashboard from './components/AdminSuperDashboard';
-import { recordPageView, recordProductView } from './services/analyticsService';
+import { recordPageView, recordProductView, recordProductInquiry } from './services/analyticsService';
 
 function Xy({
   onNavigate:t,currentPage:e,onSelectListing:selList,onSearchSubmit:searchSub
@@ -5473,6 +5473,9 @@ function yx({
       }
       return;
     }
+    if (r && r.id) {
+      recordProductInquiry(r.id, 'whatsapp');
+    }
     const phone = w || "03001234567";
     let clean = phone.replace(/[^0-9]/g, '');
     if (clean.startsWith('0')) {
@@ -5599,7 +5602,7 @@ function yx({
                     }),
                     w?jsxs(Fragment,{
                     children:[jsxs("a",{
-                      href:`tel:${w}`,className:"btn-primary w-full",children:[jsx(Phone,{
+                      href:`tel:${w}`,onClick:()=>{ if(r && r.id) recordProductInquiry(r.id, 'phone'); },className:"btn-primary w-full",children:[jsx(Phone,{
                         className:"h-5 w-5"
                       }),"Call Seller"]
                     }),!d&&jsxs("button",{

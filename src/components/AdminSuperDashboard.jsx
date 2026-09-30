@@ -2761,7 +2761,7 @@ export default function AdminSuperDashboard({
               </div>
 
               {/* Metric Cards */}
-              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
                 <div className="p-5 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Total Site Visits</span>
@@ -2809,6 +2809,36 @@ export default function AdminSuperDashboard({
                   </p>
                   <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 font-semibold">
                     Listing impressions
+                  </p>
+                </div>
+
+                {/* Synchronized Turnkey Installation Leads KPI Card */}
+                <div
+                  onClick={() => selectTab('installation-leads')}
+                  className="p-5 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-900/60 shadow-xs cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-700 transition-all group"
+                  title="Click to view Turnkey Installation Leads & Site Surveys"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-indigo-700 dark:text-indigo-300 uppercase tracking-wider">Turnkey Leads</span>
+                    <Wrench className="h-4 w-4 text-indigo-600 dark:text-indigo-400 group-hover:rotate-45 transition-transform" />
+                  </div>
+                  <div className="flex items-baseline justify-between mt-2">
+                    <p className="text-3xl font-black text-indigo-950 dark:text-indigo-100">
+                      {installationRequests.length}
+                    </p>
+                    {pendingLeadsCount > 0 ? (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-red-600 text-white animate-pulse">
+                        {pendingLeadsCount} New
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-mono text-indigo-500 dark:text-indigo-400 font-bold">
+                        Synced
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-indigo-600 dark:text-indigo-400 mt-1 font-semibold flex items-center justify-between">
+                    <span>Site Surveys</span>
+                    <span className="underline group-hover:translate-x-0.5 transition-transform">View Tab →</span>
                   </p>
                 </div>
               </div>
@@ -2931,10 +2961,10 @@ export default function AdminSuperDashboard({
                   <div>
                     <h3 className="text-sm font-black text-gray-900 dark:text-white flex items-center gap-2">
                       <Flame className="h-4 w-4 text-rose-500" />
-                      Detailed Equipment Views & Inquiry Performance
+                      Detailed Equipment Views & Buyer Inquiries
                     </h3>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                      All products ranked by total visitor views, generated inquiries, and badges.
+                      Classified marketplace listings ranked by total views and buyer contact inquiries (WhatsApp & phone calls).
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -2957,7 +2987,7 @@ export default function AdminSuperDashboard({
                         <th className="p-3.5">City</th>
                         <th className="p-3.5">Price</th>
                         <th className="p-3.5">Total Views</th>
-                        <th className="p-3.5">Inquiries</th>
+                        <th className="p-3.5">Buyer Inquiries</th>
                         <th className="p-3.5">Badges</th>
                         <th className="p-3.5 text-right">Quick Toggle</th>
                       </tr>
@@ -2997,7 +3027,7 @@ export default function AdminSuperDashboard({
                             {item.totalViews.toLocaleString()} views
                           </td>
                           <td className="p-3.5 font-mono font-bold text-purple-600 dark:text-purple-400">
-                            {item.inquiriesCount || 0} leads
+                            {item.inquiriesCount || 0} inquiries
                           </td>
                           <td className="p-3.5">
                             <div className="flex items-center gap-1">

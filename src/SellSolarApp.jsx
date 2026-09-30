@@ -2883,7 +2883,7 @@ function hx({
   })
 }const px=["panel","inverter","battery","complete_system"],gx=["new","used"];
 function yx({
-  onBack:t,onPosted:e
+  onBack:t,onPosted:e,hasOuterNavbar=false,onNavigate
 }){
   const{
     profile:r,user:seller
@@ -3142,32 +3142,34 @@ function yx({
       })
     })
   }):jsxs("div",{
-    className:"min-h-screen bg-gray-50",children:[jsx("div",{
-      className:"sticky top-0 z-40 border-b border-gray-100 bg-white/90 backdrop-blur-md",children:jsxs("div",{
-        className:"container-page flex h-16 items-center justify-between",children:[jsxs("button",{
-          onClick:t,className:"flex items-center gap-2",children:[jsx("div",{
-            className:"flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 shadow-lg shadow-primary-500/30",children:jsx(Sun,{
-              className:"h-5 w-5 text-white",strokeWidth:2.5
-            })
-          }),jsxs("span",{
-            className:"text-xl font-extrabold tracking-tight text-gray-900",children:["Sell",jsx("span",{
-              className:"text-primary-500",children:"Solar"
+    className:`min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors ${hasOuterNavbar ? "pt-20 sm:pt-24 lg:pt-28" : ""}`,children:[
+      !hasOuterNavbar ? jsx("div",{
+        className:"sticky top-0 z-40 border-b border-gray-100 dark:border-gray-800 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md",children:jsxs("div",{
+          className:"container-page flex h-16 items-center justify-between",children:[jsxs("button",{
+            onClick:t,className:"flex items-center gap-2",children:[jsx("div",{
+              className:"flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 shadow-lg shadow-primary-500/30",children:jsx(Sun,{
+                className:"h-5 w-5 text-white",strokeWidth:2.5
+              })
+            }),jsxs("span",{
+              className:"text-xl font-extrabold tracking-tight text-gray-900 dark:text-white",children:["Sell",jsx("span",{
+                className:"text-primary-500",children:"Solar"
+              })]
             })]
+          }),jsxs("button",{
+            onClick:t,className:"flex items-center gap-1 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white",children:[jsx(ArrowLeft,{
+              className:"h-4 w-4"
+            }),"Back to Home"]
           })]
-        }),jsxs("button",{
-          onClick:t,className:"flex items-center gap-1 text-sm font-semibold text-gray-600 hover:text-gray-900",children:[jsx(ArrowLeft,{
-            className:"h-4 w-4"
-          }),"Back to Home"]
-        })]
-      })
-    }),jsx("div",{
-      className:"container-page py-8 lg:py-12",children:jsxs("div",{
-        className:"mx-auto max-w-2xl",children:[jsx("h1",{
-          className:"text-3xl font-extrabold tracking-tight text-gray-900",children:"Post a New Ad"
-        }),jsx("p",{
-          className:"mt-1 text-sm text-gray-500",children:"Fill in the details below to list your solar equipment for sale."
-        }),jsx("div",{
-          className:"card mt-6 p-6 sm:p-8",children:jsxs("div",{
+        })
+      }) : null,
+      jsx("div",{
+        className:"container-page py-8 lg:py-12",children:jsxs("div",{
+          className:"mx-auto max-w-2xl",children:[jsx("h1",{
+            className:"text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white",children:"Post a New Ad"
+          }),jsx("p",{
+            className:"mt-1 text-sm text-gray-500 dark:text-gray-400",children:"Fill in the details below to list your solar equipment for sale."
+          }),jsx("div",{
+            className:"card mt-6 p-6 sm:p-8",children:jsxs("div",{
             className:"space-y-5",children:[
               jsxs("div",{
                 className:"p-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/30 border border-amber-200 dark:border-amber-900/60 flex items-start gap-3",
@@ -6899,8 +6901,17 @@ export default function App({ initialPathname, initialSlug }){
     }), jsx(hx, {
       onPostAd: c, onNavigate: handleNavigate
     })]
-  }) : n === "post-ad" ? t ? jsx(yx, {
-    onBack: () => o("home"), onPosted: () => o("home")
+  }) : n === "post-ad" ? t ? jsxs("div", {
+    className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
+      onNavigate: handleNavigate, currentPage: "post-ad", onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
+    }), jsx("main", {
+      id: "main",
+      children: jsx(yx, {
+        onBack: () => o("home"), onPosted: () => o("home"), onNavigate: handleNavigate, hasOuterNavbar: true
+      })
+    }), jsx(hx, {
+      onPostAd: c, onNavigate: handleNavigate
+    })]
   }) : jsxs("div", {
     className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
       onNavigate: handleNavigate, currentPage: "login", onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit

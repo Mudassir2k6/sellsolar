@@ -350,15 +350,15 @@ function Xy({
         : null,
 
       jsx('div', {
-        className: 'container-page',
+        className: 'container-page max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 xl:px-8',
         children: jsxs('div', {
           className:
-            'flex h-16 items-center justify-between gap-2 sm:gap-4',
+            'flex h-16 items-center justify-between gap-1.5 sm:gap-2.5 lg:gap-3',
           children: [
             // Brand Logo
             jsxs('button', {
               onClick: () => h('home'),
-              className: 'flex items-center gap-2.5 sm:gap-3 shrink-0 select-none cursor-pointer group text-left',
+              className: 'flex items-center gap-2 sm:gap-2.5 shrink-0 select-none cursor-pointer group text-left',
               title: "SellSolar - Pakistan's #1 Used Solar Marketplace",
               children: [
                 jsx('div', {
@@ -391,7 +391,7 @@ function Xy({
                     }),
                     jsx('span', {
                       className:
-                        'block text-[11px] sm:text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-tight leading-none mt-1 whitespace-nowrap',
+                        'hidden 2xl:block text-[11px] sm:text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-tight leading-none mt-1 whitespace-nowrap',
                       children: settings?.headerTagline || "Pakistan's #1 Used Solar Marketplace",
                     }),
                   ],
@@ -412,16 +412,16 @@ function Xy({
               mobileOpen: isMobileSearchOpen,
               onCloseMobile: () => setIsMobileSearchOpen(!1),
               className:
-                'flex-1 min-w-0 md:min-w-[180px] max-w-sm lg:max-w-md xl:max-w-lg mx-0 md:mx-2 lg:mx-4',
+                'flex-1 min-w-0 md:min-w-[120px] lg:min-w-[150px] max-w-xs lg:max-w-sm xl:max-w-md mx-1 sm:mx-2 lg:mx-3',
             }),
 
             // Desktop Navigation Buttons (hidden on mobile, md:flex)
             jsxs('div', {
-              className: 'hidden md:flex items-center gap-2 lg:gap-2.5',
+              className: 'hidden md:flex items-center gap-1.5 lg:gap-2 xl:gap-2.5 shrink-0',
               children: [
                 jsx('button', {
                   onClick: () => h('prices'),
-                  className: `flex items-center gap-1.5 rounded-lg px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all shadow-xs cursor-pointer ${
+                  className: `flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all shadow-xs cursor-pointer shrink-0 ${
                     e === 'prices'
                       ? 'bg-amber-500 text-white shadow-amber-500/25'
                       : 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/60 hover:bg-amber-100 dark:hover:bg-amber-900/60'
@@ -446,7 +446,7 @@ function Xy({
                         children: "Today's Rates",
                       }),
                       jsx('span', {
-                        className: `hidden lg:inline rounded px-1.5 py-0.5 text-[10px] font-extrabold uppercase ${
+                        className: `hidden xl:inline rounded px-1.5 py-0.5 text-[10px] font-extrabold uppercase ${
                           e === 'prices'
                             ? 'bg-white/20 text-white'
                             : 'bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-200'
@@ -458,7 +458,7 @@ function Xy({
                 }),
                 jsx('button', {
                   onClick: () => h('calculator'),
-                  className: `flex items-center gap-1.5 rounded-lg px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                  className: `hidden lg:flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 ${
                     e === 'calculator'
                       ? 'bg-primary-500 text-white shadow-xs shadow-primary-500/20'
                       : 'bg-primary-50 dark:bg-primary-950/40 text-primary-800 dark:text-primary-300 border border-primary-200/70 dark:border-primary-800/60 hover:bg-primary-100 dark:hover:bg-primary-900/60'
@@ -481,7 +481,7 @@ function Xy({
                 }),
                 jsx('button', {
                   onClick: () => h('verification'),
-                  className: `hidden lg:flex items-center gap-1.5 rounded-lg px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                  className: `hidden xl:flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 ${
                     e === 'verification' || e === 'tier-1-verification' || e === 'panel-verification'
                       ? 'bg-emerald-600 text-white shadow-xs shadow-emerald-600/20'
                       : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60'
@@ -497,14 +497,14 @@ function Xy({
                       }),
                       jsx('span', {
                         className: 'whitespace-nowrap',
-                        children: 'Verify Solar Plates',
+                        children: 'Verify Plates',
                       }),
                     ],
                   }),
                 }),
                 jsx('button', {
                   onClick: () => h('install'),
-                  className: `hidden xl:flex items-center gap-1.5 rounded-lg px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                  className: `hidden 2xl:flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 ${
                     e === 'install'
                       ? 'bg-secondary-600 text-white shadow-xs shadow-secondary-600/20'
                       : 'bg-secondary-50 dark:bg-secondary-950/40 text-secondary-800 dark:text-secondary-300 border border-secondary-200/70 dark:border-secondary-800/60 hover:bg-secondary-100 dark:hover:bg-secondary-900/60'
@@ -534,10 +534,10 @@ function Xy({
                         jsxs('button', {
                           onClick: () => h('post-ad'),
                           className:
-                            'btn-primary inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm shadow-xs cursor-pointer',
+                            'btn-primary inline-flex items-center gap-1.5 px-2.5 sm:px-3 lg:px-3.5 py-1.5 text-xs sm:text-sm font-bold shadow-xs shrink-0 cursor-pointer whitespace-nowrap',
                           children: [
                             jsx(CirclePlus, {
-                              className: 'h-4 w-4',
+                              className: 'h-4 w-4 shrink-0',
                             }),
                             'Post an Ad',
                           ],
@@ -721,7 +721,7 @@ function Xy({
                           onClick: () => h('login'),
                           id: 'header-signin-btn',
                           className:
-                            'inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/90 px-3 py-1.5 text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-750 hover:border-gray-300 dark:hover:border-gray-600 hover:text-primary-600 dark:hover:text-primary-400 transition-all shadow-2xs cursor-pointer shrink-0 active:scale-95',
+                            'inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/90 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-750 hover:border-gray-300 dark:hover:border-gray-600 hover:text-primary-600 dark:hover:text-primary-400 transition-all shadow-2xs cursor-pointer shrink-0 active:scale-95 whitespace-nowrap',
                           children: [
                             jsx(User, {
                               className:
@@ -734,7 +734,7 @@ function Xy({
                           onClick: () => h('login'),
                           id: 'header-post-ad-btn',
                           className:
-                            'btn-primary inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm shadow-xs shrink-0 cursor-pointer',
+                            'btn-primary inline-flex items-center gap-1.5 px-2.5 sm:px-3 lg:px-3.5 py-1.5 text-xs sm:text-sm font-bold shadow-xs shrink-0 cursor-pointer whitespace-nowrap',
                           children: [
                             jsx(CirclePlus, {
                               className: 'h-4 w-4 shrink-0',

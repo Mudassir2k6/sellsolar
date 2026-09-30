@@ -62,6 +62,7 @@ import {
   Menu,
   Ban,
   AlertTriangle,
+  RotateCcw,
 } from 'lucide-react';
 import {
   useAuth,
@@ -80,8 +81,8 @@ import {
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { useToast } from '../context/ToastContext';
 import { useSiteSettings, DEFAULT_SITE_SETTINGS } from '../context/SiteSettingsContext';
-import { getInboxMessages, fetchSharedInboxMessages, createDirectMessage, replyToInboxMessage, markMessageAsRead, deleteInboxMessage } from '../services/inboxService';
-import { getAnalyticsSummary } from '../services/analyticsService';
+import { getInboxMessages, clearInboxMessagesToZero, fetchSharedInboxMessages, createDirectMessage, replyToInboxMessage, markMessageAsRead, deleteInboxMessage } from '../services/inboxService';
+import { getAnalyticsSummary, resetAllAnalyticsToZero } from '../services/analyticsService';
 import { formatPrice } from '../lib/constants';
 import AdminDailyRatesModule from './AdminDailyRatesModule';
 import AdminDealersModule from './AdminDealersModule';
@@ -249,6 +250,14 @@ export default function AdminSuperDashboard({
     setDrillDownModalOpen(true);
   };
 
+  // Pure Real Data Mode (Zero Fake Baseline):
+  // When active, all simulated traffic, seed demo accounts, and mock equipment listings are 0.
+  // Real Installation Leads are strictly preserved and live.
+  const [zeroDashboardMode, setZeroDashboardMode] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return localStorage.getItem('sellsolar_zero_dashboard_mode') !== 'false';
+  });
+
   // Installation Leads live tracking for notification badge
   const [installationRequests, setInstallationRequests] = useState(() => {
     try {
@@ -273,6 +282,61 @@ export default function AdminSuperDashboard({
   const pendingLeadsCount = useMemo(() => {
     return installationRequests.filter((r) => r.status === 'pending').length;
   }, [installationRequests]);
+
+  const handleResetEverythingToZeroExceptLeads = () => {
+    try {
+      // 1. Reset all visitor & product view analytics
+      resetAllAnalyticsToZero();
+      setAnalyticsTick((p) => p + 1);
+
+      // 2. Clear inbox mock messages (sets to pure [])
+      clearInboxMessagesToZero();
+      setInboxMessages([]);
+
+      // 3. Clear custom listings from localStorage
+      localStorage.removeItem('sellsolar_custom_listings');
+      setListingsList([]);
+
+      // 4. Clear any local mock users / roles
+      localStorage.removeItem('sellsolar_stored_users');
+      localStorage.removeItem('sellsolar_users_roles');
+
+      // 5. Enforce zero dashboard mode
+      localStorage.setItem('sellsolar_zero_dashboard_mode', 'true');
+      setZeroDashboardMode(true);
+
+      // 6. CRITICAL: NEVER touch sellsolar_install_requests_v2!
+      // Real installation leads are 100% preserved.
+      const preservedLeads = getStoredInstallationRequests();
+      setInstallationRequests(preservedLeads);
+
+      // Reload data cleanly
+      loadData();
+
+      showToast({
+        title: 'Dashboard Zeroed Out',
+        message: `All simulated metrics, visits, inquiries, and mock listings set to 0. Real Installation Leads (${preservedLeads.length}) safely preserved!`,
+        type: 'success',
+      });
+    } catch (err) {
+      showToast({ title: 'Error', message: 'Failed to reset dashboard: ' + err.message, type: 'error' });
+    }
+  };
+
+  // Automatic clean zero initialization as requested by user
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const flag = localStorage.getItem('sellsolar_zero_dashboard_v2');
+      if (!flag) {
+        resetAllAnalyticsToZero();
+        clearInboxMessagesToZero();
+        localStorage.setItem('sellsolar_zero_dashboard_mode', 'true');
+        localStorage.setItem('sellsolar_zero_dashboard_v2', 'true');
+        setZeroDashboardMode(true);
+        loadData();
+      }
+    }
+  }, []);
 
   const [newUserForm, setNewUserForm] = useState({
     name: '',
@@ -470,8 +534,9 @@ export default function AdminSuperDashboard({
       }
     } catch {}
 
-    // 1E. Verified dealers & default community users if list has only 1 user
-    if (usersMap.size <= 1) {
+    // 1E. Verified dealers & default community users
+    // When zeroDashboardMode is enabled (default), NO fake seed accounts are injected!
+    if (!zeroDashboardMode && usersMap.size <= 1) {
       const seedAccounts = [
         { id: 'usr_dlr_lahore', name: 'Tariq Solar Solutions', email: 'tariq@solarpk.com', phone: '03008451290', city: 'Lahore', role: 'dealer', is_verified_dealer: true, account_type: 'dealer' },
         { id: 'usr_dlr_karachi', name: 'Sindh Green Energy', email: 'sales@sindhgreen.pk', phone: '03214567890', city: 'Karachi', role: 'dealer', is_verified_dealer: true, account_type: 'dealer' },
@@ -490,9 +555,9 @@ export default function AdminSuperDashboard({
       });
     }
 
-    // 2. Listings (Supabase Backend DB + Local Cache + Seed Fallback)
+    // 2. Listings (Clean Real Custom Listings or Supabase, NO fake seed fallback)
     let fetchedListings = [];
-    if (isSupabaseConfigured()) {
+    if (!zeroDashboardMode && isSupabaseConfigured()) {
       try {
         const { data: remoteListings, error: listErr } = await supabase
           .from('solar_listings')
@@ -520,7 +585,8 @@ export default function AdminSuperDashboard({
       }
     } catch {}
 
-    if (fetchedListings.length === 0) {
+    // Only inject seed listings if zeroDashboardMode is explicitly false
+    if (!zeroDashboardMode && fetchedListings.length === 0) {
       fetchedListings = [...SEED_LISTINGS];
     }
     setListingsList(fetchedListings);
@@ -603,8 +669,19 @@ export default function AdminSuperDashboard({
     setCmsForm({ ...settings });
   }, [settings]);
 
-  // Analytics summary
-  const analytics = useMemo(() => getAnalyticsSummary(listingsList), [listingsList]);
+  // Analytics summary with live event listener
+  const [analyticsTick, setAnalyticsTick] = useState(0);
+  useEffect(() => {
+    const handleAnalyticsUpdate = () => {
+      setAnalyticsTick((prev) => prev + 1);
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('sellsolar_analytics_updated', handleAnalyticsUpdate);
+      return () => window.removeEventListener('sellsolar_analytics_updated', handleAnalyticsUpdate);
+    }
+  }, []);
+
+  const analytics = useMemo(() => getAnalyticsSummary(listingsList), [listingsList, analyticsTick]);
 
   // Filtered Users List
   const filteredUsersList = useMemo(() => {
@@ -2358,24 +2435,36 @@ export default function AdminSuperDashboard({
                   </span>
                   <div>
                     <p className="text-xs font-black text-gray-900 dark:text-white flex items-center gap-2 flex-wrap">
-                      <span>Backend Live: Supabase PostgreSQL Connected</span>
+                      <span>Pure Real Data Active</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                        {installationRequests.length} Real Installation Lead{installationRequests.length === 1 ? '' : 's'} Preserved
+                      </span>
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
-                        Database Active
+                        Demo Data Zeroed (0)
                       </span>
                     </p>
                     <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
-                      Verified {usersList.length} users &amp; {listingsList.length} solar equipment listings in database. Click any KPI card below to drill down into records.
+                      All visits, mock inquiries, and sample listings set to 0. Genuine turnkey installation leads remain protected and live.
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                <div className="flex items-center gap-2 self-end sm:self-center shrink-0 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={handleResetEverythingToZeroExceptLeads}
+                    className="px-3 py-1.5 rounded-xl border border-rose-300 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/50 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer"
+                    title="Reset all mock data, visits, and inquiries to 0 while keeping installation leads safe"
+                  >
+                    <RotateCcw className="h-3.5 w-3.5 text-rose-600 dark:text-rose-400" />
+                    <span>Set All to 0 (Keep Leads Safe)</span>
+                  </button>
                   <button
                     type="button"
                     onClick={() => openDrillDown('users')}
                     className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
                   >
                     <Layers className="h-3.5 w-3.5" />
-                    <span>Open Drill-Down Explorer</span>
+                    <span>Open Drill-Down</span>
                   </button>
                   <button
                     type="button"
@@ -2389,9 +2478,41 @@ export default function AdminSuperDashboard({
               </div>
 
               {/* KPI Cards: Platform KPIs (if Super Admin/Admin) or Personal KPIs (if Dealer/Customer) */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3 sm:gap-4">
                 {effectiveIsAdmin ? (
                   <>
+                    {/* Synchronized Turnkey Installation Leads KPI Card (Highlighted - Real Data) */}
+                    <button
+                      type="button"
+                      onClick={() => selectTab('installation-leads')}
+                      className="p-4 rounded-2xl bg-indigo-50/90 dark:bg-indigo-950/60 border-2 border-indigo-500/80 dark:border-indigo-500/60 shadow-xs hover:border-indigo-600 hover:shadow-md transition-all cursor-pointer group text-left relative overflow-hidden"
+                    >
+                      <div className="flex items-center justify-between">
+                        <p className="text-[11px] font-black text-indigo-900 dark:text-indigo-200 uppercase tracking-wider flex items-center gap-1.5">
+                          <span>Installation Leads</span>
+                          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Real User Leads Live" />
+                        </p>
+                        <Wrench className="w-4 h-4 text-indigo-600 dark:text-indigo-400 group-hover:rotate-45 transition-transform" />
+                      </div>
+                      <div className="flex items-baseline justify-between mt-1">
+                        <p className="text-2xl font-black text-indigo-950 dark:text-indigo-100">
+                          {installationRequests.length}
+                        </p>
+                        {pendingLeadsCount > 0 ? (
+                          <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-red-600 text-white animate-pulse">
+                            {pendingLeadsCount} New
+                          </span>
+                        ) : (
+                          <span className="text-[9px] font-bold text-indigo-600 dark:text-indigo-400">
+                            Real
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-[10px] text-indigo-600 dark:text-indigo-300 font-bold flex items-center gap-0.5 mt-1">
+                        Protected &amp; Live →
+                      </span>
+                    </button>
+
                     <button
                       type="button"
                       onClick={() => openDrillDown('users')}
@@ -3270,6 +3391,25 @@ export default function AdminSuperDashboard({
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (window.confirm("Do you want to reset all visitor traffic, page views, and channel statistics to 0? (Real installation leads will be safely kept)")) {
+                        resetAllAnalyticsToZero();
+                        setAnalyticsTick((p) => p + 1);
+                        showToast({
+                          title: "Traffic Reset to 0",
+                          message: "Visitor traffic, product views, and channel stats have been set to 0. Real visits will now count from zero.",
+                          type: "success",
+                        });
+                      }
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-gray-700 dark:text-gray-300 hover:text-rose-600 dark:hover:text-rose-400 text-xs font-bold transition-all shadow-2xs cursor-pointer"
+                    title="Reset visitor traffic counters to 0"
+                  >
+                    <RotateCcw className="h-3.5 w-3.5 text-rose-500" />
+                    <span>Reset Traffic to 0</span>
+                  </button>
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                     Live Tracking Active
@@ -3387,37 +3527,45 @@ export default function AdminSuperDashboard({
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                        {(analytics.topVisitedPages || []).map((page) => (
-                          <tr key={page.path} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
-                            <td className="p-3 font-mono font-bold text-amber-600 dark:text-amber-400">
-                              {page.path}
-                            </td>
-                            <td className="p-3 font-bold text-gray-900 dark:text-white">
-                              {page.count.toLocaleString()}
-                            </td>
-                            <td className="p-3">
-                              <div className="flex items-center gap-2">
-                                <div className="w-24 h-2 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
-                                  <div
-                                    className="h-full bg-amber-500 rounded-full"
-                                    style={{ width: `${Math.min(100, page.percentage * 2)}%` }}
-                                  ></div>
-                                </div>
-                                <span className="text-[11px] font-mono text-gray-500">{page.percentage}%</span>
-                              </div>
-                            </td>
-                            <td className="p-3 text-right">
-                              <a
-                                href={page.path}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-[11px] font-bold text-gray-500 hover:text-amber-600"
-                              >
-                                View ↗
-                              </a>
+                        {(!analytics.topVisitedPages || analytics.topVisitedPages.length === 0) ? (
+                          <tr>
+                            <td colSpan="4" className="p-8 text-center text-gray-400">
+                              No route visits recorded yet. Real visits will automatically increment from 0 as users browse the platform.
                             </td>
                           </tr>
-                        ))}
+                        ) : (
+                          analytics.topVisitedPages.map((page) => (
+                            <tr key={page.path} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
+                              <td className="p-3 font-mono font-bold text-amber-600 dark:text-amber-400">
+                                {page.path}
+                              </td>
+                              <td className="p-3 font-bold text-gray-900 dark:text-white">
+                                {page.count.toLocaleString()}
+                              </td>
+                              <td className="p-3">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-24 h-2 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
+                                    <div
+                                      className="h-full bg-amber-500 rounded-full"
+                                      style={{ width: `${Math.min(100, page.percentage * 2)}%` }}
+                                    ></div>
+                                  </div>
+                                  <span className="text-[11px] font-mono text-gray-500">{page.percentage}%</span>
+                                </div>
+                              </td>
+                              <td className="p-3 text-right">
+                                <a
+                                  href={page.path}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 text-[11px] font-bold text-gray-500 hover:text-amber-600"
+                                >
+                                  View ↗
+                                </a>
+                              </td>
+                            </tr>
+                          ))
+                        )}
                       </tbody>
                     </table>
                   </div>
@@ -3457,15 +3605,15 @@ export default function AdminSuperDashboard({
                     <div className="grid grid-cols-3 gap-2 text-center">
                       <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/60">
                         <p className="text-[10px] text-gray-400 font-bold uppercase">Mobile</p>
-                        <p className="text-lg font-black text-amber-500 mt-0.5">74%</p>
+                        <p className="text-lg font-black text-amber-500 mt-0.5">{analytics.devicePercentages?.mobile || 0}%</p>
                       </div>
                       <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/60">
                         <p className="text-[10px] text-gray-400 font-bold uppercase">Desktop</p>
-                        <p className="text-lg font-black text-blue-500 mt-0.5">22%</p>
+                        <p className="text-lg font-black text-blue-500 mt-0.5">{analytics.devicePercentages?.desktop || 0}%</p>
                       </div>
                       <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/60">
                         <p className="text-[10px] text-gray-400 font-bold uppercase">Tablet</p>
-                        <p className="text-lg font-black text-purple-500 mt-0.5">4%</p>
+                        <p className="text-lg font-black text-purple-500 mt-0.5">{analytics.devicePercentages?.tablet || 0}%</p>
                       </div>
                     </div>
                   </div>
@@ -6393,7 +6541,7 @@ export default function AdminSuperDashboard({
         initialFilter={drillDownFilter}
         usersList={usersList}
         listingsList={listingsList}
-        dealersList={VERIFIED_DEALERS}
+        dealersList={zeroDashboardMode ? usersList.filter((u) => u.role === 'dealer' || u.is_verified_dealer) : VERIFIED_DEALERS}
         myAds={myAds}
         inboxMessages={inboxMessages}
         onNavigateToListing={onNavigateToListing}

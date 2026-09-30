@@ -65,17 +65,29 @@ const SEED_INBOX_MESSAGES = [
 ];
 
 export function getInboxMessages() {
-  if (typeof window === 'undefined') return SEED_INBOX_MESSAGES;
+  if (typeof window === 'undefined') return [];
   try {
     const raw = localStorage.getItem(INBOX_STORAGE_KEY);
-    if (!raw) {
-      localStorage.setItem(INBOX_STORAGE_KEY, JSON.stringify(SEED_INBOX_MESSAGES));
-      return SEED_INBOX_MESSAGES;
+    if (raw !== null) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
     }
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) && parsed.length > 0 ? parsed : SEED_INBOX_MESSAGES;
+    // Clean zero baseline (no fake messages)
+    localStorage.setItem(INBOX_STORAGE_KEY, JSON.stringify([]));
+    return [];
   } catch {
-    return SEED_INBOX_MESSAGES;
+    return [];
+  }
+}
+
+export function clearInboxMessagesToZero() {
+  if (typeof window === 'undefined') return [];
+  try {
+    localStorage.setItem(INBOX_STORAGE_KEY, JSON.stringify([]));
+    window.dispatchEvent(new Event('sellsolar_inbox_updated'));
+    return [];
+  } catch {
+    return [];
   }
 }
 

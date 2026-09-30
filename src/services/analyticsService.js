@@ -1,6 +1,50 @@
 const VISITOR_ANALYTICS_KEY = 'sellsolar_visitor_analytics';
 const PRODUCT_VIEWS_KEY = 'sellsolar_product_views';
 const INQUIRIES_COUNT_KEY = 'sellsolar_inquiries_analytics';
+const CLEAN_ZERO_MIGRATION_FLAG = 'sellsolar_analytics_zero_v5';
+
+// Auto-purge any legacy mock traffic on initial load to guarantee pure 0 baseline
+if (typeof window !== 'undefined') {
+  try {
+    if (!localStorage.getItem(CLEAN_ZERO_MIGRATION_FLAG)) {
+      localStorage.removeItem(VISITOR_ANALYTICS_KEY);
+      localStorage.removeItem(PRODUCT_VIEWS_KEY);
+      localStorage.removeItem(INQUIRIES_COUNT_KEY);
+      localStorage.setItem(CLEAN_ZERO_MIGRATION_FLAG, 'true');
+    }
+  } catch {}
+}
+
+export function resetAllAnalyticsToZero() {
+  if (typeof window === 'undefined') return;
+  try {
+    const zeroData = {
+      totalVisits: 0,
+      uniqueVisitors: 0,
+      dailyVisits: {},
+      pageVisits: {},
+      trafficSources: {
+        'Direct': 0,
+        'Google Organic': 0,
+        'WhatsApp Shares': 0,
+        'Social Media': 0,
+      },
+      deviceShare: {
+        'Mobile': 0,
+        'Desktop': 0,
+        'Tablet': 0,
+      },
+      visitedSessions: {},
+    };
+    localStorage.setItem(VISITOR_ANALYTICS_KEY, JSON.stringify(zeroData));
+    localStorage.removeItem(PRODUCT_VIEWS_KEY);
+    localStorage.removeItem(INQUIRIES_COUNT_KEY);
+    window.dispatchEvent(new Event('sellsolar_analytics_updated'));
+    return zeroData;
+  } catch (e) {
+    console.warn('Failed to reset analytics:', e);
+  }
+}
 
 export function recordPageView(path = '/') {
   if (typeof window === 'undefined') return;
@@ -9,58 +53,78 @@ export function recordPageView(path = '/') {
     const now = new Date();
     const todayStr = now.toISOString().split('T')[0];
 
-    let data = raw ? JSON.parse(raw) : {
-      totalVisits: 14280,
-      uniqueVisitors: 9850,
-      dailyVisits: {
-        '2026-09-11': 289,
-        '2026-09-12': 312,
-        '2026-09-13': 345,
-        '2026-09-14': 390,
-        '2026-09-15': 365,
-        '2026-09-16': 418,
-        [todayStr]: 342,
-      },
-      pageVisits: {
-        '/': 4850,
-        '/prices': 3120,
-        '/calculator': 1890,
-        '/dealers': 1640,
-        '/install': 980,
-        '/contact': 650,
-        '/used-solar': 580,
-        '/about': 320,
-      },
-      trafficSources: {
-        'Direct': 6200,
-        'Google Organic': 4900,
-        'WhatsApp Shares': 2150,
-        'Social Media': 1030,
-      },
-      deviceShare: {
-        'Mobile': 74,
-        'Desktop': 22,
-        'Tablet': 4,
-      },
-      visitedSessions: {},
-    };
+    let data = raw ? JSON.parse(raw) : null;
 
-    data.totalVisits = (data.totalVisits || 14280) + 1;
+    // If data is null or has old simulated mock data (>= 5000 visits), reset to pure 0
+    if (!data || data.totalVisits >= 5000) {
+      data = {
+        totalVisits: 0,
+        uniqueVisitors: 0,
+        dailyVisits: {},
+        pageVisits: {},
+        trafficSources: {
+          'Direct': 0,
+          'Google Organic': 0,
+          'WhatsApp Shares': 0,
+          'Social Media': 0,
+        },
+        deviceShare: {
+          'Mobile': 0,
+          'Desktop': 0,
+          'Tablet': 0,
+        },
+        visitedSessions: {},
+      };
+    }
+
+    data.totalVisits = (data.totalVisits || 0) + 1;
 
     // Check unique session
     let sessionId = sessionStorage.getItem('sellsolar_session_id');
     if (!sessionId) {
       sessionId = `sess_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
       sessionStorage.setItem('sellsolar_session_id', sessionId);
-      data.uniqueVisitors = (data.uniqueVisitors || 9850) + 1;
+      data.uniqueVisitors = (data.uniqueVisitors || 0) + 1;
     }
 
     if (!data.dailyVisits) data.dailyVisits = {};
-    data.dailyVisits[todayStr] = (data.dailyVisits[todayStr] || 342) + 1;
+    data.dailyVisits[todayStr] = (data.dailyVisits[todayStr] || 0) + 1;
 
     if (!data.pageVisits) data.pageVisits = {};
     const cleanPath = path || '/';
     data.pageVisits[cleanPath] = (data.pageVisits[cleanPath] || 0) + 1;
+
+    // Detect real referral traffic source
+    if (typeof document !== 'undefined') {
+      const ref = (document.referrer || '').toLowerCase();
+      if (!data.trafficSources) {
+        data.trafficSources = { 'Direct': 0, 'Google Organic': 0, 'WhatsApp Shares': 0, 'Social Media': 0 };
+      }
+      if (!ref) {
+        data.trafficSources['Direct'] = (data.trafficSources['Direct'] || 0) + 1;
+      } else if (ref.includes('google')) {
+        data.trafficSources['Google Organic'] = (data.trafficSources['Google Organic'] || 0) + 1;
+      } else if (ref.includes('whatsapp') || ref.includes('wa.me')) {
+        data.trafficSources['WhatsApp Shares'] = (data.trafficSources['WhatsApp Shares'] || 0) + 1;
+      } else {
+        data.trafficSources['Social Media'] = (data.trafficSources['Social Media'] || 0) + 1;
+      }
+    }
+
+    // Detect real device
+    if (typeof navigator !== 'undefined') {
+      const ua = (navigator.userAgent || '').toLowerCase();
+      if (!data.deviceShare) {
+        data.deviceShare = { 'Mobile': 0, 'Desktop': 0, 'Tablet': 0 };
+      }
+      if (/tablet|ipad/i.test(ua)) {
+        data.deviceShare['Tablet'] = (data.deviceShare['Tablet'] || 0) + 1;
+      } else if (/mobile|iphone|android/i.test(ua)) {
+        data.deviceShare['Mobile'] = (data.deviceShare['Mobile'] || 0) + 1;
+      } else {
+        data.deviceShare['Desktop'] = (data.deviceShare['Desktop'] || 0) + 1;
+      }
+    }
 
     localStorage.setItem(VISITOR_ANALYTICS_KEY, JSON.stringify(data));
   } catch (err) {
@@ -107,37 +171,21 @@ export function recordProductInquiry(listingId, channel = 'whatsapp') {
 }
 
 export function getAnalyticsSummary(listings = []) {
-  let totalVisits = 14280;
-  let uniqueVisitors = 9850;
-  let todayVisits = 342;
-  let dailyVisits = {
-    '2026-09-11': 289,
-    '2026-09-12': 312,
-    '2026-09-13': 345,
-    '2026-09-14': 390,
-    '2026-09-15': 365,
-    '2026-09-16': 418,
-  };
-  let pageVisits = {
-    '/': 4850,
-    '/prices': 3120,
-    '/calculator': 1890,
-    '/dealers': 1640,
-    '/install': 980,
-    '/contact': 650,
-    '/used-solar': 580,
-    '/about': 320,
-  };
+  let totalVisits = 0;
+  let uniqueVisitors = 0;
+  let todayVisits = 0;
+  let dailyVisits = {};
+  let pageVisits = {};
   let trafficSources = {
-    'Direct': 6200,
-    'Google Organic': 4900,
-    'WhatsApp Shares': 2150,
-    'Social Media': 1030,
+    'Direct': 0,
+    'Google Organic': 0,
+    'WhatsApp Shares': 0,
+    'Social Media': 0,
   };
   let deviceShare = {
-    'Mobile': 74,
-    'Desktop': 22,
-    'Tablet': 4,
+    'Mobile': 0,
+    'Desktop': 0,
+    'Tablet': 0,
   };
   let productViewsMap = {};
   let productInquiriesMap = {};
@@ -146,15 +194,22 @@ export function getAnalyticsSummary(listings = []) {
     try {
       const raw = localStorage.getItem(VISITOR_ANALYTICS_KEY);
       if (raw) {
-        const data = JSON.parse(raw);
-        totalVisits = data.totalVisits || 14280;
-        uniqueVisitors = data.uniqueVisitors || 9850;
-        const todayStr = new Date().toISOString().split('T')[0];
-        todayVisits = (data.dailyVisits && data.dailyVisits[todayStr]) || 342;
-        if (data.dailyVisits) dailyVisits = { ...dailyVisits, ...data.dailyVisits };
-        if (data.pageVisits) pageVisits = { ...pageVisits, ...data.pageVisits };
-        if (data.trafficSources) trafficSources = { ...trafficSources, ...data.trafficSources };
-        if (data.deviceShare) deviceShare = { ...deviceShare, ...data.deviceShare };
+        let data = JSON.parse(raw);
+        // If legacy mock baseline exists, purge it to 0
+        if (data && data.totalVisits >= 5000) {
+          resetAllAnalyticsToZero();
+          data = null;
+        }
+        if (data) {
+          totalVisits = data.totalVisits || 0;
+          uniqueVisitors = data.uniqueVisitors || 0;
+          const todayStr = new Date().toISOString().split('T')[0];
+          todayVisits = (data.dailyVisits && data.dailyVisits[todayStr]) || 0;
+          if (data.dailyVisits) dailyVisits = { ...data.dailyVisits };
+          if (data.pageVisits) pageVisits = { ...data.pageVisits };
+          if (data.trafficSources) trafficSources = { ...data.trafficSources };
+          if (data.deviceShare) deviceShare = { ...data.deviceShare };
+        }
       }
       const pvRaw = localStorage.getItem(PRODUCT_VIEWS_KEY);
       if (pvRaw) productViewsMap = JSON.parse(pvRaw);
@@ -164,12 +219,12 @@ export function getAnalyticsSummary(listings = []) {
     } catch {}
   }
 
-  // Calculate views and inquiries for listings based on real activity
+  // Calculate views and inquiries for listings based on real tracked activity
   const enrichedListings = (listings || []).map((item) => {
     const trackedViews = productViewsMap[item.id] || 0;
-    const baseViews = item.views_count || item.views || 0;
+    const baseViews = 0; // Pure 0 baseline (no fake views)
     const totalViews = baseViews + trackedViews;
-    const trackedInq = (productInquiriesMap[item.id] && productInquiriesMap[item.id].total) || item.inquiries_count || 0;
+    const trackedInq = (productInquiriesMap[item.id] && productInquiriesMap[item.id].total) || 0;
 
     return {
       ...item,
@@ -178,9 +233,8 @@ export function getAnalyticsSummary(listings = []) {
     };
   });
 
-  // Top products sorted by views
-  const topViewedProducts = [...enrichedListings]
-    .sort((a, b) => b.totalViews - a.totalViews);
+  // Top products sorted by real views
+  const topViewedProducts = [...enrichedListings].sort((a, b) => b.totalViews - a.totalViews);
 
   const totalProductViews = enrichedListings.reduce((sum, item) => sum + (item.totalViews || 0), 0);
   const totalInquiries = enrichedListings.reduce((sum, item) => sum + (item.inquiriesCount || 0), 0);
@@ -192,9 +246,17 @@ export function getAnalyticsSummary(listings = []) {
     .map(([path, count]) => ({
       path,
       count,
-      percentage: Math.round((count / Math.max(1, totalVisits)) * 100),
+      percentage: totalVisits > 0 ? Math.round((count / totalVisits) * 100) : 0,
     }))
     .sort((a, b) => b.count - a.count);
+
+  // Device percentage calculation
+  const totalDev = (deviceShare['Mobile'] || 0) + (deviceShare['Desktop'] || 0) + (deviceShare['Tablet'] || 0);
+  const devicePercentages = {
+    mobile: totalDev > 0 ? Math.round(((deviceShare['Mobile'] || 0) / totalDev) * 100) : 0,
+    desktop: totalDev > 0 ? Math.round(((deviceShare['Desktop'] || 0) / totalDev) * 100) : 0,
+    tablet: totalDev > 0 ? Math.round(((deviceShare['Tablet'] || 0) / totalDev) * 100) : 0,
+  };
 
   return {
     totalVisits,
@@ -204,6 +266,7 @@ export function getAnalyticsSummary(listings = []) {
     topVisitedPages,
     trafficSources,
     deviceShare,
+    devicePercentages,
     totalProductViews,
     totalInquiries,
     totalFeatured,

@@ -64,6 +64,15 @@ export default function InstallationRequestPage({ onBack, onNavigate, hasOuterNa
   const [notes, setNotes] = useState('');
   const [honeypot, setHoneypot] = useState('');
   const [formMountTime] = useState(() => Date.now());
+
+  useEffect(() => {
+    if (profile) {
+      if (!fullName && profile.full_name) setFullName(profile.full_name);
+      if (!city && profile.city) setCity(profile.city);
+      if (!address && profile.business_address) setAddress(profile.business_address);
+      if (!phone && profile.phone) setPhone(digitsOnlyPhone(profile.phone));
+    }
+  }, [profile]);
   
   const [fieldErrors, setFieldErrors] = useState({});
   const [busy, setBusy] = useState(false);
@@ -487,7 +496,7 @@ export default function InstallationRequestPage({ onBack, onNavigate, hasOuterNa
                         setPhone(digitsOnlyPhone(ev.target.value));
                         clearFieldError('phone');
                       }}
-                      placeholder="03001234567"
+                      placeholder="e.g. 03001234567"
                       className={fieldClass('phone', 'pl-11 pr-11 font-mono font-medium')}
                     />
                     {fieldErrors.phone && (

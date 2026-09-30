@@ -34,6 +34,7 @@ export default function AdminDrillDownModal({
   isOpen,
   onClose,
   initialMetric = 'users',
+  initialFilter = 'all',
   usersList = [],
   listingsList = [],
   dealersList = [],
@@ -46,18 +47,18 @@ export default function AdminDrillDownModal({
 }) {
   const [currentMetric, setCurrentMetric] = useState(initialMetric);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterCategory, setFilterCategory] = useState('all');
+  const [filterCategory, setFilterCategory] = useState(initialFilter || 'all');
   const [sortBy, setSortBy] = useState('newest'); // 'newest' | 'price_asc' | 'price_desc' | 'views_desc' | 'name_asc'
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Sync state if initialMetric changes when opened
+  // Sync state if initialMetric or initialFilter changes when opened
   React.useEffect(() => {
     if (initialMetric) {
       setCurrentMetric(initialMetric);
       setSearchQuery('');
-      setFilterCategory('all');
+      setFilterCategory(initialFilter || 'all');
     }
-  }, [initialMetric, isOpen]);
+  }, [initialMetric, initialFilter, isOpen]);
 
   if (!isOpen) return null;
 
@@ -112,14 +113,20 @@ export default function AdminDrillDownModal({
         CreatedAt: l.created_at || '',
       }));
     } else if (currentMetric === 'inbox') {
-      rows = filteredInbox.map((m) => ({
-        Name: m.name || '',
-        Email: m.email || '',
-        Phone: m.phone || '',
-        Subject: m.subject || '',
-        Date: m.created_at || '',
-        Status: m.read ? 'Read' : 'Unread',
-      }));
+      rows = filteredInbox.map((m) => {
+        const isRead = !!(m.is_read || m.read || m.status === 'read' || m.status === 'replied');
+        return {
+          Ticket: m.ticketNumber || m.ticket_number || '',
+          Name: m.senderName || m.name || '',
+          Email: m.senderEmail || m.email || '',
+          Phone: m.senderPhone || m.phone || '',
+          Category: m.category || 'General Inquiry',
+          Subject: m.subject || '',
+          Message: typeof m.message === 'string' ? m.message : JSON.stringify(m.message || ''),
+          Date: m.createdAt || m.created_at || '',
+          Status: m.status === 'replied' ? 'Replied' : isRead ? 'Read' : 'Unread',
+        };
+      });
     }
 
     if (rows.length === 0) return;
@@ -216,20 +223,36 @@ export default function AdminDrillDownModal({
   }, [activeSourceListings, currentMetric, filterCategory, searchQuery, sortBy]);
 
   const filteredInbox = useMemo(() => {
+    if (!Array.isArray(inboxMessages)) return [];
     return inboxMessages
       .filter((m) => {
-        if (filterCategory === 'unread' && m.read) return false;
-        if (filterCategory === 'read' && !m.read) return false;
+        if (!m || typeof m !== 'object') return false;
+        const isRead = !!(m.is_read || m.read || m.status === 'read' || m.status === 'replied');
+        if (filterCategory === 'unread' && isRead) return false;
+        if (filterCategory === 'read' && !isRead) return false;
+        if (filterCategory === 'replied' && m.status !== 'replied') return false;
         if (!searchQuery) return true;
-        const q = searchQuery.toLowerCase();
+        const q = String(searchQuery).toLowerCase();
+        const name = String(m.senderName || m.name || '').toLowerCase();
+        const email = String(m.senderEmail || m.email || '').toLowerCase();
+        const phone = String(m.senderPhone || m.phone || '').toLowerCase();
+        const subject = String(m.subject || '').toLowerCase();
+        const message = String(typeof m.message === 'string' ? m.message : '').toLowerCase();
+        const ticket = String(m.ticketNumber || m.ticket_number || '').toLowerCase();
         return (
-          m.name?.toLowerCase().includes(q) ||
-          m.email?.toLowerCase().includes(q) ||
-          m.subject?.toLowerCase().includes(q) ||
-          m.message?.toLowerCase().includes(q)
+          name.includes(q) ||
+          email.includes(q) ||
+          phone.includes(q) ||
+          subject.includes(q) ||
+          message.includes(q) ||
+          ticket.includes(q)
         );
       })
-      .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+      .sort((a, b) => {
+        const timeA = new Date(a.createdAt || a.created_at || 0).getTime() || 0;
+        const timeB = new Date(b.createdAt || b.created_at || 0).getTime() || 0;
+        return timeB - timeA;
+      });
   }, [inboxMessages, filterCategory, searchQuery]);
 
   // Metric metadata
@@ -426,6 +449,30 @@ export default function AdminDrillDownModal({
                     className={`px-2.5 py-1.5 rounded-lg font-bold transition-all cursor-pointer ${
                       filterCategory === f.id
                         ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200 border border-amber-300 dark:border-amber-800'
+                        : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700'
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {currentMetric === 'inbox' && (
+              <div className="flex items-center gap-1 text-xs">
+                {[
+                  { id: 'all', label: 'All' },
+                  { id: 'unread', label: 'Unread Only' },
+                  { id: 'read', label: 'Read' },
+                  { id: 'replied', label: 'Replied' },
+                ].map((f) => (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => setFilterCategory(f.id)}
+                    className={`px-2.5 py-1.5 rounded-lg font-bold transition-all cursor-pointer ${
+                      filterCategory === f.id
+                        ? 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-200 border border-purple-300 dark:border-purple-800'
                         : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700'
                     }`}
                   >
@@ -696,51 +743,76 @@ export default function AdminDrillDownModal({
           {currentMetric === 'inbox' && (
             <div className="space-y-3">
               {filteredInbox.length === 0 ? (
-                <div className="py-8 text-center text-gray-500">
-                  No contact inquiries found.
+                <div className="py-12 text-center">
+                  <MessageSquare className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
+                  <p className="text-gray-500 font-medium text-sm">No contact inquiries or messages found.</p>
                 </div>
               ) : (
-                filteredInbox.map((msg, idx) => (
-                  <div
-                    key={msg.id || idx}
-                    className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xs hover:border-amber-400 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                  >
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-extrabold text-sm text-gray-900 dark:text-white">
-                          {msg.name || 'Visitor'}
-                        </span>
-                        <span className="text-xs text-gray-400">• {msg.email}</span>
-                        {!msg.read && (
-                          <span className="px-1.5 py-0.2 rounded text-[9px] font-black bg-purple-100 text-purple-800 uppercase">
-                            New
+                filteredInbox.map((msg, idx) => {
+                  const isRead = !!(msg.is_read || msg.read || msg.status === 'read' || msg.status === 'replied');
+                  const dateStr = msg.createdAt || msg.created_at;
+                  return (
+                    <div
+                      key={msg.id || idx}
+                      className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xs hover:border-purple-400 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-extrabold text-sm text-gray-900 dark:text-white">
+                            {msg.senderName || msg.name || 'Visitor'}
                           </span>
-                        )}
+                          {(msg.senderEmail || msg.email) && (
+                            <span className="text-xs text-gray-400 truncate">
+                              • {msg.senderEmail || msg.email}
+                            </span>
+                          )}
+                          {(msg.senderPhone || msg.phone) && (
+                            <span className="text-xs text-gray-400 truncate">
+                              • {msg.senderPhone || msg.phone}
+                            </span>
+                          )}
+                          {msg.ticketNumber && (
+                            <span className="font-mono text-[10px] text-gray-400 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">
+                              {msg.ticketNumber}
+                            </span>
+                          )}
+                          {!isRead && (
+                            <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300 uppercase border border-purple-200">
+                              New
+                            </span>
+                          )}
+                          {msg.status === 'replied' && (
+                            <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 uppercase border border-emerald-200">
+                              Replied
+                            </span>
+                          )}
+                        </div>
+                        <p className="font-semibold text-xs text-gray-800 dark:text-gray-200 mt-1 truncate">
+                          {msg.subject || 'Marketplace Solar Inquiry'}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2">
+                          {typeof msg.message === 'string' ? msg.message : JSON.stringify(msg.message || '')}
+                        </p>
                       </div>
-                      <p className="font-semibold text-xs text-gray-700 dark:text-gray-300 mt-1">
-                        {msg.subject || 'Marketplace Solar Inquiry'}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2">
-                        {msg.message}
-                      </p>
+                      <div className="text-right shrink-0 flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2">
+                        <p className="text-[11px] text-gray-400">
+                          {dateStr ? new Date(dateStr).toLocaleDateString() : 'Recent'}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (onSelectTab) onSelectTab('inbox');
+                            onClose();
+                          }}
+                          className="px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
+                        >
+                          <MessageSquare className="w-3.5 h-3.5" />
+                          <span>Open in Inbox</span>
+                        </button>
+                      </div>
                     </div>
-                    <div className="text-right shrink-0">
-                      <p className="text-[11px] text-gray-400">
-                        {msg.created_at ? new Date(msg.created_at).toLocaleDateString() : 'Recent'}
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (onSelectTab) onSelectTab('inbox');
-                          onClose();
-                        }}
-                        className="mt-1 px-3 py-1 rounded-lg bg-amber-500 text-white font-bold text-xs"
-                      >
-                        Reply in Inbox
-                      </button>
-                    </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           )}

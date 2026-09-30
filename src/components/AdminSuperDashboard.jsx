@@ -238,8 +238,10 @@ export default function AdminSuperDashboard({
   // Drill-Down Modal State
   const [drillDownModalOpen, setDrillDownModalOpen] = useState(false);
   const [drillDownMetric, setDrillDownMetric] = useState('users');
-  const openDrillDown = (metric) => {
+  const [drillDownFilter, setDrillDownFilter] = useState('all');
+  const openDrillDown = (metric, filter = 'all') => {
     setDrillDownMetric(metric);
+    setDrillDownFilter(filter);
     setDrillDownModalOpen(true);
   };
 
@@ -2177,7 +2179,7 @@ export default function AdminSuperDashboard({
                     </button>
                     <button
                       type="button"
-                      onClick={() => openDrillDown('inbox')}
+                      onClick={() => openDrillDown('inbox', 'unread')}
                       className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-md transition-all cursor-pointer group text-left"
                     >
                       <div className="flex items-center justify-between">
@@ -6099,6 +6101,7 @@ export default function AdminSuperDashboard({
         isOpen={drillDownModalOpen}
         onClose={() => setDrillDownModalOpen(false)}
         initialMetric={drillDownMetric}
+        initialFilter={drillDownFilter}
         usersList={usersList}
         listingsList={listingsList}
         dealersList={VERIFIED_DEALERS}

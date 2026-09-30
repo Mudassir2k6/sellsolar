@@ -3,6 +3,7 @@
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -296,19 +297,19 @@ function Xy({
                       className: 'animate-ticker font-semibold text-gray-300 flex items-center gap-3',
                       children: [
                         jsxs('span', { className: 'flex items-center gap-1', children: [jsx(TrendingUp, { className: 'h-3.5 w-3.5 text-primary-400' }), "LIVE RATES:"] }),
-                        jsxs('span', { className: 'text-emerald-400', children: ['🟢 JA Solar 625W: Rs 38.00/W (Deliv 30/09)'] }),
+                        jsx('span', { className: 'text-emerald-400', children: '🟢 JA Solar 625W: Rs 38.00/W (Deliv 30/09)' }),
                         jsx('span', { className: 'text-gray-700', children: '|' }),
-                        jsxs('span', { className: 'text-emerald-400', children: ['🟢 Jinko 585W: Rs 39.75/W'] }),
+                        jsx('span', { className: 'text-emerald-400', children: '🟢 Jinko 585W: Rs 39.75/W' }),
                         jsx('span', { className: 'text-gray-700', children: '|' }),
-                        jsxs('span', { className: 'text-emerald-400', children: ['🟢 Canadian 625W: Rs 41.25/W'] }),
+                        jsx('span', { className: 'text-emerald-400', children: '🟢 Canadian 625W: Rs 41.25/W' }),
                         jsx('span', { className: 'text-gray-700', children: '|' }),
-                        jsxs('span', { className: 'text-amber-400', children: ['🟡 LCD Series 6kW: Rs 195k'] }),
+                        jsx('span', { className: 'text-amber-400', children: '🟡 LCD Series 6kW: Rs 195k' }),
                         jsx('span', { className: 'text-gray-700', children: '|' }),
-                        jsxs('span', { className: 'text-sky-400', children: ['⭕ Solis 6kW+: Rs 207k'] }),
+                        jsx('span', { className: 'text-sky-400', children: '⭕ Solis 6kW+: Rs 207k' }),
                         jsx('span', { className: 'text-gray-700', children: '|' }),
-                        jsxs('span', { className: 'text-emerald-400', children: ['🟢 Zilo Nexa (PK 🇵🇰): Rs 65k–580k'] }),
+                        jsx('span', { className: 'text-emerald-400', children: '🟢 Zilo Nexa (PK 🇵🇰): Rs 65k–580k' }),
                         jsx('span', { className: 'text-gray-700', children: '|' }),
-                        jsxs('span', { className: 'text-emerald-400', children: ['🟢 LEFN 640W: Rs 33.50/W'] }),
+                        jsx('span', { className: 'text-emerald-400', children: '🟢 LEFN 640W: Rs 33.50/W' }),
                       ]
                     })
                   ]
@@ -2267,7 +2268,7 @@ function lx({
             })
           ]
         }),
-        jsxs("div",{
+        jsx("div",{
           className:"flex items-center gap-1.5 overflow-x-auto pb-2 mb-3.5 scrollbar-none",children:[
             { id:"", label:"All Equipment" },
             { id:"panel", label:"Solar Panels", icon:Sun },
@@ -2888,40 +2889,163 @@ function yx({
     profile:r,user:seller
   }=useAuth(),[n,s]=useState(!1),[a,l]=useState(null),[o,c]=useState(!1),[u,d]=useState(""),[h,p]=useState(""),[y,w]=useState("panel"),[j,C]=useState("used"),[g,f]=useState(""),[m,v]=useState((r==null?void 0:r.city)||""),[k,x]=useState(""),[S,L]=useState(""),[z,I]=useState(""),[Y,ke]=useState(""),[ye,Be]=useState((r==null?void 0:r.full_name)||""),[le,We]=useState((r==null?void 0:r.phone)||""),[uploadedFiles,setUploadedFiles]=useState([]),[uploadNotice,setUploadNotice]=useState("");
 
+  const isSignedIn = Boolean(seller || r);
+
+  const resolvedName = useMemo(() => {
+    const raw = (r?.full_name || seller?.user_metadata?.full_name || seller?.user_metadata?.name || (seller?.email ? seller.email.split('@')[0] : '') || '').trim();
+    return raw || (isSignedIn ? 'Verified Seller' : '');
+  }, [r, seller, isSignedIn]);
+
+  const resolvedPhone = useMemo(() => {
+    if (r?.phone) return r.phone;
+    if (seller?.user_metadata?.phone) return seller.user_metadata.phone;
+    try {
+      const email = (seller?.email || r?.email || '').toLowerCase();
+      const id = (seller?.id || r?.id || '').toLowerCase();
+      const pMap = typeof getUserPhonesMap === 'function' ? getUserPhonesMap() : {};
+      if (email && pMap[email]) return pMap[email];
+      if (id && pMap[id]) return pMap[id];
+
+      const stored = typeof getStoredUsers === 'function' ? getStoredUsers() : {};
+      if (email && stored[email]?.profile?.phone) return stored[email].profile.phone;
+      if (email && stored[email]?.user?.user_metadata?.phone) return stored[email].user.user_metadata.phone;
+
+      const rawListings = typeof localStorage !== 'undefined' ? localStorage.getItem('sellsolar_custom_listings') : null;
+      if (rawListings) {
+        const parsed = JSON.parse(rawListings);
+        if (Array.isArray(parsed)) {
+          const match = parsed.find(
+            (item) =>
+              (item.seller_email && item.seller_email.toLowerCase() === email) ||
+              (item.user_id && item.user_id === id)
+          );
+          if (match?.seller_phone || match?.phone) return match.seller_phone || match.phone;
+        }
+      }
+    } catch {}
+    return isSignedIn ? (r?.phone || '03001234567') : '';
+  }, [r, seller, isSignedIn]);
+
   useEffect(() => {
-    if (r?.phone && !le) We(r.phone);
-    if (r?.full_name && !ye) Be(r.full_name);
-    if (!le && seller) {
-      try {
-        const pMap = typeof getUserPhonesMap === 'function' ? getUserPhonesMap() : {};
-        const p = (seller.email && pMap[seller.email]) || (seller.id && pMap[seller.id]) || seller.user_metadata?.phone || '';
-        if (p) We(p);
-      } catch {}
+    if (isSignedIn) {
+      if (resolvedName) Be(resolvedName);
+      if (resolvedPhone) We(resolvedPhone);
+    } else {
+      if (resolvedName && !ye) Be(resolvedName);
+      if (resolvedPhone && !le) We(resolvedPhone);
     }
-  }, [r, seller]);
+  }, [isSignedIn, resolvedName, resolvedPhone]);
+
+  // When signed in, Name and Mobile Number are permanently locked from the start and completely non-editable
+  const isNameLocked = Boolean(isSignedIn);
+  const isPhoneLocked = Boolean(isSignedIn);
+
+  const [fieldErrors, setFieldErrors] = useState({});
+  const titleInputRef = useRef(null);
+  const brandSelectRef = useRef(null);
+  const priceInputRef = useRef(null);
+  const citySelectRef = useRef(null);
+  const sellerNameRef = useRef(null);
+  const sellerPhoneRef = useRef(null);
+  const photosRef = useRef(null);
+  const descriptionRef = useRef(null);
+
+  // Auto-focus Ad Title input on mount so the cursor immediately blinks in Ad Title
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (titleInputRef.current) {
+        titleInputRef.current.focus();
+      }
+    }, 120);
+    return () => clearTimeout(timer);
+  }, []);
 
   const Xe=async()=>{
-    if(l(null),!u.trim()||!h.trim()||!g.trim()||!m.trim()){
-      l("Please fill in all required fields (title, brand, price, city)");
-      return;
+    l(null);
+    const newErrors = {};
+
+    if(!u.trim()){
+      newErrors.title = "Ad Title is required. Please enter a descriptive title for your solar equipment.";
+    } else if(u.trim().length < 5){
+      newErrors.title = "Ad Title must be at least 5 characters long.";
     }
+
+    if(!h.trim() || h === "Select brand"){
+      newErrors.brand = "Brand is required. Please select a brand (or choose 'Other').";
+    }
+
+    if(!g.trim()){
+      newErrors.price = "Price is required. Please enter the price in PKR.";
+    } else {
+      const pNum = parseFloat(g);
+      if(isNaN(pNum) || pNum <= 0){
+        newErrors.price = "Please enter a valid positive price in PKR.";
+      }
+    }
+
+    if(!m.trim() || m === "Select city"){
+      newErrors.city = "City is required. Please select your city.";
+    }
+
+    if(!ye.trim()){
+      newErrors.sellerName = "Seller Name is required.";
+    }
+
     if(!le.trim()){
-      l("Mobile / WhatsApp Phone Number is mandatory. Please enter your 11-digit phone number (e.g. 03001234567).");
+      newErrors.sellerPhone = "Mobile / WhatsApp Phone Number is required.";
+    } else if(!isValidPhone(le)){
+      newErrors.sellerPhone = "Phone number must be exactly 11 digits (e.g. 03001234567).";
+    }
+
+    if(uploadedFiles.length === 0 && !z.trim()){
+      newErrors.photos = "Equipment photo is required. Please upload at least one photo or provide an image link.";
+    }
+
+    if(!Y.trim()){
+      newErrors.description = "Description is required. Please provide details about your solar product.";
+    } else if(Y.trim().length < 10){
+      newErrors.description = "Description must be at least 10 characters long.";
+    }
+
+    if(k && (isNaN(parseFloat(k)) || parseFloat(k) < 0)){
+      newErrors.capacity = "Capacity must be a positive number in kW";
+    }
+
+    if(Object.keys(newErrors).length > 0){
+      setFieldErrors(newErrors);
+      const firstMsg = Object.values(newErrors)[0];
+      l(firstMsg);
+
+      // Focus the first invalid field (especially Ad Title if title is missing)
+      if(newErrors.title && titleInputRef.current){
+        titleInputRef.current.focus();
+        titleInputRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if(newErrors.brand && brandSelectRef.current){
+        brandSelectRef.current.focus();
+        brandSelectRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if(newErrors.price && priceInputRef.current){
+        priceInputRef.current.focus();
+        priceInputRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if(newErrors.city && citySelectRef.current){
+        citySelectRef.current.focus();
+        citySelectRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if(newErrors.sellerName && sellerNameRef.current){
+        sellerNameRef.current.focus();
+        sellerNameRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if(newErrors.sellerPhone && sellerPhoneRef.current){
+        sellerPhoneRef.current.focus();
+        sellerPhoneRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if(newErrors.photos && photosRef.current){
+        photosRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if(newErrors.description && descriptionRef.current){
+        descriptionRef.current.focus();
+        descriptionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       return;
     }
-    if(!isValidPhone(le)){
-      l("Phone number must be exactly 11 digits (e.g. 03001234567).");
-      return;
-    }
+
+    setFieldErrors({});
     const _=parseFloat(g);
-    if(isNaN(_)||_<=0){
-      l("Please enter a valid positive price in PKR");
-      return;
-    }
-    if(k&&(isNaN(parseFloat(k))||parseFloat(k)<0)){
-      l("Capacity must be a positive number in kW");
-      return;
-    }
     s(!0);
     setUploadNotice("");
     try{
@@ -2957,8 +3081,8 @@ function yx({
         image_urls: finalImageUrls.length > 0 ? finalImageUrls : (finalCover ? [finalCover] : []),
         description: Y.trim() || null,
         featured: false,
-        seller_name: ye.trim() || (r == null ? void 0 : r.full_name) || "Solar Seller",
-        seller_phone: le.trim() || (r == null ? void 0 : r.phone) || null,
+        seller_name: (isSignedIn ? (resolvedName || ye.trim()) : ye.trim()) || (r == null ? void 0 : r.full_name) || "Solar Seller",
+        seller_phone: (isSignedIn && resolvedPhone ? resolvedPhone : le.trim()) || (r == null ? void 0 : r.phone) || null,
         views: 0,
         status: "approved",
         is_sold: false,
@@ -2986,7 +3110,7 @@ function yx({
         const{
           error:A
         }=await supabase.from("solar_listings").insert({
-          user_id: safeUserId,title:u.trim(),brand:h.trim(),category:y,condition:j,price:_,city:m.trim(),capacity_kw:k?parseFloat(k):null,warranty_years:S !== null && S !== "" && !isNaN(Number(S)) ? parseFloat(Number(S).toFixed(4)) : null,image_url:finalCover,image_urls:finalImageUrls.length > 0 ? finalImageUrls : (finalCover ? [finalCover] : []),description:Y.trim()||null,featured:!1,seller_name:ye.trim()||(r==null?void 0:r.full_name)||null,seller_phone:le.trim()||(r==null?void 0:r.phone)||null,views:0,status:"approved",is_sold:!1
+          user_id: safeUserId,title:u.trim(),brand:h.trim(),category:y,condition:j,price:_,city:m.trim(),capacity_kw:k?parseFloat(k):null,warranty_years:S !== null && S !== "" && !isNaN(Number(S)) ? parseFloat(Number(S).toFixed(4)) : null,image_url:finalCover,image_urls:finalImageUrls.length > 0 ? finalImageUrls : (finalCover ? [finalCover] : []),description:Y.trim()||null,featured:!1,seller_name:(isSignedIn ? (resolvedName || ye.trim()) : ye.trim())||(r==null?void 0:r.full_name)||null,seller_phone:(isSignedIn && resolvedPhone ? resolvedPhone : le.trim())||(r==null?void 0:r.phone)||null,views:0,status:"approved",is_sold:!1
         });
         if(A)console.warn("Supabase insert notice:", A);
       } catch(err) {
@@ -3044,80 +3168,209 @@ function yx({
           className:"mt-1 text-sm text-gray-500",children:"Fill in the details below to list your solar equipment for sale."
         }),jsx("div",{
           className:"card mt-6 p-6 sm:p-8",children:jsxs("div",{
-            className:"space-y-5",children:[jsxs("div",{
-              children:[jsx("label",{
-                className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"Ad Title *"
-              }),jsx("input",{
-                type:"text",value:u,onChange:_=>d(_.target.value),placeholder:"e.g. Longi 550W Monocrystalline Solar Panel",className:"input-field"
-              })]
-            }),jsxs("div",{
-              className:"grid grid-cols-1 gap-4 sm:grid-cols-2",children:[jsxs("div",{
-                children:[jsx("label",{
-                  className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"Category *"
+            className:"space-y-5",children:[
+              jsxs("div",{
+                className:"p-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/30 border border-amber-200 dark:border-amber-900/60 flex items-start gap-3",
+                children:[
+                  jsx(ShieldCheck,{className:"h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5"}),
+                  jsxs("div",{
+                    className:"text-xs space-y-1",
+                    children:[
+                      jsx("div",{className:"font-bold text-gray-900 dark:text-white text-xs sm:text-sm",children:"Required Fields & Account Integrity"}),
+                      jsxs("p",{
+                        className:"text-gray-600 dark:text-gray-300 leading-relaxed",
+                        children:[
+                          "All fields marked with ",
+                          jsx("span",{className:"text-red-600 dark:text-red-400 font-bold",children:"*"}),
+                          " are required to publish your equipment listing.",
+                          isSignedIn ? " To prevent fraud and maintain buyer trust, your Seller Name and Mobile Number are locked to your signed-in account and cannot be modified." : ""
+                        ]
+                      })
+                    ]
+                  })
+                ]
+              }),
+              jsxs("div",{
+                children:[jsxs("div",{
+                  className:"flex items-center justify-between mb-1.5",
+                  children:[
+                    jsxs("label",{
+                      className:"block text-sm font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1",
+                      children:[
+                        "Ad Title",
+                        jsx("span",{className:"text-red-500 font-black",children:"*"})
+                      ]
+                    })
+                  ]
+                }),jsx("input",{
+                  ref:titleInputRef,
+                  type:"text",
+                  required:true,
+                  value:u,
+                  onChange:_=>{
+                    d(_.target.value);
+                    if(fieldErrors.title) setFieldErrors(prev=>({...prev, title:false}));
+                  },
+                  placeholder:"e.g. Longi 550W Monocrystalline Solar Panel",
+                  className:`input-field font-medium ${fieldErrors.title ? "border-2 border-red-500 ring-2 ring-red-200 dark:ring-red-950/60 dark:border-red-500 focus:border-red-500 focus:ring-red-400" : ""}`
+                }),
+                fieldErrors.title && jsx("p",{className:"mt-1 text-xs font-semibold text-red-600 dark:text-red-400",children:fieldErrors.title})
+                ]
+              }),jsxs("div",{
+                className:"grid grid-cols-1 gap-4 sm:grid-cols-2",children:[jsxs("div",{
+                  children:[jsxs("div",{
+                    className:"flex items-center justify-between mb-1.5",
+                    children:[
+                      jsxs("label",{
+                        className:"block text-sm font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1",
+                        children:[
+                          "Category",
+                          jsx("span",{className:"text-red-500 font-black",children:"*"})
+                        ]
+                      })
+                    ]
+                  }),jsxs("div",{
+                    className:"relative",children:[jsx(Tag,{
+                      className:"absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 z-10"
+                    }),jsx("select",{
+                      required:true,value:y,onChange:_=>w(_.target.value),className:"select-field pl-11 font-semibold",children:px.map(_=>jsx("option",{
+                        value:_,children:CATEGORIES[_]
+                      },_))
+                    })]
+                  })]
                 }),jsxs("div",{
-                  className:"relative",children:[jsx(Tag,{
-                    className:"absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 z-10"
-                  }),jsx("select",{
-                    value:y,onChange:_=>w(_.target.value),className:"select-field pl-11",children:px.map(_=>jsx("option",{
-                      value:_,children:CATEGORIES[_]
+                  children:[jsxs("div",{
+                    className:"flex items-center justify-between mb-1.5",
+                    children:[
+                      jsxs("label",{
+                        className:"block text-sm font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1",
+                        children:[
+                          "Condition",
+                          jsx("span",{className:"text-red-500 font-black",children:"*"})
+                        ]
+                      })
+                    ]
+                  }),jsx("div",{
+                    className:"flex gap-2",children:gx.map(_=>jsx("button",{
+                      type:"button",
+                      onClick:()=>C(_),className:`flex-1 rounded-xl border-2 py-3 text-sm font-bold capitalize transition-all ${j===_?"border-primary-500 bg-primary-50 dark:bg-primary-950/50 text-primary-700 dark:text-primary-300 shadow-xs":"border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-600"}`,children:_
                     },_))
                   })]
                 })]
               }),jsxs("div",{
-                children:[jsx("label",{
-                  className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"Condition *"
-                }),jsx("div",{
-                  className:"flex gap-2",children:gx.map(_=>jsx("button",{
-                    type:"button",
-                    onClick:()=>C(_),className:`flex-1 rounded-xl border-2 py-3 text-sm font-semibold capitalize transition-all ${j===_?"border-primary-500 bg-primary-50 text-primary-700":"border-gray-200 text-gray-600 hover:border-gray-300"}`,children:_
-                  },_))
-                })]
-              })]
-            }),jsxs("div",{
-              className:"grid grid-cols-1 gap-4 sm:grid-cols-2",children:[jsxs("div",{
-                children:[jsx("label",{
-                  className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"Brand *"
-                }),jsxs("select",{
-                  value:h,onChange:_=>p(_.target.value),className:"select-field",children:[jsx("option",{
-                    value:"",children:"Select brand"
-                  }),BRANDS.map(_=>jsx("option",{
-                    value:_,children:_
-                  },_)),jsx("option",{
-                    value:"Other",children:"Other"
-                  })]
-                })]
-              }),jsxs("div",{
-                children:[jsx("label",{
-                  className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"Price (PKR) *"
-                }),jsxs("div",{
-                  className:"relative",children:[jsx("span",{
-                    className:"absolute left-3 top-1/2 -translate-y-1/2 rounded-md bg-gray-100 dark:bg-gray-700 px-2 py-0.5 text-xs font-black text-gray-700 dark:text-gray-200 select-none",children:"PKR"
-                  }),jsx("input",{
-                    type:"number",min:"0",step:"any",onKeyDown:T=>{if(T.key==='-'||T.key==='e'||T.key==='+')T.preventDefault()},value:g,onChange:_=>{
-                      const v=_.target.value;
-                      if(v===""||(!isNaN(v)&&Number(v)>=0))f(v);
-                    },placeholder:"e.g. 18500",className:"input-field pl-16 font-semibold"
-                  })]
-                })]
-              })]
-            }),jsxs("div",{
-              className:"grid grid-cols-1 gap-4 sm:grid-cols-2",children:[jsxs("div",{
-                children:[jsx("label",{
-                  className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"City *"
-                }),jsxs("div",{
-                  className:"relative",children:[jsx(MapPin,{
-                    className:"absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 z-10"
+                className:"grid grid-cols-1 gap-4 sm:grid-cols-2",children:[jsxs("div",{
+                  children:[jsxs("div",{
+                    className:"flex items-center justify-between mb-1.5",
+                    children:[
+                      jsxs("label",{
+                        className:"block text-sm font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1",
+                        children:[
+                          "Brand",
+                          jsx("span",{className:"text-red-500 font-black",children:"*"})
+                        ]
+                      })
+                    ]
                   }),jsxs("select",{
-                    value:m,onChange:_=>v(_.target.value),className:"select-field pl-11",children:[jsx("option",{
-                      value:"",children:"Select city"
-                    }),CITIES.map(_=>jsx("option",{
+                    ref:brandSelectRef,
+                    required:true,
+                    value:h,
+                    onChange:_=>{
+                      p(_.target.value);
+                      if(fieldErrors.brand) setFieldErrors(prev=>({...prev, brand:false}));
+                    },
+                    className:`select-field font-medium ${fieldErrors.brand ? "border-2 border-red-500 ring-2 ring-red-200 dark:ring-red-950/60 dark:border-red-500 focus:border-red-500 focus:ring-red-400" : ""}`,
+                    children:[jsx("option",{
+                      value:"",children:"Select brand"
+                    }),BRANDS.map(_=>jsx("option",{
                       value:_,children:_
-                    },_))]
-                  })]
+                    },_)),jsx("option",{
+                      value:"Other",children:"Other"
+                    })]
+                  }),
+                  fieldErrors.brand && jsx("p",{className:"mt-1 text-xs font-semibold text-red-600 dark:text-red-400",children:fieldErrors.brand})
+                  ]
+                }),jsxs("div",{
+                  children:[jsxs("div",{
+                    className:"flex items-center justify-between mb-1.5",
+                    children:[
+                      jsxs("label",{
+                        className:"block text-sm font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1",
+                        children:[
+                          "Price (PKR)",
+                          jsx("span",{className:"text-red-500 font-black",children:"*"})
+                        ]
+                      })
+                    ]
+                  }),jsxs("div",{
+                    className:"relative",children:[jsx("span",{
+                      className:"absolute left-3 top-1/2 -translate-y-1/2 rounded-md bg-gray-100 dark:bg-gray-700 px-2 py-0.5 text-xs font-black text-gray-700 dark:text-gray-200 select-none",children:"PKR"
+                    }),jsx("input",{
+                      ref:priceInputRef,
+                      type:"number",
+                      required:true,
+                      min:"0",
+                      step:"any",
+                      onKeyDown:T=>{if(T.key==='-'||T.key==='e'||T.key==='+')T.preventDefault()},
+                      value:g,
+                      onChange:_=>{
+                        const v=_.target.value;
+                        if(v===""||(!isNaN(v)&&Number(v)>=0)){
+                          f(v);
+                          if(fieldErrors.price) setFieldErrors(prev=>({...prev, price:false}));
+                        }
+                      },
+                      placeholder:"e.g. 18500",
+                      className:`input-field pl-16 font-bold ${fieldErrors.price ? "border-2 border-red-500 ring-2 ring-red-200 dark:ring-red-950/60 dark:border-red-500 focus:border-red-500 focus:ring-red-400" : ""}`
+                    })]
+                  }),
+                  fieldErrors.price && jsx("p",{className:"mt-1 text-xs font-semibold text-red-600 dark:text-red-400",children:fieldErrors.price})
+                  ]
                 })]
               }),jsxs("div",{
-                children:[jsx("label",{
-                  className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"Capacity (kW)"
+                className:"grid grid-cols-1 gap-4 sm:grid-cols-2",children:[jsxs("div",{
+                  children:[jsxs("div",{
+                    className:"flex items-center justify-between mb-1.5",
+                    children:[
+                      jsxs("label",{
+                        className:"block text-sm font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1",
+                        children:[
+                          "City",
+                          jsx("span",{className:"text-red-500 font-black",children:"*"})
+                        ]
+                      })
+                    ]
+                  }),jsxs("div",{
+                    className:"relative",children:[jsx(MapPin,{
+                      className:"absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 z-10"
+                    }),jsxs("select",{
+                      ref:citySelectRef,
+                      required:true,
+                      value:m,
+                      onChange:_=>{
+                        v(_.target.value);
+                        if(fieldErrors.city) setFieldErrors(prev=>({...prev, city:false}));
+                      },
+                      className:`select-field pl-11 font-medium ${fieldErrors.city ? "border-2 border-red-500 ring-2 ring-red-200 dark:ring-red-950/60 dark:border-red-500 focus:border-red-500 focus:ring-red-400" : ""}`,
+                      children:[jsx("option",{
+                        value:"",children:"Select city"
+                      }),CITIES.map(_=>jsx("option",{
+                        value:_,children:_
+                      },_))]
+                    })]
+                  }),
+                  fieldErrors.city && jsx("p",{className:"mt-1 text-xs font-semibold text-red-600 dark:text-red-400",children:fieldErrors.city})
+                  ]
+                }),jsxs("div",{
+                children:[jsxs("div",{
+                  className:"flex items-center justify-between mb-1.5",
+                  children:[
+                    jsx("label",{
+                      className:"block text-sm font-bold text-gray-800 dark:text-gray-200",children:"Capacity (kW)"
+                    }),
+                    jsx("span",{
+                      className:"text-[11px] font-semibold text-gray-400 dark:text-gray-500",children:"Optional"
+                    })
+                  ]
                 }),jsxs("div",{
                   className:"relative",children:[jsx(Zap,{
                     className:"absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-amber-500"
@@ -3131,34 +3384,139 @@ function yx({
               })]
             }),jsxs("div",{
               className:"grid grid-cols-1 gap-4 sm:grid-cols-2",children:[jsxs("div",{
-                children:[jsx("label",{
-                  className:"mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300",children:"Seller Name *"
-                }),jsx("input",{
-                  type:"text",required:true,value:ye,onChange:_=>Be(_.target.value),placeholder:"e.g. Muhammad Ali",className:"input-field font-medium"
+                children:[jsx("div",{
+                  className:"flex items-center justify-between mb-1.5",
+                  children:jsxs("label",{
+                    className:"block text-sm font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1",
+                    children:[
+                      "Seller Name",
+                      jsx("span",{className:"text-red-500 font-black",children:"*"})
+                    ]
+                  })
+                }),jsxs("div",{
+                  className:"relative",children:[
+                    jsx(User,{
+                      className:`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${isNameLocked ? "text-emerald-600 dark:text-emerald-400" : "text-gray-400"}`
+                    }),
+                    jsx("input",{
+                      ref:sellerNameRef,
+                      type:"text",
+                      required:true,
+                      readOnly:isNameLocked,
+                      tabIndex:isNameLocked ? -1 : 0,
+                      value:ye,
+                      onChange:_=>{
+                        if(isNameLocked) return;
+                        Be(_.target.value);
+                        if(fieldErrors.sellerName) setFieldErrors(prev=>({...prev, sellerName:false}));
+                      },
+                      onKeyDown:e=>{
+                        if(isNameLocked) e.preventDefault();
+                      },
+                      placeholder:"e.g. Muhammad Ali",
+                      className:isNameLocked
+                        ? "input-field pl-11 pr-10 font-bold bg-gray-100 dark:bg-gray-800/80 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-700 cursor-not-allowed select-none shadow-none focus:ring-0 focus:border-gray-300 dark:focus:border-gray-700 pointer-events-none"
+                        : `input-field pl-11 font-medium ${fieldErrors.sellerName ? "border-2 border-red-500 ring-2 ring-red-200 dark:ring-red-950/60 dark:border-red-500 focus:border-red-500 focus:ring-red-400" : ""}`
+                    }),
+                    isNameLocked && jsx(Lock,{
+                      className:"absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500",
+                      title:"Locked to your account"
+                    })
+                  ]
+                }),
+                fieldErrors.sellerName && jsx("p",{className:"mt-1 text-xs font-semibold text-red-600 dark:text-red-400",children:fieldErrors.sellerName}),
+                isNameLocked && jsxs("p",{
+                  className:"mt-1 text-[11px] text-gray-500 dark:text-gray-400 flex items-center gap-1",
+                  children:[
+                    jsx(ShieldCheck,{className:"h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 shrink-0"}),
+                    "Account Name is locked after sign-in for security & buyer trust."
+                  ]
                 })]
               }),jsxs("div",{
-                children:[jsxs("label",{
-                  className:"mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center justify-between",children:[jsxs("span",{
-                    children:["Mobile / WhatsApp Number ",jsx("span",{className:"text-red-500 font-bold",children:"*"})]
-                  }),jsx("span",{
-                    className:"text-[11px] text-primary-600 dark:text-primary-400 font-bold",children:"Mandatory (11 digits)"
-                  })]
+                children:[jsx("div",{
+                  className:"flex items-center justify-between mb-1.5",
+                  children:jsxs("label",{
+                    className:"block text-sm font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1",
+                    children:[
+                      "Mobile / WhatsApp",
+                      jsx("span",{className:"text-red-500 font-black",children:"*"})
+                    ]
+                  })
                 }),jsxs("div",{
-                  className:"relative",children:[jsx(Phone,{
-                    className:"absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-primary-500"
-                  }),jsx("input",{
-                    type:"tel",required:true,value:le,onChange:_=>We(_.target.value),placeholder:"03001234567",className:"input-field pl-11 font-mono font-bold"
-                  })]
+                  className:"relative",children:[
+                    jsx(Phone,{
+                      className:`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${isPhoneLocked ? "text-emerald-600 dark:text-emerald-400" : "text-primary-500"}`
+                    }),
+                    jsx("input",{
+                      ref:sellerPhoneRef,
+                      type:"tel",
+                      required:true,
+                      readOnly:isPhoneLocked,
+                      tabIndex:isPhoneLocked ? -1 : 0,
+                      value:le,
+                      onChange:_=>{
+                        if(isPhoneLocked) return;
+                        We(_.target.value);
+                        if(fieldErrors.sellerPhone) setFieldErrors(prev=>({...prev, sellerPhone:false}));
+                      },
+                      onKeyDown:e=>{
+                        if(isPhoneLocked) e.preventDefault();
+                      },
+                      placeholder:"03001234567",
+                      className:isPhoneLocked
+                        ? "input-field pl-11 pr-10 font-mono font-bold bg-gray-100 dark:bg-gray-800/80 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-700 cursor-not-allowed select-none shadow-none focus:ring-0 focus:border-gray-300 dark:focus:border-gray-700 pointer-events-none"
+                        : `input-field pl-11 font-mono font-bold ${fieldErrors.sellerPhone ? "border-2 border-red-500 ring-2 ring-red-200 dark:ring-red-950/60 dark:border-red-500 focus:border-red-500 focus:ring-red-400" : ""}`
+                    }),
+                    isPhoneLocked && jsx(Lock,{
+                      className:"absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500",
+                      title:"Mobile number locked"
+                    })
+                  ]
+                }),
+                fieldErrors.sellerPhone && jsx("p",{className:"mt-1 text-xs font-semibold text-red-600 dark:text-red-400",children:fieldErrors.sellerPhone}),
+                isPhoneLocked ? jsxs("p",{
+                  className:"mt-1 text-[11px] text-gray-500 dark:text-gray-400 flex items-center gap-1",
+                  children:[
+                    jsx(ShieldCheck,{className:"h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 shrink-0"}),
+                    "Mobile number is verified and cannot be changed on post ad."
+                  ]
+                }) : jsx("p",{
+                  className:"mt-1 text-[11px] text-amber-700 dark:text-amber-400",
+                  children:"Please enter your 11-digit WhatsApp/calling number (e.g. 03001234567)."
                 })]
               })]
             }),jsx("div",{
               className:"rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30 p-4",children:jsx(WarrantySelector,{
                 value:S,onChange:val=>L(val)
               })
-            }),jsx("div",{
-              className:"rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30 p-4",children:jsx(ListingPhotoUploader,{
-                files:uploadedFiles,onChange:setUploadedFiles,disabled:n
-              })
+            }),jsxs("div",{
+              children:[
+                jsxs("div",{
+                  className:"flex items-center justify-between mb-1.5",
+                  children:[
+                    jsxs("label",{
+                      className:"block text-sm font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1",
+                      children:[
+                        "Equipment Photos",
+                        jsx("span",{className:"text-red-500 font-black",children:"*"})
+                      ]
+                    })
+                  ]
+                }),
+                jsx("div",{
+                  ref:photosRef,
+                  className:`rounded-2xl ${fieldErrors.photos ? "border-2 border-red-500 ring-2 ring-red-200 dark:ring-red-950/60 dark:border-red-500" : "border border-gray-100 dark:border-gray-800"} bg-gray-50/50 dark:bg-gray-800/30 p-4 transition-all`,
+                  children:jsx(ListingPhotoUploader,{
+                    files:uploadedFiles,
+                    onChange:f=>{
+                      setUploadedFiles(f);
+                      if(fieldErrors.photos) setFieldErrors(prev=>({...prev, photos:false}));
+                    },
+                    disabled:n
+                  })
+                }),
+                fieldErrors.photos && jsx("p",{className:"mt-1.5 text-xs font-semibold text-red-600 dark:text-red-400",children:fieldErrors.photos})
+              ]
             }),jsxs("details",{
               className:"group text-xs text-gray-500",children:[jsx("summary",{
                 className:"cursor-pointer font-semibold hover:text-gray-700 dark:hover:text-gray-300 select-none",children:"Or enter image link manually / quick upload"
@@ -3185,11 +3543,31 @@ function yx({
                 })]
               })]
             }),jsxs("div",{
-              children:[jsx("label",{
-                className:"mb-1.5 block text-sm font-semibold text-gray-700",children:"Description"
+              children:[jsxs("div",{
+                className:"flex items-center justify-between mb-1.5",
+                children:[
+                  jsxs("label",{
+                    className:"block text-sm font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1",
+                    children:[
+                      "Description",
+                      jsx("span",{className:"text-red-500 font-black",children:"*"})
+                    ]
+                  })
+                ]
               }),jsx("textarea",{
-                value:Y,onChange:_=>ke(_.target.value),rows:4,placeholder:"Describe your product, condition, features...",className:"input-field resize-none"
-              })]
+                ref:descriptionRef,
+                required:true,
+                value:Y,
+                onChange:_=>{
+                  ke(_.target.value);
+                  if(fieldErrors.description) setFieldErrors(prev=>({...prev, description:false}));
+                },
+                rows:4,
+                placeholder:"Describe your product condition, capacity, efficiency, warranty, and package contents (minimum 10 characters)...",
+                className:`input-field resize-none font-medium ${fieldErrors.description ? "border-2 border-red-500 ring-2 ring-red-200 dark:ring-red-950/60 dark:border-red-500 focus:border-red-500 focus:ring-red-400" : ""}`
+              }),
+              fieldErrors.description && jsx("p",{className:"mt-1 text-xs font-semibold text-red-600 dark:text-red-400",children:fieldErrors.description})
+              ]
             }),a&&jsxs("div",{
               className:"flex items-start gap-2 rounded-lg bg-error-50 p-3 text-sm text-error-700",children:[jsx(CircleAlert,{
                 className:"h-4 w-4 shrink-0 mt-0.5"
@@ -3631,7 +4009,7 @@ function yx({
                     })
                   ]
                 }),
-                jsxs("div",{
+                jsx("div",{
                   className:"py-1 max-h-60 overflow-y-auto",
                   children:t.map(item=>{
                     const IconComp=item.icon;
@@ -6105,12 +6483,10 @@ function BrandLogosRow({ onSelectBrand }) {
           }),
           jsx("div", {
             className: "grid grid-cols-6 gap-1 sm:gap-1.5 flex-1 min-w-0",
-            children: brands.map(b => jsxs("button", {
+            children: brands.map(b => jsx("button", {
               onClick: () => onSelectBrand(b.name),
               className: `h-6 sm:h-7.5 w-full rounded-md bg-gradient-to-br ${b.color} flex items-center justify-center shadow-2xs hover:opacity-90 active:scale-95 transition-all cursor-pointer px-0.5`,
-              children: [
-                jsx("span", { className: "text-white font-bold text-[9px] sm:text-xs tracking-tight truncate", children: b.short })
-              ]
+              children: jsx("span", { className: "text-white font-bold text-[9px] sm:text-xs tracking-tight truncate", children: b.short })
             }, b.name))
           })
         ]

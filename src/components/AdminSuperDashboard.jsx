@@ -455,7 +455,7 @@ export default function AdminSuperDashboard({
               existing?.is_disabled
             );
 
-            const resolvedPhone = rp.phone || existing?.phone || phoneMap[mapKey] || phoneMap[rpId] || '';
+            const resolvedPhone = rp.phone || rp.mobile || rp.phone_number || rp.contact_phone || rp.contact_number || rp.raw_user_meta_data?.phone || existing?.phone || phoneMap[mapKey] || phoneMap[rpId] || '';
 
             usersMap.set(mapKey, {
               id: rp.id || existing?.id,
@@ -591,17 +591,57 @@ export default function AdminSuperDashboard({
     }
     setListingsList(fetchedListings);
 
-    // Enrich any missing user phones from listings
+    // Enrich any missing user phones from listings, inbox/enquiries, and installation requests
     try {
+      const allInboxMsgs = getInboxMessages() || [];
+      let allInstReqs = [];
+      try {
+        allInstReqs = getStoredInstallationRequests() || [];
+      } catch {}
+
       usersMap.forEach((uObj) => {
+        const uEmail = (uObj.email || '').toLowerCase();
+        const uId = uObj.id;
+
+        // 1. Fallback from phoneMap if not yet set
+        if (!uObj.phone && phoneMap) {
+          if (uEmail && phoneMap[uEmail]) uObj.phone = phoneMap[uEmail];
+          else if (uId && phoneMap[uId]) uObj.phone = phoneMap[uId];
+        }
+
+        // 2. Fallback from listings
         if (!uObj.phone) {
           const match = fetchedListings.find(
             (l) =>
-              (l.seller_email && l.seller_email.toLowerCase() === uObj.email?.toLowerCase()) ||
-              (l.user_id && l.user_id === uObj.id)
+              (l.seller_email && l.seller_email.toLowerCase() === uEmail) ||
+              (l.email && l.email.toLowerCase() === uEmail) ||
+              (l.user_id && l.user_id === uId)
           );
           if (match?.seller_phone || match?.phone) {
             uObj.phone = match.seller_phone || match.phone;
+          }
+        }
+
+        // 3. Fallback from inbox / enquiries
+        if (!uObj.phone && Array.isArray(allInboxMsgs)) {
+          const matchMsg = allInboxMsgs.find(
+            (m) =>
+              (m.sender_email && m.sender_email.toLowerCase() === uEmail) ||
+              (m.email && m.email.toLowerCase() === uEmail) ||
+              (m.sender_id && m.sender_id === uId)
+          );
+          if (matchMsg?.contact_phone || matchMsg?.phone || matchMsg?.sender_phone) {
+            uObj.phone = matchMsg.contact_phone || matchMsg.phone || matchMsg.sender_phone;
+          }
+        }
+
+        // 4. Fallback from installation requests
+        if (!uObj.phone && Array.isArray(allInstReqs)) {
+          const matchInst = allInstReqs.find(
+            (req) => req.email && req.email.toLowerCase() === uEmail
+          );
+          if (matchInst?.phone) {
+            uObj.phone = matchInst.phone;
           }
         }
       });

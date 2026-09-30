@@ -47,6 +47,12 @@ function authErrorMessage(error, activeView = 'login') {
   if (message.includes('profiles_phone_unique') || (message.includes('already exists') && message.includes('phone'))) {
     return 'This Phone Number is already registered. Please use another number or log in.';
   }
+  if (message.includes('disabled') || message.includes('suspended') || message.includes('deactivated')) {
+    return 'Your account has been disabled by the administrator. Please contact support at info@sellsolar.pk.';
+  }
+  if (message.includes('deleted')) {
+    return 'This account has been deleted. Please register for a new account.';
+  }
   if (message.includes('already registered') || message.includes('already been registered') || message.includes('already exists')) {
     return activeView === 'signup'
       ? 'This account or identifier is already taken. Please choose another or log in.'

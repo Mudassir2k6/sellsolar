@@ -17,6 +17,136 @@ export const DEFAULT_ADMIN_EMAIL = 'mudassir2k6@gmail.com';
 export const DEFAULT_ADMIN_ID = '00000000-0000-4000-8000-000000000001';
 const LOCAL_USERS_KEY = 'sellsolar_custom_auth_users';
 const LOCAL_SESSION_KEY = 'sellsolar_active_auth_session';
+export const LOCAL_DISABLED_USERS_KEY = 'sellsolar_disabled_users';
+export const LOCAL_DELETED_USERS_KEY = 'sellsolar_deleted_users';
+export const LOCAL_USER_PHONES_KEY = 'sellsolar_user_phones';
+
+export function getDisabledUsers() {
+  if (typeof window === 'undefined') return {};
+  try {
+    const raw = localStorage.getItem(LOCAL_DISABLED_USERS_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+export function saveDisabledUsers(map) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(LOCAL_DISABLED_USERS_KEY, JSON.stringify(map || {}));
+  } catch (err) {
+    console.error('Failed to save disabled users:', err);
+  }
+}
+
+export function getDeletedUsers() {
+  if (typeof window === 'undefined') return {};
+  try {
+    const raw = localStorage.getItem(LOCAL_DELETED_USERS_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+export function saveDeletedUsers(map) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(LOCAL_DELETED_USERS_KEY, JSON.stringify(map || {}));
+  } catch (err) {
+    console.error('Failed to save deleted users:', err);
+  }
+}
+
+export function getUserPhonesMap() {
+  if (typeof window === 'undefined') return {};
+  try {
+    const raw = localStorage.getItem(LOCAL_USER_PHONES_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+export function saveUserPhonesMap(map) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(LOCAL_USER_PHONES_KEY, JSON.stringify(map || {}));
+  } catch (err) {
+    console.error('Failed to save user phones map:', err);
+  }
+}
+
+export function isAccountDisabled(userOrProfileOrEmail) {
+  if (!userOrProfileOrEmail) return false;
+  let email = '';
+  let id = '';
+  if (typeof userOrProfileOrEmail === 'string') {
+    const val = userOrProfileOrEmail.trim().toLowerCase();
+    if (val.includes('@')) {
+      email = val;
+    } else {
+      id = val;
+    }
+  } else {
+    email = (userOrProfileOrEmail.email || '').trim().toLowerCase();
+    id = (userOrProfileOrEmail.id || '').trim().toLowerCase();
+    if (userOrProfileOrEmail.is_disabled === true || userOrProfileOrEmail.status === 'disabled') {
+      return true;
+    }
+  }
+
+  if (
+    email === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
+    id === DEFAULT_ADMIN_ID.toLowerCase() ||
+    email === 'mudassir2k6' ||
+    id === 'mudassir2k6'
+  ) {
+    return false;
+  }
+
+  const disabledMap = getDisabledUsers();
+  if (email && (disabledMap[email]?.is_disabled || disabledMap[email]?.disabled)) return true;
+  if (id && (disabledMap[id]?.is_disabled || disabledMap[id]?.disabled)) return true;
+
+  const localUsers = getStoredUsers();
+  if (email && (localUsers[email]?.profile?.is_disabled || localUsers[email]?.is_disabled)) return true;
+  if (id && (localUsers[id]?.profile?.is_disabled || localUsers[id]?.is_disabled)) return true;
+
+  return false;
+}
+
+export function isAccountDeleted(userOrProfileOrEmail) {
+  if (!userOrProfileOrEmail) return false;
+  let email = '';
+  let id = '';
+  if (typeof userOrProfileOrEmail === 'string') {
+    const val = userOrProfileOrEmail.trim().toLowerCase();
+    if (val.includes('@')) {
+      email = val;
+    } else {
+      id = val;
+    }
+  } else {
+    email = (userOrProfileOrEmail.email || '').trim().toLowerCase();
+    id = (userOrProfileOrEmail.id || '').trim().toLowerCase();
+  }
+
+  if (
+    email === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
+    id === DEFAULT_ADMIN_ID.toLowerCase() ||
+    email === 'mudassir2k6' ||
+    id === 'mudassir2k6'
+  ) {
+    return false;
+  }
+
+  const deletedMap = getDeletedUsers();
+  if (email && deletedMap[email]) return true;
+  if (id && deletedMap[id]) return true;
+  return false;
+}
 
 export const USER_ROLES = {
   SUPER_ADMIN: 'super_admin',
@@ -225,6 +355,7 @@ export function AuthProvider({ children }) {
     }
 
     const targetEmail = (userEmail || '').toLowerCase();
+    const phoneMap = getUserPhonesMap();
 
     // 1. Try Supabase query if configured
     if (isSupabaseConfigured()) {
@@ -237,6 +368,14 @@ export function AuthProvider({ children }) {
         }
         const { data, error } = await query.maybeSingle();
         if (!error && data) {
+          // If remote phone is missing, try fallback from user_phones map
+          if (!data.phone) {
+            const fallbackPhone = phoneMap[targetEmail] || (userId ? phoneMap[userId] : '') || '';
+            if (fallbackPhone) {
+              data.phone = fallbackPhone;
+              supabase.from('profiles').update({ phone: fallbackPhone }).eq('id', data.id).catch(() => {});
+            }
+          }
           setProfile(data);
           return;
         }
@@ -250,6 +389,12 @@ export function AuthProvider({ children }) {
     for (const key of Object.keys(localUsers)) {
       const u = localUsers[key];
       if ((targetEmail && key === targetEmail) || (userId && u.user?.id === userId)) {
+        if (!u.profile?.phone) {
+          const fallbackPhone = phoneMap[targetEmail] || (userId ? phoneMap[userId] : '') || '';
+          if (fallbackPhone && u.profile) {
+            u.profile.phone = fallbackPhone;
+          }
+        }
         setProfile(u.profile);
         return;
       }
@@ -342,19 +487,59 @@ export function AuthProvider({ children }) {
             setPasswordRecovery(true);
           }
           if (session?.user) {
+            const userEmail = (session.user.email || '').toLowerCase();
+            const userId = session.user.id;
+
+            // Immediate security check for disabled or deleted accounts
+            if (
+              isAccountDeleted(userId) ||
+              isAccountDeleted(userEmail) ||
+              isAccountDisabled(userEmail) ||
+              isAccountDisabled(userId)
+            ) {
+              supabase.auth.signOut();
+              saveStoredSession(null);
+              setUser(null);
+              setProfile(null);
+              return;
+            }
+
             setUser(session.user);
             const metaName =
               session.user.user_metadata?.full_name ||
               session.user.user_metadata?.name ||
               session.user.email?.split('@')[0] ||
               'User';
+            const metaPhone =
+              session.user.user_metadata?.phone ||
+              getUserPhonesMap()[userEmail] ||
+              getUserPhonesMap()[userId] ||
+              '';
+            const metaCity = session.user.user_metadata?.city || 'Lahore';
+            const metaAccountType = session.user.user_metadata?.account_type || 'individual';
+            const metaCnic = session.user.user_metadata?.cnic || null;
+            const metaBusinessName = session.user.user_metadata?.business_name || null;
+            const metaBusinessAddress = session.user.user_metadata?.business_address || null;
+
+            if (metaPhone) {
+              const pMap = getUserPhonesMap();
+              pMap[userEmail] = metaPhone;
+              if (userId) pMap[userId] = metaPhone;
+              saveUserPhonesMap(pMap);
+            }
+
             const oauthProfile = {
               id: session.user.id,
               email: session.user.email,
               full_name: metaName,
-              account_type: 'individual',
+              phone: metaPhone,
+              city: metaCity,
+              account_type: metaAccountType,
+              cnic: metaCnic,
+              business_name: metaBusinessName,
+              business_address: metaBusinessAddress,
               is_admin: (session.user.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase(),
-              is_verified_dealer: false,
+              is_verified_dealer: metaAccountType === 'dealer',
             };
             setProfile(oauthProfile);
             saveStoredSession({ user: session.user, profile: oauthProfile });
@@ -364,6 +549,9 @@ export function AuthProvider({ children }) {
               const key = session.user.email.toLowerCase();
               if (localUsers[key]) {
                 localUsers[key].emailConfirmed = true;
+                if (!localUsers[key].profile?.phone && metaPhone) {
+                  localUsers[key].profile.phone = metaPhone;
+                }
                 saveStoredUsers(localUsers);
               } else {
                 localUsers[key] = {
@@ -375,15 +563,22 @@ export function AuthProvider({ children }) {
               }
             }
             if (isSupabaseConfigured()) {
+              const upsertData = {
+                id: session.user.id,
+                email: session.user.email,
+                full_name: metaName,
+                account_type: metaAccountType,
+                is_verified_dealer: metaAccountType === 'dealer',
+                is_admin: (session.user.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase(),
+              };
+              if (metaPhone) upsertData.phone = metaPhone;
+              if (metaCity) upsertData.city = metaCity;
+              if (metaCnic) upsertData.cnic = metaCnic;
+              if (metaBusinessName) upsertData.business_name = metaBusinessName;
+              if (metaBusinessAddress) upsertData.business_address = metaBusinessAddress;
+
               supabase.from('profiles').upsert(
-                {
-                  id: session.user.id,
-                  email: session.user.email,
-                  full_name: metaName,
-                  account_type: 'individual',
-                  is_verified_dealer: false,
-                  is_admin: (session.user.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase(),
-                },
+                upsertData,
                 { onConflict: 'id' }
               ).then(() => {
                 loadProfile(session.user.id, session.user.email);
@@ -510,7 +705,12 @@ export function AuthProvider({ children }) {
         user_metadata: {
           username: rawIdentifier,
           full_name: cleanFullName,
+          phone: cleanPhone,
+          city: cleanCity || null,
           account_type: accountType,
+          cnic,
+          business_name: cleanBusinessName,
+          business_address: cleanBusinessAddress,
         },
       };
 
@@ -529,9 +729,19 @@ export function AuthProvider({ children }) {
         visiting_card_url: visitingCard,
         is_admin: isAdm,
         is_verified_dealer: false,
+        is_disabled: false,
+        status: 'active',
         registration_source: 'self_registered',
         created_at: new Date().toISOString(),
       };
+
+      if (cleanPhone) {
+        const pMap = getUserPhonesMap();
+        pMap[cleanEmail] = cleanPhone;
+        if (newId) pMap[newId] = cleanPhone;
+        if (rawIdentifier) pMap[rawIdentifier.toLowerCase()] = cleanPhone;
+        saveUserPhonesMap(pMap);
+      }
 
       // Record successful signup
       recordRateLimitAttempt('signup', cleanEmail || 'global');
@@ -626,6 +836,16 @@ export function AuthProvider({ children }) {
       const cleanPass = password.trim();
       const digitsOnly = cleanIdentifier.replace(/\D/g, '');
 
+      // Security check: deleted account
+      if (isAccountDeleted(cleanIdentifier)) {
+        throw new Error('This account has been deleted. Please register for a new account.');
+      }
+
+      // Security check: disabled account
+      if (isAccountDisabled(cleanIdentifier)) {
+        throw new Error('Your account has been disabled by the administrator. Please contact support at info@sellsolar.pk.');
+      }
+
       // Security check: Brute force & DoS lockout protection
       const rateCheck = checkRateLimit('login', cleanIdentifier || 'global');
       if (!rateCheck.allowed) {
@@ -668,6 +888,14 @@ export function AuthProvider({ children }) {
         matchedEmail = record.profile?.email || cleanIdentifier;
       }
 
+      // Check matched email for disabled / deleted
+      if (matchedEmail && (isAccountDeleted(matchedEmail) || isAccountDisabled(matchedEmail))) {
+        if (isAccountDeleted(matchedEmail)) {
+          throw new Error('This account has been deleted. Please register for a new account.');
+        }
+        throw new Error('Your account has been disabled by the administrator. Please contact support at info@sellsolar.pk.');
+      }
+
       // 2. Try Supabase if configured and we resolved an email
       if (isSupabaseConfigured() && matchedEmail && matchedEmail.includes('@') && !matchedEmail.endsWith('@sellsolar.local')) {
         try {
@@ -690,25 +918,76 @@ export function AuthProvider({ children }) {
               throw error;
             }
           } else if (data?.session?.user) {
+            const authUser = data.session.user;
+            const authEmail = (matchedEmail || authUser.email || '').toLowerCase();
+            const authId = authUser.id;
+
+            // Check if account has been deleted or disabled
+            if (isAccountDeleted(authId) || isAccountDeleted(authEmail)) {
+              await supabase.auth.signOut();
+              saveStoredSession(null);
+              throw new Error('This account has been deleted.');
+            }
+
+            let isDisabled = isAccountDisabled(authEmail) || isAccountDisabled(authId);
+            if (!isDisabled) {
+              try {
+                const { data: dbP } = await supabase
+                  .from('profiles')
+                  .select('is_disabled, status')
+                  .eq('id', authId)
+                  .maybeSingle();
+                if (dbP?.is_disabled === true || dbP?.status === 'disabled') {
+                  isDisabled = true;
+                }
+              } catch {}
+            }
+
+            if (isDisabled) {
+              await supabase.auth.signOut();
+              saveStoredSession(null);
+              throw new Error('Your account has been disabled by the administrator. Please contact support at info@sellsolar.pk.');
+            }
+
+            const metaPhone =
+              authUser.user_metadata?.phone ||
+              record?.profile?.phone ||
+              getUserPhonesMap()[authEmail] ||
+              getUserPhonesMap()[authId] ||
+              '';
+            const metaCity =
+              authUser.user_metadata?.city ||
+              record?.profile?.city ||
+              'Lahore';
+
+            if (metaPhone) {
+              const pMap = getUserPhonesMap();
+              pMap[authEmail] = metaPhone;
+              pMap[authId] = metaPhone;
+              saveUserPhonesMap(pMap);
+            }
+
             clearRateLimit('login', cleanIdentifier || 'global');
-            setUser(data.session.user);
-            await loadProfile(data.session.user.id, data.session.user.email);
+            setUser(authUser);
+            await loadProfile(authUser.id, authUser.email);
             const activeProfile = {
-              id: data.session.user.id,
+              id: authUser.id,
               email: matchedEmail,
-              full_name: data.session.user.user_metadata?.full_name || matchedEmail.split('@')[0],
+              full_name: authUser.user_metadata?.full_name || matchedEmail.split('@')[0],
+              phone: metaPhone,
+              city: metaCity,
               is_admin: isAdm || matchedEmail.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase(),
             };
             saveStoredSession({
-              user: data.session.user,
+              user: authUser,
               profile: activeProfile,
             });
             // Ensure local mirror is persisted and confirmed after successful cloud login
             const localUsers = getStoredUsers();
-            const saveKey = (matchedEmail || data.session.user.email || data.session.user.id).toLowerCase();
+            const saveKey = (matchedEmail || authUser.email || authUser.id).toLowerCase();
             localUsers[saveKey] = {
               ...(localUsers[saveKey] || {}),
-              user: data.session.user,
+              user: authUser,
               profile: {
                 ...(localUsers[saveKey]?.profile || {}),
                 ...activeProfile,
@@ -716,10 +995,15 @@ export function AuthProvider({ children }) {
               emailConfirmed: true,
             };
             saveStoredUsers(localUsers);
-            return { success: true, user: data.session.user };
+
+            if (isSupabaseConfigured() && metaPhone) {
+              supabase.from('profiles').update({ phone: metaPhone }).eq('id', authId).catch(() => {});
+            }
+
+            return { success: true, user: authUser };
           }
         } catch (err) {
-          if (err?.code === 'email_not_confirmed' || (err?.message || '').toLowerCase().includes('confirm your email')) {
+          if (err?.code === 'email_not_confirmed' || (err?.message || '').toLowerCase().includes('confirm your email') || (err?.message || '').toLowerCase().includes('disabled') || (err?.message || '').toLowerCase().includes('deleted')) {
             throw err;
           }
           console.warn('Supabase signin attempt bypassed:', err);
@@ -786,6 +1070,9 @@ export function AuthProvider({ children }) {
 
       // 4. Existing registered user check
       if (record) {
+        if (record.profile?.is_disabled || record.is_disabled || isAccountDisabled(cleanIdentifier) || (matchedEmail && isAccountDisabled(matchedEmail))) {
+          throw new Error('Your account has been disabled by the administrator. Please contact support at info@sellsolar.pk.');
+        }
         if (record.password === cleanPass) {
           clearRateLimit('login', cleanIdentifier || 'global');
           const activeUser = record.user;
@@ -1546,6 +1833,280 @@ export function AuthProvider({ children }) {
     setPasswordRecovery(false);
   }, []);
 
+  const toggleUserDisabled = useCallback(
+    async (targetUserIdOrEmail, shouldDisable = true, reason = '') => {
+      const isFallbackAdmin =
+        isSuperAdmin ||
+        isAdmin ||
+        (user?.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
+        profile?.is_admin ||
+        profile?.is_super_admin;
+
+      if (!isFallbackAdmin) {
+        throw new Error('Only administrators can disable or enable user accounts.');
+      }
+
+      const cleanId = (targetUserIdOrEmail || '').trim().toLowerCase();
+      if (
+        cleanId === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
+        cleanId === DEFAULT_ADMIN_ID.toLowerCase() ||
+        cleanId === 'mudassir2k6'
+      ) {
+        throw new Error('Super Admin account cannot be disabled.');
+      }
+
+      // 1. Update disabled map in localStorage
+      const disabledMap = getDisabledUsers();
+      if (shouldDisable) {
+        disabledMap[cleanId] = {
+          is_disabled: true,
+          disabled: true,
+          reason: reason || 'Disabled by Administrator',
+          updatedAt: new Date().toISOString(),
+        };
+      } else {
+        delete disabledMap[cleanId];
+      }
+
+      // 2. Update local users store
+      const localUsers = getStoredUsers();
+      let foundEmail = cleanId.includes('@') ? cleanId : null;
+      for (const [k, v] of Object.entries(localUsers)) {
+        const p = v.profile || {};
+        const u = v.user || {};
+        if (
+          k.toLowerCase() === cleanId ||
+          p.id?.toLowerCase() === cleanId ||
+          u.id?.toLowerCase() === cleanId ||
+          p.email?.toLowerCase() === cleanId
+        ) {
+          if (!foundEmail && p.email) foundEmail = p.email.toLowerCase();
+          p.is_disabled = shouldDisable;
+          p.status = shouldDisable ? 'disabled' : 'active';
+          v.is_disabled = shouldDisable;
+          if (shouldDisable) {
+            disabledMap[k.toLowerCase()] = { is_disabled: true, disabled: true, updatedAt: new Date().toISOString() };
+            if (p.email) disabledMap[p.email.toLowerCase()] = { is_disabled: true, disabled: true, updatedAt: new Date().toISOString() };
+            if (p.id) disabledMap[p.id.toLowerCase()] = { is_disabled: true, disabled: true, updatedAt: new Date().toISOString() };
+          } else {
+            delete disabledMap[k.toLowerCase()];
+            if (p.email) delete disabledMap[p.email.toLowerCase()];
+            if (p.id) delete disabledMap[p.id.toLowerCase()];
+          }
+        }
+      }
+      saveStoredUsers(localUsers);
+      saveDisabledUsers(disabledMap);
+
+      // 3. Supabase profiles sync
+      if (isSupabaseConfigured()) {
+        try {
+          await supabase
+            .from('profiles')
+            .update({
+              is_disabled: shouldDisable,
+              status: shouldDisable ? 'disabled' : 'active',
+            })
+            .or(`id.eq.${targetUserIdOrEmail},email.eq.${cleanId}`);
+        } catch (sbErr) {
+          console.warn('Supabase toggle disabled sync warning:', sbErr);
+        }
+      }
+
+      // 4. If current active session is being disabled, force logout
+      if (
+        user?.id?.toLowerCase() === cleanId ||
+        user?.email?.toLowerCase() === cleanId ||
+        (foundEmail && user?.email?.toLowerCase() === foundEmail)
+      ) {
+        if (shouldDisable) {
+          await signOut();
+        }
+      }
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('sellsolar_auth_updated'));
+        window.dispatchEvent(new CustomEvent('sellsolar_users_updated'));
+      }
+
+      return { success: true, is_disabled: shouldDisable };
+    },
+    [isSuperAdmin, isAdmin, user, profile, signOut]
+  );
+
+  const deleteUserAccount = useCallback(
+    async (targetUserIdOrEmail) => {
+      const isFallbackAdmin =
+        isSuperAdmin ||
+        isAdmin ||
+        (user?.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
+        profile?.is_admin ||
+        profile?.is_super_admin;
+
+      if (!isFallbackAdmin) {
+        throw new Error('Only administrators can delete user accounts.');
+      }
+
+      const cleanId = (targetUserIdOrEmail || '').trim().toLowerCase();
+      if (
+        cleanId === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
+        cleanId === DEFAULT_ADMIN_ID.toLowerCase() ||
+        cleanId === 'mudassir2k6'
+      ) {
+        throw new Error('Super Admin account cannot be deleted.');
+      }
+
+      // 1. Mark in deleted tombstone map
+      const deletedMap = getDeletedUsers();
+      deletedMap[cleanId] = { deletedAt: new Date().toISOString() };
+
+      // 2. Remove from local users store
+      const localUsers = getStoredUsers();
+      let foundEmail = cleanId.includes('@') ? cleanId : null;
+      for (const [k, v] of Object.entries(localUsers)) {
+        const p = v.profile || {};
+        const u = v.user || {};
+        if (
+          k.toLowerCase() === cleanId ||
+          p.id?.toLowerCase() === cleanId ||
+          u.id?.toLowerCase() === cleanId ||
+          p.email?.toLowerCase() === cleanId
+        ) {
+          if (p.email) {
+            foundEmail = p.email.toLowerCase();
+            deletedMap[p.email.toLowerCase()] = { deletedAt: new Date().toISOString() };
+          }
+          if (p.id) {
+            deletedMap[p.id.toLowerCase()] = { deletedAt: new Date().toISOString() };
+          }
+          delete localUsers[k];
+        }
+      }
+      saveDeletedUsers(deletedMap);
+      saveStoredUsers(localUsers);
+
+      // 3. Remove from disabled map if present
+      const disabledMap = getDisabledUsers();
+      delete disabledMap[cleanId];
+      if (foundEmail) delete disabledMap[foundEmail];
+      saveDisabledUsers(disabledMap);
+
+      // 4. Supabase profiles delete
+      if (isSupabaseConfigured()) {
+        try {
+          await supabase
+            .from('profiles')
+            .delete()
+            .or(`id.eq.${targetUserIdOrEmail},email.eq.${cleanId}`);
+        } catch (sbErr) {
+          console.warn('Supabase delete profile warning:', sbErr);
+        }
+      }
+
+      // 5. If deleted user is current session, sign them out
+      if (
+        user?.id?.toLowerCase() === cleanId ||
+        user?.email?.toLowerCase() === cleanId ||
+        (foundEmail && user?.email?.toLowerCase() === foundEmail)
+      ) {
+        await signOut();
+      }
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('sellsolar_auth_updated'));
+        window.dispatchEvent(new CustomEvent('sellsolar_users_updated'));
+      }
+
+      return { success: true };
+    },
+    [isSuperAdmin, isAdmin, user, profile, signOut]
+  );
+
+  const adminUpdateUserProfile = useCallback(
+    async (targetUserIdOrEmail, updates) => {
+      const isFallbackAdmin =
+        isSuperAdmin ||
+        isAdmin ||
+        (user?.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
+        profile?.is_admin ||
+        profile?.is_super_admin;
+
+      if (!isFallbackAdmin) {
+        throw new Error('Only administrators can update user details.');
+      }
+
+      const cleanId = (targetUserIdOrEmail || '').trim().toLowerCase();
+      const localUsers = getStoredUsers();
+      let updatedRecord = null;
+      let targetEmail = cleanId.includes('@') ? cleanId : '';
+
+      for (const [k, v] of Object.entries(localUsers)) {
+        const p = v.profile || {};
+        const u = v.user || {};
+        if (
+          k.toLowerCase() === cleanId ||
+          p.id?.toLowerCase() === cleanId ||
+          u.id?.toLowerCase() === cleanId ||
+          p.email?.toLowerCase() === cleanId
+        ) {
+          if (p.email) targetEmail = p.email.toLowerCase();
+          v.profile = {
+            ...v.profile,
+            ...updates,
+            ...(updates.phone ? { phone: normalizePhone(updates.phone) } : {}),
+          };
+          updatedRecord = v.profile;
+        }
+      }
+
+      if (cleanId.includes('@') && !localUsers[cleanId]) {
+        localUsers[cleanId] = {
+          user: { id: targetUserIdOrEmail, email: cleanId },
+          profile: {
+            id: targetUserIdOrEmail,
+            email: cleanId,
+            ...updates,
+            ...(updates.phone ? { phone: normalizePhone(updates.phone) } : {}),
+          },
+        };
+        updatedRecord = localUsers[cleanId].profile;
+      }
+      saveStoredUsers(localUsers);
+
+      // Save to persistent user phones map
+      if (updates.phone) {
+        const cleanP = normalizePhone(updates.phone);
+        const pMap = getUserPhonesMap();
+        pMap[cleanId] = cleanP;
+        if (targetEmail) pMap[targetEmail] = cleanP;
+        if (updatedRecord?.id) pMap[updatedRecord.id.toLowerCase()] = cleanP;
+        saveUserPhonesMap(pMap);
+      }
+
+      // Supabase update
+      if (isSupabaseConfigured()) {
+        try {
+          const payload = { ...updates };
+          if (payload.phone) payload.phone = normalizePhone(payload.phone);
+          await supabase
+            .from('profiles')
+            .update(payload)
+            .or(`id.eq.${targetUserIdOrEmail},email.eq.${cleanId}`);
+        } catch (sbErr) {
+          console.warn('Supabase profile update warning:', sbErr);
+        }
+      }
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('sellsolar_auth_updated'));
+        window.dispatchEvent(new CustomEvent('sellsolar_users_updated'));
+      }
+
+      return { success: true, profile: updatedRecord };
+    },
+    [isSuperAdmin, isAdmin, user, profile]
+  );
+
   const value = useMemo(
     () => ({
       user,
@@ -1566,6 +2127,9 @@ export function AuthProvider({ children }) {
       updateProfile,
       refreshProfile,
       updateUserRole,
+      toggleUserDisabled,
+      deleteUserAccount,
+      adminUpdateUserProfile,
       requestPasswordResetOtp,
       verifyPasswordResetOtp,
       resetPasswordWithOtp,
@@ -1590,6 +2154,9 @@ export function AuthProvider({ children }) {
       updateProfile,
       refreshProfile,
       updateUserRole,
+      toggleUserDisabled,
+      deleteUserAccount,
+      adminUpdateUserProfile,
       requestPasswordResetOtp,
       verifyPasswordResetOtp,
       resetPasswordWithOtp,

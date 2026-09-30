@@ -60,8 +60,23 @@ import {
   Download,
   Upload,
   Menu,
+  Ban,
+  AlertTriangle,
 } from 'lucide-react';
-import { useAuth, USER_ROLES, getStoredUsers, saveStoredUsers, DEFAULT_ADMIN_ID, DEFAULT_ADMIN_EMAIL } from '../context/AuthContext';
+import {
+  useAuth,
+  USER_ROLES,
+  getStoredUsers,
+  saveStoredUsers,
+  DEFAULT_ADMIN_ID,
+  DEFAULT_ADMIN_EMAIL,
+  getDisabledUsers,
+  getDeletedUsers,
+  getUserPhonesMap,
+  saveUserPhonesMap,
+  isAccountDisabled,
+  isAccountDeleted,
+} from '../context/AuthContext';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { useToast } from '../context/ToastContext';
 import { useSiteSettings, DEFAULT_SITE_SETTINGS } from '../context/SiteSettingsContext';
@@ -130,7 +145,20 @@ export default function AdminSuperDashboard({
   onChangePassword,
   initialTab = 'dashboard',
 }) {
-  const { user, profile, isSuperAdmin, isAdmin, isDealer, isCustomer, updateUserRole, updateProfile, signOut } = useAuth();
+  const {
+    user,
+    profile,
+    isSuperAdmin,
+    isAdmin,
+    isDealer,
+    isCustomer,
+    updateUserRole,
+    updateProfile,
+    signOut,
+    toggleUserDisabled,
+    deleteUserAccount,
+    adminUpdateUserProfile,
+  } = useAuth();
   const { showToast } = useToast();
   const { settings, updateSiteSettings, updateHomePageCms } = useSiteSettings();
 
@@ -248,6 +276,11 @@ export default function AdminSuperDashboard({
     role: 'dealer',
   });
 
+  const [editingPhoneUser, setEditingPhoneUser] = useState(null);
+  const [newPhoneNumber, setNewPhoneNumber] = useState('');
+  const [confirmDeleteUser, setConfirmDeleteUser] = useState(null);
+  const [isSubmittingUserAction, setIsSubmittingUserAction] = useState(false);
+
   const [profileForm, setProfileForm] = useState({
     fullName: profile?.full_name || user?.user_metadata?.full_name || '',
     phone: profile?.phone || '',
@@ -288,6 +321,9 @@ export default function AdminSuperDashboard({
   const loadData = async () => {
     // 1. Users Map
     const usersMap = new Map();
+    const phoneMap = getUserPhonesMap();
+    const disabledUsersMap = getDisabledUsers();
+    const deletedUsersMap = getDeletedUsers();
 
     // 1A. Stored Local Users
     const rawUsers = getStoredUsers();
@@ -297,16 +333,30 @@ export default function AdminSuperDashboard({
       const id = p.id || u.id || key;
       const email = p.email || u.email || (key.includes('@') ? key : '');
       const mapKey = (email || id).toLowerCase();
+      const idKey = (id || '').toLowerCase();
+      if (deletedUsersMap[mapKey] || deletedUsersMap[idKey]) return;
+
+      const isDisabled = Boolean(
+        p.is_disabled ||
+        val.is_disabled ||
+        p.status === 'disabled' ||
+        disabledUsersMap[mapKey]?.is_disabled ||
+        disabledUsersMap[idKey]?.is_disabled
+      );
+
+      const resolvedPhone = p.phone || u.user_metadata?.phone || phoneMap[mapKey] || phoneMap[idKey] || '';
+
       usersMap.set(mapKey, {
         id,
         email,
         name: p.full_name || u.user_metadata?.full_name || p.username || (email ? email.split('@')[0] : key),
-        phone: p.phone || '',
-        city: p.city || 'Lahore',
+        phone: resolvedPhone,
+        city: p.city || u.user_metadata?.city || 'Lahore',
         role: p.role || (p.is_super_admin ? 'super_admin' : p.is_admin ? 'admin' : p.account_type === 'dealer' || p.is_verified_dealer ? 'dealer' : 'customer'),
         is_verified_dealer: !!p.is_verified_dealer,
         account_type: p.account_type || 'individual',
         created_at: p.created_at || '2026-01-01T00:00:00Z',
+        is_disabled: isDisabled,
         isCurrentSession: false,
       });
     });
@@ -321,18 +371,33 @@ export default function AdminSuperDashboard({
         if (!error && Array.isArray(remoteProfiles) && remoteProfiles.length > 0) {
           remoteProfiles.forEach((rp) => {
             const mapKey = (rp.email || rp.id || '').toLowerCase();
-            const existing = usersMap.get(mapKey);
+            const rpId = (rp.id || '').toLowerCase();
+            if (deletedUsersMap[mapKey] || deletedUsersMap[rpId]) return;
+
+            const existing = usersMap.get(mapKey) || usersMap.get(rpId);
             const computedRole = rp.is_admin ? 'admin' : (rp.account_type === 'dealer' || rp.is_verified_dealer) ? 'dealer' : 'customer';
+
+            const isDisabled = Boolean(
+              rp.is_disabled ||
+              rp.status === 'disabled' ||
+              disabledUsersMap[mapKey]?.is_disabled ||
+              disabledUsersMap[rpId]?.is_disabled ||
+              existing?.is_disabled
+            );
+
+            const resolvedPhone = rp.phone || existing?.phone || phoneMap[mapKey] || phoneMap[rpId] || '';
+
             usersMap.set(mapKey, {
               id: rp.id || existing?.id,
               email: rp.email || existing?.email || '',
               name: rp.full_name || rp.username || existing?.name || (rp.email ? rp.email.split('@')[0] : 'User'),
-              phone: rp.phone || existing?.phone || '',
+              phone: resolvedPhone,
               city: rp.city || existing?.city || 'Lahore',
               role: rp.role || computedRole,
               is_verified_dealer: Boolean(rp.is_verified_dealer || rp.account_type === 'dealer'),
               account_type: rp.account_type || existing?.account_type || 'individual',
               created_at: rp.created_at || existing?.created_at || '2026-01-01T00:00:00Z',
+              is_disabled: isDisabled,
               isCurrentSession: false,
               source: 'supabase_db',
               business_name: rp.business_name || '',
@@ -355,12 +420,13 @@ export default function AdminSuperDashboard({
           id: activeId || existing?.id || DEFAULT_ADMIN_ID,
           email: activeEmail || existing?.email || DEFAULT_ADMIN_EMAIL,
           name: profile?.full_name || user?.user_metadata?.full_name || existing?.name || 'You',
-          phone: profile?.phone || existing?.phone || '',
+          phone: profile?.phone || existing?.phone || phoneMap[activeEmail] || '',
           city: profile?.city || existing?.city || 'Lahore',
           role: profile?.role || (isSuperAdmin ? 'super_admin' : isAdmin ? 'admin' : isDealer ? 'dealer' : existing?.role || 'customer'),
           is_verified_dealer: !!profile?.is_verified_dealer || isDealer,
           account_type: profile?.account_type || existing?.account_type || 'individual',
           created_at: profile?.created_at || existing?.created_at || new Date().toISOString(),
+          is_disabled: false,
           isCurrentSession: true,
         });
       }
@@ -378,7 +444,7 @@ export default function AdminSuperDashboard({
             const sellerPhone = item.seller_phone || item.phone || '';
             const sellerId = item.user_id;
             const sellerKey = (sellerEmail || sellerId || sellerPhone).toLowerCase();
-            if (sellerKey && !usersMap.has(sellerKey)) {
+            if (sellerKey && !deletedUsersMap[sellerKey] && !usersMap.has(sellerKey)) {
               usersMap.set(sellerKey, {
                 id: sellerId || `seller_${sellerPhone || Math.random().toString(36).slice(2, 8)}`,
                 email: sellerEmail || `${(item.seller_name || 'seller').toLowerCase().replace(/\s+/g, '')}@sellsolar.seller`,
@@ -389,6 +455,7 @@ export default function AdminSuperDashboard({
                 is_verified_dealer: !!item.is_verified_seller,
                 account_type: 'dealer',
                 created_at: item.created_at || '2026-02-01T00:00:00Z',
+                is_disabled: false,
                 isCurrentSession: false,
               });
             }
@@ -406,17 +473,16 @@ export default function AdminSuperDashboard({
         { id: 'usr_cst_rawalpindi', name: 'Engr. Usman Khan', email: 'usman.solar@gmail.com', phone: '03335551234', city: 'Rawalpindi', role: 'customer', is_verified_dealer: false, account_type: 'individual' },
       ];
       seedAccounts.forEach((s) => {
-        if (!usersMap.has(s.email.toLowerCase())) {
+        if (!usersMap.has(s.email.toLowerCase()) && !deletedUsersMap[s.email.toLowerCase()]) {
           usersMap.set(s.email.toLowerCase(), {
             ...s,
             created_at: '2026-01-15T00:00:00Z',
+            is_disabled: false,
             isCurrentSession: false,
           });
         }
       });
     }
-
-    setUsersList(Array.from(usersMap.values()));
 
     // 2. Listings (Supabase Backend DB + Local Cache + Seed Fallback)
     let fetchedListings = [];
@@ -452,6 +518,24 @@ export default function AdminSuperDashboard({
       fetchedListings = [...SEED_LISTINGS];
     }
     setListingsList(fetchedListings);
+
+    // Enrich any missing user phones from listings
+    try {
+      usersMap.forEach((uObj) => {
+        if (!uObj.phone) {
+          const match = fetchedListings.find(
+            (l) =>
+              (l.seller_email && l.seller_email.toLowerCase() === uObj.email?.toLowerCase()) ||
+              (l.user_id && l.user_id === uObj.id)
+          );
+          if (match?.seller_phone || match?.phone) {
+            uObj.phone = match.seller_phone || match.phone;
+          }
+        }
+      });
+    } catch {}
+
+    setUsersList(Array.from(usersMap.values()));
 
     // 3. Inbox
     setInboxMessages(getInboxMessages());
@@ -612,6 +696,148 @@ export default function AdminSuperDashboard({
       });
     } catch (err) {
       showToast({ title: 'Error', message: err.message, type: 'error' });
+    }
+  };
+
+  // Toggle User Disabled / Enabled Status
+  const handleToggleUserStatus = async (targetUser, shouldDisable) => {
+    if (isSubmittingUserAction) return;
+    const targetIdentifier = targetUser.id || targetUser.email;
+    const isOwner = (targetUser.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase();
+    if (isOwner) {
+      showToast({
+        title: 'Action Not Allowed',
+        message: 'Super Admin account cannot be disabled.',
+        type: 'error',
+      });
+      return;
+    }
+
+    try {
+      setIsSubmittingUserAction(true);
+      // Optimistic update
+      setUsersList((prev) =>
+        prev.map((u) => {
+          if (u.id === targetUser.id || (u.email && u.email.toLowerCase() === (targetUser.email || '').toLowerCase())) {
+            return { ...u, is_disabled: shouldDisable };
+          }
+          return u;
+        })
+      );
+
+      if (toggleUserDisabled) {
+        await toggleUserDisabled(targetIdentifier, shouldDisable);
+      }
+
+      await loadData();
+      showToast({
+        title: shouldDisable ? 'Account Disabled' : 'Account Enabled',
+        message: `${targetUser.name || targetUser.email} has been ${shouldDisable ? 'disabled / suspended' : 're-enabled and activated'}.`,
+        type: shouldDisable ? 'warning' : 'success',
+      });
+    } catch (err) {
+      await loadData();
+      showToast({
+        title: 'Action Failed',
+        message: err.message || 'Could not update user status.',
+        type: 'error',
+      });
+    } finally {
+      setIsSubmittingUserAction(false);
+    }
+  };
+
+  // Permanently Delete User Account
+  const handleConfirmDeleteUser = async () => {
+    if (!confirmDeleteUser || isSubmittingUserAction) return;
+    const targetUser = confirmDeleteUser;
+    const targetIdentifier = targetUser.id || targetUser.email;
+    const isOwner = (targetUser.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase();
+    if (isOwner) {
+      showToast({
+        title: 'Action Not Allowed',
+        message: 'Super Admin account cannot be deleted.',
+        type: 'error',
+      });
+      setConfirmDeleteUser(null);
+      return;
+    }
+
+    try {
+      setIsSubmittingUserAction(true);
+      // Optimistic update
+      setUsersList((prev) =>
+        prev.filter((u) => u.id !== targetUser.id && (!targetUser.email || u.email?.toLowerCase() !== targetUser.email.toLowerCase()))
+      );
+
+      if (deleteUserAccount) {
+        await deleteUserAccount(targetIdentifier);
+      }
+
+      setConfirmDeleteUser(null);
+      await loadData();
+      showToast({
+        title: 'Account Deleted',
+        message: `Account for ${targetUser.name || targetUser.email} has been permanently deleted.`,
+        type: 'success',
+      });
+    } catch (err) {
+      await loadData();
+      showToast({
+        title: 'Delete Failed',
+        message: err.message || 'Could not delete user account.',
+        type: 'error',
+      });
+    } finally {
+      setIsSubmittingUserAction(false);
+    }
+  };
+
+  // Open Edit Phone Modal
+  const handleOpenEditPhone = (targetUser) => {
+    setEditingPhoneUser(targetUser);
+    setNewPhoneNumber(targetUser.phone || '');
+  };
+
+  // Save Updated User Phone
+  const handleSaveUserPhone = async (e) => {
+    e?.preventDefault();
+    if (!editingPhoneUser) return;
+    const targetIdentifier = editingPhoneUser.id || editingPhoneUser.email;
+    const cleanPhone = newPhoneNumber.trim();
+
+    try {
+      setIsSubmittingUserAction(true);
+      // Optimistic update
+      setUsersList((prev) =>
+        prev.map((u) => {
+          if (u.id === editingPhoneUser.id || (u.email && u.email.toLowerCase() === (editingPhoneUser.email || '').toLowerCase())) {
+            return { ...u, phone: cleanPhone };
+          }
+          return u;
+        })
+      );
+
+      if (adminUpdateUserProfile) {
+        await adminUpdateUserProfile(targetIdentifier, { phone: cleanPhone });
+      }
+
+      setEditingPhoneUser(null);
+      await loadData();
+      showToast({
+        title: 'Phone Number Updated',
+        message: `Phone number updated successfully for ${editingPhoneUser.name || editingPhoneUser.email}.`,
+        type: 'success',
+      });
+    } catch (err) {
+      await loadData();
+      showToast({
+        title: 'Update Failed',
+        message: err.message || 'Could not update phone number.',
+        type: 'error',
+      });
+    } finally {
+      setIsSubmittingUserAction(false);
     }
   };
 
@@ -4582,17 +4808,18 @@ export default function AdminSuperDashboard({
                   <table className="w-full text-left text-xs">
                     <thead className="bg-gray-50 dark:bg-gray-800/50 text-[11px] font-black uppercase text-gray-500 tracking-wider">
                       <tr>
-                        <th className="p-3.5">User Account & Status</th>
+                        <th className="p-3.5">User Account</th>
                         <th className="p-3.5">Email & Phone</th>
                         <th className="p-3.5">City & Source</th>
+                        <th className="p-3.5">Status</th>
                         <th className="p-3.5">Current Role</th>
-                        <th className="p-3.5 text-right">Assign / Change Role</th>
+                        <th className="p-3.5 text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                       {filteredUsersList.length === 0 ? (
                         <tr>
-                          <td colSpan="5" className="p-8 text-center text-gray-400">
+                          <td colSpan="6" className="p-8 text-center text-gray-400">
                             No users found matching your search.
                           </td>
                         </tr>
@@ -4623,22 +4850,46 @@ export default function AdminSuperDashboard({
                               </td>
                               <td className="p-3.5 text-gray-500">
                                 <p className="font-semibold text-gray-800 dark:text-gray-200">{u.email || 'No email'}</p>
-                                <p className="text-[11px] text-gray-400 flex items-center gap-1 mt-0.5">
+                                <div className="flex items-center gap-1.5 mt-0.5">
                                   {u.phone ? (
-                                    <>
-                                      <Phone className="h-3 w-3 text-gray-400" />
+                                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-gray-700 dark:text-gray-300">
+                                      <Phone className="h-3 w-3 text-purple-500 shrink-0" />
                                       {u.phone}
-                                    </>
+                                    </span>
                                   ) : (
-                                    <span className="italic">No phone listed</span>
+                                    <span className="text-[11px] italic text-amber-600 dark:text-amber-400">
+                                      No phone listed
+                                    </span>
                                   )}
-                                </p>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenEditPhone(u)}
+                                    className="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                                    title={u.phone ? 'Change phone number' : 'Add phone number'}
+                                    aria-label="Edit phone number"
+                                  >
+                                    <Edit3 className="h-3 w-3" />
+                                  </button>
+                                </div>
                               </td>
                               <td className="p-3.5 text-gray-500">
                                 <p className="font-medium text-gray-700 dark:text-gray-300">{u.city || 'Pakistan'}</p>
                                 <span className="inline-block mt-0.5 px-2 py-0.5 rounded-md text-[9px] font-bold uppercase bg-slate-100 dark:bg-gray-800 text-gray-500">
                                   {u.account_type || 'Account'}
                                 </span>
+                              </td>
+                              <td className="p-3.5">
+                                {u.is_disabled ? (
+                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-100 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-800">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                    Disabled
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                    Active
+                                  </span>
+                                )}
                               </td>
                               <td className="p-3.5">
                                 <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
@@ -4654,18 +4905,56 @@ export default function AdminSuperDashboard({
                                 </span>
                               </td>
                               <td className="p-3.5 text-right">
-                                <div className="inline-flex items-center gap-2 justify-end">
+                                <div className="inline-flex items-center gap-2 justify-end flex-wrap">
                                   <select
                                     value={u.role}
+                                    disabled={isDefaultAdmin}
                                     onChange={(e) => handleRoleChange(u.id || u.email, e.target.value)}
-                                    className="text-xs font-bold py-1.5 px-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 outline-none shadow-xs cursor-pointer"
+                                    className="text-xs font-bold py-1.5 px-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 outline-none shadow-xs cursor-pointer disabled:opacity-50"
                                   >
                                     <option value="customer">👤 Customer</option>
                                     <option value="dealer">🏬 Verified Dealer</option>
                                     <option value="admin">🛡️ Admin</option>
                                     <option value="super_admin">👑 Super Admin</option>
                                   </select>
-                                  {isDefaultAdmin && (
+
+                                  {!isDefaultAdmin ? (
+                                    <>
+                                      {u.is_disabled ? (
+                                        <button
+                                          type="button"
+                                          onClick={() => handleToggleUserStatus(u, false)}
+                                          disabled={isSubmittingUserAction}
+                                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 text-xs font-bold border border-emerald-300 dark:border-emerald-700 transition-colors shrink-0 disabled:opacity-50"
+                                          title="Enable / Activate this account"
+                                        >
+                                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                                          <span>Enable</span>
+                                        </button>
+                                      ) : (
+                                        <button
+                                          type="button"
+                                          onClick={() => handleToggleUserStatus(u, true)}
+                                          disabled={isSubmittingUserAction}
+                                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 dark:hover:bg-amber-900 text-amber-800 dark:text-amber-200 text-xs font-bold border border-amber-300 dark:border-amber-700 transition-colors shrink-0 disabled:opacity-50"
+                                          title="Disable / Suspend this account"
+                                        >
+                                          <Ban className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+                                          <span>Disable</span>
+                                        </button>
+                                      )}
+
+                                      <button
+                                        type="button"
+                                        onClick={() => setConfirmDeleteUser(u)}
+                                        disabled={isSubmittingUserAction}
+                                        className="p-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800 transition-colors shrink-0 disabled:opacity-50"
+                                        title="Permanently Delete Account"
+                                      >
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                      </button>
+                                    </>
+                                  ) : (
                                     <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400 whitespace-nowrap">
                                       (Owner)
                                     </span>
@@ -4680,6 +4969,121 @@ export default function AdminSuperDashboard({
                   </table>
                 </div>
               </div>
+
+              {/* Edit User Phone Modal */}
+              {editingPhoneUser && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+                  <div className="bg-white dark:bg-gray-900 rounded-3xl p-6 max-w-md w-full border border-gray-200 dark:border-gray-800 shadow-2xl animate-in zoom-in-95">
+                    <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
+                      <div className="flex items-center gap-2">
+                        <div className="p-2 rounded-xl bg-purple-100 dark:bg-purple-950/70 text-purple-600 dark:text-purple-400">
+                          <Phone className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-sm text-gray-900 dark:text-white">Update Phone Number</h3>
+                          <p className="text-xs text-gray-500 truncate max-w-[240px]">{editingPhoneUser.name || editingPhoneUser.email}</p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setEditingPhoneUser(null)}
+                        className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+
+                    <form onSubmit={handleSaveUserPhone} className="mt-4 space-y-4">
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">
+                          Mobile Number (e.g. 03001234567)
+                        </label>
+                        <input
+                          type="text"
+                          value={newPhoneNumber}
+                          onChange={(e) => setNewPhoneNumber(e.target.value)}
+                          placeholder="03001234567"
+                          className="input-field text-sm"
+                          required
+                          autoFocus
+                        />
+                        <p className="text-[11px] text-gray-400 mt-1">
+                          This will immediately save the mobile number to user profiles across the directory.
+                        </p>
+                      </div>
+
+                      <div className="flex items-center justify-end gap-2 pt-2">
+                        <button
+                          type="button"
+                          onClick={() => setEditingPhoneUser(null)}
+                          className="btn-secondary text-xs px-3 py-2"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={isSubmittingUserAction}
+                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-xs transition-colors disabled:opacity-50"
+                        >
+                          <Check className="h-3.5 w-3.5" />
+                          <span>Save Phone</span>
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
+
+              {/* Confirm Delete User Modal */}
+              {confirmDeleteUser && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+                  <div className="bg-white dark:bg-gray-900 rounded-3xl p-6 max-w-md w-full border border-rose-200 dark:border-rose-900 shadow-2xl animate-in zoom-in-95">
+                    <div className="flex items-center gap-3 text-rose-600 dark:text-rose-400 mb-3">
+                      <div className="p-2.5 rounded-2xl bg-rose-100 dark:bg-rose-950/70 border border-rose-200 dark:border-rose-800">
+                        <Trash2 className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h3 className="font-black text-base text-gray-900 dark:text-white">Delete User Account?</h3>
+                        <p className="text-xs text-rose-600 dark:text-rose-400 font-semibold">Permanent & Irreversible Action</p>
+                      </div>
+                    </div>
+
+                    <div className="p-3.5 rounded-2xl bg-rose-50/60 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/40 text-xs space-y-1.5 mb-4">
+                      <p className="text-gray-700 dark:text-gray-300">
+                        Are you sure you want to permanently delete the account for:
+                      </p>
+                      <p className="font-bold text-gray-900 dark:text-white">
+                        👤 {confirmDeleteUser.name}
+                      </p>
+                      <p className="font-mono text-[11px] text-gray-500">
+                        ✉️ {confirmDeleteUser.email || 'No email'} | 📞 {confirmDeleteUser.phone || 'No phone'}
+                      </p>
+                      <p className="text-[11px] text-rose-600 dark:text-rose-400 mt-2 font-medium">
+                        ⚠️ This will erase the profile, invalidate active sessions, and block subsequent logins.
+                      </p>
+                    </div>
+
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setConfirmDeleteUser(null)}
+                        className="btn-secondary text-xs px-3.5 py-2"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleConfirmDeleteUser}
+                        disabled={isSubmittingUserAction}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition-colors disabled:opacity-50"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        <span>Permanently Delete</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Add User Modal */}
               {isAddingUser && (

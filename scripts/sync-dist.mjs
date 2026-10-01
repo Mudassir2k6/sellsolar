@@ -66,22 +66,19 @@ if (fs.existsSync(authCallbackHtml)) {
 // ============================================================================
 // PERFORMANCE OPTIMIZATION: Eliminate Render-Blocking Resources & Accelerate LCP
 // ============================================================================
-function optimizeHtmlFiles(dir) {
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
+function optimizeHtmlDirectory(targetBaseDir) {
+  if (!fs.existsSync(targetBaseDir)) return;
 
-  // Locate media and css assets
-  const mediaDir = path.join(distDir, '_next', 'static', 'media');
+  const mediaDir = path.join(targetBaseDir, '_next', 'static', 'media');
   let primaryFontFile = null;
   if (fs.existsSync(mediaDir)) {
     const mediaFiles = fs.readdirSync(mediaDir);
-    // Find Next.js primary font subset (.p.woff2)
     primaryFontFile = mediaFiles.find((f) => f.includes('.p.woff2')) || mediaFiles.find((f) => f.endsWith('.woff2'));
   }
 
-  const cssDir = path.join(distDir, '_next', 'static', 'css');
+  const cssDir = path.join(targetBaseDir, '_next', 'static', 'css');
   let fontCssFile = null;
   let fontCssContent = '';
-  let mainCssFile = null;
 
   if (fs.existsSync(cssDir)) {
     const cssFiles = fs.readdirSync(cssDir);
@@ -90,23 +87,21 @@ function optimizeHtmlFiles(dir) {
       if (content.includes('@font-face') && content.length < 10000) {
         fontCssFile = f;
         fontCssContent = content;
-      } else if (content.length > 20000) {
-        mainCssFile = f;
       }
     }
   }
 
-  function processDirectory(currentDir) {
+  function walk(currentDir) {
     const items = fs.readdirSync(currentDir, { withFileTypes: true });
     for (const item of items) {
       const fullPath = path.join(currentDir, item.name);
       if (item.isDirectory()) {
-        processDirectory(fullPath);
+        walk(fullPath);
       } else if (item.isFile() && item.name.endsWith('.html')) {
         let html = fs.readFileSync(fullPath, 'utf8');
         let modified = false;
 
-        // 1. Preload primary font subset to accelerate LCP
+        // 1. Preload primary font subset to accelerate LCP & FCP
         if (primaryFontFile && !html.includes(primaryFontFile)) {
           const fontPreloadTag = `<link rel="preload" href="/_next/static/media/${primaryFontFile}" as="font" type="font/woff2" crossorigin="anonymous"/>`;
           html = html.replace('<head>', `<head>${fontPreloadTag}`);
@@ -123,10 +118,13 @@ function optimizeHtmlFiles(dir) {
           }
         }
 
-        // 3. Preload main stylesheet with fetchpriority="high" for immediate critical styling
-        if (mainCssFile && !html.includes(`rel="preload" as="style" href="/_next/static/css/${mainCssFile}"`)) {
-          const cssPreloadTag = `<link rel="preload" as="style" href="/_next/static/css/${mainCssFile}" fetchpriority="high"/>`;
-          html = html.replace('<head>', `<head>${cssPreloadTag}`);
+        // 3. Convert all render-blocking stylesheets to high-priority asynchronous preload (media="print" onload="this.media='all'")
+        // Eliminates Render-Blocking Resources warning on Google PageSpeed & SEO Site Checkup
+        const blockingCssRegex = /<link\s+rel="stylesheet"\s+href="(\/_next\/static\/css\/[^"]+\.css)"\s+data-precedence="next"\s*\/?>/gi;
+        if (blockingCssRegex.test(html)) {
+          html = html.replace(blockingCssRegex, (match, href) => {
+            return `<link rel="preload" href="${href}" as="style" fetchpriority="high"/><link rel="stylesheet" href="${href}" media="print" onload="this.media='all'"/><noscript><link rel="stylesheet" href="${href}"/></noscript>`;
+          });
           modified = true;
         }
 
@@ -137,12 +135,13 @@ function optimizeHtmlFiles(dir) {
     }
   }
 
-  processDirectory(dir);
+  walk(targetBaseDir);
 }
 
 try {
-  optimizeHtmlFiles(distDir);
-  console.log('[perf] Optimized HTML files: Inlined font CSS, preloaded primary WOFF2 font & high-priority stylesheet.');
+  optimizeHtmlDirectory(outDir);
+  optimizeHtmlDirectory(distDir);
+  console.log('[perf] Optimized HTML files: Inlined font CSS, preloaded WOFF2 font & eliminated render-blocking stylesheets.');
 } catch (perfErr) {
   console.warn('[perf] Note during HTML optimization:', perfErr.message);
 }

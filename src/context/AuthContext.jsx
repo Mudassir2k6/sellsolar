@@ -1271,12 +1271,12 @@ export function AuthProvider({ children }) {
               );
               if (conflict) {
                 throw new Error(
-                  `Yeh Phone Number (${cleanPhone}) pehle se registered hai (${conflict.full_name || 'User'}). Baraye meherbani doosra number darj karein.`
+                  `This phone number (${cleanPhone}) is already registered (${conflict.full_name || 'User'}). Please enter a different number.`
                 );
               }
             }
           } catch (err) {
-            if (err.message && err.message.includes('pehle se registered')) throw err;
+            if (err.message && (err.message.includes('already registered') || err.message.includes('pehle se registered'))) throw err;
           }
         }
 
@@ -1294,7 +1294,7 @@ export function AuthProvider({ children }) {
 
           if (!isOwnAccount && profPhone && profPhone === cleanPhone) {
             throw new Error(
-              `Yeh Phone Number (${cleanPhone}) pehle se kisi doosray account ke sath registered hai. Baraye meherbani doosra phone number use karein.`
+              `This phone number (${cleanPhone}) is already registered with another account. Please use a different phone number.`
             );
           }
         }
@@ -1316,12 +1316,12 @@ export function AuthProvider({ children }) {
               );
               if (conflict) {
                 throw new Error(
-                  `Yeh Email (${cleanEmail}) pehle se kisi doosray account ke sath registered hai. Baraye meherbani doosri email darj karein.`
+                  `This email (${cleanEmail}) is already registered with another account. Please enter a different email address.`
                 );
               }
             }
           } catch (err) {
-            if (err.message && err.message.includes('pehle se')) throw err;
+            if (err.message && (err.message.includes('already registered') || err.message.includes('pehle se'))) throw err;
           }
         }
 
@@ -1338,7 +1338,7 @@ export function AuthProvider({ children }) {
           const storedEmail = (prof?.email || val.user?.email || key).toLowerCase();
           if (!isOwnAccount && storedEmail === cleanEmail) {
             throw new Error(
-              `Yeh Email (${cleanEmail}) pehle se kisi doosray account ke sath registered hai. Baraye meherbani doosri email darj karein.`
+              `This email (${cleanEmail}) is already registered with another account. Please enter a different email address.`
             );
           }
         }
@@ -1394,13 +1394,13 @@ export function AuthProvider({ children }) {
                 dbUpdateErr.message?.includes('profiles_email_unique')
               ) {
                 if (dbUpdateErr.message?.includes('phone') || dbUpdateErr.message?.includes('profiles_phone_unique')) {
-                  throw new Error(`Yeh Phone Number (${cleanPhone}) pehle se system mein kisi account ke sath registered hai.`);
+                  throw new Error(`This phone number (${cleanPhone}) is already registered in the system.`);
                 }
-                throw new Error(`Yeh Email (${finalEmail}) pehle se system mein kisi account ke sath registered hai.`);
+                throw new Error(`This email (${finalEmail}) is already registered in the system.`);
               }
             }
           } catch (dbErr) {
-            if (dbErr.message && dbErr.message.includes('pehle se')) {
+            if (dbErr.message && (dbErr.message.includes('already registered') || dbErr.message.includes('pehle se'))) {
               throw dbErr;
             }
           }

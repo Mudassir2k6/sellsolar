@@ -4170,7 +4170,7 @@ function yx({
         full_name: "Mudassir (Admin)",
         phone: "03001234567",
         city: "Lahore",
-        account_type: "individual",
+        account_type: "admin",
         is_admin: true,
         is_verified_dealer: false,
         created_at: "2026-01-01T00:00:00Z"

@@ -233,7 +233,7 @@ export function getStoredUsers() {
           full_name: 'Mudassir (Super Admin)',
           phone: '03001234567',
           city: 'Lahore',
-          account_type: 'individual',
+          account_type: 'admin',
           role: 'super_admin',
           is_super_admin: true,
           is_admin: true,
@@ -263,7 +263,7 @@ export function getStoredUsers() {
           full_name: 'Mudassir (Admin)',
           phone: '03001234567',
           city: 'Lahore',
-          account_type: 'individual',
+          account_type: 'admin',
           is_admin: true,
           is_verified_dealer: false,
           created_at: '2026-01-01T00:00:00Z',
@@ -408,9 +408,9 @@ export function AuthProvider({ children }) {
         username: 'mudassir2k6',
         display_identifier: 'mudassir2k6',
         full_name: 'Mudassir (Admin)',
-        phone: '03001234567',
-        city: 'Lahore',
-        account_type: 'individual',
+          phone: '03001234567',
+          city: 'Lahore',
+          account_type: 'admin',
         is_admin: true,
         is_verified_dealer: false,
         created_at: '2026-01-01T00:00:00Z',
@@ -516,7 +516,8 @@ export function AuthProvider({ children }) {
               getUserPhonesMap()[userId] ||
               '';
             const metaCity = session.user.user_metadata?.city || 'Lahore';
-            const metaAccountType = session.user.user_metadata?.account_type || 'individual';
+            const isOAuthAdmin = (session.user.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() || (session.user.email || '').toLowerCase() === 'admin@sellsolar.pk';
+            const metaAccountType = isOAuthAdmin ? 'admin' : (session.user.user_metadata?.account_type || 'individual');
             const metaCnic = session.user.user_metadata?.cnic || null;
             const metaBusinessName = session.user.user_metadata?.business_name || null;
             const metaBusinessAddress = session.user.user_metadata?.business_address || null;
@@ -535,10 +536,12 @@ export function AuthProvider({ children }) {
               phone: metaPhone,
               city: metaCity,
               account_type: metaAccountType,
+              role: isOAuthAdmin ? 'super_admin' : (metaAccountType === 'dealer' ? 'dealer' : 'customer'),
+              is_super_admin: isOAuthAdmin,
+              is_admin: isOAuthAdmin,
               cnic: metaCnic,
               business_name: metaBusinessName,
               business_address: metaBusinessAddress,
-              is_admin: (session.user.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase(),
               is_verified_dealer: metaAccountType === 'dealer',
             };
             setProfile(oauthProfile);
@@ -1043,9 +1046,9 @@ export function AuthProvider({ children }) {
             email: DEFAULT_ADMIN_EMAIL,
             username: 'mudassir2k6',
             full_name: 'Mudassir (Admin)',
-            phone: '03001234567',
-            city: 'Lahore',
-            account_type: 'individual',
+          phone: '03001234567',
+          city: 'Lahore',
+          account_type: 'admin',
             is_admin: true,
             is_verified_dealer: false,
             created_at: '2026-01-01T00:00:00Z',

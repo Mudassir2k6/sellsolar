@@ -477,9 +477,9 @@ export default function AdminSuperDashboard({
         name: p.full_name || u.user_metadata?.full_name || p.username || (email ? email.split('@')[0] : key),
         phone: resolvedPhone,
         city: p.city || u.user_metadata?.city || 'Lahore',
-        role: p.role || (p.is_super_admin ? 'super_admin' : p.is_admin ? 'admin' : p.account_type === 'dealer' || p.is_verified_dealer ? 'dealer' : 'customer'),
-        is_verified_dealer: !!p.is_verified_dealer,
-        account_type: p.account_type || 'individual',
+        role: (email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ? 'super_admin' : (p.role || (p.is_super_admin ? 'super_admin' : p.is_admin ? 'admin' : p.account_type === 'dealer' || p.is_verified_dealer ? 'dealer' : 'customer')),
+        is_verified_dealer: (email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ? false : !!p.is_verified_dealer,
+        account_type: (email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ? 'admin' : (p.account_type || 'individual'),
         created_at: p.created_at || '2026-01-01T00:00:00Z',
         is_disabled: isDisabled,
         isCurrentSession: false,
@@ -500,7 +500,8 @@ export default function AdminSuperDashboard({
             if (deletedUsersMap[mapKey] || deletedUsersMap[rpId]) return;
 
             const existing = usersMap.get(mapKey) || usersMap.get(rpId);
-            const computedRole = rp.is_admin ? 'admin' : (rp.account_type === 'dealer' || rp.is_verified_dealer) ? 'dealer' : 'customer';
+            const isMasterAdm = mapKey === DEFAULT_ADMIN_EMAIL.toLowerCase() || mapKey === 'admin@sellsolar.pk';
+            const computedRole = isMasterAdm ? 'super_admin' : (rp.is_admin ? 'admin' : (rp.account_type === 'dealer' || rp.is_verified_dealer) ? 'dealer' : 'customer');
 
             const isDisabled = Boolean(
               rp.is_disabled ||
@@ -518,9 +519,9 @@ export default function AdminSuperDashboard({
               name: rp.full_name || rp.username || existing?.name || (rp.email ? rp.email.split('@')[0] : 'User'),
               phone: resolvedPhone,
               city: rp.city || existing?.city || 'Lahore',
-              role: rp.role || computedRole,
-              is_verified_dealer: Boolean(rp.is_verified_dealer || rp.account_type === 'dealer'),
-              account_type: rp.account_type || existing?.account_type || 'individual',
+              role: isMasterAdm ? 'super_admin' : (rp.role || computedRole),
+              is_verified_dealer: !isMasterAdm && Boolean(rp.is_verified_dealer || rp.account_type === 'dealer'),
+              account_type: isMasterAdm ? 'admin' : (rp.account_type || existing?.account_type || 'individual'),
               created_at: rp.created_at || existing?.created_at || '2026-01-01T00:00:00Z',
               is_disabled: isDisabled,
               isCurrentSession: false,
@@ -547,9 +548,9 @@ export default function AdminSuperDashboard({
           name: profile?.full_name || user?.user_metadata?.full_name || existing?.name || 'You',
           phone: profile?.phone || existing?.phone || phoneMap[activeEmail] || '',
           city: profile?.city || existing?.city || 'Lahore',
-          role: profile?.role || (isSuperAdmin ? 'super_admin' : isAdmin ? 'admin' : isDealer ? 'dealer' : existing?.role || 'customer'),
-          is_verified_dealer: !!profile?.is_verified_dealer || isDealer,
-          account_type: profile?.account_type || existing?.account_type || 'individual',
+          role: activeEmail === DEFAULT_ADMIN_EMAIL.toLowerCase() ? 'super_admin' : (profile?.role || (isSuperAdmin ? 'super_admin' : isAdmin ? 'admin' : isDealer ? 'dealer' : existing?.role || 'customer')),
+          is_verified_dealer: activeEmail === DEFAULT_ADMIN_EMAIL.toLowerCase() ? false : (!!profile?.is_verified_dealer || isDealer),
+          account_type: activeEmail === DEFAULT_ADMIN_EMAIL.toLowerCase() ? 'admin' : (profile?.account_type || existing?.account_type || 'individual'),
           created_at: profile?.created_at || existing?.created_at || new Date().toISOString(),
           is_disabled: false,
           isCurrentSession: true,
@@ -5325,8 +5326,14 @@ export default function AdminSuperDashboard({
                               </td>
                               <td className="p-3.5 text-gray-500">
                                 <p className="font-medium text-gray-700 dark:text-gray-300">{u.city || 'Pakistan'}</p>
-                                <span className="inline-block mt-0.5 px-2 py-0.5 rounded-md text-[9px] font-bold uppercase bg-slate-100 dark:bg-gray-800 text-gray-500">
-                                  {u.account_type || 'Account'}
+                                <span className={`inline-block mt-0.5 px-2 py-0.5 rounded-md text-[9px] font-bold uppercase ${
+                                  u.account_type === 'admin' || u.role === 'super_admin' || u.role === 'admin'
+                                    ? 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300'
+                                    : u.account_type === 'dealer'
+                                    ? 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300'
+                                    : 'bg-slate-100 dark:bg-gray-800 text-gray-500'
+                                }`}>
+                                  {u.account_type === 'admin' || u.role === 'super_admin' ? 'ADMIN' : (u.account_type || 'INDIVIDUAL')}
                                 </span>
                               </td>
                               <td className="p-3.5">

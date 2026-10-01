@@ -290,7 +290,7 @@ export const PAGE_SEO = {
   },
   contact: {
     title: 'Contact Us | SellSolar Pakistan',
-    description: 'Reach our Islamabad headquarters, WhatsApp support desk, or email info@sellsolar.pk.',
+    description: 'Reach our Islamabad headquarters, WhatsApp support desk, or submit an inquiry through our contact portal.',
     path: '/contact',
     robots: INDEXABLE,
   },

@@ -1368,7 +1368,7 @@ function Xy({
                         className:
                           'text-[11px] text-gray-500 dark:text-gray-400',
                         children:
-                          'Support & Inquiries: info@sellsolar.pk • Mon–Sat 9am–6pm',
+                          'Support & Inquiries: Available Mon–Sat 9am–6pm • Online Helpdesk',
                       }),
                       jsx('p', {
                         className:
@@ -2449,7 +2449,7 @@ function hx({
     settings?.socialLinks?.linkedin ? { label: "LinkedIn", href: settings.socialLinks.linkedin, Icon: Linkedin, isExternal: true } : null,
     settings?.socialLinks?.youtube ? { label: "YouTube", href: settings.socialLinks.youtube, Icon: Youtube, isExternal: true } : null,
     settings?.socialLinks?.twitter ? { label: "Twitter / X", href: settings.socialLinks.twitter, Icon: Twitter, isExternal: true } : null,
-    { label: "Email Support", href: `mailto:${supportEmail}`, Icon: Mail, isEmail: true },
+    { label: "Email Support", href: "#contact-support", Icon: Mail, isEmail: true },
   ].filter(Boolean);
 
   const handleNav = (page) => {
@@ -2554,7 +2554,7 @@ function hx({
                         className: "flex items-center gap-2.5 text-gray-300 hover:text-primary-400 transition-colors cursor-pointer text-left group",
                         children: [
                           jsx(Mail, { className: "h-4 w-4 text-primary-400 group-hover:scale-110 transition-transform shrink-0" }),
-                          jsx("span", { className: "group-hover:underline", children: supportEmail })
+                          jsx("span", { className: "group-hover:underline", dangerouslySetInnerHTML: { __html: supportEmail.split("").map(c => `&#${c.charCodeAt(0)};`).join("") } })
                         ]
                       }),
                       /* Phone Call (Hidden per user request) */

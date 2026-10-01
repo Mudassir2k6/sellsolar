@@ -2048,7 +2048,7 @@ function ContactUsContent() {
                 Inquiry Logged Successfully!
               </h3>
               <p className="text-xs text-gray-600 dark:text-gray-300">
-                Your message has been registered for <strong>info@sellsolar.pk</strong>. Our team in Islamabad reviews inquiries within 4 business hours.
+                Your message has been registered with our support desk. Our team in Islamabad reviews inquiries within 4 business hours.
               </p>
             </div>
 
@@ -2231,7 +2231,7 @@ function ContactUsContent() {
 
             <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <p className="text-[11px] text-gray-500 dark:text-gray-400">
-                Sends to <strong className="text-gray-700 dark:text-gray-300">info@sellsolar.pk</strong> with automatic ticket generation.
+                Sends to <strong className="text-gray-700 dark:text-gray-300">SellSolar Support Desk</strong> with automatic ticket generation.
               </p>
               <button
                 type="submit"

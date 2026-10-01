@@ -105,7 +105,12 @@ export function getGlobalJsonLd() {
       alternateName: ['SellSolar', 'Sell Solar Pakistan', 'SellSolar.pk', 'Solar Plates Pakistan'],
       url: SITE_URL,
       logo: `${SITE_URL}/apple-touch-icon.png`,
-      email: 'info@sellsolar.pk',
+      contactPoint: {
+        '@type': 'ContactPoint',
+        contactType: 'customer support',
+        url: `${SITE_URL}/contact`,
+        availableLanguage: ['English', 'Urdu'],
+      },
       sameAs: [],
       areaServed: {
         '@type': 'Country',
@@ -354,7 +359,7 @@ export function getJsonLdForSlug(slug) {
       name: 'Contact SellSolar Pakistan',
       url,
       description:
-        'Get in touch with SellSolar customer support, Islamabad head office, or send an inquiry to info@sellsolar.pk.',
+        'Get in touch with SellSolar customer support, Islamabad head office, or submit an inquiry through our online support desk.',
     });
   }
 

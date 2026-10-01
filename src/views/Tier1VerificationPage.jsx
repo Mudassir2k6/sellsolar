@@ -320,13 +320,7 @@ export default function Tier1VerificationPage({ onNavigate }) {
 
                 {brand.email && (
                   <div className="flex items-center gap-2">
-                    <a
-                      href={`mailto:${brand.email}?subject=Panel Authenticity Verification Request`}
-                      className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-colors shadow-2xs"
-                    >
-                      <Mail className="h-3.5 w-3.5" />
-                      <span>Email Pakistan Desk</span>
-                    </a>
+                    <button type="button" onClick={() => { window.location.href = `mailto:${brand.email}?subject=Panel Authenticity Verification Request`; }} className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-colors shadow-2xs cursor-pointer"><Mail className="h-3.5 w-3.5" /><span>Email Pakistan Desk</span></button>
                     <button
                       onClick={() => handleCopy(brand.email, `mail-${brand.id}`)}
                       title="Copy Email"

@@ -1,0 +1,6 @@
+﻿# Ads.txt - SellSolar.pk Authorized Digital Sellers
+# Specification: https://iabtechlab.com/ads-txt/
+contact=https://sellsolar.pk/contact
+
+# Direct Authorized Sellers (Google AdSense / Authorized Digital Sellers)
+google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0

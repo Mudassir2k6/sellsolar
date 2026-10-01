@@ -47,7 +47,7 @@ if (preservedChunks.size > 0 && fs.existsSync(distChunksDir)) {
 
 // Explicitly ensure _headers and _redirects are in dist/
 const publicDir = path.join(root, 'public');
-for (const specialFile of ['_headers', '_redirects']) {
+for (const specialFile of ['_headers', '_redirects', 'ads.txt']) {
   const src = path.join(publicDir, specialFile);
   const dest = path.join(distDir, specialFile);
   if (fs.existsSync(src)) {

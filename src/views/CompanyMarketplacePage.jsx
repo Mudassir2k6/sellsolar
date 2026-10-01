@@ -961,12 +961,7 @@ function PressContent({ onNavigate }) {
               Email our press desk for comments, market data, and expert solar analysis.
             </p>
           </div>
-          <a
-            href="mailto:press@sellsolar.pk"
-            className="btn-primary text-xs px-4 py-2 inline-flex items-center gap-1.5 shadow-xs"
-          >
-            <Mail className="h-3.5 w-3.5" /> press@sellsolar.pk
-          </a>
+          <button type="button" onClick={() => { window.location.href = "mailto:" + ["press", "sellsolar.pk"].join("@"); }} className="btn-primary text-xs px-4 py-2 inline-flex items-center gap-1.5 shadow-xs cursor-pointer"><Mail className="h-3.5 w-3.5" /><span dangerouslySetInnerHTML={{ __html: "press@sellsolar.pk".split("").map(c => "&#" + c.charCodeAt(0) + ";").join("") }} /></button>
         </div>
       </div>
 
@@ -2546,7 +2541,7 @@ function PrivacyContent() {
           <section>
             <h3 className="font-bold text-gray-900 dark:text-white text-base">3. Account Deletion & Rights</h3>
             <p className="mt-1">
-              You can modify or remove your listings at any time through your dashboard. To request permanent account deletion, contact our privacy desk at <code>privacy@sellsolar.pk</code>.
+              You can modify or remove your listings at any time through your dashboard. To request permanent account deletion, contact our privacy desk at <code dangerouslySetInnerHTML={{ __html: "privacy@sellsolar.pk".split("").map(c => "&#" + c.charCodeAt(0) + ";").join("") }} />.
             </p>
           </section>
         </div>

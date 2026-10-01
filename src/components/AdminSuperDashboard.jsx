@@ -1728,6 +1728,33 @@ export default function AdminSuperDashboard({
         </div>
 
         <div className="flex items-center gap-1.5 sm:gap-2.5">
+          <div className="hidden lg:flex items-center gap-1 mr-2">
+            <button
+              onClick={() => { if (typeof window !== 'undefined') window.location.href = '/prices'; }}
+              className="text-xs font-bold text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 px-3 py-1.5 cursor-pointer transition-colors"
+            >
+              Today's Rates
+            </button>
+            <button
+              onClick={() => { if (typeof window !== 'undefined') window.location.href = '/calculator'; }}
+              className="text-xs font-bold text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 px-3 py-1.5 cursor-pointer transition-colors"
+            >
+              Load Calculator
+            </button>
+            <button
+              onClick={() => { if (typeof window !== 'undefined') window.location.href = '/dealers'; }}
+              className="text-xs font-bold text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 px-3 py-1.5 cursor-pointer transition-colors"
+            >
+              Verify Plates
+            </button>
+            <button
+              onClick={() => { if (typeof window !== 'undefined') window.location.href = '/installation'; }}
+              className="text-xs font-bold text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 px-3 py-1.5 cursor-pointer transition-colors"
+            >
+              Installation
+            </button>
+          </div>
+
           {onPostAd && (
             <button
               type="button"

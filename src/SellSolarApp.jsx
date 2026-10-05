@@ -1861,7 +1861,7 @@ function nx({
       cta: 'Get Quote',
       icon: Wrench,
       color: 'from-emerald-500 to-emerald-600',
-      action: () => (onInstall ? onInstall() : (onNavigate && onNavigate('installation')))
+      action: () => (onInstall ? onInstall() : (onNavigate && onNavigate('install')))
     }
   ];
 
@@ -6582,10 +6582,10 @@ function _x({
 
   return jsxs(Fragment,{
     children:[jsx(nx,{
-      filters:e,onFilterChange:y,onSearch:w,onReset:j,onNavigatePrices:nav?()=>nav("prices"):void 0,onNavigateCalculator:nav?()=>nav("calculator"):void 0,onNavigateDealers:nav?()=>nav("dealers"):void 0,onNavigateInstallation:nav?()=>nav("installation"):void 0
+      filters:e,onFilterChange:y,onSearch:w,onReset:j,onNavigatePrices:nav?()=>nav("prices"):void 0,onNavigateCalculator:nav?()=>nav("calculator"):void 0,onNavigateDealers:nav?()=>nav("dealers"):void 0,onNavigateInstallation:nav?()=>nav("install"):void 0
     }),jsx(PakWheelsSellCards,{
       onPostAd:()=>nav?nav("post-ad"):void 0,
-      onInstall:()=>nav?nav("installation"):void 0,
+      onInstall:()=>nav?nav("install"):void 0,
       onNavigate:nav
     }),jsx(DailyMarketRates,{
       onNavigate:nav,

@@ -279,7 +279,9 @@ function Xy({
               className: 'container-page flex items-center justify-between',
               children: [
                 jsxs('div', {
-                  className: 'flex items-center overflow-hidden whitespace-nowrap text-xs max-w-[60%]',
+                  className: 'flex items-center overflow-hidden whitespace-nowrap text-xs max-w-[65%] group cursor-pointer',
+                  onClick: () => h('prices'),
+                  title: 'Hover to pause | Click to view Today’s Rates page',
                   children: [
                     jsx('style', {
                       dangerouslySetInnerHTML: { __html: `
@@ -288,8 +290,14 @@ function Xy({
                           100% { transform: translateX(-100%); }
                         }
                         .animate-ticker {
-                          display: inline-block;
-                          animation: ticker 35s linear infinite;
+                          display: inline-flex;
+                          align-items: center;
+                          animation: ticker 120s linear infinite;
+                          will-change: transform;
+                        }
+                        .animate-ticker:hover,
+                        .group:hover .animate-ticker {
+                          animation-play-state: paused;
                         }
                       ` }
                     }),

@@ -182,6 +182,29 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
     setCatalogCurrentPage(1);
   };
 
+  // Global hero search: one box that filters BOTH the daily rate sheet and the equipment catalog
+  const [globalSearch, setGlobalSearch] = useState('');
+  const applyGlobalSearch = (value) => {
+    setGlobalSearch(value);
+    setSheetSearchQuery(value);
+    setSearchQuery(value);
+    setSheetCategory('all');
+    setSelectedCategory('all');
+    setSelectedBrand('');
+    setSheetFilterStatus('all');
+    setShowDailySheetDetail(true);
+    setSheetCurrentPage(1);
+    setCatalogCurrentPage(1);
+  };
+  const jumpToResults = (tab) => {
+    setPageTab(tab);
+    if (typeof window === 'undefined') return;
+    window.setTimeout(() => {
+      const el = document.getElementById(tab === 'catalog' ? 'catalog-results' : 'live-rate-sheet');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 60);
+  };
+
   // Calculator state removed — full calculator lives at /calculator
 
   // Categories list
@@ -484,6 +507,90 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
               <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white">
                 Today's Solar Prices in <span className="text-amber-400">Pakistan (PKR)</span>
               </h1>
+
+              {/* Global item search (searches rate sheet + catalog together) */}
+              <form
+                role="search"
+                className="mt-3 w-full max-w-xl"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (!globalSearch.trim()) return;
+                  jumpToResults(displayedSheetRates.length > 0 || filteredItems.length === 0 ? 'rates' : 'catalog');
+                }}
+              >
+                <label htmlFor="prices-global-search" className="sr-only">
+                  Search solar item prices
+                </label>
+                <div className="relative">
+                  <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-amber-400" />
+                  <input
+                    id="prices-global-search"
+                    type="search"
+                    value={globalSearch}
+                    onChange={(e) => applyGlobalSearch(e.target.value)}
+                    placeholder="Search any item: Longi 585W, Jinko, 6kW hybrid, Narada, lithium..."
+                    autoComplete="off"
+                    className="w-full rounded-xl border border-white/15 bg-white/10 py-2.5 pl-10 pr-24 text-sm text-white placeholder-gray-400 backdrop-blur-sm transition-colors focus:border-amber-400 focus:bg-white/15 focus:outline-none focus:ring-2 focus:ring-amber-400/30"
+                  />
+                  {globalSearch ? (
+                    <button
+                      type="button"
+                      id="prices-global-search-clear"
+                      onClick={() => applyGlobalSearch('')}
+                      className="absolute right-[4.6rem] top-1/2 -translate-y-1/2 rounded-md px-1.5 py-0.5 text-[11px] font-semibold text-gray-300 hover:text-white"
+                    >
+                      Clear
+                    </button>
+                  ) : null}
+                  <button
+                    type="submit"
+                    id="prices-global-search-submit"
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-bold text-slate-950 transition-all hover:bg-amber-400 active:scale-95"
+                  >
+                    Search
+                  </button>
+                </div>
+
+                {globalSearch.trim() ? (
+                  <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px]">
+                    <span className="text-gray-400">Results for "{globalSearch.trim()}":</span>
+                    <button
+                      type="button"
+                      id="prices-global-search-goto-rates"
+                      onClick={() => jumpToResults('rates')}
+                      className="inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2.5 py-0.5 font-semibold text-emerald-300 hover:brightness-110"
+                    >
+                      {displayedSheetRates.length} in Daily Rate Sheet <ArrowRight className="h-3 w-3" />
+                    </button>
+                    <button
+                      type="button"
+                      id="prices-global-search-goto-catalog"
+                      onClick={() => jumpToResults('catalog')}
+                      className="inline-flex items-center gap-1 rounded-full border border-amber-400/30 bg-amber-500/15 px-2.5 py-0.5 font-semibold text-amber-300 hover:brightness-110"
+                    >
+                      {filteredItems.length} in Equipment Catalog <ArrowRight className="h-3 w-3" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px]">
+                    <span className="text-gray-400">Popular:</span>
+                    {['Longi', 'Jinko', 'Canadian', '585W', '6kW', 'Hybrid', 'Lithium', 'Narada', '10kW'].map((term) => (
+                      <button
+                        key={term}
+                        type="button"
+                        id={`prices-global-search-chip-${term.toLowerCase()}`}
+                        onClick={() => {
+                          applyGlobalSearch(term);
+                          jumpToResults('rates');
+                        }}
+                        className="rounded-full border border-white/15 bg-white/5 px-2.5 py-0.5 font-medium text-gray-200 transition-colors hover:border-amber-400/50 hover:text-amber-300"
+                      >
+                        {term}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </form>
             </div>
             {/* Compact 3-stat inline chips */}
             <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap shrink-0">

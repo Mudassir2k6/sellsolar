@@ -297,19 +297,33 @@ function Xy({
                       className: 'animate-ticker font-semibold text-gray-300 flex items-center gap-3',
                       children: [
                         jsxs('span', { className: 'flex items-center gap-1', children: [jsx(TrendingUp, { className: 'h-3.5 w-3.5 text-primary-400' }), "LIVE RATES:"] }),
-                        jsx('span', { className: 'text-emerald-400', children: '🟢 JA Solar 625W: Rs 38.00/W (Deliv 30/09)' }),
+                        jsx('span', { className: 'text-emerald-400', children: '🟢 LONGi 645W BF: Rs 43.25/W (Ready Stock)' }),
                         jsx('span', { className: 'text-gray-700', children: '|' }),
-                        jsx('span', { className: 'text-emerald-400', children: '🟢 Jinko 585W: Rs 39.75/W' }),
+                        jsx('span', { className: 'text-emerald-400', children: '🟢 Canadian 625W: Rs 41.00/W • 590W: Rs 40.50/W' }),
                         jsx('span', { className: 'text-gray-700', children: '|' }),
-                        jsx('span', { className: 'text-emerald-400', children: '🟢 Canadian 625W: Rs 41.25/W' }),
+                        jsx('span', { className: 'text-emerald-400', children: '🟢 Jinko 585W: Rs 39.25/W • 645W BF: Rs 40.15/W' }),
+                        jsx('span', { className: 'text-gray-700', children: '|' }),
+                        jsx('span', { className: 'text-emerald-400', children: '🟢 JA Solar 625W: Rs 38.00/W • 585W: Rs 38.50/W (Ready Stock)' }),
+                        jsx('span', { className: 'text-gray-700', children: '|' }),
+                        jsx('span', { className: 'text-emerald-400', children: '⭐ Astronergy 625W: Booking Available • 590W: Rs 38.00/W • 720W: Rs 39.00/W' }),
+                        jsx('span', { className: 'text-gray-700', children: '|' }),
+                        jsx('span', { className: 'text-emerald-400', children: '🟢 AIKO 665W: Rs 42.50/W (Rawat Stock)' }),
+                        jsx('span', { className: 'text-gray-700', children: '|' }),
+                        jsx('span', { className: 'text-emerald-400', children: '🟢 Inverex 620W: Rs 42.50/W (With Warranty Card)' }),
+                        jsx('span', { className: 'text-gray-700', children: '|' }),
+                        jsx('span', { className: 'text-emerald-400', children: '🟢 Korean 585W: Rs 37.00/W • 645W ABC: Rs 39.00/W • 715W: Rs 37.25/W' }),
+                        jsx('span', { className: 'text-gray-700', children: '|' }),
+                        jsx('span', { className: 'text-emerald-400', children: '🟢 TCL 720W: Rs 38.00/W' }),
+                        jsx('span', { className: 'text-gray-700', children: '|' }),
+                        jsx('span', { className: 'text-emerald-400', children: '🟢 OSDA 585W: Rs 35.65/W (Ready Stock)' }),
+                        jsx('span', { className: 'text-gray-700', children: '|' }),
+                        jsx('span', { className: 'text-emerald-400', children: '🔋 DAEWOO Lithium (N-Tech): 2.56kWh Rs 120k • 5.12kWh Rs 213k • 10.24kWh Trolley Rs 420k (10-Yr Warranty, 26-No Islamabad)' }),
                         jsx('span', { className: 'text-gray-700', children: '|' }),
                         jsx('span', { className: 'text-amber-400', children: '🟡 LCD Series 6kW: Rs 195k' }),
                         jsx('span', { className: 'text-gray-700', children: '|' }),
                         jsx('span', { className: 'text-sky-400', children: '⭕ Solis 6kW+: Rs 207k' }),
                         jsx('span', { className: 'text-gray-700', children: '|' }),
                         jsx('span', { className: 'text-emerald-400', children: '🟢 Zilo Nexa (PK 🇵🇰): Rs 65k–580k' }),
-                        jsx('span', { className: 'text-gray-700', children: '|' }),
-                        jsx('span', { className: 'text-emerald-400', children: '🟢 LEFN 640W: Rs 33.50/W' }),
                       ]
                     })
                   ]
@@ -1408,58 +1422,6 @@ function nx({
   const heroCms = settings?.homePageCms?.hero;
   const [moreFiltersOpen, setMoreFiltersOpen] = useState(() => Boolean(t.brand || t.condition || t.minPrice || t.maxPrice));
   const activeExtraFiltersCount = [t.brand, t.condition, t.minPrice, t.maxPrice].filter(Boolean).length;
-  // Live dynamic ticking animated counters for hero metrics
-  const [counts, setCounts] = useState({
-    listings: 512,
-    sellers: 124,
-    cities: 16,
-    buyers: 10450,
-  });
-
-  useEffect(() => {
-    // Smooth initial count-up
-    const startTime = Date.now();
-    const duration = 1800;
-    const targets = { listings: 512, sellers: 124, cities: 16, buyers: 10450 };
-
-    const animInterval = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      // Ease out cubic
-      const ease = 1 - Math.pow(1 - progress, 3);
-
-      setCounts({
-        listings: Math.floor(targets.listings * ease),
-        sellers: Math.floor(targets.sellers * ease),
-        cities: Math.floor(targets.cities * ease),
-        buyers: Math.floor(targets.buyers * ease),
-      });
-
-      if (progress >= 1) {
-        clearInterval(animInterval);
-      }
-    }, 30);
-
-    // Continuous live ticker that gently updates so it stays alive and never stays fixed
-    const liveTicker = setInterval(() => {
-      setCounts(prev => {
-        const deltaListings = Math.random() > 0.6 ? (Math.random() > 0.5 ? 1 : -1) : 0;
-        const deltaBuyers = Math.floor(Math.random() * 5) - 2;
-        const newListings = Math.max(500, prev.listings + deltaListings);
-        const newBuyers = Math.max(10400, prev.buyers + deltaBuyers);
-        return {
-          ...prev,
-          listings: newListings,
-          buyers: newBuyers,
-        };
-      });
-    }, 2800);
-
-    return () => {
-      clearInterval(animInterval);
-      clearInterval(liveTicker);
-    };
-  }, []);
 
   const popularSearches = [
     "Used Solar Plates",
@@ -1813,22 +1775,6 @@ function nx({
                 children:jsx(ChevronRight,{ className:"h-4 w-4" })
               })
             ]
-          }),
-          jsx("div",{
-            className:"mx-auto mt-4 sm:mt-5 grid max-w-4xl grid-cols-2 gap-2.5 sm:gap-3.5 sm:grid-cols-4",children:[{
-              value: `${counts.listings.toLocaleString()}+`, label: "Active Listings"
-            },{
-              value: `${counts.sellers}+`, label: "Verified Sellers"
-            },{
-              value: `${counts.cities}+`, label: "Cities Covered"
-            },{
-              value: counts.buyers >= 1000 ? `${(counts.buyers / 1000).toFixed(1)}K+` : `${counts.buyers}+`, label: "Monthly Buyers"
-            }].map(s=>jsxs("div",{
-              className:"card-interactive p-2.5 sm:p-3 text-center border border-gray-200/80 dark:border-gray-800 dark:bg-gray-900 shadow-2xs transition-all duration-300 hover:border-primary-400 dark:hover:border-primary-600",children:[
-                jsx("div",{ className:"text-lg sm:text-xl font-extrabold text-gray-900 dark:text-white font-mono tracking-tight", children:s.value }),
-                jsx("div",{ className:"mt-0.5 text-xs font-semibold text-gray-500 dark:text-gray-400", children:s.label })
-              ]
-            },s.label))
           })
         ]
       })

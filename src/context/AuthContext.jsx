@@ -155,10 +155,41 @@ export const USER_ROLES = {
   CUSTOMER: 'customer',
 };
 
+export function isUserAdmin(user, profile) {
+  const email = (user?.email || profile?.email || user?.user_metadata?.email || '').toLowerCase();
+  const username = (profile?.username || user?.user_metadata?.user_name || '').toLowerCase();
+  if (
+    email === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
+    email === 'admin@sellsolar.pk' ||
+    email === 'info@sellsolar.pk' ||
+    email === 'mudassirkhan78907890@gmail.com' ||
+    email === 'mudassir2k6@gmail.com' ||
+    email === 'mudassir2k@yahoo.com' ||
+    username === 'mudassir2k6' ||
+    username === 'mudassir'
+  ) {
+    return true;
+  }
+  if (profile?.role === 'super_admin' || profile?.is_super_admin) return true;
+  if (profile?.role === 'admin' || profile?.is_admin) return true;
+  return false;
+}
+
 export function getUserRole(user, profile) {
-  const email = (user?.email || profile?.email || '').toLowerCase();
-  if (email === DEFAULT_ADMIN_EMAIL.toLowerCase()) return USER_ROLES.SUPER_ADMIN;
-  if (email === 'admin@sellsolar.pk' || email === 'info@sellsolar.pk') return USER_ROLES.SUPER_ADMIN;
+  const email = (user?.email || profile?.email || user?.user_metadata?.email || '').toLowerCase();
+  const username = (profile?.username || user?.user_metadata?.user_name || '').toLowerCase();
+  if (
+    email === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
+    email === 'admin@sellsolar.pk' ||
+    email === 'info@sellsolar.pk' ||
+    email === 'mudassirkhan78907890@gmail.com' ||
+    email === 'mudassir2k6@gmail.com' ||
+    email === 'mudassir2k@yahoo.com' ||
+    username === 'mudassir2k6' ||
+    username === 'mudassir'
+  ) {
+    return USER_ROLES.SUPER_ADMIN;
+  }
   if (profile?.role === 'super_admin' || profile?.is_super_admin) return USER_ROLES.SUPER_ADMIN;
   if (profile?.role === 'admin' || profile?.is_admin) return USER_ROLES.ADMIN;
   if (profile?.role === 'dealer' || profile?.account_type === 'dealer' || profile?.is_verified_dealer) return USER_ROLES.DEALER;
@@ -2026,8 +2057,9 @@ export function AuthProvider({ children }) {
   );
 
   const adminUpdateUserProfile = useCallback(
-    async (targetUserIdOrEmail, updates) => {
+    async (targetUserIdOrEmail, updates, targetUserObj = null) => {
       const isFallbackAdmin =
+        isUserAdmin(user, profile) ||
         isSuperAdmin ||
         isAdmin ||
         (user?.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
@@ -2038,63 +2070,103 @@ export function AuthProvider({ children }) {
         throw new Error('Only administrators can update user details.');
       }
 
-      const cleanId = (targetUserIdOrEmail || '').trim().toLowerCase();
+      const targetId = (targetUserObj?.id || (!String(targetUserIdOrEmail || '').includes('@') ? targetUserIdOrEmail : '') || '').trim();
+      const targetEmail = (targetUserObj?.email || (String(targetUserIdOrEmail || '').includes('@') ? targetUserIdOrEmail : '') || '').trim().toLowerCase();
+      const cleanPhone = updates.phone ? normalizePhone(updates.phone) : null;
+
       const localUsers = getStoredUsers();
       let updatedRecord = null;
-      let targetEmail = cleanId.includes('@') ? cleanId : '';
 
       for (const [k, v] of Object.entries(localUsers)) {
         const p = v.profile || {};
         const u = v.user || {};
-        if (
-          k.toLowerCase() === cleanId ||
-          p.id?.toLowerCase() === cleanId ||
-          u.id?.toLowerCase() === cleanId ||
-          p.email?.toLowerCase() === cleanId
-        ) {
-          if (p.email) targetEmail = p.email.toLowerCase();
+        const match =
+          (targetId && (k.toLowerCase() === targetId.toLowerCase() || p.id?.toLowerCase() === targetId.toLowerCase() || u.id?.toLowerCase() === targetId.toLowerCase())) ||
+          (targetEmail && (k.toLowerCase() === targetEmail || p.email?.toLowerCase() === targetEmail || u.email?.toLowerCase() === targetEmail));
+
+        if (match) {
           v.profile = {
             ...v.profile,
             ...updates,
-            ...(updates.phone ? { phone: normalizePhone(updates.phone) } : {}),
+            ...(cleanPhone ? { phone: cleanPhone } : {}),
           };
           updatedRecord = v.profile;
         }
       }
 
-      if (cleanId.includes('@') && !localUsers[cleanId]) {
-        localUsers[cleanId] = {
-          user: { id: targetUserIdOrEmail, email: cleanId },
+      if (!updatedRecord) {
+        const storeKey = targetEmail || targetId || `user_${Date.now()}`;
+        localUsers[storeKey] = {
+          user: { id: targetId || storeKey, email: targetEmail },
           profile: {
-            id: targetUserIdOrEmail,
-            email: cleanId,
+            id: targetId || storeKey,
+            email: targetEmail,
+            full_name: targetUserObj?.name || 'User',
             ...updates,
-            ...(updates.phone ? { phone: normalizePhone(updates.phone) } : {}),
+            ...(cleanPhone ? { phone: cleanPhone } : {}),
           },
         };
-        updatedRecord = localUsers[cleanId].profile;
+        updatedRecord = localUsers[storeKey].profile;
       }
       saveStoredUsers(localUsers);
 
-      // Save to persistent user phones map
-      if (updates.phone) {
-        const cleanP = normalizePhone(updates.phone);
+      // Save to persistent user phones map across all possible lookups
+      if (cleanPhone) {
         const pMap = getUserPhonesMap();
-        pMap[cleanId] = cleanP;
-        if (targetEmail) pMap[targetEmail] = cleanP;
-        if (updatedRecord?.id) pMap[updatedRecord.id.toLowerCase()] = cleanP;
+        if (targetId) {
+          pMap[targetId] = cleanPhone;
+          pMap[targetId.toLowerCase()] = cleanPhone;
+        }
+        if (targetEmail) {
+          pMap[targetEmail] = cleanPhone;
+        }
+        if (targetUserIdOrEmail) {
+          pMap[targetUserIdOrEmail] = cleanPhone;
+          pMap[String(targetUserIdOrEmail).toLowerCase()] = cleanPhone;
+        }
         saveUserPhonesMap(pMap);
+      }
+
+      // If updating the active logged-in user, immediately sync profile React state & stored session
+      const currentActiveId = (user?.id || profile?.id || '').toLowerCase();
+      const currentActiveEmail = (user?.email || profile?.email || '').toLowerCase();
+      const isSelf =
+        (targetId && targetId.toLowerCase() === currentActiveId) ||
+        (targetEmail && targetEmail === currentActiveEmail) ||
+        (targetUserIdOrEmail && (String(targetUserIdOrEmail).toLowerCase() === currentActiveId || String(targetUserIdOrEmail).toLowerCase() === currentActiveEmail));
+
+      if (isSelf) {
+        setProfile((prev) => ({
+          ...(prev || {}),
+          ...updates,
+          ...(cleanPhone ? { phone: cleanPhone } : {}),
+        }));
+        saveStoredSession({
+          user,
+          profile: {
+            ...(profile || {}),
+            ...updates,
+            ...(cleanPhone ? { phone: cleanPhone } : {}),
+          },
+        });
       }
 
       // Supabase update
       if (isSupabaseConfigured()) {
         try {
           const payload = { ...updates };
-          if (payload.phone) payload.phone = normalizePhone(payload.phone);
-          await supabase
-            .from('profiles')
-            .update(payload)
-            .or(`id.eq.${targetUserIdOrEmail},email.eq.${cleanId}`);
+          if (cleanPhone) payload.phone = cleanPhone;
+          if (isValidUuid(targetId)) {
+            await supabase
+              .from('profiles')
+              .update(payload)
+              .eq('id', targetId);
+          } else if (targetEmail && !targetEmail.endsWith('@sellsolar.local')) {
+            await supabase
+              .from('profiles')
+              .update(payload)
+              .ilike('email', targetEmail);
+          }
         } catch (sbErr) {
           console.warn('Supabase profile update warning:', sbErr);
         }

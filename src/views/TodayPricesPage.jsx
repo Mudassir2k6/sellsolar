@@ -2084,15 +2084,15 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                                 <div className="text-[11px] text-gray-500 dark:text-gray-400">{item.capacity} • {item.type}</div>
                               </td>
                               <td className="px-3 py-2.5 font-bold text-emerald-600 dark:text-emerald-400">
-                                {item.rate != null ? `Rs. ${item.rate.toLocaleString()}` : 'Rs. N/A'}
+                                {item.rate != null ? (typeof item.rate === 'number' ? `Rs. ${item.rate.toLocaleString()}` : item.rate) : (item.priceDisplay || 'Coming Soon')}
                               </td>
                               <td className="px-3 py-2.5 text-gray-600 dark:text-gray-300">
-                                {item.prevRate != null ? `Rs. ${item.prevRate.toLocaleString()}` : 'Rs. N/A'}
+                                {item.prevRate != null ? (typeof item.prevRate === 'number' ? `Rs. ${item.prevRate.toLocaleString()}` : item.prevRate) : '—'}
                               </td>
                               <td className="px-3 py-2.5">
                                 {item.rate == null ? (
-                                  <span className="inline-flex items-center gap-1 text-gray-400">
-                                    Call for Rate
+                                  <span className="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400 font-medium text-xs">
+                                    {item.priceDisplay || 'Coming Soon'}
                                   </span>
                                 ) : item.change < 0 ? (
                                   <span className="inline-flex items-center gap-0.5 text-emerald-600 dark:text-emerald-400 font-bold">
@@ -2112,7 +2112,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                               </td>
                               <td className="px-3 py-2.5">
                                 <div className="font-bold text-gray-900 dark:text-white">
-                                  {item.rate != null ? `Rs. ${item.rate.toLocaleString()}` : 'Call for Rate'}
+                                  {item.rate != null ? (typeof item.rate === 'number' ? `Rs. ${item.rate.toLocaleString()}` : item.rate) : (item.priceDisplay || 'Coming Soon')}
                                 </div>
                                 <div className="text-[10px] text-gray-500 dark:text-gray-400">
                                   {item.warranty || '10 Years (6000 Cycles)'}

@@ -70,7 +70,9 @@ import {
   MessageSquare,
   Package,
   PackageOpen,
+  Pause,
   Phone,
+  Play,
   RefreshCw,
   ScrollText,
   Search,
@@ -113,6 +115,23 @@ import MobileBottomNav from './components/MobileBottomNav';
 import AdminSuperDashboard from './components/AdminSuperDashboard';
 import { recordPageView, recordProductView, recordProductInquiry } from './services/analyticsService';
 
+const TICKER_ITEMS = [
+  { text: 'LONGi 645W BF: Rs 43.25/W (Ready Stock)', color: 'text-emerald-400', icon: '🟢' },
+  { text: 'Canadian 625W: Rs 41.00/W • 590W: Rs 40.50/W', color: 'text-emerald-400', icon: '🟢' },
+  { text: 'Jinko 585W: Rs 39.25/W • 645W BF: Rs 40.15/W', color: 'text-emerald-400', icon: '🟢' },
+  { text: 'JA Solar 625W: Rs 38.00/W • 585W: Rs 38.50/W (Ready Stock)', color: 'text-emerald-400', icon: '🟢' },
+  { text: 'Astronergy 625W: Booking Available • 590W: Rs 38.00/W • 720W: Rs 39.00/W', color: 'text-emerald-400', icon: '⭐' },
+  { text: 'AIKO 665W: Rs 42.50/W (Rawat Stock)', color: 'text-emerald-400', icon: '🟢' },
+  { text: 'Inverex 620W: Rs 42.50/W (With Warranty Card)', color: 'text-emerald-400', icon: '🟢' },
+  { text: 'Korean 585W: Rs 37.00/W • 645W ABC: Rs 39.00/W • 715W: Rs 37.25/W', color: 'text-emerald-400', icon: '🟢' },
+  { text: 'TCL 720W: Rs 38.00/W', color: 'text-emerald-400', icon: '🟢' },
+  { text: 'OSDA 585W: Rs 35.65/W (Ready Stock)', color: 'text-emerald-400', icon: '🟢' },
+  { text: 'DAEWOO Lithium (N-Tech): 2.56kWh Rs 120k • 5.12kWh Rs 213k • 10.24kWh Trolley Rs 420k (10-Yr Warranty, 26-No Islamabad)', color: 'text-emerald-400', icon: '🔋' },
+  { text: 'LCD Series 6kW: Rs 195k', color: 'text-amber-400', icon: '🟡' },
+  { text: 'Solis 6kW+: Rs 207k', color: 'text-sky-400', icon: '⭕' },
+  { text: 'Zilo Nexa (PK 🇵🇰): Rs 65k–580k', color: 'text-emerald-400', icon: '🟢' },
+];
+
 function Xy({
   onNavigate:t,currentPage:e,onSelectListing:selList,onSearchSubmit:searchSub
 }){
@@ -121,6 +140,7 @@ function Xy({
     [s, a] = useState(!1),
     [l, o] = useState(!1),
     [isMobileSearchOpen, setIsMobileSearchOpen] = useState(!1),
+    [isTickerPaused, setIsTickerPaused] = useState(!1),
     {
       user: c,
       profile: u,
@@ -279,59 +299,79 @@ function Xy({
               className: 'container-page flex items-center justify-between',
               children: [
                 jsxs('div', {
-                  className: 'flex items-center overflow-hidden whitespace-nowrap text-xs max-w-[65%] group cursor-pointer',
-                  onClick: () => h('prices'),
-                  title: 'Hover to pause | Click to view Today’s Rates page',
+                  className: 'flex items-center overflow-hidden whitespace-nowrap text-xs max-w-[68%] group select-none',
                   children: [
                     jsx('style', {
                       dangerouslySetInnerHTML: { __html: `
-                        @keyframes ticker {
-                          0% { transform: translateX(100%); }
-                          100% { transform: translateX(-100%); }
+                        @keyframes tickerSeamlessSlow {
+                          0% { transform: translate3d(0, 0, 0); }
+                          100% { transform: translate3d(-50%, 0, 0); }
                         }
-                        .animate-ticker {
+                        .ticker-track-slow {
                           display: inline-flex;
                           align-items: center;
-                          animation: ticker 120s linear infinite;
+                          width: max-content;
+                          animation: tickerSeamlessSlow 280s linear infinite;
                           will-change: transform;
                         }
-                        .animate-ticker:hover,
-                        .group:hover .animate-ticker {
-                          animation-play-state: paused;
+                        .ticker-track-slow:hover,
+                        .ticker-paused-state .ticker-track-slow {
+                          animation-play-state: paused !important;
                         }
                       ` }
                     }),
-                    jsxs('span', {
-                      className: 'animate-ticker font-semibold text-gray-300 flex items-center gap-3',
+                    jsxs('div', {
+                      className: 'flex items-center gap-1.5 shrink-0 pr-3 border-r border-gray-800 bg-gray-950 z-10',
                       children: [
-                        jsxs('span', { className: 'flex items-center gap-1', children: [jsx(TrendingUp, { className: 'h-3.5 w-3.5 text-primary-400' }), "LIVE RATES:"] }),
-                        jsx('span', { className: 'text-emerald-400', children: '🟢 LONGi 645W BF: Rs 43.25/W (Ready Stock)' }),
-                        jsx('span', { className: 'text-gray-700', children: '|' }),
-                        jsx('span', { className: 'text-emerald-400', children: '🟢 Canadian 625W: Rs 41.00/W • 590W: Rs 40.50/W' }),
-                        jsx('span', { className: 'text-gray-700', children: '|' }),
-                        jsx('span', { className: 'text-emerald-400', children: '🟢 Jinko 585W: Rs 39.25/W • 645W BF: Rs 40.15/W' }),
-                        jsx('span', { className: 'text-gray-700', children: '|' }),
-                        jsx('span', { className: 'text-emerald-400', children: '🟢 JA Solar 625W: Rs 38.00/W • 585W: Rs 38.50/W (Ready Stock)' }),
-                        jsx('span', { className: 'text-gray-700', children: '|' }),
-                        jsx('span', { className: 'text-emerald-400', children: '⭐ Astronergy 625W: Booking Available • 590W: Rs 38.00/W • 720W: Rs 39.00/W' }),
-                        jsx('span', { className: 'text-gray-700', children: '|' }),
-                        jsx('span', { className: 'text-emerald-400', children: '🟢 AIKO 665W: Rs 42.50/W (Rawat Stock)' }),
-                        jsx('span', { className: 'text-gray-700', children: '|' }),
-                        jsx('span', { className: 'text-emerald-400', children: '🟢 Inverex 620W: Rs 42.50/W (With Warranty Card)' }),
-                        jsx('span', { className: 'text-gray-700', children: '|' }),
-                        jsx('span', { className: 'text-emerald-400', children: '🟢 Korean 585W: Rs 37.00/W • 645W ABC: Rs 39.00/W • 715W: Rs 37.25/W' }),
-                        jsx('span', { className: 'text-gray-700', children: '|' }),
-                        jsx('span', { className: 'text-emerald-400', children: '🟢 TCL 720W: Rs 38.00/W' }),
-                        jsx('span', { className: 'text-gray-700', children: '|' }),
-                        jsx('span', { className: 'text-emerald-400', children: '🟢 OSDA 585W: Rs 35.65/W (Ready Stock)' }),
-                        jsx('span', { className: 'text-gray-700', children: '|' }),
-                        jsx('span', { className: 'text-emerald-400', children: '🔋 DAEWOO Lithium (N-Tech): 2.56kWh Rs 120k • 5.12kWh Rs 213k • 10.24kWh Trolley Rs 420k (10-Yr Warranty, 26-No Islamabad)' }),
-                        jsx('span', { className: 'text-gray-700', children: '|' }),
-                        jsx('span', { className: 'text-amber-400', children: '🟡 LCD Series 6kW: Rs 195k' }),
-                        jsx('span', { className: 'text-gray-700', children: '|' }),
-                        jsx('span', { className: 'text-sky-400', children: '⭕ Solis 6kW+: Rs 207k' }),
-                        jsx('span', { className: 'text-gray-700', children: '|' }),
-                        jsx('span', { className: 'text-emerald-400', children: '🟢 Zilo Nexa (PK 🇵🇰): Rs 65k–580k' }),
+                        jsx(TrendingUp, { className: 'h-3.5 w-3.5 text-primary-400' }),
+                        jsx('span', { className: 'font-bold text-gray-200 tracking-wider text-[11px]', children: 'LIVE RATES:' }),
+                        jsx('button', {
+                          type: 'button',
+                          onClick: (e) => {
+                            e.stopPropagation();
+                            setIsTickerPaused(!isTickerPaused);
+                          },
+                          className: 'ml-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-gray-900 hover:bg-gray-800 text-gray-300 hover:text-white border border-gray-700/80 flex items-center gap-1 cursor-pointer transition-colors',
+                          title: isTickerPaused ? 'اسکرولنگ دوبارہ چلائیں (Play scroll)' : 'اسکرولنگ روکیں (Pause scroll)',
+                          children: [
+                            isTickerPaused
+                              ? jsx(Play, { className: 'h-2.5 w-2.5 text-emerald-400 fill-emerald-400' })
+                              : jsx(Pause, { className: 'h-2.5 w-2.5 text-amber-400' }),
+                            jsx('span', { children: isTickerPaused ? 'Play' : 'Pause' })
+                          ]
+                        })
+                      ]
+                    }),
+                    jsxs('div', {
+                      className: `overflow-hidden flex-1 relative cursor-pointer pl-3 ${isTickerPaused ? 'ticker-paused-state' : ''}`,
+                      onClick: () => h('prices'),
+                      title: 'Hover to pause | Click to open Today’s Rates page',
+                      children: [
+                        jsxs('div', {
+                          className: 'ticker-track-slow font-semibold text-gray-300 flex items-center gap-3',
+                          children: [
+                            ...TICKER_ITEMS.map((item, idx) =>
+                              jsxs('span', {
+                                key: `s1-${idx}`,
+                                className: 'inline-flex items-center gap-3 shrink-0',
+                                children: [
+                                  jsx('span', { className: item.color, children: `${item.icon} ${item.text}` }),
+                                  jsx('span', { className: 'text-gray-700 select-none', children: '|' })
+                                ]
+                              })
+                            ),
+                            ...TICKER_ITEMS.map((item, idx) =>
+                              jsxs('span', {
+                                key: `s2-${idx}`,
+                                className: 'inline-flex items-center gap-3 shrink-0',
+                                children: [
+                                  jsx('span', { className: item.color, children: `${item.icon} ${item.text}` }),
+                                  jsx('span', { className: 'text-gray-700 select-none', children: '|' })
+                                ]
+                              })
+                            )
+                          ]
+                        })
                       ]
                     })
                   ]

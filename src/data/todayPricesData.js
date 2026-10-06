@@ -12,9 +12,9 @@ export const LAST_UPDATE_ISO = _currentPkt.iso;
 
 // Islamabad Ready Stock Daily Sheets Comparison (16-Sep vs 15-Sep/14-Sep 2026)
 export const ISLAMABAD_DAILY_SHEETS = {
-  "24-Sep-2026": {
-      "date": "24-September-2026",
-      "label": "24-Sep-2026 (Today)",
+  "05-Oct-2026": {
+      "date": "05-October-2026",
+      "label": "05-Oct-2026 (Ready Stock)",
       "rates": [
             {
                   "brand": "LONGi",
@@ -1489,22 +1489,24 @@ export const ISLAMABAD_DAILY_SHEETS = {
   }
 };
 
-// 16-Sep-2026 alias to active sheet
-ISLAMABAD_DAILY_SHEETS["16-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["24-Sep-2026"];
-ISLAMABAD_DAILY_SHEETS["15-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["24-Sep-2026"];
-ISLAMABAD_DAILY_SHEETS["14-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["24-Sep-2026"];
-ISLAMABAD_DAILY_SHEETS["24-Sept-2026"] = ISLAMABAD_DAILY_SHEETS["24-Sep-2026"];
-ISLAMABAD_DAILY_SHEETS["today"] = ISLAMABAD_DAILY_SHEETS["24-Sep-2026"];
-ISLAMABAD_DAILY_SHEETS["yesterday"] = ISLAMABAD_DAILY_SHEETS["24-Sep-2026"];
+// 05-Oct-2026 active sheet aliases
+ISLAMABAD_DAILY_SHEETS["24-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
+ISLAMABAD_DAILY_SHEETS["06-Oct-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
+ISLAMABAD_DAILY_SHEETS["16-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
+ISLAMABAD_DAILY_SHEETS["15-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
+ISLAMABAD_DAILY_SHEETS["14-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
+ISLAMABAD_DAILY_SHEETS["24-Sept-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
+ISLAMABAD_DAILY_SHEETS["today"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
+ISLAMABAD_DAILY_SHEETS["yesterday"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
 
-const todayKey = _currentPkt?.shortDate || "24-Sep-2026";
-const yesterdayKey = _currentPkt?.yesterdayShortDate || "23-Sep-2026";
+const todayKey = _currentPkt?.shortDate || "05-Oct-2026";
+const yesterdayKey = _currentPkt?.yesterdayShortDate || "04-Oct-2026";
 
 if (!ISLAMABAD_DAILY_SHEETS[todayKey]) {
   ISLAMABAD_DAILY_SHEETS[todayKey] = {
-    ...ISLAMABAD_DAILY_SHEETS["24-Sep-2026"],
-    date: _currentPkt?.todayStr || "24 September 2026",
-    label: `${todayKey} (Today)`
+    ...ISLAMABAD_DAILY_SHEETS["05-Oct-2026"],
+    date: _currentPkt?.todayStr || "05 October 2026",
+    label: `${todayKey} (Ready Stock)`
   };
 }
 if (_currentPkt?.shortDate) {
@@ -4205,8 +4207,12 @@ export const CUSTOM_DAILY_RATES_STORAGE_KEY = 'sellsolar_custom_daily_rates';
 /**
  * Get active benchmark rates merging default ISLAMABAD_DAILY_SHEETS with any admin-customized rates
  */
-export function getActiveDailyRates(sheetDateKey = '16-Sep-2026') {
-  const baseSheet = ISLAMABAD_DAILY_SHEETS[sheetDateKey] || ISLAMABAD_DAILY_SHEETS['16-Sep-2026'];
+export function getActiveDailyRates(sheetDateKey = '05-Oct-2026') {
+  const baseSheet = ISLAMABAD_DAILY_SHEETS[sheetDateKey]
+    || ISLAMABAD_DAILY_SHEETS['05-Oct-2026']
+    || ISLAMABAD_DAILY_SHEETS['24-Sep-2026']
+    || ISLAMABAD_DAILY_SHEETS['16-Sep-2026']
+    || Object.values(ISLAMABAD_DAILY_SHEETS)[0];
   if (typeof window === 'undefined') {
     return baseSheet;
   }

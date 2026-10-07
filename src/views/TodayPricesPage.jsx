@@ -793,8 +793,8 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-20 pt-28 sm:pt-32 lg:pt-36 text-gray-900 dark:text-gray-100 transition-colors">
       {/* Compact Top Hero Banner */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-primary-900 via-gray-900 to-gray-900 py-6 sm:py-8 text-white border-b border-gray-800">
-        <div className="absolute inset-0 bg-grid opacity-10 pointer-events-none" />
+      <section className="relative overflow-visible bg-gradient-to-r from-primary-900 via-gray-900 to-gray-900 py-6 sm:py-8 text-white border-b border-gray-800 z-20">
+        <div className="absolute inset-0 bg-grid opacity-10 pointer-events-none overflow-hidden" />
         <div className="container-page relative z-10">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
@@ -813,7 +813,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
               </h1>
 
               {/* Global item search with live hints & direct rate selection */}
-              <div ref={searchContainerRef} className="mt-3.5 w-full max-w-xl relative">
+              <div ref={searchContainerRef} className="mt-3.5 w-full max-w-xl relative z-30">
                 <form
                   role="search"
                   onSubmit={(e) => {
@@ -863,82 +863,82 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                     >
                       Search
                     </button>
-                  </div>
-                </form>
 
-                {/* Interactive Hints & Autocomplete Dropdown */}
-                {searchHintsOpen && (
-                  <div className="absolute left-0 right-0 top-full mt-1.5 z-50 rounded-2xl border border-amber-400/40 bg-gray-950/95 shadow-2xl backdrop-blur-xl p-2 text-white max-h-[380px] overflow-y-auto ring-1 ring-white/10">
-                    <div className="flex items-center justify-between px-2.5 py-1.5 border-b border-gray-800 text-[11px] font-bold text-gray-400">
-                      <span className="flex items-center gap-1.5">
-                        <Sparkles className="h-3 w-3 text-amber-400" />
-                        {globalSearch.trim()
-                          ? `Matching Solar Rates (${searchHints.length} items - Click to select)`
-                          : 'Top Live Rates Today (Click to select & view rate)'}
-                      </span>
-                      <span className="text-[10px] text-amber-400 font-semibold">Wholesale &bull; Pakistan</span>
-                    </div>
+                    {/* Interactive Hints & Autocomplete Dropdown - Positioned directly below input */}
+                    {searchHintsOpen && (
+                      <div className="absolute left-0 right-0 top-full mt-2 z-[999] rounded-2xl border-2 border-amber-400/60 bg-gray-950/98 shadow-2xl backdrop-blur-2xl p-2.5 text-white max-h-[380px] overflow-y-auto ring-1 ring-white/20">
+                        <div className="flex items-center justify-between px-2.5 py-1.5 border-b border-gray-800 text-[11px] font-bold text-gray-400">
+                          <span className="flex items-center gap-1.5 text-amber-300">
+                            <Sparkles className="h-3.5 w-3.5 text-amber-400 shrink-0" />
+                            {globalSearch.trim()
+                              ? `Matching Solar Rates (${searchHints.length} items - Click to select)`
+                              : 'Top Live Rates Today (Click to select & view rate)'}
+                          </span>
+                          <span className="text-[10px] text-amber-400 font-semibold">Wholesale Pakistan</span>
+                        </div>
 
-                    {searchHints.length === 0 ? (
-                      <div className="p-4 text-center text-xs text-gray-400">
-                        No exact match for "{globalSearch}". Try typing "585W", "Longi", "Knox", "Narada", or "6kW".
-                      </div>
-                    ) : (
-                      <div className="divide-y divide-gray-800/60 mt-1">
-                        {searchHints.map((item, idx) => (
-                          <button
-                            key={item.id || idx}
-                            type="button"
-                            onMouseDown={(e) => {
-                              e.preventDefault();
-                              handleSelectHint(item);
-                            }}
-                            className={`w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-white/10 transition-all text-left cursor-pointer group ${
-                              activeHintIndex === idx ? 'bg-white/15' : ''
-                            }`}
-                          >
-                            <div className="flex items-center gap-2.5 min-w-0 pr-2">
-                              <span
-                                className={`shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                                  item.category === 'panel'
-                                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                                    : item.category === 'inverter'
-                                    ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-                                    : item.category === 'battery'
-                                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                                    : item.category === 'cables_wiring'
-                                    ? 'bg-amber-700/30 text-amber-300 border border-amber-600/30'
-                                    : 'bg-violet-500/20 text-violet-300 border border-violet-500/30'
+                        {searchHints.length === 0 ? (
+                          <div className="p-4 text-center text-xs text-gray-400">
+                            No exact match for "{globalSearch}". Try typing "585W", "Longi", "Knox", "Narada", or "6kW".
+                          </div>
+                        ) : (
+                          <div className="divide-y divide-gray-800/60 mt-1">
+                            {searchHints.map((item, idx) => (
+                              <button
+                                key={item.id || idx}
+                                type="button"
+                                onMouseDown={(e) => {
+                                  e.preventDefault();
+                                  handleSelectHint(item);
+                                }}
+                                className={`w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-white/10 active:bg-white/15 transition-all text-left cursor-pointer group ${
+                                  activeHintIndex === idx ? 'bg-white/15 ring-1 ring-amber-400' : ''
                                 }`}
                               >
-                                {item.categoryLabel}
-                              </span>
-                              <div className="min-w-0">
-                                <div className="text-xs sm:text-sm font-bold text-white group-hover:text-amber-300 truncate">
-                                  {item.fullName}
+                                <div className="flex items-center gap-2.5 min-w-0 pr-2">
+                                  <span
+                                    className={`shrink-0 rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                                      item.category === 'panel'
+                                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                        : item.category === 'inverter'
+                                        ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                                        : item.category === 'battery'
+                                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                        : item.category === 'cables_wiring'
+                                        ? 'bg-amber-700/30 text-amber-300 border border-amber-600/30'
+                                        : 'bg-violet-500/20 text-violet-300 border border-violet-500/30'
+                                    }`}
+                                  >
+                                    {item.categoryLabel}
+                                  </span>
+                                  <div className="min-w-0">
+                                    <div className="text-xs sm:text-sm font-bold text-white group-hover:text-amber-300 truncate">
+                                      {item.fullName}
+                                    </div>
+                                    <div className="text-[10px] text-gray-400 truncate flex items-center gap-1.5 mt-0.5">
+                                      <span>{item.brand}</span>
+                                      {item.badge && <span className="text-emerald-400">&bull; {item.badge}</span>}
+                                      {item.unit && <span className="hidden sm:inline">&bull; {item.unit}</span>}
+                                    </div>
+                                  </div>
                                 </div>
-                                <div className="text-[10px] text-gray-400 truncate flex items-center gap-1.5">
-                                  <span>{item.brand}</span>
-                                  {item.badge && <span>&bull; {item.badge}</span>}
-                                  {item.unit && <span className="hidden sm:inline">&bull; {item.unit}</span>}
-                                </div>
-                              </div>
-                            </div>
 
-                            <div className="shrink-0 text-right">
-                              <div className="text-xs sm:text-sm font-extrabold text-amber-400 font-mono group-hover:scale-105 transition-transform">
-                                {item.formattedRate}
-                              </div>
-                              <div className="text-[10px] font-semibold text-emerald-400 group-hover:text-emerald-300">
-                                Select Rate &rarr;
-                              </div>
-                            </div>
-                          </button>
-                        ))}
+                                <div className="shrink-0 text-right pl-2">
+                                  <div className="text-xs sm:text-sm font-extrabold text-amber-400 font-mono group-hover:scale-105 transition-transform">
+                                    {item.formattedRate}
+                                  </div>
+                                  <div className="text-[10px] font-semibold text-emerald-400 group-hover:text-emerald-300">
+                                    Select Rate &rarr;
+                                  </div>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
-                )}
+                </form>
 
                 {/* Direct Selected Rate Spotlight Card */}
                 {selectedDirectRate && (

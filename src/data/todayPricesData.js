@@ -4220,7 +4220,7 @@ export function getActiveDailyRates(sheetDateKey = '05-Oct-2026') {
     const raw = localStorage.getItem(CUSTOM_DAILY_RATES_STORAGE_KEY);
     if (raw) {
       const overrides = JSON.parse(raw);
-      if (overrides && typeof overrides === 'object') {
+      if (overrides && typeof overrides === 'object' && (!overrides.date || overrides.date === baseSheet.date)) {
         return {
           ...baseSheet,
           ...overrides,

@@ -211,10 +211,12 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
     };
   }, []);
 
-  const applyGlobalSearch = (value, preserveDirectRate = false) => {
-    setGlobalSearch(value);
-    setSheetSearchQuery(value);
-    setSearchQuery(value);
+  // Execute search across rate sheet and catalog ONLY on submit, hint selection, or chip click.
+  // Typing in search bar does NOT alter or filter the table below ("list neeche na change ho").
+  const executeSearch = (searchTerm, directItem = null) => {
+    const term = (searchTerm || '').trim();
+    setSheetSearchQuery(term);
+    setSearchQuery(term);
     setSheetCategory('all');
     setSelectedCategory('all');
     setSelectedBrand('');
@@ -222,17 +224,42 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
     setShowDailySheetDetail(true);
     setSheetCurrentPage(1);
     setCatalogCurrentPage(1);
-    if (!preserveDirectRate) {
+    setSearchHintsOpen(false);
+    setActiveHintIndex(-1);
+
+    if (directItem) {
+      setSelectedDirectRate(directItem);
+    } else if (term) {
+      // Find closest direct rate from pool
+      const cleanTerms = term.toLowerCase().replace(/[^a-z0-9]/g, ' ').split(/\s+/).filter(Boolean);
+      const matched = allRateItemsPool.find((item) => {
+        const text = `${item.fullName} ${item.brand} ${item.model}`.toLowerCase().replace(/[^a-z0-9]/g, ' ');
+        return cleanTerms.every((t) => text.includes(t));
+      });
+      if (matched) {
+        setSelectedDirectRate(matched);
+      } else {
+        setSelectedDirectRate(null);
+      }
+    } else {
       setSelectedDirectRate(null);
     }
   };
 
-  const handleSelectHint = (item) => {
-    setSelectedDirectRate(item);
+  const clearSearch = () => {
+    setGlobalSearch('');
+    setSheetSearchQuery('');
+    setSearchQuery('');
+    setSelectedDirectRate(null);
     setSearchHintsOpen(false);
     setActiveHintIndex(-1);
-    const searchTerm = item.model || `${item.brand} ${item.model}`;
-    applyGlobalSearch(searchTerm, true);
+  };
+
+  const handleSelectHint = (item) => {
+    const displayText = item.fullName || `${item.brand} ${item.model}`;
+    const searchTerm = item.model || displayText;
+    setGlobalSearch(displayText);
+    executeSearch(searchTerm, item);
     jumpToResults(item.source === 'sheet' ? 'rates' : 'catalog');
   };
 
@@ -248,11 +275,12 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
       e.preventDefault();
       setActiveHintIndex((prev) => (prev > 0 ? prev - 1 : searchHints.length - 1));
     } else if (e.key === 'Enter') {
+      e.preventDefault();
       if (activeHintIndex >= 0 && searchHints[activeHintIndex]) {
-        e.preventDefault();
         handleSelectHint(searchHints[activeHintIndex]);
       } else {
-        setSearchHintsOpen(false);
+        executeSearch(globalSearch);
+        jumpToResults('rates');
       }
     } else if (e.key === 'Escape') {
       setSearchHintsOpen(false);
@@ -509,11 +537,11 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         )
         .slice(0, 8);
     }
-    const terms = q.split(/\s+/).filter(Boolean);
+    const cleanTerms = q.replace(/[^a-z0-9]/g, ' ').split(/\s+/).filter(Boolean);
     return allRateItemsPool
       .filter((item) => {
-        const text = `${item.fullName} ${item.brand} ${item.model} ${item.category} ${item.unit || ''} ${item.badge || ''}`.toLowerCase();
-        return terms.every((t) => text.includes(t));
+        const text = `${item.fullName} ${item.brand} ${item.model} ${item.category} ${item.categoryLabel || ''} ${item.unit || ''} ${item.badge || ''} ${item.type || ''}`.toLowerCase().replace(/[^a-z0-9]/g, ' ');
+        return cleanTerms.every((t) => text.includes(t));
       })
       .slice(0, 10);
   }, [allRateItemsPool, globalSearch]);
@@ -626,10 +654,10 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
     }
 
     if (searchQuery.trim()) {
-      const terms = searchQuery.toLowerCase().trim().split(/\s+/).filter(Boolean);
+      const cleanTerms = searchQuery.toLowerCase().replace(/[^a-z0-9]/g, ' ').split(/\s+/).filter(Boolean);
       result = result.filter((item) => {
-        const combined = `${item.brand} ${item.model} ${item.type || ''} ${item.description || ''} ${item.capacity || ''} ${item.badge || ''}`.toLowerCase();
-        return terms.every((t) => combined.includes(t));
+        const combined = `${item.brand} ${item.model} ${item.type || ''} ${item.description || ''} ${item.capacity || ''} ${item.badge || ''}`.toLowerCase().replace(/[^a-z0-9]/g, ' ');
+        return cleanTerms.every((t) => combined.includes(t));
       });
     }
 
@@ -663,7 +691,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
     const isYesterday = dailySheetDate === 'yesterday';
     const sheet = isYesterday
       ? (ISLAMABAD_DAILY_SHEETS['yesterday'] || ISLAMABAD_DAILY_SHEETS[yesterdayDateLabel] || ISLAMABAD_DAILY_SHEETS['15-Sep-2026'] || ISLAMABAD_DAILY_SHEETS['14-Sep-2026'])
-      : getActiveDailyRates(todayDateLabel || '16-Sep-2026');
+      : getActiveDailyRates(todayDateLabel || '05-Oct-2026');
 
     let activeData = [];
     if (sheetCategory === 'inverter') {
@@ -766,9 +794,9 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
       }
 
       if (!sheetSearchQuery) return true;
-      const terms = sheetSearchQuery.toLowerCase().trim().split(/\s+/).filter(Boolean);
-      const combined = `${item.brand} ${item.model} ${item.type || ''} ${item.capacity || ''} ${item.badge || ''}`.toLowerCase();
-      return terms.every((t) => combined.includes(t));
+      const cleanTerms = sheetSearchQuery.toLowerCase().replace(/[^a-z0-9]/g, ' ').split(/\s+/).filter(Boolean);
+      const combined = `${item.brand} ${item.model} ${item.type || ''} ${item.capacity || ''} ${item.badge || ''}`.toLowerCase().replace(/[^a-z0-9]/g, ' ');
+      return cleanTerms.every((t) => combined.includes(t));
     });
   }, [dailySheetDate, sheetCategory, sheetFilterStatus, sheetSearchQuery]);
 
@@ -818,9 +846,12 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                   role="search"
                   onSubmit={(e) => {
                     e.preventDefault();
-                    setSearchHintsOpen(false);
-                    if (!globalSearch.trim()) return;
-                    jumpToResults(displayedSheetRates.length > 0 || filteredItems.length === 0 ? 'rates' : 'catalog');
+                    if (activeHintIndex >= 0 && searchHints[activeHintIndex]) {
+                      handleSelectHint(searchHints[activeHintIndex]);
+                    } else {
+                      executeSearch(globalSearch);
+                      jumpToResults('rates');
+                    }
                   }}
                 >
                   <label htmlFor="prices-global-search" className="sr-only">
@@ -833,12 +864,13 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                       type="search"
                       value={globalSearch}
                       onChange={(e) => {
-                        applyGlobalSearch(e.target.value);
+                        setGlobalSearch(e.target.value);
                         setSearchHintsOpen(true);
+                        setActiveHintIndex(-1);
                       }}
                       onFocus={() => setSearchHintsOpen(true)}
                       onKeyDown={handleSearchKeyDown}
-                      placeholder="Search any item: Longi 585W, Jinko, 6kW hybrid, Narada, lithium..."
+                      placeholder="Search any item: Longi 645, 585W, Jinko, Knox, Narada..."
                       autoComplete="off"
                       className="w-full rounded-xl border border-white/20 bg-white/10 py-3 pl-10 pr-24 text-sm text-white placeholder-gray-300 backdrop-blur-md transition-all focus:border-amber-400 focus:bg-white/15 focus:outline-none focus:ring-2 focus:ring-amber-400/40 shadow-inner"
                     />
@@ -846,12 +878,8 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                       <button
                         type="button"
                         id="prices-global-search-clear"
-                        onClick={() => {
-                          applyGlobalSearch('');
-                          setSelectedDirectRate(null);
-                          setSearchHintsOpen(false);
-                        }}
-                        className="absolute right-[4.8rem] top-1/2 -translate-y-1/2 rounded-md px-1.5 py-0.5 text-[11px] font-semibold text-gray-300 hover:text-white transition-colors"
+                        onClick={clearSearch}
+                        className="absolute right-[4.8rem] top-1/2 -translate-y-1/2 rounded-md px-1.5 py-0.5 text-[11px] font-semibold text-gray-300 hover:text-white transition-colors cursor-pointer"
                       >
                         Clear
                       </button>
@@ -859,27 +887,27 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                     <button
                       type="submit"
                       id="prices-global-search-submit"
-                      className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-lg bg-amber-500 px-3.5 py-1.5 text-xs font-bold text-slate-950 transition-all hover:bg-amber-400 active:scale-95 shadow-sm"
+                      className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-lg bg-amber-500 px-3.5 py-1.5 text-xs font-bold text-slate-950 transition-all hover:bg-amber-400 active:scale-95 shadow-sm cursor-pointer"
                     >
                       Search
                     </button>
 
-                    {/* Interactive Hints & Autocomplete Dropdown - Positioned directly below input */}
+                    {/* Live Hints Dropdown anchored directly below search bar */}
                     {searchHintsOpen && (
-                      <div className="absolute left-0 right-0 top-full mt-2 z-[999] rounded-2xl border-2 border-amber-400/60 bg-gray-950/98 shadow-2xl backdrop-blur-2xl p-2.5 text-white max-h-[380px] overflow-y-auto ring-1 ring-white/20">
+                      <div className="absolute left-0 right-0 top-full mt-2 z-[999] rounded-2xl border-2 border-amber-400/70 bg-gray-950/98 shadow-2xl backdrop-blur-2xl p-2.5 text-white max-h-[380px] overflow-y-auto ring-1 ring-white/20">
                         <div className="flex items-center justify-between px-2.5 py-1.5 border-b border-gray-800 text-[11px] font-bold text-gray-400">
                           <span className="flex items-center gap-1.5 text-amber-300">
                             <Sparkles className="h-3.5 w-3.5 text-amber-400 shrink-0" />
                             {globalSearch.trim()
-                              ? `Matching Solar Rates (${searchHints.length} items - Click to select)`
-                              : 'Top Live Rates Today (Click to select & view rate)'}
+                              ? `Matching Rates for "${globalSearch.trim()}" (${searchHints.length} items)`
+                              : 'Live Daily Rates Today (Click to select & view rate)'}
                           </span>
                           <span className="text-[10px] text-amber-400 font-semibold">Wholesale Pakistan</span>
                         </div>
 
                         {searchHints.length === 0 ? (
                           <div className="p-4 text-center text-xs text-gray-400">
-                            No exact match for "{globalSearch}". Try typing "585W", "Longi", "Knox", "Narada", or "6kW".
+                            No exact match for "{globalSearch}". Try typing "645", "585W", "Longi", "Knox", "Narada", or "6kW".
                           </div>
                         ) : (
                           <div className="divide-y divide-gray-800/60 mt-1">
@@ -982,9 +1010,9 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                           type="button"
                           onClick={() => {
                             setSelectedDirectRate(null);
-                            applyGlobalSearch('');
+                            clearSearch();
                           }}
-                          className="rounded-xl border border-white/20 bg-white/10 hover:bg-white/20 p-2 text-xs font-semibold text-gray-200 transition-colors"
+                          className="rounded-xl border border-white/20 bg-white/10 hover:bg-white/20 p-2 text-xs font-semibold text-gray-200 transition-colors cursor-pointer"
                           title="Clear selected rate"
                         >
                           <X className="h-4 w-4" />
@@ -998,7 +1026,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                       <button
                         type="button"
                         onClick={() => jumpToResults(selectedDirectRate.source === 'sheet' ? 'rates' : 'catalog')}
-                        className="inline-flex items-center gap-1 font-bold text-amber-300 hover:text-amber-200 hover:underline"
+                        className="inline-flex items-center gap-1 font-bold text-amber-300 hover:text-amber-200 hover:underline cursor-pointer"
                       >
                         View in {selectedDirectRate.source === 'sheet' ? 'Daily Rate Sheet' : 'Catalog'} &darr;
                       </button>
@@ -1006,15 +1034,15 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                   </div>
                 )}
 
-                {/* Search Results Summary / Popular Badges */}
-                {globalSearch.trim() && !selectedDirectRate ? (
+                {/* Search Results Summary (only shown when search is executed) / Popular Badges */}
+                {sheetSearchQuery.trim() && !selectedDirectRate ? (
                   <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px]">
-                    <span className="text-gray-400">Results for "{globalSearch.trim()}":</span>
+                    <span className="text-gray-400">Results for "{sheetSearchQuery.trim()}":</span>
                     <button
                       type="button"
                       id="prices-global-search-goto-rates"
                       onClick={() => jumpToResults('rates')}
-                      className="inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2.5 py-0.5 font-semibold text-emerald-300 hover:brightness-110"
+                      className="inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2.5 py-0.5 font-semibold text-emerald-300 hover:brightness-110 cursor-pointer"
                     >
                       {displayedSheetRates.length} in Daily Rate Sheet <ArrowRight className="h-3 w-3" />
                     </button>
@@ -1022,7 +1050,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                       type="button"
                       id="prices-global-search-goto-catalog"
                       onClick={() => jumpToResults('catalog')}
-                      className="inline-flex items-center gap-1 rounded-full border border-amber-400/30 bg-amber-500/15 px-2.5 py-0.5 font-semibold text-amber-300 hover:brightness-110"
+                      className="inline-flex items-center gap-1 rounded-full border border-amber-400/30 bg-amber-500/15 px-2.5 py-0.5 font-semibold text-amber-300 hover:brightness-110 cursor-pointer"
                     >
                       {filteredItems.length} in Equipment Catalog <ArrowRight className="h-3 w-3" />
                     </button>
@@ -1030,16 +1058,17 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                 ) : !selectedDirectRate ? (
                   <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px]">
                     <span className="text-gray-400">Popular:</span>
-                    {['Longi', 'Jinko', 'Canadian', '585W', '6kW', 'Hybrid', 'Lithium', 'Narada', '10kW'].map((term) => (
+                    {['Longi', 'Jinko', 'Canadian', '585W', '645W', '6kW', 'Hybrid', 'Lithium', 'Narada'].map((term) => (
                       <button
                         key={term}
                         type="button"
                         id={`prices-global-search-chip-${term.toLowerCase()}`}
                         onClick={() => {
-                          applyGlobalSearch(term);
+                          setGlobalSearch(term);
+                          executeSearch(term);
                           jumpToResults('rates');
                         }}
-                        className="rounded-full border border-white/15 bg-white/5 px-2.5 py-0.5 font-medium text-gray-200 transition-colors hover:border-amber-400/50 hover:text-amber-300"
+                        className="rounded-full border border-white/15 bg-white/5 px-2.5 py-0.5 font-medium text-gray-200 transition-colors hover:border-amber-400/50 hover:text-amber-300 cursor-pointer"
                       >
                         {term}
                       </button>

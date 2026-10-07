@@ -459,8 +459,8 @@ export default function AdminDealersModule() {
                         <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 flex items-center gap-2">
                           <span>{dealer.full_name}</span>
                           <span>•</span>
-                          <a href={`tel:${dealer.phone}`} className="hover:underline font-mono text-gray-700 dark:text-gray-300">
-                            {dealer.phone}
+                          <a href={`tel:${dealer.phone}`} className="hover:underline font-semibold text-primary-600 dark:text-primary-400">
+                            Call Dealer
                           </a>
                         </div>
                       </td>

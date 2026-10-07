@@ -13,7 +13,8 @@ import {
 
 export const AuthContext = createContext(null);
 
-export const DEFAULT_ADMIN_EMAIL = 'mudassir2k6@gmail.com';
+export const DEFAULT_ADMIN_EMAIL = 'admin@sellsolar.pk';
+export const LEGACY_ADMIN_EMAIL = 'mudassir2k6@gmail.com';
 export const DEFAULT_ADMIN_ID = '00000000-0000-4000-8000-000000000001';
 const LOCAL_USERS_KEY = 'sellsolar_custom_auth_users';
 const LOCAL_SESSION_KEY = 'sellsolar_active_auth_session';
@@ -256,13 +257,14 @@ export function getStoredUsers() {
         user: {
           id: DEFAULT_ADMIN_ID,
           email: DEFAULT_ADMIN_EMAIL,
-          user_metadata: { full_name: 'Mudassir (Super Admin)' },
+          user_metadata: { full_name: 'SellSolar Administrator' },
         },
         profile: {
           id: DEFAULT_ADMIN_ID,
           email: DEFAULT_ADMIN_EMAIL,
-          full_name: 'Mudassir (Super Admin)',
-          phone: '03001234567',
+          username: 'admin',
+          full_name: 'SellSolar Administrator',
+          phone: '',
           city: 'Lahore',
           account_type: 'admin',
           role: 'super_admin',
@@ -286,13 +288,14 @@ export function getStoredUsers() {
         user: {
           id: DEFAULT_ADMIN_ID,
           email: DEFAULT_ADMIN_EMAIL,
-          user_metadata: { full_name: 'Mudassir (Admin)' },
+          user_metadata: { full_name: 'SellSolar Administrator' },
         },
         profile: {
           id: DEFAULT_ADMIN_ID,
           email: DEFAULT_ADMIN_EMAIL,
-          full_name: 'Mudassir (Admin)',
-          phone: '03001234567',
+          username: 'admin',
+          full_name: 'SellSolar Administrator',
+          phone: '',
           city: 'Lahore',
           account_type: 'admin',
           is_admin: true,
@@ -332,6 +335,27 @@ export function getStoredSession() {
       if (session.profile) {
         session.profile.id = fixedId;
       }
+      modified = true;
+    }
+
+    // Sanitize any personal name/email/phone from session
+    if (session.user.email && session.user.email.toLowerCase().includes('mudassir')) {
+      session.user.email = DEFAULT_ADMIN_EMAIL;
+      if (session.profile) {
+        session.profile.email = DEFAULT_ADMIN_EMAIL;
+      }
+      modified = true;
+    }
+    if (session.profile?.full_name && session.profile.full_name.toLowerCase().includes('mudassir')) {
+      session.profile.full_name = 'SellSolar Administrator';
+      modified = true;
+    }
+    if (session.profile?.username && session.profile.username.toLowerCase().includes('mudassir')) {
+      session.profile.username = 'admin';
+      modified = true;
+    }
+    if (session.profile?.phone === '03001234567') {
+      session.profile.phone = '';
       modified = true;
     }
 
@@ -432,16 +456,16 @@ export function AuthProvider({ children }) {
     }
 
     // 3. Fallback default admin profile
-    if (targetEmail === DEFAULT_ADMIN_EMAIL.toLowerCase()) {
+    if (targetEmail === DEFAULT_ADMIN_EMAIL.toLowerCase() || targetEmail === LEGACY_ADMIN_EMAIL.toLowerCase()) {
       const adminProf = {
         id: DEFAULT_ADMIN_ID,
         email: DEFAULT_ADMIN_EMAIL,
-        username: 'mudassir2k6',
-        display_identifier: 'mudassir2k6',
-        full_name: 'Mudassir (Admin)',
-          phone: '03001234567',
-          city: 'Lahore',
-          account_type: 'admin',
+        username: 'admin',
+        display_identifier: 'admin',
+        full_name: 'SellSolar Administrator',
+        phone: '',
+        city: 'Lahore',
+        account_type: 'admin',
         is_admin: true,
         is_verified_dealer: false,
         created_at: '2026-01-01T00:00:00Z',
@@ -1070,16 +1094,16 @@ export function AuthProvider({ children }) {
           const defaultUser = {
             id: DEFAULT_ADMIN_ID,
             email: DEFAULT_ADMIN_EMAIL,
-            user_metadata: { full_name: 'Mudassir (Admin)' },
+            user_metadata: { full_name: 'SellSolar Administrator' },
           };
           const defaultProfile = {
             id: DEFAULT_ADMIN_ID,
             email: DEFAULT_ADMIN_EMAIL,
-            username: 'mudassir2k6',
-            full_name: 'Mudassir (Admin)',
-          phone: '03001234567',
-          city: 'Lahore',
-          account_type: 'admin',
+            username: 'admin',
+            full_name: 'SellSolar Administrator',
+            phone: '',
+            city: 'Lahore',
+            account_type: 'admin',
             is_admin: true,
             is_verified_dealer: false,
             created_at: '2026-01-01T00:00:00Z',

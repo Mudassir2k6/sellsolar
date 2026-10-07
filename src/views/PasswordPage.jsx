@@ -175,7 +175,7 @@ export default function PasswordPage({
           .eq('email', targetEmail)
           .maybeSingle();
 
-        const isDefaultAdmin = targetEmail === 'mudassir2k6@gmail.com';
+        const isDefaultAdmin = targetEmail === 'mudassir2k6@gmail.com' || targetEmail === DEFAULT_ADMIN_EMAIL.toLowerCase();
         if (!profData?.id && !isDefaultAdmin) {
           setError('Email address does not exist. Please check your email or create a new account.');
           setBusy(false);
@@ -241,7 +241,7 @@ export default function PasswordPage({
           if (rec && rec.password === currentPassword.trim()) {
             verified = true;
           } else if (
-            user.email.toLowerCase() === 'mudassir2k6@gmail.com' &&
+            (user.email.toLowerCase() === 'mudassir2k6@gmail.com' || user.email.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase()) &&
             (currentPassword.trim() === '12345678' || (rec && rec.password === currentPassword.trim()))
           ) {
             verified = true;

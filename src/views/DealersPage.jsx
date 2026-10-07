@@ -501,7 +501,7 @@ export default function DealersPage({ onNavigate, onBack, hasOuterNavbar = false
                       className="py-2.5 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 hover:border-amber-500 hover:text-amber-600 dark:hover:text-amber-400 text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-2xs"
                     >
                       <Phone className="h-3.5 w-3.5 text-amber-500" />
-                      <span>{dealer.phone}</span>
+                      <span>Call Dealer</span>
                     </a>
 
                     {/* WhatsApp Button */}

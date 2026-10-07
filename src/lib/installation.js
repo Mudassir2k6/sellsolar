@@ -3,7 +3,7 @@ import { isValidUuid } from './auth';
 import { checkRateLimit, recordRateLimitAttempt, sanitizeText } from './security';
 import { sendContactMessage } from '../services/inboxService';
 
-export const ADMIN_NOTIFICATION_EMAIL = 'mudassir2k6@gmail.com';
+export const ADMIN_NOTIFICATION_EMAIL = 'info@sellsolar.pk';
 
 export const INSTALLATION_STATUSES = {
   pending: { label: 'Pending Review', color: 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300' },

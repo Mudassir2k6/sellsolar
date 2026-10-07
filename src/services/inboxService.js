@@ -218,7 +218,7 @@ export async function sendContactMessage({
           message: cleanMessage,
           recipientEmail,
           ticketNumber,
-          adminEmail: 'mudassir2k6@gmail.com',
+          adminEmail: 'admin@sellsolar.pk',
         },
       });
     } catch (fnErr) {

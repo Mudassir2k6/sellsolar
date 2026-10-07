@@ -622,7 +622,7 @@ export default function AdminDrillDownModal({
                     <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs">
                       <span className="font-bold text-gray-900 dark:text-white flex items-center gap-1">
                         <Phone className="w-3.5 h-3.5 text-emerald-500" />
-                        {d.phone || '0300-SOLAR-PK'}
+                        Direct Contact Active
                       </span>
                       <a
                         href={`https://wa.me/92${(d.phone || '').replace(/[^0-9]/g, '').slice(-10)}`}
@@ -682,7 +682,7 @@ export default function AdminDrillDownModal({
                                 {item.title}
                               </p>
                               <p className="text-[11px] text-gray-500 dark:text-gray-400">
-                                Seller: {item.seller_name || 'Verified Seller'} {item.seller_phone ? `• ${item.seller_phone}` : ''}
+                                Seller: {item.seller_name || 'Verified Seller'}
                               </p>
                             </div>
                           </div>
@@ -768,8 +768,8 @@ export default function AdminDrillDownModal({
                             </span>
                           )}
                           {(msg.senderPhone || msg.phone) && (
-                            <span className="text-xs text-gray-400 truncate">
-                              • {msg.senderPhone || msg.phone}
+                            <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium truncate">
+                              • Phone Provided
                             </span>
                           )}
                           {msg.ticketNumber && (

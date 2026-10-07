@@ -1970,8 +1970,8 @@ function ContactUsContent() {
                 </span>
               </div>
               <p className="font-bold text-xs text-gray-900 dark:text-white">Call / WhatsApp</p>
-              <p className="text-xs font-mono font-bold text-gray-800 dark:text-gray-200 mt-1 select-all">
-                {supportPhone}
+              <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-1">
+                Official Helpdesk Active
               </p>
               <p className="text-[10px] text-gray-400 mt-0.5">Mon-Sat: 9am - 7pm PKT</p>
             </div>

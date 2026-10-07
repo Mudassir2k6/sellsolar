@@ -1203,25 +1203,25 @@ export default function AdminSuperDashboard({
           body: {
             name: 'SellSolar System Test',
             email: 'info@sellsolar.pk',
-            phone: '03001234567',
-            subject: 'Test Notification: Inquiry Alert to Gmail',
-            message: 'This is a test notification confirming that SellSolar customer messages and contact inquiries are sent directly to mudassir2k6@gmail.com.',
+            phone: '',
+            subject: 'Test Notification: Inquiry Alert to Admin Inbox',
+            message: 'This is a test notification confirming that SellSolar customer messages and contact inquiries are sent directly to the official admin inbox.',
             recipientEmail: 'info@sellsolar.pk',
             ticketNumber: testTicket,
-            adminEmail: 'mudassir2k6@gmail.com',
+            adminEmail: 'admin@sellsolar.pk',
           },
         });
         if (error) {
           showToast({
             title: 'Test Email Dispatched',
-            message: 'Edge function invoked. Opening Gmail to verify...',
+            message: 'Edge function invoked. Opening inbox to verify...',
             type: 'info',
           });
           window.open('https://mail.google.com/mail/?view=cm&fs=1&to=info@sellsolar.pk&su=Test%20Message%20to%20info@sellsolar.pk&body=This%20is%20a%20test%20message%20to%20verify%20email%20delivery%20to%20SellSolar%20support.', '_blank');
         } else {
           showToast({
             title: 'Test Alert Sent!',
-            message: 'Inquiry notification sent to mudassir2k6@gmail.com. Please check your Gmail Inbox / Spam folder.',
+            message: 'Inquiry notification sent to admin inbox. Please check your inbox / spam folder.',
             type: 'success',
           });
         }
@@ -1229,7 +1229,7 @@ export default function AdminSuperDashboard({
         window.open('https://mail.google.com/mail/?view=cm&fs=1&to=info@sellsolar.pk&su=Test%20Message%20to%20info@sellsolar.pk&body=This%20is%20a%20test%20message%20to%20verify%20email%20delivery%20to%20SellSolar%20support.', '_blank');
         showToast({
           title: 'Gmail Compose Opened',
-          message: 'Compose test message to info@sellsolar.pk to verify routing to mudassir2k6@gmail.com.',
+          message: 'Compose test message to info@sellsolar.pk to verify routing to admin inbox.',
           type: 'info',
         });
       }
@@ -1873,10 +1873,12 @@ export default function AdminSuperDashboard({
                 <div className="absolute right-0 mt-2 w-64 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-2 shadow-2xl z-50 animate-in fade-in duration-150">
                   <div className="px-3 py-2.5 border-b border-gray-100 dark:border-gray-800 mb-1">
                     <p className="text-xs font-bold text-gray-900 dark:text-white truncate">
-                      {profile?.full_name || user?.user_metadata?.full_name || 'Admin User'}
+                      {((profile?.full_name || user?.user_metadata?.full_name || '').toLowerCase().includes('mudassir'))
+                        ? 'SellSolar Administrator'
+                        : (profile?.full_name || user?.user_metadata?.full_name || 'Admin User')}
                     </p>
                     <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate font-mono">
-                      {userEmail || DEFAULT_ADMIN_EMAIL}
+                      {(userEmail && !userEmail.toLowerCase().includes('mudassir')) ? userEmail : 'admin@sellsolar.pk'}
                     </p>
                     <span className="mt-1 inline-block text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">
                       {effectiveIsSuperAdmin ? '👑 Super Admin' : effectiveIsAdmin ? '🛡️ Admin' : '👤 User'}
@@ -3026,7 +3028,7 @@ export default function AdminSuperDashboard({
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 transition-all"
-                    title="Open incoming emails forwarded to mudassir2k6@gmail.com"
+                    title="Open incoming emails forwarded to admin inbox"
                   >
                     <ExternalLink className="h-3.5 w-3.5" />
                     <span>Open in Gmail</span>
@@ -3114,9 +3116,9 @@ export default function AdminSuperDashboard({
                 <div className="flex items-start sm:items-center gap-2.5">
                   <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5 sm:mt-0" />
                   <div>
-                    <span className="font-bold text-amber-900 dark:text-amber-200">Email Routing to Gmail:</span>{' '}
+                    <span className="font-bold text-amber-900 dark:text-amber-200">Email Routing to Admin Inbox:</span>{' '}
                     <span className="text-amber-800/90 dark:text-amber-300/90">
-                      Emails sent to <strong>info@sellsolar.pk</strong> route straight to your Gmail (<strong>mudassir2k6@gmail.com</strong>).
+                      Emails sent to <strong>info@sellsolar.pk</strong> route straight to your administrator email inbox.
                       Website contact inquiries and messages also log in real time below.
                     </span>
                   </div>
@@ -3127,7 +3129,7 @@ export default function AdminSuperDashboard({
                     onClick={handleSendTestNotification}
                     disabled={isSendingTestEmail}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-gray-800 border border-amber-300 dark:border-amber-700 hover:bg-amber-100 text-amber-900 dark:text-amber-200 font-bold text-xs shadow-2xs transition-all active:scale-95 cursor-pointer disabled:opacity-60"
-                    title="Send a test email notification to mudassir2k6@gmail.com"
+                    title="Send a test email notification to admin inbox"
                   >
                     <Mail className="w-3.5 h-3.5 text-amber-600" />
                     <span>{isSendingTestEmail ? 'Sending Alert...' : 'Send Test Email'}</span>
@@ -6140,7 +6142,7 @@ export default function AdminSuperDashboard({
                         type="text"
                         value={cmsForm.supportPhone}
                         onChange={(e) => setCmsForm({ ...cmsForm, supportPhone: e.target.value })}
-                        placeholder="+92 300 1234567"
+                        placeholder="Helpdesk number (Optional)"
                         className="input-field text-xs"
                       />
                     </div>
@@ -6514,7 +6516,7 @@ export default function AdminSuperDashboard({
                       <input
                         type="email"
                         disabled
-                        value={user?.email || DEFAULT_ADMIN_EMAIL}
+                        value={(user?.email && !user.email.toLowerCase().includes('mudassir')) ? user.email : 'admin@sellsolar.pk'}
                         className="input-field text-xs opacity-60 bg-gray-100 dark:bg-gray-800 cursor-not-allowed"
                       />
                     </div>
@@ -6528,7 +6530,7 @@ export default function AdminSuperDashboard({
                         value={profileForm.phone}
                         onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
                         className="input-field text-xs"
-                        placeholder="e.g. 03001234567"
+                        placeholder="Phone / WhatsApp Number (Optional)"
                       />
                     </div>
 

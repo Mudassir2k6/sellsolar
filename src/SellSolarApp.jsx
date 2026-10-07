@@ -131,6 +131,17 @@ const TICKER_ITEMS = [
   { text: 'Solis 6kW+: Rs 207k', color: 'text-sky-400', icon: '⭕' },
   { text: 'Zilo Nexa (PK 🇵🇰): Rs 65k–580k', color: 'text-emerald-400', icon: '🟢' },
 ];
+const DOUBLE_TICKER_ITEMS = [...TICKER_ITEMS, ...TICKER_ITEMS];
+
+function TickerEntry({ item }) {
+  return jsxs('span', {
+    className: 'inline-flex items-center gap-3 shrink-0',
+    children: [
+      jsx('span', { className: item.color, children: `${item.icon} ${item.text}` }),
+      jsx('span', { className: 'text-gray-700 select-none', children: '|' })
+    ]
+  });
+}
 
 function Xy({
   onNavigate:t,currentPage:e,onSelectListing:selList,onSearchSubmit:searchSub
@@ -282,7 +293,10 @@ function Xy({
     },
   ];
 
-  const userInitial = ((u?.full_name || c?.email || 'U').charAt(0).toUpperCase());
+  const displayUserName = ((u?.full_name && !String(u.full_name).toLowerCase().includes('mudassir'))
+    ? u.full_name
+    : (isUserAdmin ? 'Admin' : (c?.email || 'User')));
+  const userInitial = displayUserName.charAt(0).toUpperCase();
 
   return jsxs('header', {
     className: `fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -342,37 +356,16 @@ function Xy({
                         })
                       ]
                     }),
-                    jsxs('div', {
+                    jsx('div', {
                       className: `overflow-hidden flex-1 relative cursor-pointer pl-3 ${isTickerPaused ? 'ticker-paused-state' : ''}`,
                       onClick: () => h('prices'),
                       title: 'Hover to pause | Click to open Today’s Rates page',
-                      children: [
-                        jsxs('div', {
-                          className: 'ticker-track-slow font-semibold text-gray-300 flex items-center gap-3',
-                          children: [
-                            ...TICKER_ITEMS.map((item, idx) =>
-                              jsxs('span', {
-                                key: `s1-${idx}`,
-                                className: 'inline-flex items-center gap-3 shrink-0',
-                                children: [
-                                  jsx('span', { className: item.color, children: `${item.icon} ${item.text}` }),
-                                  jsx('span', { className: 'text-gray-700 select-none', children: '|' })
-                                ]
-                              })
-                            ),
-                            ...TICKER_ITEMS.map((item, idx) =>
-                              jsxs('span', {
-                                key: `s2-${idx}`,
-                                className: 'inline-flex items-center gap-3 shrink-0',
-                                children: [
-                                  jsx('span', { className: item.color, children: `${item.icon} ${item.text}` }),
-                                  jsx('span', { className: 'text-gray-700 select-none', children: '|' })
-                                ]
-                              })
-                            )
-                          ]
-                        })
-                      ]
+                      children: jsx('div', {
+                        className: 'ticker-track-slow font-semibold text-gray-300 flex items-center gap-3',
+                        children: DOUBLE_TICKER_ITEMS.map((item, idx) =>
+                          jsx(TickerEntry, { item }, `tk-${idx}`)
+                        )
+                      })
                     })
                   ]
                 }),
@@ -645,21 +638,24 @@ function Xy({
                                         className:
                                           'text-sm font-bold text-gray-900 dark:text-white',
                                         children:
-                                          (u == null ? void 0 : u.full_name) ||
-                                          'User',
+                                          ((u == null ? void 0 : u.full_name) && !String(u.full_name).toLowerCase().includes('mudassir')
+                                            ? u.full_name
+                                            : (isUserAdmin ? 'SellSolar Administrator' : 'User')),
                                       }),
                                       jsx('p', {
                                         className:
                                           'truncate text-xs text-gray-500 dark:text-gray-400',
                                         children:
-                                          u?.username ||
-                                          (c?.email?.endsWith('@sellsolar.local')
-                                            ? c.email.replace(
-                                                '@sellsolar.local',
-                                                ''
-                                              )
-                                            : c?.email) ||
-                                          '',
+                                          (String(c?.email || '').toLowerCase().includes('mudassir') || String(u?.username || '').toLowerCase().includes('mudassir'))
+                                            ? (isUserAdmin ? 'admin@sellsolar.pk' : '')
+                                            : (u?.username ||
+                                               (c?.email?.endsWith('@sellsolar.local')
+                                                 ? c.email.replace(
+                                                     '@sellsolar.local',
+                                                     ''
+                                                   )
+                                                 : c?.email) ||
+                                               ''),
                                       }),
                                       (u == null ? void 0 : u.account_type) ===
                                         'dealer' &&
@@ -958,12 +954,17 @@ function Xy({
                                     className:
                                       'text-sm font-extrabold text-gray-900 dark:text-white truncate',
                                     children:
-                                      u?.full_name || 'Solar User',
+                                      ((u?.full_name) && !String(u.full_name).toLowerCase().includes('mudassir'))
+                                        ? u.full_name
+                                        : (isUserAdmin ? 'SellSolar Administrator' : 'Solar User'),
                                   }),
                                   jsx('p', {
                                     className:
                                       'text-xs text-gray-500 dark:text-gray-400 truncate',
-                                    children: c?.email || '',
+                                    children:
+                                      (String(c?.email || '').toLowerCase().includes('mudassir'))
+                                        ? (isUserAdmin ? 'admin@sellsolar.pk' : '')
+                                        : (c?.email || ''),
                                   }),
                                   jsx('span', {
                                     className:
@@ -1569,7 +1570,7 @@ function nx({
             ]
           }),
           jsx("div",{
-            className:"mx-auto mt-3.5 sm:mt-4 max-w-4xl",children:jsxs("div",{
+            className:"mx-auto mt-3.5 sm:mt-4 max-w-5xl lg:max-w-6xl w-full",children:jsxs("div",{
               className:"card overflow-hidden border border-gray-200/90 dark:border-gray-800 shadow-xl dark:bg-gray-900",children:[
                 jsx("div",{
                   className:"flex gap-1 overflow-x-auto border-b border-gray-200 dark:border-gray-800 p-1.5 sm:p-2 scrollbar-hide bg-gray-50/70 dark:bg-gray-900/90",children:Zy.map(s=>{
@@ -1705,7 +1706,7 @@ function nx({
             })
           }),
           jsxs("div",{
-            className:"relative mx-auto mt-3.5 max-w-4xl lg:max-w-5xl px-0",
+            className:"relative mx-auto mt-3.5 max-w-5xl lg:max-w-6xl w-full px-0",
             children:[
               jsx("button",{
                 type:"button",
@@ -2022,14 +2023,14 @@ function ax({
       jsxs("div", {
         children: [
           jsxs("div", {
-            className: "relative aspect-[16/11] overflow-hidden bg-gray-100 dark:bg-gray-800",
+            className: "relative aspect-[4/3] sm:aspect-[16/11] overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center",
             children: [
               jsx("img", {
                 src: imgUrl,
                 alt: t.title,
                 loading: "lazy",
                 referrerPolicy: "no-referrer",
-                className: "h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105",
+                className: "h-full w-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105",
                 onError: s => {
                   s.currentTarget.onerror = null;
                   s.currentTarget.src = getEquipmentFallbackImage(t.category, t.title);
@@ -2325,8 +2326,8 @@ function lx({
           children:[
             jsx("div",{
               id:"listings-grid",
-              className: isCarousel ? "flex overflow-x-auto snap-x snap-mandatory gap-3 sm:gap-4 pb-4 scrollbar-hide -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8" : "grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4",
-              children:t.slice(0, visibleCount).map(a=>jsx("div", { className: isCarousel ? "shrink-0 w-[240px] sm:w-[280px] snap-start" : "", children: jsx(ax,{
+              className: isCarousel ? "flex overflow-x-auto snap-x snap-mandatory gap-3 sm:gap-4 pb-4 scrollbar-hide -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8" : "grid grid-cols-2 gap-3.5 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 pb-2",
+              children:t.slice(0, visibleCount).map(a=>jsx("div", { className: isCarousel ? "shrink-0 w-[240px] sm:w-[280px] snap-start" : "w-full", children: jsx(ax,{
                 listing:a,onClick:()=>s(a.id),onNavigate:nav
               },a.id)}, a.id))
             }),
@@ -2816,10 +2817,6 @@ function hx({
               className:"flex items-center gap-2",children:[jsx(MapPin,{
                 className:"h-4 w-4 text-gray-400"
               }),h.city]
-            }),h.phone&&jsxs("div",{
-              className:"flex items-center gap-2",children:[jsx(Phone,{
-                className:"h-4 w-4 text-gray-400"
-              }),h.phone]
             }),h.business_address&&jsxs("div",{
               className:"flex items-start gap-2",children:[jsx(Store,{
                 className:"h-4 w-4 mt-0.5 text-gray-400 shrink-0"
@@ -3797,10 +3794,6 @@ function yx({
                   className:"flex items-center gap-1",children:[jsx(MapPin,{
                     className:"h-3 w-3"
                   }),x.city]
-                }),x.phone&&jsxs("span",{
-                  className:"flex items-center gap-1",children:[jsx(Phone,{
-                    className:"h-3 w-3"
-                  }),x.phone]
                 }),x.cnic&&jsxs("span",{
                   className:"flex items-center gap-1",children:[jsx(CreditCard,{
                     className:"h-3 w-3"
@@ -4135,9 +4128,9 @@ function yx({
     const profilesData = (!b.error && b.data && b.data.length > 0) ? b.data : [
       {
         id: DEFAULT_ADMIN_ID,
-        email: "mudassir2k6@gmail.com",
-        full_name: "Mudassir (Admin)",
-        phone: "03001234567",
+        email: "admin@sellsolar.pk",
+        full_name: "SellSolar Administrator",
+        phone: "",
         city: "Lahore",
         account_type: "admin",
         is_admin: true,
@@ -4458,10 +4451,6 @@ function yx({
             className:"flex items-center gap-1",children:[jsx(MapPin,{
               className:"h-3 w-3"
             }),b.city]
-          }),b.phone&&jsxs("span",{
-            className:"flex items-center gap-1",children:[jsx(Phone,{
-              className:"h-3 w-3"
-            }),b.phone]
           }),b.cnic&&jsxs("span",{
             className:"flex items-center gap-1",children:[jsx(CreditCard,{
               className:"h-3 w-3"
@@ -6161,10 +6150,10 @@ function yx({
                         className:"h-4 w-4"
                       }),"Show Phone Number"]
                     }),d&&jsxs("div",{
-                      className:"rounded-xl bg-primary-50 dark:bg-primary-950/50 p-4 text-center border border-primary-100 dark:border-primary-800",children:[jsx("div",{
-                        className:"text-xs font-semibold text-gray-500 dark:text-gray-400",children:"Phone Number"
+                      className:"rounded-xl bg-primary-50 dark:bg-primary-950/50 p-3 text-center border border-primary-100 dark:border-primary-800",children:[jsx("div",{
+                        className:"text-xs font-semibold text-gray-500 dark:text-gray-400",children:"Seller Contact"
                       }),jsx("div",{
-                        className:"mt-1 text-lg font-extrabold text-primary-700 dark:text-primary-300 font-mono",children:w
+                        className:"mt-0.5 text-sm font-extrabold text-primary-700 dark:text-primary-300",children:"Direct Call Connected (Tap 'Call Seller' Above)"
                       }),canEditPhone&&jsxs("button",{
                         type:"button",onClick:()=>{
                           setPhoneInputVal(w);
@@ -6256,7 +6245,7 @@ function yx({
                       jsxs("div",{
                         className:"flex items-center gap-2",children:[jsx(Phone,{
                           className:"h-4 w-4 text-primary-500 shrink-0"
-                        }),jsx("span",{className:"font-semibold font-mono",children:w})]
+                        }),jsx("span",{className:"font-semibold text-emerald-600 dark:text-emerald-400",children:"Direct Phone Link Active"})]
                       }),
                       canEditPhone&&jsxs("button",{
                         type:"button",onClick:()=>{
@@ -6571,7 +6560,7 @@ function _x({
         setTimeout(w, 50);
       }
     }),jsx(BrandLogosRow, { onSelectBrand: (brandName) => { y("brand", brandName); setTimeout(w, 50); } }),jsx(lx,{
-      isCarousel:isHome,
+      isCarousel:false,
       listings:n,loading:a,error:o,totalCount:u,onSelectListing:t,onResetFilters:j,onNavigate:nav,currentCondition:e.condition,onConditionChange:(newCond)=>{
         y("condition", newCond);
         p(cnt => cnt + 1);

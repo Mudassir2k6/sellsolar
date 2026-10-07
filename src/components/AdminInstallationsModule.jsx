@@ -223,8 +223,8 @@ export default function AdminInstallationsModule() {
                       <td className="px-4 py-3">
                         <div className="font-black text-gray-900 dark:text-white">{req.fullName}</div>
                         <div className="text-[11px] text-gray-500 dark:text-gray-400 flex items-center gap-2 mt-0.5">
-                          <a href={`tel:${req.phone}`} className="hover:underline font-mono text-gray-700 dark:text-gray-300">
-                            {req.phone}
+                          <a href={`tel:${req.phone}`} className="hover:underline font-semibold text-primary-600 dark:text-primary-400">
+                            Call Client
                           </a>
                           <span>•</span>
                           <span>{req.city}</span>

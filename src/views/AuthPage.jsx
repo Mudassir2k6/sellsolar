@@ -759,7 +759,7 @@ export default function AuthPage({ onSuccess, onBack, onForgotPassword, initialV
           .eq('email', cleanMail)
           .maybeSingle();
 
-        const isDefaultAdmin = cleanMail === 'mudassir2k6@gmail.com';
+        const isDefaultAdmin = cleanMail === 'mudassir2k6@gmail.com' || cleanMail === DEFAULT_ADMIN_EMAIL.toLowerCase();
         if (!profData?.id && !isDefaultAdmin) {
           setError('Email address does not exist. Please check your email or sign up first.');
           setBusy(false);

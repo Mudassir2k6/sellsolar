@@ -370,7 +370,7 @@ export default function EmailContactModal({
                 </div>
                 <div className="text-left">
                   <div className="text-xs font-bold">Chat on WhatsApp Desk</div>
-                  <div className="text-[10px] text-emerald-700 dark:text-emerald-400">{supportPhone} • Immediate reply</div>
+                  <div className="text-[10px] text-emerald-700 dark:text-emerald-400">Online 24/7 • Immediate reply</div>
                 </div>
               </div>
               <ExternalLink className="h-4 w-4 text-emerald-600 group-hover:translate-x-0.5 transition-transform" />

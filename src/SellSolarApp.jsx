@@ -339,19 +339,19 @@ function Xy({
                       children: [
                         jsx(TrendingUp, { className: 'h-3.5 w-3.5 text-primary-400' }),
                         jsx('span', { className: 'font-bold text-gray-200 tracking-wider text-[11px]', children: 'LIVE RATES:' }),
-                        jsx('button', {
+                        jsxs('button', {
                           type: 'button',
                           onClick: (e) => {
                             e.stopPropagation();
                             setIsTickerPaused(!isTickerPaused);
                           },
                           className: 'ml-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-gray-900 hover:bg-gray-800 text-gray-300 hover:text-white border border-gray-700/80 flex items-center gap-1 cursor-pointer transition-colors',
-                          title: isTickerPaused ? 'اسکرولنگ دوبارہ چلائیں (Play scroll)' : 'اسکرولنگ روکیں (Pause scroll)',
+                          title: isTickerPaused ? 'Play scroll' : 'Pause scroll',
                           children: [
                             isTickerPaused
-                              ? jsx(Play, { className: 'h-2.5 w-2.5 text-emerald-400 fill-emerald-400' })
-                              : jsx(Pause, { className: 'h-2.5 w-2.5 text-amber-400' }),
-                            jsx('span', { children: isTickerPaused ? 'Play' : 'Pause' })
+                              ? jsx(Play, { key: 'ticker-play-icon', className: 'h-2.5 w-2.5 text-emerald-400 fill-emerald-400' })
+                              : jsx(Pause, { key: 'ticker-pause-icon', className: 'h-2.5 w-2.5 text-amber-400' }),
+                            jsx('span', { key: 'ticker-pause-text', children: isTickerPaused ? 'Play' : 'Pause' })
                           ]
                         })
                       ]

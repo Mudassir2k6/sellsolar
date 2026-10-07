@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import {
   Sun,
   Zap,
@@ -28,6 +28,8 @@ import {
   ArrowDownRight,
   Equal,
   Users,
+  Sparkles,
+  X,
 } from 'lucide-react';
 import {
   SOLAR_PRICES_DATA,
@@ -181,10 +183,35 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
     setSheetCurrentPage(1);
     setCatalogCurrentPage(1);
   };
-
   // Global hero search: one box that filters BOTH the daily rate sheet and the equipment catalog
   const [globalSearch, setGlobalSearch] = useState('');
-  const applyGlobalSearch = (value) => {
+  const [selectedDirectRate, setSelectedDirectRate] = useState(null);
+  const [searchHintsOpen, setSearchHintsOpen] = useState(false);
+  const [activeHintIndex, setActiveHintIndex] = useState(-1);
+  const searchContainerRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target)) {
+        setSearchHintsOpen(false);
+      }
+    };
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setSearchHintsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  const applyGlobalSearch = (value, preserveDirectRate = false) => {
     setGlobalSearch(value);
     setSheetSearchQuery(value);
     setSearchQuery(value);
@@ -195,7 +222,43 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
     setShowDailySheetDetail(true);
     setSheetCurrentPage(1);
     setCatalogCurrentPage(1);
+    if (!preserveDirectRate) {
+      setSelectedDirectRate(null);
+    }
   };
+
+  const handleSelectHint = (item) => {
+    setSelectedDirectRate(item);
+    setSearchHintsOpen(false);
+    setActiveHintIndex(-1);
+    const searchTerm = item.model || `${item.brand} ${item.model}`;
+    applyGlobalSearch(searchTerm, true);
+    jumpToResults(item.source === 'sheet' ? 'rates' : 'catalog');
+  };
+
+  const handleSearchKeyDown = (e) => {
+    if (!searchHintsOpen && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+      setSearchHintsOpen(true);
+      return;
+    }
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveHintIndex((prev) => (prev < searchHints.length - 1 ? prev + 1 : 0));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveHintIndex((prev) => (prev > 0 ? prev - 1 : searchHints.length - 1));
+    } else if (e.key === 'Enter') {
+      if (activeHintIndex >= 0 && searchHints[activeHintIndex]) {
+        e.preventDefault();
+        handleSelectHint(searchHints[activeHintIndex]);
+      } else {
+        setSearchHintsOpen(false);
+      }
+    } else if (e.key === 'Escape') {
+      setSearchHintsOpen(false);
+    }
+  };
+
   const jumpToResults = (tab) => {
     setPageTab(tab);
     if (typeof window === 'undefined') return;
@@ -204,6 +267,256 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 60);
   };
+
+  // Unified searchable item pool with live rates for direct search & hints
+  const allRateItemsPool = useMemo(() => {
+    const isYesterday = dailySheetDate === 'yesterday';
+    const sheet = isYesterday
+      ? (ISLAMABAD_DAILY_SHEETS['yesterday'] || ISLAMABAD_DAILY_SHEETS[yesterdayDateLabel] || ISLAMABAD_DAILY_SHEETS['05-Oct-2026'] || ISLAMABAD_DAILY_SHEETS['16-Sep-2026'])
+      : getActiveDailyRates(todayDateLabel || '05-Oct-2026');
+
+    const pool = [];
+    const seen = new Set();
+
+    // 1. Panels from daily sheet
+    (sheet?.rates || []).forEach((item, idx) => {
+      const key = `sheet-panel-${item.brand}-${item.model}`.toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        pool.push({
+          id: `sheet-panel-${idx}`,
+          brand: item.brand,
+          model: item.model,
+          fullName: `${item.brand} ${item.model}`,
+          category: 'panel',
+          categoryLabel: 'Solar Panel',
+          rate: item.rate,
+          formattedRate: `Rs ${item.rate}/W`,
+          unit: 'Per Watt Wholesale',
+          change: item.change,
+          status: item.status,
+          badge: item.badge || 'Ready Stock',
+          source: 'sheet',
+          note: item.note,
+        });
+      }
+    });
+
+    // 2. Inverters from daily sheet
+    (sheet?.inverterRates || []).forEach((item, idx) => {
+      const key = `sheet-inv-${item.brand}-${item.model}`.toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        const fRate = typeof item.rate === 'number' ? (item.rate >= 1000 ? `Rs ${item.rate.toLocaleString('en-PK')}` : `Rs ${item.rate}`) : item.rate;
+        pool.push({
+          id: `sheet-inv-${idx}`,
+          brand: item.brand,
+          model: item.model,
+          fullName: `${item.brand} ${item.model}`,
+          category: 'inverter',
+          categoryLabel: 'Inverter',
+          rate: item.rate,
+          formattedRate: fRate,
+          unit: item.type || item.capacity || 'Inverter Unit',
+          change: item.change,
+          status: item.status,
+          badge: item.badge || item.capacity || 'Ready Stock',
+          source: 'sheet',
+        });
+      }
+    });
+
+    // 3. Batteries from daily sheet
+    (sheet?.batteryRates || []).forEach((item, idx) => {
+      const key = `sheet-bat-${item.brand}-${item.model}`.toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        const fRate = typeof item.rate === 'number' ? (item.rate >= 1000 ? `Rs ${item.rate.toLocaleString('en-PK')}` : `Rs ${item.rate}`) : item.rate;
+        pool.push({
+          id: `sheet-bat-${idx}`,
+          brand: item.brand,
+          model: item.model,
+          fullName: `${item.brand} ${item.model}`,
+          category: 'battery',
+          categoryLabel: 'Battery',
+          rate: item.rate,
+          formattedRate: fRate,
+          unit: item.type || item.capacity || 'Battery Unit',
+          change: item.change,
+          status: item.status,
+          badge: item.badge || item.capacity || 'Ready Stock',
+          source: 'sheet',
+        });
+      }
+    });
+
+    // 4. ESS storage
+    (sheet?.essRates || []).forEach((item, idx) => {
+      const key = `sheet-ess-${item.brand}-${item.model}`.toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        const fRate = typeof item.rate === 'number' ? `Rs ${item.rate.toLocaleString('en-PK')}` : item.rate;
+        pool.push({
+          id: `sheet-ess-${idx}`,
+          brand: item.brand,
+          model: item.model,
+          fullName: `${item.brand} ${item.model}`,
+          category: 'ess',
+          categoryLabel: 'ESS Storage',
+          rate: item.rate,
+          formattedRate: fRate,
+          unit: item.capacity || 'Power Station',
+          change: item.change,
+          badge: item.badge || 'Storage',
+          source: 'sheet',
+        });
+      }
+    });
+
+    // 5. Cables & Wiring
+    (sheet?.cableRates || []).forEach((item, idx) => {
+      const key = `sheet-cable-${item.brand}-${item.model}`.toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        const fRate = typeof item.rate === 'number' ? `Rs ${item.rate}/M` : item.rate;
+        pool.push({
+          id: `sheet-cable-${idx}`,
+          brand: item.brand,
+          model: item.model,
+          fullName: `${item.brand} ${item.model}`,
+          category: 'cables_wiring',
+          categoryLabel: 'Solar Cable',
+          rate: item.rate,
+          formattedRate: fRate,
+          unit: item.type || 'Pure Copper DC Wire',
+          badge: item.badge || 'Pure Copper',
+          source: 'sheet',
+        });
+      }
+    });
+
+    // 6. Accessories
+    (sheet?.accessoriesRates || []).forEach((item, idx) => {
+      const key = `sheet-acc-${item.brand}-${item.model}`.toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        const fRate = typeof item.rate === 'number' ? `Rs ${item.rate.toLocaleString('en-PK')}` : item.rate;
+        pool.push({
+          id: `sheet-acc-${idx}`,
+          brand: item.brand,
+          model: item.model,
+          fullName: `${item.brand} ${item.model}`,
+          category: 'solar_accessories',
+          categoryLabel: 'Protection & BOS',
+          rate: item.rate,
+          formattedRate: fRate,
+          unit: item.type || 'Electrical Protection',
+          badge: item.badge || 'DC Protection',
+          source: 'sheet',
+        });
+      }
+    });
+
+    // 7. Complete Systems
+    (sheet?.systemRates || []).forEach((item, idx) => {
+      const key = `sheet-sys-${item.brand}-${item.model}`.toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        const fRate = typeof item.rate === 'number' ? `Rs ${item.rate.toLocaleString('en-PK')}` : item.rate;
+        pool.push({
+          id: `sheet-sys-${idx}`,
+          brand: item.brand,
+          model: item.model,
+          fullName: `${item.brand} ${item.model}`,
+          category: 'complete_system',
+          categoryLabel: 'Solar System',
+          rate: item.rate,
+          formattedRate: fRate,
+          unit: 'Turnkey Installation Package',
+          badge: item.badge || 'Complete Setup',
+          source: 'sheet',
+        });
+      }
+    });
+
+    // 8. Structures & Mounts
+    (sheet?.structureRates || []).forEach((item, idx) => {
+      const key = `sheet-struct-${item.brand}-${item.model}`.toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        const fRate = typeof item.rate === 'number' ? `Rs ${item.rate.toLocaleString('en-PK')}` : item.rate;
+        pool.push({
+          id: `sheet-struct-${idx}`,
+          brand: item.brand,
+          model: item.model,
+          fullName: `${item.brand} ${item.model}`,
+          category: 'structure_accessories',
+          categoryLabel: 'GI Structure',
+          rate: item.rate,
+          formattedRate: fRate,
+          unit: item.type || 'Mounting Frame',
+          badge: item.badge || 'Galvanized',
+          source: 'sheet',
+        });
+      }
+    });
+
+    // 9. Items from SOLAR_PRICES_DATA
+    SOLAR_PRICES_DATA.forEach((catItem) => {
+      const key = `cat-${catItem.brand}-${catItem.model}`.toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        const fRate = catItem.pricePerWatt
+          ? `Rs ${catItem.pricePerWatt}/W`
+          : catItem.unitPriceMin
+          ? `Rs ${formatPrice(catItem.unitPriceMin)}`
+          : 'Market Rate';
+        pool.push({
+          id: `catalog-${catItem.id}`,
+          brand: catItem.brand,
+          model: catItem.model,
+          fullName: `${catItem.brand} ${catItem.model}`,
+          category: catItem.category,
+          categoryLabel:
+            catItem.category === 'panel'
+              ? 'Solar Panel'
+              : catItem.category === 'inverter'
+              ? 'Inverter'
+              : catItem.category === 'battery'
+              ? 'Battery'
+              : 'Equipment',
+          rate: catItem.pricePerWatt || catItem.unitPriceMin,
+          formattedRate: fRate,
+          unit: catItem.capacity || catItem.type || 'Verified Specification',
+          badge: catItem.badge || (catItem.popular ? 'Popular' : 'Benchmark'),
+          source: 'catalog',
+        });
+      }
+    });
+
+    return pool;
+  }, [dailySheetDate, todayDateLabel, yesterdayDateLabel]);
+
+  // Autocomplete hints filtered from pool
+  const searchHints = useMemo(() => {
+    const q = globalSearch.trim().toLowerCase();
+    if (!q) {
+      return allRateItemsPool
+        .filter((item) =>
+          ['645w', '585w', '625w', 'knox', 'nitrox', 'narada', 'fast'].some((k) =>
+            item.fullName.toLowerCase().includes(k)
+          )
+        )
+        .slice(0, 8);
+    }
+    const terms = q.split(/\s+/).filter(Boolean);
+    return allRateItemsPool
+      .filter((item) => {
+        const text = `${item.fullName} ${item.brand} ${item.model} ${item.category} ${item.unit || ''} ${item.badge || ''}`.toLowerCase();
+        return terms.every((t) => text.includes(t));
+      })
+      .slice(0, 10);
+  }, [allRateItemsPool, globalSearch]);
 
   // Calculator state removed — full calculator lives at /calculator
 
@@ -313,15 +626,11 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
     }
 
     if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      result = result.filter(
-        (item) =>
-          item.model.toLowerCase().includes(q) ||
-          item.brand.toLowerCase().includes(q) ||
-          item.type.toLowerCase().includes(q) ||
-          item.description.toLowerCase().includes(q) ||
-          item.capacity.toLowerCase().includes(q)
-      );
+      const terms = searchQuery.toLowerCase().trim().split(/\s+/).filter(Boolean);
+      result = result.filter((item) => {
+        const combined = `${item.brand} ${item.model} ${item.type || ''} ${item.description || ''} ${item.capacity || ''} ${item.badge || ''}`.toLowerCase();
+        return terms.every((t) => combined.includes(t));
+      });
     }
 
     // Sorting
@@ -457,14 +766,9 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
       }
 
       if (!sheetSearchQuery) return true;
-      const q = sheetSearchQuery.toLowerCase().trim();
-      return (
-        item.brand.toLowerCase().includes(q) ||
-        item.model.toLowerCase().includes(q) ||
-        (item.type && item.type.toLowerCase().includes(q)) ||
-        (item.capacity && item.capacity.toLowerCase().includes(q)) ||
-        (item.badge && item.badge.toLowerCase().includes(q))
-      );
+      const terms = sheetSearchQuery.toLowerCase().trim().split(/\s+/).filter(Boolean);
+      const combined = `${item.brand} ${item.model} ${item.type || ''} ${item.capacity || ''} ${item.badge || ''}`.toLowerCase();
+      return terms.every((t) => combined.includes(t));
     });
   }, [dailySheetDate, sheetCategory, sheetFilterStatus, sheetSearchQuery]);
 
@@ -487,9 +791,9 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
   }, [filteredItems, safeCatalogPage, catalogPageSize]);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-20 pt-20 text-gray-900 dark:text-gray-100 transition-colors">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-20 pt-28 sm:pt-32 lg:pt-36 text-gray-900 dark:text-gray-100 transition-colors">
       {/* Compact Top Hero Banner */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-primary-900 via-gray-900 to-gray-900 py-5 sm:py-6 text-white border-b border-gray-800">
+      <section className="relative overflow-hidden bg-gradient-to-r from-primary-900 via-gray-900 to-gray-900 py-6 sm:py-8 text-white border-b border-gray-800">
         <div className="absolute inset-0 bg-grid opacity-10 pointer-events-none" />
         <div className="container-page relative z-10">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -508,50 +812,202 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                 Today's Solar Prices in <span className="text-amber-400">Pakistan (PKR)</span>
               </h1>
 
-              {/* Global item search (searches rate sheet + catalog together) */}
-              <form
-                role="search"
-                className="mt-3 w-full max-w-xl"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  if (!globalSearch.trim()) return;
-                  jumpToResults(displayedSheetRates.length > 0 || filteredItems.length === 0 ? 'rates' : 'catalog');
-                }}
-              >
-                <label htmlFor="prices-global-search" className="sr-only">
-                  Search solar item prices
-                </label>
-                <div className="relative">
-                  <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-amber-400" />
-                  <input
-                    id="prices-global-search"
-                    type="search"
-                    value={globalSearch}
-                    onChange={(e) => applyGlobalSearch(e.target.value)}
-                    placeholder="Search any item: Longi 585W, Jinko, 6kW hybrid, Narada, lithium..."
-                    autoComplete="off"
-                    className="w-full rounded-xl border border-white/15 bg-white/10 py-2.5 pl-10 pr-24 text-sm text-white placeholder-gray-400 backdrop-blur-sm transition-colors focus:border-amber-400 focus:bg-white/15 focus:outline-none focus:ring-2 focus:ring-amber-400/30"
-                  />
-                  {globalSearch ? (
+              {/* Global item search with live hints & direct rate selection */}
+              <div ref={searchContainerRef} className="mt-3.5 w-full max-w-xl relative">
+                <form
+                  role="search"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    setSearchHintsOpen(false);
+                    if (!globalSearch.trim()) return;
+                    jumpToResults(displayedSheetRates.length > 0 || filteredItems.length === 0 ? 'rates' : 'catalog');
+                  }}
+                >
+                  <label htmlFor="prices-global-search" className="sr-only">
+                    Search solar item prices and live rates
+                  </label>
+                  <div className="relative">
+                    <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-amber-400" />
+                    <input
+                      id="prices-global-search"
+                      type="search"
+                      value={globalSearch}
+                      onChange={(e) => {
+                        applyGlobalSearch(e.target.value);
+                        setSearchHintsOpen(true);
+                      }}
+                      onFocus={() => setSearchHintsOpen(true)}
+                      onKeyDown={handleSearchKeyDown}
+                      placeholder="Search any item: Longi 585W, Jinko, 6kW hybrid, Narada, lithium..."
+                      autoComplete="off"
+                      className="w-full rounded-xl border border-white/20 bg-white/10 py-3 pl-10 pr-24 text-sm text-white placeholder-gray-300 backdrop-blur-md transition-all focus:border-amber-400 focus:bg-white/15 focus:outline-none focus:ring-2 focus:ring-amber-400/40 shadow-inner"
+                    />
+                    {globalSearch ? (
+                      <button
+                        type="button"
+                        id="prices-global-search-clear"
+                        onClick={() => {
+                          applyGlobalSearch('');
+                          setSelectedDirectRate(null);
+                          setSearchHintsOpen(false);
+                        }}
+                        className="absolute right-[4.8rem] top-1/2 -translate-y-1/2 rounded-md px-1.5 py-0.5 text-[11px] font-semibold text-gray-300 hover:text-white transition-colors"
+                      >
+                        Clear
+                      </button>
+                    ) : null}
                     <button
-                      type="button"
-                      id="prices-global-search-clear"
-                      onClick={() => applyGlobalSearch('')}
-                      className="absolute right-[4.6rem] top-1/2 -translate-y-1/2 rounded-md px-1.5 py-0.5 text-[11px] font-semibold text-gray-300 hover:text-white"
+                      type="submit"
+                      id="prices-global-search-submit"
+                      className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-lg bg-amber-500 px-3.5 py-1.5 text-xs font-bold text-slate-950 transition-all hover:bg-amber-400 active:scale-95 shadow-sm"
                     >
-                      Clear
+                      Search
                     </button>
-                  ) : null}
-                  <button
-                    type="submit"
-                    id="prices-global-search-submit"
-                    className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-bold text-slate-950 transition-all hover:bg-amber-400 active:scale-95"
-                  >
-                    Search
-                  </button>
-                </div>
+                  </div>
+                </form>
 
-                {globalSearch.trim() ? (
+                {/* Interactive Hints & Autocomplete Dropdown */}
+                {searchHintsOpen && (
+                  <div className="absolute left-0 right-0 top-full mt-1.5 z-50 rounded-2xl border border-amber-400/40 bg-gray-950/95 shadow-2xl backdrop-blur-xl p-2 text-white max-h-[380px] overflow-y-auto ring-1 ring-white/10">
+                    <div className="flex items-center justify-between px-2.5 py-1.5 border-b border-gray-800 text-[11px] font-bold text-gray-400">
+                      <span className="flex items-center gap-1.5">
+                        <Sparkles className="h-3 w-3 text-amber-400" />
+                        {globalSearch.trim()
+                          ? `Matching Solar Rates (${searchHints.length} items - Click to select)`
+                          : 'Top Live Rates Today (Click to select & view rate)'}
+                      </span>
+                      <span className="text-[10px] text-amber-400 font-semibold">Wholesale &bull; Pakistan</span>
+                    </div>
+
+                    {searchHints.length === 0 ? (
+                      <div className="p-4 text-center text-xs text-gray-400">
+                        No exact match for "{globalSearch}". Try typing "585W", "Longi", "Knox", "Narada", or "6kW".
+                      </div>
+                    ) : (
+                      <div className="divide-y divide-gray-800/60 mt-1">
+                        {searchHints.map((item, idx) => (
+                          <button
+                            key={item.id || idx}
+                            type="button"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              handleSelectHint(item);
+                            }}
+                            className={`w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-white/10 transition-all text-left cursor-pointer group ${
+                              activeHintIndex === idx ? 'bg-white/15' : ''
+                            }`}
+                          >
+                            <div className="flex items-center gap-2.5 min-w-0 pr-2">
+                              <span
+                                className={`shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                                  item.category === 'panel'
+                                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                    : item.category === 'inverter'
+                                    ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                                    : item.category === 'battery'
+                                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                    : item.category === 'cables_wiring'
+                                    ? 'bg-amber-700/30 text-amber-300 border border-amber-600/30'
+                                    : 'bg-violet-500/20 text-violet-300 border border-violet-500/30'
+                                }`}
+                              >
+                                {item.categoryLabel}
+                              </span>
+                              <div className="min-w-0">
+                                <div className="text-xs sm:text-sm font-bold text-white group-hover:text-amber-300 truncate">
+                                  {item.fullName}
+                                </div>
+                                <div className="text-[10px] text-gray-400 truncate flex items-center gap-1.5">
+                                  <span>{item.brand}</span>
+                                  {item.badge && <span>&bull; {item.badge}</span>}
+                                  {item.unit && <span className="hidden sm:inline">&bull; {item.unit}</span>}
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="shrink-0 text-right">
+                              <div className="text-xs sm:text-sm font-extrabold text-amber-400 font-mono group-hover:scale-105 transition-transform">
+                                {item.formattedRate}
+                              </div>
+                              <div className="text-[10px] font-semibold text-emerald-400 group-hover:text-emerald-300">
+                                Select Rate &rarr;
+                              </div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Direct Selected Rate Spotlight Card */}
+                {selectedDirectRate && (
+                  <div className="mt-3 p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-amber-500/15 via-gray-900 to-gray-900 border-2 border-amber-400/50 shadow-xl backdrop-blur-md">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <div>
+                        <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/25 px-2 py-0.5 text-[10px] font-bold text-amber-300 border border-amber-400/40 uppercase tracking-wide">
+                            Direct Rate Result
+                          </span>
+                          <span className="text-[11px] text-gray-300 font-semibold">
+                            {selectedDirectRate.categoryLabel} &bull; {selectedDirectRate.brand}
+                          </span>
+                          {selectedDirectRate.badge && (
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-semibold border border-emerald-500/30">
+                              {selectedDirectRate.badge}
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-sm sm:text-base font-extrabold text-white">
+                          {selectedDirectRate.fullName}
+                        </div>
+                        <div className="text-[11px] text-gray-300 mt-0.5">
+                          Verified wholesale ready stock benchmark &bull; Updated {TODAY_DATE_STR}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3 sm:self-center shrink-0">
+                        <div className="text-right">
+                          <div className="text-[10px] uppercase font-bold text-amber-300/90 tracking-wider">Live Rate Today</div>
+                          <div className="text-lg sm:text-2xl font-black text-amber-400 font-mono tracking-tight">
+                            {selectedDirectRate.formattedRate}
+                          </div>
+                          {selectedDirectRate.change !== undefined && selectedDirectRate.change !== 0 && (
+                            <div className={`text-[10px] font-bold ${selectedDirectRate.change < 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                              {selectedDirectRate.change < 0 ? `↓ Dropped Rs ${Math.abs(selectedDirectRate.change)}` : `↑ Increased Rs ${selectedDirectRate.change}`}
+                            </div>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedDirectRate(null);
+                            applyGlobalSearch('');
+                          }}
+                          className="rounded-xl border border-white/20 bg-white/10 hover:bg-white/20 p-2 text-xs font-semibold text-gray-200 transition-colors"
+                          title="Clear selected rate"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="mt-2.5 pt-2 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-[11px]">
+                      <span className="text-gray-300">
+                        Filtered in Daily Rate Sheet & Equipment Catalog
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => jumpToResults(selectedDirectRate.source === 'sheet' ? 'rates' : 'catalog')}
+                        className="inline-flex items-center gap-1 font-bold text-amber-300 hover:text-amber-200 hover:underline"
+                      >
+                        View in {selectedDirectRate.source === 'sheet' ? 'Daily Rate Sheet' : 'Catalog'} &darr;
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Search Results Summary / Popular Badges */}
+                {globalSearch.trim() && !selectedDirectRate ? (
                   <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px]">
                     <span className="text-gray-400">Results for "{globalSearch.trim()}":</span>
                     <button
@@ -571,7 +1027,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                       {filteredItems.length} in Equipment Catalog <ArrowRight className="h-3 w-3" />
                     </button>
                   </div>
-                ) : (
+                ) : !selectedDirectRate ? (
                   <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px]">
                     <span className="text-gray-400">Popular:</span>
                     {['Longi', 'Jinko', 'Canadian', '585W', '6kW', 'Hybrid', 'Lithium', 'Narada', '10kW'].map((term) => (
@@ -589,10 +1045,10 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                       </button>
                     ))}
                   </div>
-                )}
-              </form>
+                ) : null}
+              </div>
             </div>
-            {/* Compact 3-stat inline chips */}
+{/* Compact 3-stat inline chips */}
             <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap shrink-0">
               {[
                 { id:'panel', icon: Sun, color:'text-amber-400', bg:'bg-amber-500/15 border-amber-400/30', val: MARKET_SUMMARY.panelsPerWattAvg || 'Rs 33–44/W', label:'Panels' },
@@ -651,7 +1107,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         </div>
 
         {/* Sticky Mobile/Desktop Category Quick-Bar */}
-        <div className="sticky top-16 z-30 -mx-4 sm:mx-0 px-3 sm:px-4 py-2 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-y sm:border sm:rounded-2xl border-gray-200/80 dark:border-gray-800 shadow-xs mb-4">
+        <div className="sticky top-[68px] lg:top-[104px] z-30 -mx-4 sm:mx-0 px-3 sm:px-4 py-2 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-y sm:border sm:rounded-2xl border-gray-200/80 dark:border-gray-800 shadow-xs mb-4">
           <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-hide">
             <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 shrink-0 mr-1 hidden sm:inline-block">
               Quick Rates:

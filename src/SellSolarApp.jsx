@@ -2024,7 +2024,7 @@ function ax({
   listing:t,onClick:e,onNavigate:nav
 }){
   const { user } = useAuth();
-  const toastCtx = useToast ? useToast() : null;
+  const toastCtx = useToast();
   const r=t.condition==="used";
   const allImages = listingImages(t);
   const imgUrl = allImages[0] || t.image_url || getEquipmentFallbackImage(t.category, t.title);
@@ -5818,7 +5818,7 @@ function yx({
 }){
   const[r,n]=useState(null),[s,a]=useState(null),[l,o]=useState(!0),[c,u]=useState(null),[d,h]=useState(!1),[activePhotoIdx,setActivePhotoIdx]=useState(0),[inquiryModalOpen,setInquiryModalOpen]=useState(!1);
   const { user: currentUser, profile: currentProfile, isAdmin, isSuperAdmin } = useAuth();
-  const toastCtx = useToast ? useToast() : null;
+  const toastCtx = useToast();
   const [editPhoneModalOpen, setEditPhoneModalOpen] = useState(!1);
   const [phoneInputVal, setPhoneInputVal] = useState("");
   const [phoneInputError, setPhoneInputError] = useState("");

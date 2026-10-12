@@ -60,7 +60,6 @@ export default function AdminDrillDownModal({
     }
   }, [initialMetric, initialFilter, isOpen]);
 
-  if (!isOpen) return null;
 
   const handleManualRefresh = async () => {
     if (!onRefreshData) return;
@@ -268,6 +267,8 @@ export default function AdminDrillDownModal({
   ];
 
   const activeTabMeta = metricTabs.find((m) => m.id === currentMetric) || metricTabs[0];
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-sm animate-fade-in">

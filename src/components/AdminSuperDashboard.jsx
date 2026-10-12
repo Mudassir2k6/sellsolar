@@ -6634,7 +6634,8 @@ export default function AdminSuperDashboard({
       </div>
 
       {/* Comprehensive Drill-Down Modal */}
-      <AdminDrillDownModal
+      {drillDownModalOpen && (
+        <AdminDrillDownModal
         isOpen={drillDownModalOpen}
         onClose={() => setDrillDownModalOpen(false)}
         initialMetric={drillDownMetric}
@@ -6653,6 +6654,7 @@ export default function AdminSuperDashboard({
           totalListings: listingsList.length,
         }}
       />
+      )}
     </div>
   );
 }

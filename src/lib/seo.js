@@ -168,7 +168,7 @@ export const PAGE_SEO = {
     title: 'Today Solar Rates in Pakistan | Live Solar Plates & Inverter Prices',
     description:
       'Check today live solar rates in Pakistan: panel PKR/watt cost, on-grid and hybrid inverters, and lithium battery prices updated daily for accurate budget planning.',
-    path: '/today-prices',
+    path: '/prices',
     robots: INDEXABLE,
     keywords:
       'today solar rates, solar rates today Pakistan, solar plate price in Pakistan today, live solar rates Pakistan, today solar panel price, today inverter rate Pakistan',
@@ -177,7 +177,7 @@ export const PAGE_SEO = {
     title: 'Calculate Solar Load Free in Pakistan | Solar System Load Calculator',
     description:
       'Calculate solar load in Pakistan free. Calculate your home appliances kW load, required solar plates count, inverter kW size, and battery backup.',
-    path: '/load-calculator',
+    path: '/calculator',
     robots: INDEXABLE,
     keywords:
       'calculate solar load, solar load calculator, calculate solar system load, solar load calculator Pakistan, how to calculate solar load, calculate home solar load',
@@ -374,13 +374,15 @@ const PAGE_ALIASES = {
   'terms-of-service': 'terms',
   'privacy-policy': 'privacy',
   'cookie-policy': 'cookies',
+  'installation': 'install',
+  'request-installation': 'install',
 };
 
 export function canonicalPage(page) {
-  if (PAGE_SEO && PAGE_SEO[page]) {
-    return page;
+  if (PAGE_ALIASES && PAGE_ALIASES[page]) {
+    return PAGE_ALIASES[page];
   }
-  return PAGE_ALIASES[page] || page;
+  return page;
 }
 
 export function pageToPath(page, listingId, hash) {

@@ -1816,7 +1816,7 @@ export default function AdminSuperDashboard({
               Verify Plates
             </button>
             <button
-              onClick={() => { if (typeof window !== 'undefined') window.location.href = '/installation'; }}
+              onClick={() => { if (typeof window !== 'undefined') window.location.href = '/install'; }}
               className="text-xs font-bold text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 px-3 py-1.5 cursor-pointer transition-colors"
             >
               Installation

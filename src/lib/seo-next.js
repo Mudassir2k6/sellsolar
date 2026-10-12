@@ -37,7 +37,7 @@ export function slugToPageKey(slug) {
 export function buildMetadataForSlug(slug) {
   const rawKey = slug && slug.length > 0 ? slug[0] : 'home';
   const aliasKey = canonicalPage(slugToPageKey(slug));
-  const key = PAGE_SEO[rawKey] ? rawKey : aliasKey;
+  const key = PAGE_SEO[aliasKey] ? aliasKey : (PAGE_SEO[rawKey] ? rawKey : 'home');
   const meta = PAGE_SEO[key] || PAGE_SEO.home;
   const currentPath = slug && slug.length > 0 ? `/${slug.join('/')}` : '/';
   const path = meta.path || currentPath;

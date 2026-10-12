@@ -20,14 +20,14 @@ export default function SeoCrawlerFallback({ slug = [], meta = {} }) {
         <ul>
           <li><a href="/prices">Solar Plate Price in Pakistan Today</a></li>
           <li><a href="/solar-plates-price">Live Solar Plates Price Per Watt</a></li>
-          <li><a href="/today-prices">Today Solar Rates in Pakistan</a></li>
+          <li><a href="/prices">Today Solar Rates in Pakistan</a></li>
           <li><a href="/solar-plates">Solar Plates for Sale in Pakistan</a></li>
           <li><a href="/solar-plate">550W &amp; 585W Solar Plate Models &amp; Prices</a></li>
           <li><a href="/used-solar">Used Solar Plates &amp; Second-Hand Equipment</a></li>
           <li><a href="/solar-inverter">Solar Inverters &amp; Hybrid Invertor Price</a></li>
           <li><a href="/solar-batteries">Solar Batteries (Lithium LiFePO4 &amp; Tubular Battries)</a></li>
           <li><a href="/calculator">Calculate Solar Load in Pakistan</a></li>
-          <li><a href="/load-calculator">Solar System &amp; Inverter Load Calculator</a></li>
+          <li><a href="/calculator">Solar System &amp; Inverter Load Calculator</a></li>
           <li><a href="/dealers">Solar Authorised Dealers in Pakistan</a></li>
           <li><a href="/verification">Tier 1 Solar Plates Verification Portal</a></li>
           <li><a href="/tier-1-verification">Barcode &amp; Serial Number Authenticity Check</a></li>
@@ -222,7 +222,7 @@ export default function SeoCrawlerFallback({ slug = [], meta = {} }) {
           <li><a href="/">SellSolar Home — Pakistan's #1 Used Solar Marketplace</a></li>
           <li><a href="/prices">Solar Plate Price in Pakistan Today</a></li>
           <li><a href="/solar-plates-price">Solar Plates Price Daily Per Watt</a></li>
-          <li><a href="/today-prices">Today Solar Rates &amp; Per Watt Benchmark</a></li>
+          <li><a href="/prices">Today Solar Rates &amp; Per Watt Benchmark</a></li>
           <li><a href="/solar-plates">Solar Plates for Sale in Pakistan</a></li>
           <li><a href="/solar-plate">Solar Plate Models &amp; Wattage</a></li>
           <li><a href="/solar-panels">Solar Panels &amp; Modules Directory</a></li>
@@ -230,7 +230,7 @@ export default function SeoCrawlerFallback({ slug = [], meta = {} }) {
           <li><a href="/solar-inverter">Solar Inverter Prices Pakistan</a></li>
           <li><a href="/solar-batteries">Solar Batteries &amp; Lithium Price</a></li>
           <li><a href="/calculator">Calculate Solar Load Pakistan</a></li>
-          <li><a href="/load-calculator">Home Solar System Size Calculator</a></li>
+          <li><a href="/calculator">Home Solar System Size Calculator</a></li>
           <li><a href="/dealers">Solar Authorised Dealers Pakistan</a></li>
           <li><a href="/verification">Tier 1 Solar Verification Portal</a></li>
           <li><a href="/tier-1-verification">Solar Plate Serial &amp; Barcode Check</a></li>

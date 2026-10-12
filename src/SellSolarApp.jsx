@@ -6790,7 +6790,14 @@ export default function App({ initialPathname, initialSlug }){
     }), jsx("main", {
       id: "main",
       children: jsx(PasswordPage, {
-        initialMode: "reset", onSuccess: () => o("home"), onBack: () => o("home"), hasOuterNavbar: true
+        initialMode: "reset", onSuccess: () => o("home"), onBack: () => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.history.pushState({}, '', '/');
+      }
+    } catch (err) {}
+    o("home");
+  }, hasOuterNavbar: true
       })
     }), jsx(hx, {
       onPostAd: c, onNavigate: handleNavigate
@@ -6801,7 +6808,14 @@ export default function App({ initialPathname, initialSlug }){
     }), jsx("main", {
       id: "main",
       children: jsx(PasswordPage, {
-        initialMode: t ? "change" : "forgot", onSuccess: () => o(t ? "dashboard" : "home"), onBack: () => o("home"), hasOuterNavbar: true
+        initialMode: t ? "change" : "forgot", onSuccess: () => o(t ? "dashboard" : "home"), onBack: () => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.history.pushState({}, '', '/');
+      }
+    } catch (err) {}
+    o("home");
+  }, hasOuterNavbar: true
       })
     }), jsx(hx, {
       onPostAd: c, onNavigate: handleNavigate
@@ -6812,7 +6826,14 @@ export default function App({ initialPathname, initialSlug }){
     }), jsx("main", {
       id: "main",
       children: jsx(PasswordPage, {
-        initialMode: "forgot", onSuccess: () => o("home"), onBack: () => o("home"), hasOuterNavbar: true
+        initialMode: "forgot", onSuccess: () => o("home"), onBack: () => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.history.pushState({}, '', '/');
+      }
+    } catch (err) {}
+    o("home");
+  }, hasOuterNavbar: true
       })
     }), jsx(hx, {
       onPostAd: c, onNavigate: handleNavigate
@@ -6823,7 +6844,14 @@ export default function App({ initialPathname, initialSlug }){
     }), jsx("main", {
       id: "main",
       children: jsx(PasswordPage, {
-        initialMode: "reset", onSuccess: () => o("home"), onBack: () => o("home"), hasOuterNavbar: true
+        initialMode: "reset", onSuccess: () => o("home"), onBack: () => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.history.pushState({}, '', '/');
+      }
+    } catch (err) {}
+    o("home");
+  }, hasOuterNavbar: true
       })
     }), jsx(hx, {
       onPostAd: c, onNavigate: handleNavigate
@@ -6834,7 +6862,14 @@ export default function App({ initialPathname, initialSlug }){
     }), jsx("main", {
       id: "main",
       children: jsx(Bn, {
-        onSuccess: () => o("home"), onBack: () => o("home"), onForgotPassword: () => o("forgot-password"), onNavigate: handleNavigate, hasOuterNavbar: true
+        onSuccess: () => o("home"), onBack: () => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.history.pushState({}, '', '/');
+      }
+    } catch (err) {}
+    o("home");
+  }, onForgotPassword: () => o("forgot-password"), onNavigate: handleNavigate, hasOuterNavbar: true
       })
     }), jsx(hx, {
       onPostAd: c, onNavigate: handleNavigate
@@ -6845,7 +6880,14 @@ export default function App({ initialPathname, initialSlug }){
     }), jsx("main", {
       id: "main",
       children: jsx(DealersPage, {
-        onNavigate: handleNavigate, onBack: () => o("home"), hasOuterNavbar: true
+        onNavigate: handleNavigate, onBack: () => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.history.pushState({}, '', '/');
+      }
+    } catch (err) {}
+    o("home");
+  }, hasOuterNavbar: true
       })
     }), jsx(hx, {
       onPostAd: c, onNavigate: handleNavigate
@@ -6856,7 +6898,14 @@ export default function App({ initialPathname, initialSlug }){
     }), jsx("main", {
       id: "main",
       children: jsx(InstallationRequestPage, {
-        onNavigate: handleNavigate, onBack: () => o("home"), hasOuterNavbar: true
+        onNavigate: handleNavigate, onBack: () => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.history.pushState({}, '', '/');
+      }
+    } catch (err) {}
+    o("home");
+  }, hasOuterNavbar: true
       })
     }), jsx(hx, {
       onPostAd: c, onNavigate: handleNavigate
@@ -6942,7 +6991,14 @@ export default function App({ initialPathname, initialSlug }){
     }), jsx("main", {
       id: "main",
       children: jsx(yx, {
-        onBack: () => o("home"), onPosted: () => o("home"), onNavigate: handleNavigate, hasOuterNavbar: true
+        onBack: () => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.history.pushState({}, '', '/');
+      }
+    } catch (err) {}
+    o("home");
+  }, onPosted: () => o("home"), onNavigate: handleNavigate, hasOuterNavbar: true
       })
     }), jsx(hx, {
       onPostAd: c, onNavigate: handleNavigate
@@ -6953,7 +7009,14 @@ export default function App({ initialPathname, initialSlug }){
     }), jsx("main", {
       id: "main",
       children: jsx(Bn, {
-        onSuccess: () => o("post-ad"), onBack: () => o("home"), onForgotPassword: () => o("forgot-password"), onNavigate: handleNavigate, hasOuterNavbar: true
+        onSuccess: () => o("post-ad"), onBack: () => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.history.pushState({}, '', '/');
+      }
+    } catch (err) {}
+    o("home");
+  }, onForgotPassword: () => o("forgot-password"), onNavigate: handleNavigate, hasOuterNavbar: true
       })
     }), jsx(hx, {
       onPostAd: c, onNavigate: handleNavigate
@@ -6964,13 +7027,27 @@ export default function App({ initialPathname, initialSlug }){
     }), jsx("main", {
       id: "main",
       children: jsx(Bn, {
-        onSuccess: () => o(n), onBack: () => o("home"), onForgotPassword: () => o("forgot-password"), onNavigate: handleNavigate, hasOuterNavbar: true
+        onSuccess: () => o(n), onBack: () => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.history.pushState({}, '', '/');
+      }
+    } catch (err) {}
+    o("home");
+  }, onForgotPassword: () => o("forgot-password"), onNavigate: handleNavigate, hasOuterNavbar: true
       })
     }), jsx(hx, {
       onPostAd: c, onNavigate: handleNavigate
     })]
   }) : jsx(AdminSuperDashboard, {
-    onBack: () => o("home"),
+    onBack: () => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.history.pushState({}, '', '/');
+      }
+    } catch (err) {}
+    o("home");
+  },
     onNavigateToListing: u,
     onPostAd: c,
     onChangePassword: () => o("password"),

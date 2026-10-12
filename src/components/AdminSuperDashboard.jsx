@@ -30,6 +30,7 @@ import {
   Share2,
   Sparkles,
   ArrowLeft,
+  Home,
   ArrowUpRight,
   ChevronRight,
   CheckCircle2,
@@ -219,6 +220,21 @@ export default function AdminSuperDashboard({
   } = useAuth();
   const { showToast } = useToast();
   const { settings, updateSiteSettings, updateHomePageCms } = useSiteSettings();
+  const handleGoHome = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (typeof onBack === 'function') {
+      try {
+        onBack();
+      } catch (err) {}
+    }
+    if (typeof window !== 'undefined') {
+      try {
+        window.history.pushState({}, '', '/');
+      } catch (err) {}
+      window.location.href = '/';
+    }
+  };
+
 
   const userEmail = (user?.email || profile?.email || '').toLowerCase().trim();
   const isMasterAdminEmail = userEmail === 'mudassir2k6@gmail.com' || userEmail === 'admin@sellsolar.pk' || userEmail === DEFAULT_ADMIN_EMAIL.toLowerCase();
@@ -1923,41 +1939,45 @@ export default function AdminSuperDashboard({
             {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </button>
 
-          <button
-            type="button"
-            onClick={onBack}
-            className="p-2 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors shrink-0"
-            title="Back to Marketplace"
+                    <a
+            href="/"
+            onClick={handleGoHome}
+            className="flex items-center gap-2 sm:gap-3 group cursor-pointer select-none text-left min-w-0"
+            title="Go to SellSolar Main Home Page"
           >
-            <ArrowLeft className="h-4 w-4" />
-          </button>
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <span className="text-base sm:text-lg font-black tracking-tight text-gray-900 dark:text-white shrink-0 leading-none">
-                Sell<span className="text-amber-500">Solar</span>
-              </span>
-              <span className={`px-2 sm:px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-wider truncate max-w-[130px] sm:max-w-none ${
-                effectiveIsSuperAdmin
-                  ? 'bg-purple-100 dark:bg-purple-950/70 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800'
-                  : effectiveIsAdmin
-                  ? 'bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
-                  : isDealer
-                  ? 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
-                  : 'bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
-              }`}>
-                {effectiveIsSuperAdmin
-                  ? '👑 Super Admin'
-                  : effectiveIsAdmin
-                  ? '🛡️ Admin'
-                  : isDealer
-                  ? '🏬 Dealer'
-                  : '👤 Dashboard'}
-              </span>
+            <div
+              className="p-2 rounded-xl border border-gray-200 dark:border-gray-800 group-hover:border-amber-400 dark:group-hover:border-amber-500 group-hover:bg-amber-50 dark:group-hover:bg-amber-950/40 text-gray-600 dark:text-gray-300 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-all shrink-0 shadow-2xs"
+            >
+              <ArrowLeft className="h-4 w-4" />
             </div>
-            <p className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 tracking-tight leading-none mt-1 whitespace-nowrap">
-              {settings?.headerTagline || "Pakistan's #1 Used Solar Marketplace"}
-            </p>
-          </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <span className="text-base sm:text-lg font-black tracking-tight text-gray-900 dark:text-white shrink-0 leading-none group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                  Sell<span className="text-amber-500">Solar</span>
+                </span>
+                <span className={`px-2 sm:px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-wider truncate max-w-[130px] sm:max-w-none ${
+                  effectiveIsSuperAdmin
+                    ? 'bg-purple-100 dark:bg-purple-950/70 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800'
+                    : effectiveIsAdmin
+                    ? 'bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
+                    : isDealer
+                    ? 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                    : 'bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
+                }`}>
+                  {effectiveIsSuperAdmin
+                    ? '👑 Super Admin'
+                    : effectiveIsAdmin
+                    ? '🛡️ Admin'
+                    : isDealer
+                    ? '🏪 Dealer'
+                    : '📋 Dashboard'}
+                </span>
+              </div>
+              <p className="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 tracking-tight leading-none mt-1 whitespace-nowrap group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors">
+                {settings?.headerTagline || "Pakistan's #1 Used Solar Marketplace"}
+              </p>
+            </div>
+          </a>
         </div>
 
         <div className="flex items-center gap-1.5 sm:gap-2.5">
@@ -2582,6 +2602,14 @@ export default function AdminSuperDashboard({
 
           {/* Sidebar Footer */}
           <div className="pt-4 mt-4 border-t border-gray-100 dark:border-gray-800 space-y-2">
+            <a
+              href="/"
+              onClick={handleGoHome}
+              className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl border border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 text-xs font-bold hover:bg-gray-100 dark:hover:bg-gray-800 transition-all cursor-pointer"
+            >
+              <Home className="h-3.5 w-3.5 text-amber-500" />
+              <span>Back to Main Marketplace</span>
+            </a>
             {onPostAd && (
               <button
                 type="button"

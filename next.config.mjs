@@ -4,11 +4,11 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {import('next').NextConfig} */
-const isProd = process.env.NODE_ENV === 'production';
+const isDev = process.env.NODE_ENV === 'development' || process.env.npm_lifecycle_event === 'dev';
 
 const nextConfig = {
   // Static export for production build (Cloudflare Pages / Netlify / dist/ sync)
-  ...(isProd ? { output: 'export' } : {}),
+  ...(isDev ? {} : { output: 'export' }),
   images: {
     unoptimized: true,
   },

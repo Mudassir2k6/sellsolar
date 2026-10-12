@@ -62,7 +62,7 @@ export default {
       redirect: 'manual'
     });
 
-    const response = await fetch(proxyRequest);
+    const response = await fetch(proxyRequest, { cf: { cacheEverything: false, cacheTtl: 0 } });
 
     // Return response with original content, bypassing edge HTML cache
     const responseHeaders = new Headers(response.headers);

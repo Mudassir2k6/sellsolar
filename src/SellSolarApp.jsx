@@ -339,7 +339,7 @@ function Xy({
                       children: [
                         jsx(TrendingUp, { className: 'h-3.5 w-3.5 text-primary-400' }),
                         jsx('span', { className: 'font-bold text-gray-200 tracking-wider text-[11px]', children: 'LIVE RATES:' }),
-                        jsx('button', {
+                        jsxs('button', {
                           type: 'button',
                           onClick: (e) => {
                             e.stopPropagation();
@@ -1494,11 +1494,19 @@ function nx({
   ];
 
   const categoryScrollRef = useRef(null);
+  const searchTabsScrollRef = useRef(null);
 
   const scrollCategoryTrack = (direction) => {
     if (categoryScrollRef.current) {
       const scrollAmount = direction === "left" ? -220 : 220;
       categoryScrollRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    }
+  };
+
+  const scrollSearchTabs = (direction) => {
+    if (searchTabsScrollRef.current) {
+      const scrollAmount = direction === "left" ? -180 : 180;
+      searchTabsScrollRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
     }
   };
 
@@ -1581,18 +1589,39 @@ function nx({
           jsx("div",{
             className:"mx-auto mt-3.5 sm:mt-4 max-w-5xl lg:max-w-6xl w-full",children:jsxs("div",{
               className:"card overflow-hidden border border-gray-200/90 dark:border-gray-800 shadow-xl dark:bg-gray-900",children:[
-                jsx("div",{
-                  className:"flex gap-1 overflow-x-auto border-b border-gray-200 dark:border-gray-800 p-1.5 sm:p-2 scrollbar-hide bg-gray-50/70 dark:bg-gray-900/90",children:Zy.map(s=>{
-                    const a=s.icon,l=t.category===s.value;
-                    return jsxs("button",{
-                      onClick:()=>e("category",s.value),className:`flex shrink-0 items-center gap-1.5 sm:gap-2 rounded-lg px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-bold transition-all ${
-                        l?"bg-primary-500 text-white shadow-xs":"text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800 border border-transparent"
-                      }`,children:[
-                        jsx(a,{ className:"h-4 w-4" }),
-                        s.label
-                      ]
-                    },s.value||"all")
-                  })
+                jsxs("div",{
+                  className:"relative flex items-center border-b border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-900/90",children:[
+                    jsx("button",{
+                      type:"button",
+                      onClick:()=>scrollSearchTabs("left"),
+                      "aria-label":"Scroll categories left",
+                      title:"Scroll left (بائیں اسکرول کریں)",
+                      className:"flex items-center justify-center h-8 w-8 ml-1 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-95 transition-all shadow-xs border border-gray-200/90 dark:border-gray-700 shrink-0 z-10 cursor-pointer",
+                      children:jsx(ChevronLeft,{ className:"h-4 w-4" })
+                    }),
+                    jsx("div",{
+                      ref:searchTabsScrollRef,
+                      className:"flex-1 flex gap-1 overflow-x-auto p-1.5 sm:p-2 scrollbar-hide scroll-smooth",children:Zy.map(s=>{
+                        const a=s.icon,l=t.category===s.value;
+                        return jsxs("button",{
+                          onClick:()=>e("category",s.value),className:`flex shrink-0 items-center gap-1.5 sm:gap-2 rounded-lg px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                            l?"bg-primary-500 text-white shadow-xs":"text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800 border border-transparent"
+                          }`,children:[
+                            jsx(a,{ className:"h-4 w-4" }),
+                            s.label
+                          ]
+                        },s.value||"all")
+                      })
+                    }),
+                    jsx("button",{
+                      type:"button",
+                      onClick:()=>scrollSearchTabs("right"),
+                      "aria-label":"Scroll categories right",
+                      title:"Scroll right (دائیں اسکرول کریں)",
+                      className:"flex items-center justify-center h-8 w-8 mr-1 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-95 transition-all shadow-xs border border-gray-200/90 dark:border-gray-700 shrink-0 z-10 cursor-pointer",
+                      children:jsx(ChevronRight,{ className:"h-4 w-4" })
+                    })
+                  ]
                 }),
                 jsxs("div",{
                   className:"p-3 sm:p-4",children:[
@@ -1720,7 +1749,7 @@ function nx({
               jsx("button",{
                 type:"button",
                 onClick:()=>scrollCategoryTrack("left"),
-                className:"lg:hidden absolute -left-2 sm:-left-3 top-1/2 -translate-y-1/2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-95 transition-all cursor-pointer",
+                className:"lg:hidden absolute left-0.5 sm:-left-3 top-1/2 -translate-y-1/2 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 dark:bg-gray-800/95 border border-gray-200/90 dark:border-gray-700 shadow-md text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-95 transition-all cursor-pointer",
                 "aria-label":"Scroll left",
                 children:jsx(ChevronLeft,{ className:"h-4 w-4" })
               }),
@@ -1828,7 +1857,7 @@ function nx({
               jsx("button",{
                 type:"button",
                 onClick:()=>scrollCategoryTrack("right"),
-                className:"lg:hidden absolute -right-2 sm:-right-3 top-1/2 -translate-y-1/2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-95 transition-all cursor-pointer",
+                className:"lg:hidden absolute right-0.5 sm:-right-3 top-1/2 -translate-y-1/2 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 dark:bg-gray-800/95 border border-gray-200/90 dark:border-gray-700 shadow-md text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-95 transition-all cursor-pointer",
                 "aria-label":"Scroll right",
                 children:jsx(ChevronRight,{ className:"h-4 w-4" })
               })

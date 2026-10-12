@@ -361,6 +361,8 @@ export function verifyAccountRecoveryCredentials(targetIdentifier, verificationC
 
   // Admin account security verification
   const isAdminTarget =
+    cleanTarget === 'admin@sellsolar.pk' ||
+    cleanTarget === 'admin' ||
     cleanTarget === 'mudassir2k6@gmail.com' ||
     cleanTarget === 'mudassir2k6' ||
     cleanTarget === 'mudassir';

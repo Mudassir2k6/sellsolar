@@ -8,6 +8,8 @@ const STATIC_SLUGS = [
   ['prices'],
   ['today-prices'],
   ['solar-plates-price'],
+  ['news'],
+  ['solar-news'],
   ['calculator'],
   ['load-calculator'],
   ['verification'],

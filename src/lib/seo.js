@@ -56,6 +56,24 @@ export const PAGE_SEO = {
     path: '/install',
     robots: INDEXABLE,
   },
+  news: {
+    title: 'Daily Solar News Pakistan | Live Solar Rates, NEPRA & Market Updates',
+    description:
+      'Read daily updated solar energy news in Pakistan powered by Google search grounding. Get latest updates on NEPRA net-metering policies, solar plate rates, and import trends.',
+    path: '/news',
+    robots: INDEXABLE,
+    keywords:
+      'solar news Pakistan, daily solar rates update, NEPRA net metering news, solar plate price trends, Pakistan renewable energy updates',
+  },
+  'solar-news': {
+    title: 'Daily Solar News Pakistan | Live Solar Rates, NEPRA & Market Updates',
+    description:
+      'Read daily updated solar energy news in Pakistan powered by Google search grounding. Get latest updates on NEPRA net-metering policies, solar plate rates, and import trends.',
+    path: '/solar-news',
+    robots: INDEXABLE,
+    keywords:
+      'solar news Pakistan, daily solar rates update, NEPRA net metering news, solar plate price trends, Pakistan renewable energy updates',
+  },
   verification: {
     title: 'Tier 1 Solar Plates Verification Pakistan | Official Barcode & Serial Check',
     description:

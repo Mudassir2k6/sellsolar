@@ -302,6 +302,7 @@ export default function AdminSuperDashboard({
   // User Management State
   const [userSearchQuery, setUserSearchQuery] = useState('');
   const [userRoleFilter, setUserRoleFilter] = useState('all');
+  const [userMetricFilter, setUserMetricFilter] = useState('all'); // 'all' | 'signed_in' | 'dealers' | 'admins'
   const [userUniquenessFilter, setUserUniquenessFilter] = useState('all'); // 'all' | 'super_admin' | 'admin' | 'dealer' | 'customer'
   const [isAddingUser, setIsAddingUser] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -864,10 +865,26 @@ export default function AdminSuperDashboard({
     };
   }, [usersList]);
 
-  // Filtered Users List with Role, Search, and Uniqueness
+  // Filtered Users List with Role, Search, Uniqueness, and Metric Card filter
   const filteredUsersList = useMemo(() => {
     let list = usersList.filter((u) => {
-      if (userRoleFilter !== 'all' && u.role !== userRoleFilter) return false;
+      // Metric Card Quick Filter
+      if (userMetricFilter === 'signed_in') {
+        const isSelf = Boolean(u.isCurrentSession || (user?.email && (u.email || '').toLowerCase() === user.email.toLowerCase()));
+        if (!isSelf) return false;
+      } else if (userMetricFilter === 'dealers') {
+        if (u.role !== 'dealer' && !u.is_verified_dealer) return false;
+      } else if (userMetricFilter === 'admins') {
+        if (u.role !== 'super_admin' && u.role !== 'admin') return false;
+      }
+
+      // Role filter check
+      if (userRoleFilter === 'admin_all') {
+        if (u.role !== 'super_admin' && u.role !== 'admin') return false;
+      } else if (userRoleFilter !== 'all' && u.role !== userRoleFilter) {
+        return false;
+      }
+
       if (!userSearchQuery) return true;
       const q = userSearchQuery.toLowerCase();
       return (
@@ -912,10 +929,19 @@ export default function AdminSuperDashboard({
     }
 
     return list;
-  }, [usersList, userRoleFilter, userSearchQuery, userUniquenessFilter]);
+  }, [usersList, userRoleFilter, userSearchQuery, userUniquenessFilter, userMetricFilter, user]);
 
   // Handle User Role Change
   const handleRoleChange = async (userIdOrEmail, newRole) => {
+    const isOwner = (userIdOrEmail || '').toLowerCase() === 'mudassir2k6@gmail.com';
+    if (isOwner) {
+      showToast({
+        title: 'Action Not Allowed',
+        message: 'The Platform Owner (mudassir2k6@gmail.com) role cannot be changed.',
+        type: 'error',
+      });
+      return;
+    }
     try {
       // Optimistic update
       setUsersList((prev) =>
@@ -1001,11 +1027,11 @@ export default function AdminSuperDashboard({
   const handleToggleUserStatus = async (targetUser, shouldDisable) => {
     if (isSubmittingUserAction) return;
     const targetIdentifier = targetUser.id || targetUser.email;
-    const isOwner = (targetUser.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase();
+    const isOwner = (targetUser.email || '').toLowerCase() === 'mudassir2k6@gmail.com';
     if (isOwner) {
       showToast({
         title: 'Action Not Allowed',
-        message: 'Super Admin account cannot be disabled.',
+        message: 'The Platform Owner account (mudassir2k6@gmail.com) cannot be disabled.',
         type: 'error',
       });
       return;
@@ -1050,11 +1076,11 @@ export default function AdminSuperDashboard({
     if (!confirmDeleteUser || isSubmittingUserAction) return;
     const targetUser = confirmDeleteUser;
     const targetIdentifier = targetUser.id || targetUser.email;
-    const isOwner = (targetUser.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase();
+    const isOwner = (targetUser.email || '').toLowerCase() === 'mudassir2k6@gmail.com';
     if (isOwner) {
       showToast({
         title: 'Action Not Allowed',
-        message: 'Super Admin account cannot be deleted.',
+        message: 'The Platform Owner account (mudassir2k6@gmail.com) cannot be deleted.',
         type: 'error',
       });
       setConfirmDeleteUser(null);
@@ -5425,49 +5451,128 @@ export default function AdminSuperDashboard({
                 </div>
               </div>
 
-              {/* Metric Cards */}
+              {/* Metric Cards - Interactive Filter Buttons */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-                <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUserMetricFilter('all');
+                    setUserRoleFilter('all');
+                    setUserUniquenessFilter('all');
+                  }}
+                  className={`p-4 rounded-2xl text-left transition-all duration-200 cursor-pointer shadow-xs hover:shadow-md transform hover:-translate-y-0.5 group ${
+                    userMetricFilter === 'all' && userRoleFilter === 'all'
+                      ? 'bg-purple-50 dark:bg-purple-950/40 border-2 border-purple-500 ring-2 ring-purple-300 dark:ring-purple-800'
+                      : 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:border-purple-300'
+                  }`}
+                  title="Click to view all platform accounts"
+                >
                   <div className="flex items-center justify-between">
-                    <p className="text-[11px] font-bold text-gray-400 uppercase">Total Accounts</p>
-                    <Users className="h-4 w-4 text-purple-500" />
+                    <p className="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Accounts</p>
+                    <Users className={`h-4 w-4 transition-transform group-hover:scale-110 ${userMetricFilter === 'all' && userRoleFilter === 'all' ? 'text-purple-600 dark:text-purple-400' : 'text-purple-500'}`} />
                   </div>
                   <p className="text-2xl font-black text-gray-900 dark:text-white mt-1.5">{usersList.length}</p>
-                  <p className="text-[10px] text-gray-400 mt-0.5">Synced across platform</p>
-                </div>
+                  <div className="flex items-center justify-between mt-0.5">
+                    <p className="text-[10px] text-gray-400">Synced across platform</p>
+                    {userMetricFilter === 'all' && userRoleFilter === 'all' && (
+                      <span className="text-[9px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-wider bg-purple-100 dark:bg-purple-900/60 px-1.5 py-0.5 rounded-md">Filter Active</span>
+                    )}
+                  </div>
+                </button>
 
-                <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-emerald-200 dark:border-emerald-900/50 shadow-xs">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUserMetricFilter((prev) => (prev === 'signed_in' ? 'all' : 'signed_in'));
+                    setUserRoleFilter('all');
+                  }}
+                  className={`p-4 rounded-2xl text-left transition-all duration-200 cursor-pointer shadow-xs hover:shadow-md transform hover:-translate-y-0.5 group ${
+                    userMetricFilter === 'signed_in'
+                      ? 'bg-emerald-50 dark:bg-emerald-950/40 border-2 border-emerald-500 ring-2 ring-emerald-300 dark:ring-emerald-800'
+                      : 'bg-white dark:bg-gray-900 border border-emerald-200 dark:border-emerald-900/50 hover:border-emerald-400'
+                  }`}
+                  title="Click to filter by currently active signed-in session"
+                >
                   <div className="flex items-center justify-between">
-                    <p className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">Signed In Now</p>
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <p className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Signed In Now</p>
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                   </div>
                   <p className="text-2xl font-black text-emerald-700 dark:text-emerald-300 mt-1.5">
                     {usersList.filter((u) => u.isCurrentSession).length || 1}
                   </p>
-                  <p className="text-[10px] text-emerald-600/80 dark:text-emerald-400/80 mt-0.5">Active logged in session</p>
-                </div>
+                  <div className="flex items-center justify-between mt-0.5">
+                    <p className="text-[10px] text-emerald-600/80 dark:text-emerald-400/80">Active logged in session</p>
+                    {userMetricFilter === 'signed_in' && (
+                      <span className="text-[9px] font-black text-emerald-700 dark:text-emerald-300 uppercase tracking-wider bg-emerald-100 dark:bg-emerald-900/60 px-1.5 py-0.5 rounded-md">Filter Active</span>
+                    )}
+                  </div>
+                </button>
 
-                <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (userMetricFilter === 'dealers') {
+                      setUserMetricFilter('all');
+                      setUserRoleFilter('all');
+                    } else {
+                      setUserMetricFilter('dealers');
+                      setUserRoleFilter('dealer');
+                    }
+                  }}
+                  className={`p-4 rounded-2xl text-left transition-all duration-200 cursor-pointer shadow-xs hover:shadow-md transform hover:-translate-y-0.5 group ${
+                    userMetricFilter === 'dealers' || userRoleFilter === 'dealer'
+                      ? 'bg-amber-50 dark:bg-amber-950/40 border-2 border-amber-500 ring-2 ring-amber-300 dark:ring-amber-800'
+                      : 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:border-amber-300'
+                  }`}
+                  title="Click to filter verified solar shop dealers"
+                >
                   <div className="flex items-center justify-between">
-                    <p className="text-[11px] font-bold text-gray-400 uppercase">Verified Dealers</p>
-                    <Store className="h-4 w-4 text-amber-500" />
+                    <p className="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Verified Dealers</p>
+                    <Store className={`h-4 w-4 transition-transform group-hover:scale-110 ${userMetricFilter === 'dealers' || userRoleFilter === 'dealer' ? 'text-amber-600 dark:text-amber-400' : 'text-amber-500'}`} />
                   </div>
                   <p className="text-2xl font-black text-gray-900 dark:text-white mt-1.5">
                     {usersList.filter((u) => u.role === 'dealer').length}
                   </p>
-                  <p className="text-[10px] text-gray-400 mt-0.5">Solar shops & stores</p>
-                </div>
+                  <div className="flex items-center justify-between mt-0.5">
+                    <p className="text-[10px] text-gray-400">Solar shops & stores</p>
+                    {(userMetricFilter === 'dealers' || userRoleFilter === 'dealer') && (
+                      <span className="text-[9px] font-black text-amber-700 dark:text-amber-300 uppercase tracking-wider bg-amber-100 dark:bg-amber-900/60 px-1.5 py-0.5 rounded-md">Filter Active</span>
+                    )}
+                  </div>
+                </button>
 
-                <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xs">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (userMetricFilter === 'admins') {
+                      setUserMetricFilter('all');
+                      setUserRoleFilter('all');
+                    } else {
+                      setUserMetricFilter('admins');
+                      setUserRoleFilter('admin_all');
+                    }
+                  }}
+                  className={`p-4 rounded-2xl text-left transition-all duration-200 cursor-pointer shadow-xs hover:shadow-md transform hover:-translate-y-0.5 group ${
+                    userMetricFilter === 'admins' || userRoleFilter === 'admin_all' || userRoleFilter === 'super_admin' || userRoleFilter === 'admin'
+                      ? 'bg-blue-50 dark:bg-blue-950/40 border-2 border-blue-500 ring-2 ring-blue-300 dark:ring-blue-800'
+                      : 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:border-blue-300'
+                  }`}
+                  title="Click to filter administrators & super admins"
+                >
                   <div className="flex items-center justify-between">
-                    <p className="text-[11px] font-bold text-gray-400 uppercase">Administrators</p>
-                    <ShieldCheck className="h-4 w-4 text-blue-500" />
+                    <p className="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Administrators</p>
+                    <ShieldCheck className={`h-4 w-4 transition-transform group-hover:scale-110 ${userMetricFilter === 'admins' || userRoleFilter === 'admin_all' ? 'text-blue-600 dark:text-blue-400' : 'text-blue-500'}`} />
                   </div>
                   <p className="text-2xl font-black text-gray-900 dark:text-white mt-1.5">
                     {usersList.filter((u) => u.role === 'super_admin' || u.role === 'admin').length}
                   </p>
-                  <p className="text-[10px] text-gray-400 mt-0.5">Super Admin & Admin team</p>
-                </div>
+                  <div className="flex items-center justify-between mt-0.5">
+                    <p className="text-[10px] text-gray-400">Super Admin & Admin team</p>
+                    {(userMetricFilter === 'admins' || userRoleFilter === 'admin_all' || userRoleFilter === 'super_admin' || userRoleFilter === 'admin') && (
+                      <span className="text-[9px] font-black text-blue-700 dark:text-blue-300 uppercase tracking-wider bg-blue-100 dark:bg-blue-900/60 px-1.5 py-0.5 rounded-md">Filter Active</span>
+                    )}
+                  </div>
+                </button>
               </div>
 
               {/* Search, Role, and Uniqueness Filter Bar */}
@@ -5504,9 +5609,15 @@ export default function AdminSuperDashboard({
                       <button
                         key={tab.id}
                         type="button"
-                        onClick={() => setUserRoleFilter(tab.id)}
+                        onClick={() => {
+                          setUserRoleFilter(tab.id);
+                          if (tab.id === 'all') setUserMetricFilter('all');
+                          else if (tab.id === 'dealer') setUserMetricFilter('dealers');
+                          else if (tab.id === 'super_admin' || tab.id === 'admin') setUserMetricFilter('admins');
+                          else setUserMetricFilter('all');
+                        }}
                         className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-colors ${
-                          userRoleFilter === tab.id
+                          (userRoleFilter === tab.id || (tab.id === 'all' && userRoleFilter === 'all' && userMetricFilter === 'all'))
                             ? 'bg-purple-600 text-white shadow-xs'
                             : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                         }`}
@@ -5568,18 +5679,27 @@ export default function AdminSuperDashboard({
                         </tr>
                       ) : (
                         filteredUsersList.map((u) => {
-                          const isDefaultAdmin = (u.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase();
+                          const isOwner = (u.email || '').toLowerCase() === 'mudassir2k6@gmail.com';
                           const isActiveUser = u.isCurrentSession || (u.email && u.email.toLowerCase() === (user?.email || '').toLowerCase());
                           return (
-                            <tr key={u.id} className={`hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors ${isActiveUser ? 'bg-emerald-50/30 dark:bg-emerald-950/10' : ''}`}>
+                            <tr key={u.id} className={`hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors ${isOwner ? 'bg-purple-50/40 dark:bg-purple-950/20' : isActiveUser ? 'bg-emerald-50/30 dark:bg-emerald-950/10' : ''}`}>
                               <td className="p-3.5">
                                 <div className="flex items-center gap-3">
-                                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-purple-700 text-white font-bold flex items-center justify-center text-xs shadow-xs shrink-0">
-                                    {(u.name || u.email || 'U').charAt(0).toUpperCase()}
+                                  <div className={`w-9 h-9 rounded-xl font-bold flex items-center justify-center text-xs shadow-xs shrink-0 text-white ${
+                                    isOwner
+                                      ? 'bg-gradient-to-br from-amber-500 via-purple-600 to-indigo-700 ring-2 ring-amber-400'
+                                      : 'bg-gradient-to-br from-purple-500 to-purple-700'
+                                  }`}>
+                                    {isOwner ? '👑' : (u.name || u.email || 'U').charAt(0).toUpperCase()}
                                   </div>
                                   <div className="min-w-0">
                                     <div className="flex items-center gap-2 flex-wrap">
                                       <p className="font-bold text-gray-900 dark:text-white truncate">{u.name}</p>
+                                      {isOwner && (
+                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-200 border border-amber-300 dark:border-amber-700">
+                                          👑 Platform Owner
+                                        </span>
+                                      )}
                                       {isActiveUser && (
                                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700">
                                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -5642,7 +5762,9 @@ export default function AdminSuperDashboard({
                               </td>
                               <td className="p-3.5">
                                 <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                                  u.role === 'super_admin'
+                                  isOwner
+                                    ? 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-200 border border-amber-300 dark:border-amber-700 shadow-xs'
+                                    : u.role === 'super_admin'
                                     ? 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800'
                                     : u.role === 'admin'
                                     ? 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
@@ -5650,25 +5772,28 @@ export default function AdminSuperDashboard({
                                     ? 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
                                     : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
                                 }`}>
-                                  {u.role === 'super_admin' ? '👑 Super Admin' : u.role === 'admin' ? '🛡️ Admin' : u.role === 'dealer' ? '🏬 Dealer' : '👤 Customer'}
+                                  {isOwner ? '👑 Super Admin (Owner)' : u.role === 'super_admin' ? '👑 Super Admin' : u.role === 'admin' ? '🛡️ Admin' : u.role === 'dealer' ? '🏬 Dealer' : '👤 Customer'}
                                 </span>
                               </td>
                               <td className="p-3.5 text-right">
                                 <div className="inline-flex items-center gap-2 justify-end flex-wrap">
-                                  <select
-                                    value={u.role}
-                                    disabled={isDefaultAdmin}
-                                    onChange={(e) => handleRoleChange(u.id || u.email, e.target.value)}
-                                    className="text-xs font-bold py-1.5 px-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 outline-none shadow-xs cursor-pointer disabled:opacity-50"
-                                  >
-                                    <option value="customer">👤 Customer</option>
-                                    <option value="dealer">🏬 Verified Dealer</option>
-                                    <option value="admin">🛡️ Admin</option>
-                                    <option value="super_admin">👑 Super Admin</option>
-                                  </select>
-
-                                  {!isDefaultAdmin ? (
+                                  {isOwner ? (
+                                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-black text-xs border border-purple-300 dark:border-purple-800 shadow-xs">
+                                      👑 Platform Owner
+                                    </span>
+                                  ) : (
                                     <>
+                                      <select
+                                        value={u.role}
+                                        onChange={(e) => handleRoleChange(u.id || u.email, e.target.value)}
+                                        className="text-xs font-bold py-1.5 px-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 outline-none shadow-xs cursor-pointer"
+                                      >
+                                        <option value="customer">👤 Customer</option>
+                                        <option value="dealer">🏬 Verified Dealer</option>
+                                        <option value="admin">🛡️ Admin</option>
+                                        <option value="super_admin">👑 Super Admin</option>
+                                      </select>
+
                                       {u.is_disabled ? (
                                         <button
                                           type="button"
@@ -5703,10 +5828,6 @@ export default function AdminSuperDashboard({
                                         <Trash2 className="h-3.5 w-3.5" />
                                       </button>
                                     </>
-                                  ) : (
-                                    <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400 whitespace-nowrap">
-                                      (Owner)
-                                    </span>
                                   )}
                                 </div>
                               </td>

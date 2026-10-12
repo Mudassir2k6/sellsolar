@@ -35,6 +35,7 @@ import {
   CheckCircle2,
   CircleAlert,
   SlidersHorizontal,
+  Filter,
   Package,
   PlusCircle,
   User,
@@ -280,7 +281,8 @@ export default function AdminSuperDashboard({
 
   // User Management State
   const [userSearchQuery, setUserSearchQuery] = useState('');
-  const [userRoleFilter, setUserRoleFilter] = useState('all'); // 'all' | 'super_admin' | 'admin' | 'dealer' | 'customer'
+  const [userRoleFilter, setUserRoleFilter] = useState('all');
+  const [userUniquenessFilter, setUserUniquenessFilter] = useState('all'); // 'all' | 'super_admin' | 'admin' | 'dealer' | 'customer'
   const [isAddingUser, setIsAddingUser] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
@@ -578,6 +580,17 @@ export default function AdminSuperDashboard({
             const sellerEmail = (item.seller_email || item.email || '').toLowerCase();
             const sellerPhone = item.seller_phone || item.phone || '';
             const sellerId = item.user_id;
+            // Deduplicate with existing accounts before adding a seller account
+            if (sellerEmail && usersMap.has(sellerEmail)) {
+              const ex = usersMap.get(sellerEmail);
+              if (!ex.phone && sellerPhone) ex.phone = sellerPhone;
+              return;
+            }
+            if (sellerId && usersMap.has(String(sellerId).toLowerCase())) {
+              const ex = usersMap.get(String(sellerId).toLowerCase());
+              if (!ex.phone && sellerPhone) ex.phone = sellerPhone;
+              return;
+            }
             const sellerKey = (sellerEmail || sellerId || sellerPhone).toLowerCase();
             if (sellerKey && !deletedUsersMap[sellerKey] && !usersMap.has(sellerKey)) {
               usersMap.set(sellerKey, {
@@ -712,7 +725,23 @@ export default function AdminSuperDashboard({
       });
     } catch {}
 
-    setUsersList(Array.from(usersMap.values()));
+    // 5. Enforce email uniqueness: Deduplicate accounts so each email appears only once!
+    const deduplicatedUsers = new Map();
+    usersMap.forEach((uObj) => {
+      const emailKey = (uObj.email || '').trim().toLowerCase();
+      if (emailKey && deduplicatedUsers.has(emailKey)) {
+        const exist = deduplicatedUsers.get(emailKey);
+        // Merge: keep non-empty phone, valid UUID, higher role, active session
+        if (!exist.phone && uObj.phone) exist.phone = uObj.phone;
+        if (isValidUuid(uObj.id) && !isValidUuid(exist.id)) exist.id = uObj.id;
+        if (uObj.isCurrentSession) exist.isCurrentSession = true;
+        if (uObj.role === 'super_admin' || (uObj.role === 'admin' && exist.role !== 'super_admin')) exist.role = uObj.role;
+        return;
+      }
+      deduplicatedUsers.set(emailKey || (uObj.id || '').toLowerCase(), uObj);
+    });
+
+    setUsersList(Array.from(deduplicatedUsers.values()));
 
     // 3. Inbox
     setInboxMessages(getInboxMessages());
@@ -788,9 +817,36 @@ export default function AdminSuperDashboard({
 
   const analytics = useMemo(() => getAnalyticsSummary(listingsList), [listingsList, analyticsTick]);
 
-  // Filtered Users List
+  // Uniqueness & Phone Metrics for Filters
+  const userStats = useMemo(() => {
+    const phoneCounts = {};
+    const emailCounts = {};
+    usersList.forEach((u) => {
+      const p = (u.phone || '').trim().replace(/\D/g, '');
+      if (p) phoneCounts[p] = (phoneCounts[p] || 0) + 1;
+      const em = (u.email || '').trim().toLowerCase();
+      if (em) emailCounts[em] = (emailCounts[em] || 0) + 1;
+    });
+
+    const uniquePhones = Object.keys(phoneCounts).length;
+    const uniqueEmails = Object.keys(emailCounts).length;
+    const duplicatePhones = usersList.filter((u) => {
+      const p = (u.phone || '').trim().replace(/\D/g, '');
+      return p && phoneCounts[p] > 1;
+    }).length;
+    const missingPhones = usersList.filter((u) => !(u.phone || '').trim()).length;
+
+    return {
+      uniquePhones,
+      uniqueEmails,
+      duplicatePhones,
+      missingPhones,
+    };
+  }, [usersList]);
+
+  // Filtered Users List with Role, Search, and Uniqueness
   const filteredUsersList = useMemo(() => {
-    return usersList.filter((u) => {
+    let list = usersList.filter((u) => {
       if (userRoleFilter !== 'all' && u.role !== userRoleFilter) return false;
       if (!userSearchQuery) return true;
       const q = userSearchQuery.toLowerCase();
@@ -802,7 +858,41 @@ export default function AdminSuperDashboard({
         (u.id || '').toLowerCase().includes(q)
       );
     });
-  }, [usersList, userRoleFilter, userSearchQuery]);
+
+    if (userUniquenessFilter === 'unique_numbers') {
+      const seenPhones = new Set();
+      list = list.filter((u) => {
+        const cleanP = (u.phone || '').trim().replace(/\D/g, '');
+        if (!cleanP) return false;
+        if (seenPhones.has(cleanP)) return false;
+        seenPhones.add(cleanP);
+        return true;
+      });
+    } else if (userUniquenessFilter === 'unique_emails') {
+      const seenEmails = new Set();
+      list = list.filter((u) => {
+        const cleanE = (u.email || '').trim().toLowerCase();
+        if (!cleanE) return true;
+        if (seenEmails.has(cleanE)) return false;
+        seenEmails.add(cleanE);
+        return true;
+      });
+    } else if (userUniquenessFilter === 'duplicate_numbers') {
+      const phoneCounts = {};
+      usersList.forEach((u) => {
+        const cleanP = (u.phone || '').trim().replace(/\D/g, '');
+        if (cleanP) phoneCounts[cleanP] = (phoneCounts[cleanP] || 0) + 1;
+      });
+      list = list.filter((u) => {
+        const cleanP = (u.phone || '').trim().replace(/\D/g, '');
+        return cleanP && phoneCounts[cleanP] > 1;
+      });
+    } else if (userUniquenessFilter === 'missing_phone') {
+      list = list.filter((u) => !(u.phone || '').trim());
+    }
+
+    return list;
+  }, [usersList, userRoleFilter, userSearchQuery, userUniquenessFilter]);
 
   // Handle User Role Change
   const handleRoleChange = async (userIdOrEmail, newRole) => {
@@ -5277,44 +5367,73 @@ export default function AdminSuperDashboard({
                 </div>
               </div>
 
-              {/* Search and Role Filter Bar */}
-              <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <div className="relative w-full sm:w-80">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
-                  <input
-                    type="text"
-                    value={userSearchQuery}
-                    onChange={(e) => setUserSearchQuery(e.target.value)}
-                    placeholder="Search by name, email, phone, city..."
-                    className="input-field pl-9 text-xs py-2"
-                  />
-                  {userSearchQuery && (
-                    <button
-                      type="button"
-                      onClick={() => setUserSearchQuery('')}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  )}
+              {/* Search, Role, and Uniqueness Filter Bar */}
+              <div className="p-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 flex flex-col gap-3">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+                  <div className="relative w-full sm:w-80">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                    <input
+                      type="text"
+                      value={userSearchQuery}
+                      onChange={(e) => setUserSearchQuery(e.target.value)}
+                      placeholder="Search by name, email, phone, city..."
+                      className="input-field pl-9 text-xs py-2"
+                    />
+                    {userSearchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => setUserSearchQuery('')}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
+                    {[
+                      { id: 'all', label: `All Roles (${usersList.length})` },
+                      { id: 'super_admin', label: '👑 Super Admin' },
+                      { id: 'admin', label: '🛡️ Admin' },
+                      { id: 'dealer', label: '🏬 Dealer' },
+                      { id: 'customer', label: '👤 Customer' },
+                    ].map((tab) => (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => setUserRoleFilter(tab.id)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-colors ${
+                          userRoleFilter === tab.id
+                            ? 'bg-purple-600 text-white shadow-xs'
+                            : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
+                {/* Uniqueness & Phone Filters Bar */}
+                <div className="flex items-center gap-1.5 overflow-x-auto pt-2.5 border-t border-gray-100 dark:border-gray-800 text-xs">
+                  <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider shrink-0 flex items-center gap-1 mr-1">
+                    <Filter className="h-3 w-3 text-purple-500" /> Filter:
+                  </span>
                   {[
-                    { id: 'all', label: `All (${usersList.length})` },
-                    { id: 'super_admin', label: '👑 Super Admin' },
-                    { id: 'admin', label: '🛡️ Admin' },
-                    { id: 'dealer', label: '🏬 Dealer' },
-                    { id: 'customer', label: '👤 Customer' },
+                    { id: 'all', label: `All Accounts (${usersList.length})` },
+                    { id: 'unique_numbers', label: `🔢 Unique Numbers (${userStats.uniquePhones})` },
+                    { id: 'unique_emails', label: `✉️ Unique Emails (${userStats.uniqueEmails})` },
+                    { id: 'duplicate_numbers', label: `⚠️ Duplicate Numbers (${userStats.duplicatePhones})` },
+                    { id: 'missing_phone', label: `📵 Missing Phone (${userStats.missingPhones})` },
                   ].map((tab) => (
                     <button
                       key={tab.id}
                       type="button"
-                      onClick={() => setUserRoleFilter(tab.id)}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-colors ${
-                        userRoleFilter === tab.id
-                          ? 'bg-purple-600 text-white shadow-xs'
-                          : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                      onClick={() => setUserUniquenessFilter(tab.id)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                        userUniquenessFilter === tab.id
+                          ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-xs ring-2 ring-purple-300 dark:ring-purple-900'
+                          : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                       }`}
                     >
                       {tab.label}
@@ -5375,7 +5494,7 @@ export default function AdminSuperDashboard({
                                   {u.phone ? (
                                     <span className="inline-flex items-center gap-1 text-[11px] font-medium text-gray-700 dark:text-gray-300">
                                       <Phone className="h-3 w-3 text-purple-500 shrink-0" />
-                                      {u.phone.length >= 7 ? `${u.phone.slice(0, 3)}••••••${u.phone.slice(-2)}` : '•••••••••••'}
+                                      <span className="font-mono font-bold text-gray-900 dark:text-gray-100">{u.phone}</span>
                                     </span>
                                   ) : (
                                     <span className="text-[11px] italic text-amber-600 dark:text-amber-400">

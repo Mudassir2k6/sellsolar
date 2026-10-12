@@ -97,7 +97,7 @@ import {
 } from 'lucide-react';
 import { useAuth, DEFAULT_ADMIN_ID, DEFAULT_ADMIN_EMAIL, getStoredUsers, saveStoredUsers, getUserPhonesMap, saveUserPhonesMap } from './context/AuthContext';
 import { useToast } from './context/ToastContext';
-import { supabase } from './lib/supabase';
+import { supabase, isSupabaseConfigured } from './lib/supabase';
 import { BRANDS, CATEGORIES, CITIES, formatPrice } from './lib/constants';
 import { digitsOnlyPhone, isValidPhone, normalizePhone, isValidUuid } from './lib/auth';
 import { getLocalOrSeedListings, getLocalOrSeedListingById } from './data/seedListings';
@@ -2890,7 +2890,7 @@ function yx({
   onBack:t,onPosted:e,hasOuterNavbar=false,onNavigate
 }){
   const{
-    profile:r,user:seller
+    profile:r,user:seller,updateProfile
   }=useAuth(),[n,s]=useState(!1),[a,l]=useState(null),[o,c]=useState(!1),[u,d]=useState(""),[h,p]=useState(""),[y,w]=useState("panel"),[j,C]=useState("used"),[g,f]=useState(""),[m,v]=useState((r==null?void 0:r.city)||""),[k,x]=useState(""),[S,L]=useState(""),[z,I]=useState(""),[Y,ke]=useState(""),[ye,Be]=useState((r==null?void 0:r.full_name)||""),[le,We]=useState((r==null?void 0:r.phone)||""),[uploadedFiles,setUploadedFiles]=useState([]),[uploadNotice,setUploadNotice]=useState("");
 
   const isSignedIn = Boolean(seller || r);
@@ -3099,16 +3099,73 @@ function yx({
         localStorage.setItem("sellsolar_custom_listings", JSON.stringify(list));
       } catch (err) {}
 
-      try {
-        const pMap = typeof getUserPhonesMap === 'function' ? getUserPhonesMap() : {};
-        if (seller?.email) pMap[seller.email] = le.trim();
-        if (safeUserId) pMap[safeUserId] = le.trim();
-        if (ye.trim()) pMap[ye.trim()] = le.trim();
-        if (typeof saveUserPhonesMap === 'function') saveUserPhonesMap(pMap);
-        if (safeUserId && isValidUuid(safeUserId)) {
-          supabase.from('profiles').update({ phone: le.trim() }).eq('id', safeUserId).catch(() => {});
+      // Persist phone for Google/Gmail users and update user profile everywhere
+      const enteredPhone = le.trim();
+      if (enteredPhone) {
+        try {
+          // 1. Update phones map
+          const pMap = typeof getUserPhonesMap === 'function' ? getUserPhonesMap() : {};
+          if (seller?.email) pMap[seller.email.toLowerCase()] = enteredPhone;
+          if (r?.email) pMap[r.email.toLowerCase()] = enteredPhone;
+          if (safeUserId) pMap[safeUserId] = enteredPhone;
+          if (typeof saveUserPhonesMap === 'function') saveUserPhonesMap(pMap);
+
+          // 2. Persist to Supabase profiles table (both by id and by email)
+          if (typeof isSupabaseConfigured === 'function' && isSupabaseConfigured()) {
+            const phoneUpdatePayload = {
+              phone: enteredPhone,
+              mobile: enteredPhone,
+              contact_phone: enteredPhone,
+            };
+            if (safeUserId && isValidUuid(safeUserId)) {
+              await supabase.from('profiles').update(phoneUpdatePayload).eq('id', safeUserId).catch(() => {});
+            }
+            if (seller?.email) {
+              await supabase.from('profiles').update(phoneUpdatePayload).ilike('email', seller.email).catch(() => {});
+            }
+            if (r?.email && r.email !== seller?.email) {
+              await supabase.from('profiles').update(phoneUpdatePayload).ilike('email', r.email).catch(() => {});
+            }
+          }
+
+          // 3. Update local stored users
+          try {
+            const rawUsers = typeof getStoredUsers === 'function' ? getStoredUsers() : {};
+            const keysToMatch = [seller?.email, r?.email, safeUserId].filter(Boolean).map((k) => k.toLowerCase());
+            for (const [k, v] of Object.entries(rawUsers)) {
+              const uEmail = (v.user?.email || v.profile?.email || '').toLowerCase();
+              const uId = (v.user?.id || v.profile?.id || '').toLowerCase();
+              if (keysToMatch.includes(k.toLowerCase()) || (uEmail && keysToMatch.includes(uEmail)) || (uId && keysToMatch.includes(uId))) {
+                if (v.profile) v.profile.phone = enteredPhone;
+                if (v.user?.user_metadata) v.user.user_metadata.phone = enteredPhone;
+              }
+            }
+            if (typeof saveStoredUsers === 'function') saveStoredUsers(rawUsers);
+          } catch (e) {}
+
+          // 4. Update in-memory auth profile if available
+          if (typeof updateProfile === 'function') {
+            try {
+              await updateProfile({
+                fullName: resolvedName || ye.trim() || r?.full_name || (seller?.email ? seller.email.split('@')[0] : 'User'),
+                phone: enteredPhone,
+                email: seller?.email || r?.email,
+                city: m.trim() || r?.city || 'Lahore',
+              });
+            } catch (pErr) {
+              console.warn('Post-ad profile update warning:', pErr);
+            }
+          }
+
+          // 5. Dispatch sync events so Admin dashboard updates immediately
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new Event('sellsolar_users_updated'));
+            window.dispatchEvent(new Event('sellsolar_auth_updated'));
+          }
+        } catch (phonePersistErr) {
+          console.warn('Phone persistence notice:', phonePersistErr);
         }
-      } catch (err) {}
+      }
 
       try {
         const{
@@ -3484,11 +3541,16 @@ function yx({
                   className:"mt-1 text-[11px] text-gray-500 dark:text-gray-400 flex items-center gap-1",
                   children:[
                     jsx(ShieldCheck,{className:"h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 shrink-0"}),
-                    "Mobile number is verified and cannot be changed on post ad."
+                    "Mobile number is verified and linked to your profile."
                   ]
-                }) : jsx("p",{
-                  className:"mt-1 text-[11px] text-amber-700 dark:text-amber-400",
-                  children:"Please enter your 11-digit WhatsApp/calling number (e.g. 03001234567)."
+                }) : jsxs("p",{
+                  className:`mt-1 text-[11px] flex items-center gap-1 font-semibold ${isSignedIn ? "text-primary-600 dark:text-primary-400" : "text-amber-700 dark:text-amber-400"}`,
+                  children:[
+                    isSignedIn ? jsx(ShieldCheck,{className:"h-3.5 w-3.5 text-primary-600 dark:text-primary-400 shrink-0"}) : null,
+                    isSignedIn
+                      ? "Google / Gmail Account: Please enter your 11-digit mobile number. It will be permanently saved to your user profile."
+                      : "Please enter your 11-digit WhatsApp/calling number (e.g. 03001234567)."
+                  ]
                 })]
               })]
             }),jsx("div",{

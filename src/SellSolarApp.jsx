@@ -339,7 +339,7 @@ function Xy({
                       children: [
                         jsx(TrendingUp, { className: 'h-3.5 w-3.5 text-primary-400' }),
                         jsx('span', { className: 'font-bold text-gray-200 tracking-wider text-[11px]', children: 'LIVE RATES:' }),
-                        jsxs('button', {
+                        jsx('button', {
                           type: 'button',
                           onClick: (e) => {
                             e.stopPropagation();

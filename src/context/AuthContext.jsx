@@ -412,6 +412,11 @@ export function AuthProvider({ children }) {
     const targetEmail = (userEmail || '').toLowerCase();
     const phoneMap = getUserPhonesMap();
 
+    const isDefaultAdmin =
+      targetEmail === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
+      targetEmail === LEGACY_ADMIN_EMAIL.toLowerCase() ||
+      (userId && userId === DEFAULT_ADMIN_ID);
+
     // 1. Try Supabase query if configured
     if (isSupabaseConfigured()) {
       try {
@@ -431,11 +436,41 @@ export function AuthProvider({ children }) {
               supabase.from('profiles').update({ phone: fallbackPhone }).eq('id', data.id).catch(() => {});
             }
           }
+          // Ensure Super Admin has is_admin = true in remote database
+          if (isDefaultAdmin && !data.is_admin) {
+            data.is_admin = true;
+            supabase.from('profiles').update({ is_admin: true }).eq('id', data.id).catch(() => {});
+          }
           setProfile(data);
           return;
         }
-      } catch {
-        // Fall back to local storage
+
+        // CRITICAL CROSS-DEVICE SYNC:
+        // If a non-admin account is missing from Supabase profiles, it was deleted by the Admin!
+        // Immediately invalidate any cached sessions on this device/laptop and force sign-out.
+        if (!error && !data && !isDefaultAdmin) {
+          console.warn('Account not found in cloud database for:', targetEmail || userId, '- Purging cached session');
+          const localUsers = getStoredUsers();
+          if (targetEmail && localUsers[targetEmail]) delete localUsers[targetEmail];
+          if (userId && localUsers[userId]) delete localUsers[userId];
+          saveStoredUsers(localUsers);
+
+          const dMap = getDeletedUsers();
+          if (targetEmail) dMap[targetEmail] = { deletedAt: new Date().toISOString() };
+          if (userId) dMap[userId] = { deletedAt: new Date().toISOString() };
+          saveDeletedUsers(dMap);
+
+          saveStoredSession(null);
+          setUser(null);
+          setProfile(null);
+          supabase.auth.signOut().catch(() => {});
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('sellsolar_auth_updated'));
+          }
+          return;
+        }
+      } catch (err) {
+        console.warn('Supabase loadProfile check notice:', err);
       }
     }
 
@@ -528,7 +563,10 @@ export function AuthProvider({ children }) {
             setProfile(null);
             if (mounted) setLoading(false);
           } else {
-            if (mounted) setLoading(false);
+            // Verify cached local session with cloud database
+            loadProfile(localSess.user.id, localSess.user.email).finally(() => {
+              if (mounted) setLoading(false);
+            });
           }
         })
         .catch(() => {
@@ -915,6 +953,36 @@ export function AuthProvider({ children }) {
         cleanIdentifier === 'mudassir2k6' ||
         cleanIdentifier === 'mudassir' ||
         (digitsOnly.length >= 10 && digitsOnly === '03001234567');
+
+      // 0. Verify account existence in cloud database (Cross-device deletion enforcement)
+      if (isSupabaseConfigured() && !isAdm) {
+        try {
+          const { data: dbCheck, error: dbCheckErr } = await supabase
+            .from('profiles')
+            .select('id, email')
+            .or(`id.eq.${cleanIdentifier},email.ilike.${cleanIdentifier},phone.eq.${cleanIdentifier}`)
+            .maybeSingle();
+
+          if (!dbCheckErr && !dbCheck) {
+            // Account does not exist in cloud database (deleted by admin)
+            const localUsers = getStoredUsers();
+            delete localUsers[cleanIdentifier];
+            if (matchedEmail) delete localUsers[matchedEmail];
+            saveStoredUsers(localUsers);
+
+            const dMap = getDeletedUsers();
+            dMap[cleanIdentifier] = { deletedAt: new Date().toISOString() };
+            if (matchedEmail) dMap[matchedEmail] = { deletedAt: new Date().toISOString() };
+            saveDeletedUsers(dMap);
+
+            throw new Error('This account has been deleted by the administrator. Please register for a new account.');
+          }
+        } catch (cloudErr) {
+          if (cloudErr.message && cloudErr.message.includes('deleted')) {
+            throw cloudErr;
+          }
+        }
+      }
 
       // 1. Check local users store first to find matching user record
       const users = getStoredUsers();
@@ -2049,13 +2117,40 @@ export function AuthProvider({ children }) {
       if (foundEmail) delete disabledMap[foundEmail];
       saveDisabledUsers(disabledMap);
 
-      // 4. Supabase profiles delete
+      // 4. Supabase profiles delete via security definer RPC
       if (isSupabaseConfigured()) {
         try {
-          await supabase
-            .from('profiles')
-            .delete()
-            .or(`id.eq.${targetUserIdOrEmail},email.eq.${cleanId}`);
+          // Resolve target UUID in Supabase
+          let targetUuid = isValidUuid(cleanId) ? cleanId : null;
+          if (!targetUuid) {
+            const { data: found } = await supabase
+              .from('profiles')
+              .select('id, email')
+              .or(`id.eq.${cleanId},email.ilike.${cleanId}`)
+              .maybeSingle();
+            if (found?.id) {
+              targetUuid = found.id;
+              if (found.email) deletedMap[found.email.toLowerCase()] = { deletedAt: new Date().toISOString() };
+            }
+          }
+
+          if (targetUuid) {
+            // Call admin_delete_profile RPC with postgres security definer
+            const { error: rpcErr } = await supabase.rpc('admin_delete_profile', {
+              target_user_id: targetUuid,
+            });
+            if (rpcErr) {
+              console.warn('admin_delete_profile RPC notice:', rpcErr);
+              await supabase.from('profiles').delete().eq('id', targetUuid).catch(() => {});
+            }
+
+            // Also delete any equipment listings posted by this user
+            await supabase.from('solar_listings').delete().eq('user_id', targetUuid).catch(() => {});
+          }
+
+          if (cleanId.includes('@')) {
+            await supabase.from('solar_listings').delete().ilike('seller_email', cleanId).catch(() => {});
+          }
         } catch (sbErr) {
           console.warn('Supabase delete profile warning:', sbErr);
         }

@@ -430,13 +430,11 @@ export function AuthProvider({ children }) {
         }
         const { data, error } = await query.maybeSingle();
         if (!error && data) {
-          // If remote phone is missing, try fallback from user_phones map
-          if (!data.phone) {
-            const fallbackPhone = phoneMap[targetEmail] || (userId ? phoneMap[userId] : '') || '';
-            if (fallbackPhone) {
-              data.phone = fallbackPhone;
-              supabase.from('profiles').update({ phone: fallbackPhone }).eq('id', data.id).catch(() => {});
-            }
+          // If remote phone is missing or if user has persistent phone recorded in user_phones map
+          const fallbackPhone = phoneMap[targetEmail] || (userId ? phoneMap[userId] : '') || '';
+          if (fallbackPhone && (!data.phone || targetEmail === 'mudassir2k6@gmail.com' || isDefaultAdmin)) {
+            data.phone = fallbackPhone;
+            supabase.from('profiles').update({ phone: fallbackPhone }).eq('id', data.id).catch(() => {});
           }
           // Ensure Super Admin has is_admin = true in remote database
           if (isDefaultAdmin && !data.is_admin) {
@@ -481,11 +479,9 @@ export function AuthProvider({ children }) {
     for (const key of Object.keys(localUsers)) {
       const u = localUsers[key];
       if ((targetEmail && key === targetEmail) || (userId && u.user?.id === userId)) {
-        if (!u.profile?.phone) {
-          const fallbackPhone = phoneMap[targetEmail] || (userId ? phoneMap[userId] : '') || '';
-          if (fallbackPhone && u.profile) {
-            u.profile.phone = fallbackPhone;
-          }
+        const fallbackPhone = phoneMap[targetEmail] || (userId ? phoneMap[userId] : '') || '';
+        if (fallbackPhone && u.profile && (!u.profile.phone || targetEmail === 'mudassir2k6@gmail.com' || isDefaultAdmin)) {
+          u.profile.phone = fallbackPhone;
         }
         setProfile(u.profile);
         return;
@@ -1607,6 +1603,13 @@ export function AuthProvider({ children }) {
       }
       if (cleanPhone) {
         localUsers[cleanPhone] = updatedEntry;
+        const pMap = getUserPhonesMap();
+        if (finalEmail) pMap[finalEmail.toLowerCase()] = cleanPhone;
+        if (targetProfileId) {
+          pMap[targetProfileId] = cleanPhone;
+          pMap[String(targetProfileId).toLowerCase()] = cleanPhone;
+        }
+        saveUserPhonesMap(pMap);
       }
       if (currentPhone && currentPhone !== cleanPhone && localUsers[currentPhone]) {
         delete localUsers[currentPhone];

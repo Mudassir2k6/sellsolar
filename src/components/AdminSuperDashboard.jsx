@@ -426,28 +426,50 @@ export default function AdminSuperDashboard({
 
   const [editingPhoneUser, setEditingPhoneUser] = useState(null);
   const [newPhoneNumber, setNewPhoneNumber] = useState('');
+  const [newUserCity, setNewUserCity] = useState('Lahore');
   const [confirmDeleteUser, setConfirmDeleteUser] = useState(null);
   const [isSubmittingUserAction, setIsSubmittingUserAction] = useState(false);
 
+  const resolveActivePhone = useCallback(() => {
+    const pMap = getUserPhonesMap();
+    const activeEmail = (user?.email || profile?.email || '').toLowerCase();
+    const activeId = user?.id || profile?.id;
+    return (
+      (activeEmail && pMap[activeEmail]) ||
+      (activeId && pMap[activeId]) ||
+      (activeId && pMap[String(activeId).toLowerCase()]) ||
+      profile?.phone ||
+      user?.user_metadata?.phone ||
+      ''
+    );
+  }, [user, profile]);
+
+  const resolveActiveCity = useCallback(() => {
+    return profile?.city || user?.user_metadata?.city || 'Lahore';
+  }, [user, profile]);
+
   const [profileForm, setProfileForm] = useState({
     fullName: profile?.full_name || user?.user_metadata?.full_name || '',
-    phone: profile?.phone || '',
-    city: profile?.city || 'Lahore',
+    phone: '',
+    city: 'Lahore',
     businessName: profile?.business_name || '',
     showroomAddress: profile?.showroom_address || '',
   });
 
   useEffect(() => {
     if (profile || user) {
-      setProfileForm({
-        fullName: profile?.full_name || user?.user_metadata?.full_name || '',
-        phone: profile?.phone || '',
-        city: profile?.city || 'Lahore',
-        businessName: profile?.business_name || '',
-        showroomAddress: profile?.showroom_address || '',
-      });
+      const activePhone = resolveActivePhone();
+      const activeCity = resolveActiveCity();
+      setProfileForm((prev) => ({
+        ...prev,
+        fullName: profile?.full_name || user?.user_metadata?.full_name || prev.fullName || '',
+        phone: activePhone || prev.phone || '',
+        city: activeCity || prev.city || 'Lahore',
+        businessName: profile?.business_name || prev.businessName || '',
+        showroomAddress: profile?.showroom_address || prev.showroomAddress || '',
+      }));
     }
-  }, [profile, user]);
+  }, [profile, user, resolveActivePhone, resolveActiveCity]);
 
   // Compute user's personal ads
   const myAds = useMemo(() => {
@@ -1117,18 +1139,20 @@ export default function AdminSuperDashboard({
     }
   };
 
-  // Open Edit Phone Modal
+  // Open Edit User Contact & Location Modal
   const handleOpenEditPhone = (targetUser) => {
     setEditingPhoneUser(targetUser);
     setNewPhoneNumber(targetUser.phone || '');
+    setNewUserCity(targetUser.city || 'Lahore');
   };
 
-  // Save Updated User Phone
+  // Save Updated User Phone and Location
   const handleSaveUserPhone = async (e) => {
     e?.preventDefault();
     if (!editingPhoneUser) return;
     const targetIdentifier = editingPhoneUser.id || editingPhoneUser.email;
     const cleanPhone = newPhoneNumber.trim();
+    const cleanCity = newUserCity.trim() || 'Lahore';
 
     try {
       setIsSubmittingUserAction(true);
@@ -1154,7 +1178,7 @@ export default function AdminSuperDashboard({
           (editingPhoneUser.id && (k.toLowerCase() === String(editingPhoneUser.id).toLowerCase() || p.id?.toLowerCase() === String(editingPhoneUser.id).toLowerCase() || u.id?.toLowerCase() === String(editingPhoneUser.id).toLowerCase())) ||
           (editingPhoneUser.email && (k.toLowerCase() === editingPhoneUser.email.toLowerCase() || p.email?.toLowerCase() === editingPhoneUser.email.toLowerCase() || u.email?.toLowerCase() === editingPhoneUser.email.toLowerCase()));
         if (match) {
-          v.profile = { ...(v.profile || {}), phone: cleanPhone };
+          v.profile = { ...(v.profile || {}), phone: cleanPhone, city: cleanCity };
           foundLocal = true;
         }
       }
@@ -1167,7 +1191,7 @@ export default function AdminSuperDashboard({
             email: editingPhoneUser.email,
             full_name: editingPhoneUser.name,
             phone: cleanPhone,
-            city: editingPhoneUser.city || 'Islamabad',
+            city: cleanCity,
           },
         };
       }
@@ -1180,42 +1204,61 @@ export default function AdminSuperDashboard({
             (editingPhoneUser.id && u.id === editingPhoneUser.id) ||
             (editingPhoneUser.email && u.email && u.email.toLowerCase() === editingPhoneUser.email.toLowerCase())
           ) {
-            return { ...u, phone: cleanPhone };
+            return { ...u, phone: cleanPhone, city: cleanCity };
           }
           return u;
         })
       );
 
-      // 4. Update via AuthContext (syncs Supabase, active session, events)
-      if (adminUpdateUserProfile) {
-        await adminUpdateUserProfile(targetIdentifier, { phone: cleanPhone }, editingPhoneUser);
+      // 4. If this user is currently signed in, also sync active profileForm & updateProfile
+      const isSelf =
+        (user?.id && editingPhoneUser.id === user.id) ||
+        (user?.email && editingPhoneUser.email && editingPhoneUser.email.toLowerCase() === user.email.toLowerCase());
+      if (isSelf) {
+        setProfileForm((prev) => ({
+          ...prev,
+          phone: cleanPhone,
+          city: cleanCity,
+        }));
+        if (updateProfile) {
+          try {
+            await updateProfile({
+              fullName: profileForm.fullName || editingPhoneUser.name,
+              phone: cleanPhone,
+              city: cleanCity,
+            });
+          } catch (selfErr) {
+            console.warn('Active session sync notice:', selfErr);
+          }
+        }
+      } else if (adminUpdateUserProfile) {
+        await adminUpdateUserProfile(targetIdentifier, { phone: cleanPhone, city: cleanCity }, editingPhoneUser);
       }
 
       setEditingPhoneUser(null);
       await loadData();
       showToast({
-        title: 'Phone Number Updated',
-        message: `Phone number updated successfully for ${editingPhoneUser.name || editingPhoneUser.email || 'user'}.`,
+        title: 'User Details Updated',
+        message: `Mobile number and city updated successfully for ${editingPhoneUser.name || editingPhoneUser.email || 'user'}.`,
         type: 'success',
       });
     } catch (err) {
-      console.warn('Backend update notice, persistent local phone saved:', err);
-      // Ensure phone remains saved in UI and local storage
+      console.warn('Backend update notice, persistent local phone and city saved:', err);
       setUsersList((prev) =>
         prev.map((u) => {
           if (
             (editingPhoneUser.id && u.id === editingPhoneUser.id) ||
             (editingPhoneUser.email && u.email && u.email.toLowerCase() === editingPhoneUser.email.toLowerCase())
           ) {
-            return { ...u, phone: cleanPhone };
+            return { ...u, phone: cleanPhone, city: cleanCity };
           }
           return u;
         })
       );
       setEditingPhoneUser(null);
       showToast({
-        title: 'Phone Number Saved',
-        message: `Phone number updated for ${editingPhoneUser.name || editingPhoneUser.email || 'user'}.`,
+        title: 'Changes Saved',
+        message: `Mobile and city saved for ${editingPhoneUser.name || editingPhoneUser.email || 'user'}.`,
         type: 'success',
       });
     } finally {
@@ -1850,18 +1893,72 @@ export default function AdminSuperDashboard({
   const handleSaveProfile = async (e) => {
     e?.preventDefault();
     try {
+      setIsSubmittingUserAction(true);
+      const cleanPhone = (profileForm.phone || '').trim();
+      const cleanCity = (profileForm.city || '').trim() || 'Lahore';
+      const cleanFullName = (profileForm.fullName || '').trim();
+      const activeEmail = (user?.email || profile?.email || '').toLowerCase();
+      const activeId = user?.id || profile?.id;
+
+      // 1. Immediately persist to phoneMap
+      if (cleanPhone) {
+        const pMap = getUserPhonesMap();
+        if (activeEmail) pMap[activeEmail] = cleanPhone;
+        if (activeId) {
+          pMap[activeId] = cleanPhone;
+          pMap[String(activeId).toLowerCase()] = cleanPhone;
+        }
+        saveUserPhonesMap(pMap);
+      }
+
+      // 2. Immediately update in local stored users
+      const localUsers = getStoredUsers();
+      for (const [k, v] of Object.entries(localUsers)) {
+        const p = v.profile || {};
+        const u = v.user || {};
+        const match =
+          (activeId && (k.toLowerCase() === String(activeId).toLowerCase() || p.id?.toLowerCase() === String(activeId).toLowerCase() || u.id?.toLowerCase() === String(activeId).toLowerCase())) ||
+          (activeEmail && (k.toLowerCase() === activeEmail || p.email?.toLowerCase() === activeEmail || u.email?.toLowerCase() === activeEmail));
+        if (match) {
+          v.profile = { ...(v.profile || {}), phone: cleanPhone, city: cleanCity, full_name: cleanFullName || p.full_name };
+        }
+      }
+      saveStoredUsers(localUsers);
+
+      // 3. Update AuthContext profile
       if (updateProfile) {
         await updateProfile({
-          fullName: profileForm.fullName,
-          phone: profileForm.phone,
-          city: profileForm.city,
+          fullName: cleanFullName,
+          phone: cleanPhone,
+          city: cleanCity,
           businessName: profileForm.businessName,
           businessAddress: profileForm.showroomAddress,
         });
       }
+
+      // 4. Update usersList in React state and reload
+      setUsersList((prev) =>
+        prev.map((u) => {
+          const match =
+            (activeId && u.id === activeId) ||
+            (activeEmail && u.email && u.email.toLowerCase() === activeEmail);
+          if (match) {
+            return {
+              ...u,
+              name: cleanFullName || u.name,
+              phone: cleanPhone,
+              city: cleanCity,
+            };
+          }
+          return u;
+        })
+      );
+
+      await loadData();
+
       showToast({
         title: 'Profile Updated',
-        message: 'Your personal information and contact details have been updated.',
+        message: 'Your personal information, mobile number, and location have been updated.',
         type: 'success',
       });
     } catch (err) {
@@ -1870,6 +1967,8 @@ export default function AdminSuperDashboard({
         message: err.message || 'Could not update profile.',
         type: 'error',
       });
+    } finally {
+      setIsSubmittingUserAction(false);
     }
   };
 
@@ -5840,7 +5939,7 @@ export default function AdminSuperDashboard({
                 </div>
               </div>
 
-              {/* Edit User Phone Modal */}
+              {/* Edit User Phone & Location Modal */}
               {editingPhoneUser && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
                   <div className="bg-white dark:bg-gray-900 rounded-3xl p-6 max-w-md w-full border border-gray-200 dark:border-gray-800 shadow-2xl animate-in zoom-in-95">
@@ -5850,7 +5949,7 @@ export default function AdminSuperDashboard({
                           <Phone className="h-4 w-4" />
                         </div>
                         <div>
-                          <h3 className="font-bold text-sm text-gray-900 dark:text-white">Update Phone Number</h3>
+                          <h3 className="font-bold text-sm text-gray-900 dark:text-white">Edit Mobile & Location</h3>
                           <p className="text-xs text-gray-500 truncate max-w-[240px]">{editingPhoneUser.name || editingPhoneUser.email}</p>
                         </div>
                       </div>
@@ -5866,19 +5965,42 @@ export default function AdminSuperDashboard({
                     <form onSubmit={handleSaveUserPhone} className="mt-4 space-y-4">
                       <div>
                         <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">
-                          Mobile Number (e.g. 03001234567)
+                          Mobile / WhatsApp Number
                         </label>
                         <input
-                          type="text"
+                          type="tel"
                           value={newPhoneNumber}
                           onChange={(e) => setNewPhoneNumber(e.target.value)}
-                          placeholder="03001234567"
-                          className="input-field text-sm"
+                          placeholder="03345453761"
+                          className="input-field text-sm font-mono"
                           required
                           autoFocus
                         />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">
+                          City / Location
+                        </label>
+                        <select
+                          value={newUserCity}
+                          onChange={(e) => setNewUserCity(e.target.value)}
+                          className="input-field text-sm"
+                        >
+                          <option value="Lahore">Lahore</option>
+                          <option value="Karachi">Karachi</option>
+                          <option value="Islamabad">Islamabad</option>
+                          <option value="Rawalpindi">Rawalpindi</option>
+                          <option value="Faisalabad">Faisalabad</option>
+                          <option value="Multan">Multan</option>
+                          <option value="Peshawar">Peshawar</option>
+                          <option value="Quetta">Quetta</option>
+                          <option value="Gujranwala">Gujranwala</option>
+                          <option value="Sialkot">Sialkot</option>
+                          <option value="Other">Other</option>
+                        </select>
                         <p className="text-[11px] text-gray-400 mt-1">
-                          This will immediately save the mobile number to user profiles across the directory.
+                          This updates the user&apos;s mobile number and location across the entire platform.
                         </p>
                       </div>
 
@@ -5893,10 +6015,10 @@ export default function AdminSuperDashboard({
                         <button
                           type="submit"
                           disabled={isSubmittingUserAction}
-                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-xs transition-colors disabled:opacity-50"
+                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
                         >
                           <Check className="h-3.5 w-3.5" />
-                          <span>Save Phone</span>
+                          <span>Save Changes</span>
                         </button>
                       </div>
                     </form>

@@ -9,7 +9,7 @@ export default function MobileBottomNav({
 }) {
   const { user, profile, isSuperAdmin, isAdmin } = useAuth();
   const isUserAdmin = Boolean(
-    user && (isSuperAdmin || isAdmin || profile?.is_admin || profile?.is_super_admin || profile?.role === 'super_admin' || profile?.role === 'admin' || user?.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase())
+    user && (isSuperAdmin || isAdmin || profile?.is_admin || profile?.is_super_admin || profile?.role === 'super_admin' || profile?.role === 'admin' || user?.email?.toLowerCase() === 'mudassir2k6@gmail.com' || user?.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase())
   );
 
   const isHome = currentPage === 'home' || currentPage === 'buy-solar';

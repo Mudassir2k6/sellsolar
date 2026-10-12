@@ -220,11 +220,13 @@ export default function AdminSuperDashboard({
   const { showToast } = useToast();
   const { settings, updateSiteSettings, updateHomePageCms } = useSiteSettings();
 
-  const userEmail = (user?.email || profile?.email || '').toLowerCase();
+  const userEmail = (user?.email || profile?.email || '').toLowerCase().trim();
+  const isMasterAdminEmail = userEmail === 'mudassir2k6@gmail.com' || userEmail === 'admin@sellsolar.pk' || userEmail === DEFAULT_ADMIN_EMAIL.toLowerCase();
   const effectiveIsSuperAdmin = Boolean(
     isSuperAdmin ||
     profile?.role === 'super_admin' ||
     profile?.is_super_admin ||
+    isMasterAdminEmail ||
     ['admin@sellsolar.pk', 'info@sellsolar.pk', DEFAULT_ADMIN_EMAIL.toLowerCase(), 'mudassirkhan78907890@gmail.com', 'mudassir2k6@gmail.com'].includes(userEmail)
   );
   const effectiveIsAdmin = Boolean(
@@ -244,7 +246,9 @@ export default function AdminSuperDashboard({
   const [inboxSearchQuery, setInboxSearchQuery] = useState('');
   const [syncingInbox, setSyncingInbox] = useState(false);
   const [productFilter, setProductFilter] = useState('all'); // 'all' | 'featured' | 'hot_sell' | 'pending' | 'approved'
-  const [myAdsFilter, setMyAdsFilter] = useState('all'); // 'all' | 'active' | 'sold'
+  const [myAdsFilter, setMyAdsFilter] = useState('all'); // 'all' | 'active' | 'sold' | 'pending' | 'featured'
+  const [adsScope, setAdsScope] = useState('all'); // 'all' (All Platform Ads) | 'my' (My Personal Ads)
+  const [adsSearchQuery, setAdsSearchQuery] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [cmsForm, setCmsForm] = useState({ ...settings });
   const [cmsSaved, setCmsSaved] = useState(false);
@@ -1178,10 +1182,12 @@ export default function AdminSuperDashboard({
   };
 
   // Toggle Featured Listing
-  const handleToggleFeatured = (listingId) => {
+  const handleToggleFeatured = async (listingId) => {
+    let nextFeatured = false;
     const updated = listingsList.map((item) => {
       if (item.id === listingId) {
-        return { ...item, is_featured: !item.is_featured };
+        nextFeatured = !item.is_featured;
+        return { ...item, is_featured: nextFeatured, featured: nextFeatured };
       }
       return item;
     });
@@ -1189,18 +1195,32 @@ export default function AdminSuperDashboard({
     try {
       localStorage.setItem('sellsolar_custom_listings', JSON.stringify(updated));
     } catch {}
+
+    if (isValidUuid(listingId) && isSupabaseConfigured()) {
+      try {
+        await supabase
+          .from('solar_listings')
+          .update({ is_featured: nextFeatured, featured: nextFeatured })
+          .eq('id', listingId);
+      } catch (sbErr) {
+        console.warn('Supabase toggle featured error:', sbErr);
+      }
+    }
+
     showToast({
       title: 'Listing Updated',
-      message: 'Featured status has been updated.',
+      message: `Featured status has been ${nextFeatured ? 'enabled' : 'disabled'}.`,
       type: 'success',
     });
   };
 
   // Toggle Hot Sell Listing
-  const handleToggleHotSell = (listingId) => {
+  const handleToggleHotSell = async (listingId) => {
+    let nextHot = false;
     const updated = listingsList.map((item) => {
       if (item.id === listingId) {
-        return { ...item, is_hot_sell: !item.is_hot_sell };
+        nextHot = !item.is_hot_sell;
+        return { ...item, is_hot_sell: nextHot };
       }
       return item;
     });
@@ -1208,15 +1228,27 @@ export default function AdminSuperDashboard({
     try {
       localStorage.setItem('sellsolar_custom_listings', JSON.stringify(updated));
     } catch {}
+
+    if (isValidUuid(listingId) && isSupabaseConfigured()) {
+      try {
+        await supabase
+          .from('solar_listings')
+          .update({ is_hot_sell: nextHot })
+          .eq('id', listingId);
+      } catch (sbErr) {
+        console.warn('Supabase toggle hot sell error:', sbErr);
+      }
+    }
+
     showToast({
       title: 'Listing Updated',
-      message: 'Hot Sell status has been updated.',
+      message: `Hot Sell status has been ${nextHot ? 'enabled' : 'disabled'}.`,
       type: 'success',
     });
   };
 
   // Toggle Approved Status
-  const handleToggleApproved = (listingId, newStatus) => {
+  const handleToggleApproved = async (listingId, newStatus) => {
     const updated = listingsList.map((item) => {
       if (item.id === listingId) {
         return { ...item, status: newStatus };
@@ -1227,6 +1259,18 @@ export default function AdminSuperDashboard({
     try {
       localStorage.setItem('sellsolar_custom_listings', JSON.stringify(updated));
     } catch {}
+
+    if (isValidUuid(listingId) && isSupabaseConfigured()) {
+      try {
+        await supabase
+          .from('solar_listings')
+          .update({ status: newStatus })
+          .eq('id', listingId);
+      } catch (sbErr) {
+        console.warn('Supabase update status error:', sbErr);
+      }
+    }
+
     showToast({
       title: 'Listing Status Updated',
       message: `Product is now marked as ${newStatus}.`,
@@ -1239,7 +1283,7 @@ export default function AdminSuperDashboard({
     e?.preventDefault();
     if (!selectedMessage || !replyText.trim()) return;
     try {
-      replyToInboxMessage(selectedMessage.id, replyText.trim(), isSuperAdmin ? 'Super Admin' : 'Admin');
+      replyToInboxMessage(selectedMessage.id, replyText.trim(), effectiveIsSuperAdmin ? 'Super Admin' : 'Admin');
       setReplyText('');
       setInboxMessages(getInboxMessages());
       const refreshed = getInboxMessages().find((m) => m.id === selectedMessage.id);
@@ -1680,11 +1724,12 @@ export default function AdminSuperDashboard({
   };
 
   // Toggle Sold for Personal Ad
-  const handleToggleSold = (listingId) => {
+  const handleToggleSold = async (listingId) => {
+    let targetSoldNow = false;
     const updated = listingsList.map((item) => {
       if (item.id === listingId) {
-        const isSoldNow = !item.is_sold;
-        return { ...item, is_sold: isSoldNow, status: isSoldNow ? 'sold' : 'approved' };
+        targetSoldNow = !item.is_sold;
+        return { ...item, is_sold: targetSoldNow, status: targetSoldNow ? 'sold' : 'approved' };
       }
       return item;
     });
@@ -1692,21 +1737,42 @@ export default function AdminSuperDashboard({
     try {
       localStorage.setItem('sellsolar_custom_listings', JSON.stringify(updated));
     } catch {}
+
+    if (isValidUuid(listingId) && isSupabaseConfigured()) {
+      try {
+        await supabase
+          .from('solar_listings')
+          .update({ is_sold: targetSoldNow, status: targetSoldNow ? 'sold' : 'approved' })
+          .eq('id', listingId);
+      } catch (sbErr) {
+        console.warn('Supabase toggle sold error:', sbErr);
+      }
+    }
+
     showToast({
       title: 'Status Updated',
-      message: 'Product sold status has been updated.',
+      message: `Product is now marked as ${targetSoldNow ? 'Sold' : 'Available'}.`,
       type: 'success',
     });
   };
 
   // Delete Marketplace Listing (Admin Moderation)
-  const handleDeleteListing = (listingId) => {
+  const handleDeleteListing = async (listingId) => {
     if (!confirm('Are you sure you want to permanently delete this marketplace listing?')) return;
     const updated = listingsList.filter((item) => item.id !== listingId);
     setListingsList(updated);
     try {
       localStorage.setItem('sellsolar_custom_listings', JSON.stringify(updated));
     } catch {}
+
+    if (isValidUuid(listingId) && isSupabaseConfigured()) {
+      try {
+        await supabase.from('solar_listings').delete().eq('id', listingId);
+      } catch (sbErr) {
+        console.warn('Supabase delete listing error:', sbErr);
+      }
+    }
+
     showToast({
       title: 'Listing Deleted',
       message: 'The listing has been permanently removed from the marketplace.',
@@ -1715,13 +1781,22 @@ export default function AdminSuperDashboard({
   };
 
   // Delete Personal Ad
-  const handleDeleteMyAd = (listingId) => {
+  const handleDeleteMyAd = async (listingId) => {
     if (!confirm('Are you sure you want to remove this solar ad?')) return;
     const updated = listingsList.filter((item) => item.id !== listingId);
     setListingsList(updated);
     try {
       localStorage.setItem('sellsolar_custom_listings', JSON.stringify(updated));
     } catch {}
+
+    if (isValidUuid(listingId) && isSupabaseConfigured()) {
+      try {
+        await supabase.from('solar_listings').delete().eq('id', listingId);
+      } catch (sbErr) {
+        console.warn('Supabase delete my ad error:', sbErr);
+      }
+    }
+
     showToast({
       title: 'Ad Removed',
       message: 'Your listing has been removed from SellSolar.',
@@ -1968,7 +2043,7 @@ export default function AdminSuperDashboard({
                         : (profile?.full_name || user?.user_metadata?.full_name || 'Admin User')}
                     </p>
                     <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate font-mono">
-                      {(userEmail && !userEmail.toLowerCase().includes('mudassir')) ? userEmail : 'admin@sellsolar.pk'}
+                      {userEmail || 'mudassir2k6@gmail.com'}
                     </p>
                     <span className="mt-1 inline-block text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">
                       {effectiveIsSuperAdmin ? '👑 Super Admin' : effectiveIsAdmin ? '🛡️ Admin' : '👤 User'}
@@ -1991,9 +2066,9 @@ export default function AdminSuperDashboard({
                   >
                     <div className="flex items-center gap-2">
                       <Package className="h-3.5 w-3.5 text-blue-500" />
-                      <span>My Solar Ads</span>
+                      <span>{effectiveIsAdmin ? 'All Solar Ads' : 'My Solar Ads'}</span>
                     </div>
-                    <span className="text-[10px] text-gray-400 font-mono">({myAds.length})</span>
+                    <span className="text-[10px] text-gray-400 font-mono">({effectiveIsAdmin ? listingsList.length : myAds.length})</span>
                   </button>
 
                   <button
@@ -2099,8 +2174,8 @@ export default function AdminSuperDashboard({
               : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
           }`}
         >
-          <span>My Ads</span>
-          <span className="text-[10px] opacity-80 font-mono">({myAds.length})</span>
+          <span>{effectiveIsAdmin ? 'All Ads' : 'My Ads'}</span>
+          <span className="text-[10px] opacity-80 font-mono">({effectiveIsAdmin ? listingsList.length : myAds.length})</span>
         </button>
 
         <button
@@ -2120,7 +2195,7 @@ export default function AdminSuperDashboard({
           )}
         </button>
 
-        {(isSuperAdmin || isAdmin) && (
+        {effectiveIsAdmin && (
           <>
             <button
               type="button"
@@ -2291,12 +2366,12 @@ export default function AdminSuperDashboard({
             >
               <div className="flex items-center gap-2.5">
                 <Package className="h-4 w-4" />
-                <span>My Solar Ads</span>
+                <span>{effectiveIsAdmin ? 'Platform Solar Ads' : 'My Solar Ads'}</span>
               </div>
               <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
                 activeTab === 'my-ads' ? 'bg-amber-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
               }`}>
-                {myAds.length}
+                {effectiveIsAdmin ? listingsList.length : myAds.length}
               </span>
             </button>
 
@@ -2378,7 +2453,7 @@ export default function AdminSuperDashboard({
             )}
 
             {/* TAB 7: DAILY PRICE BENCHMARKS & SHEETS */}
-            {(isSuperAdmin || isAdmin) && (
+            {effectiveIsAdmin && (
               <button
                 type="button"
                 onClick={() => selectTab('daily-rates')}
@@ -2399,7 +2474,7 @@ export default function AdminSuperDashboard({
             )}
 
             {/* TAB 8: VERIFIED DEALERS DIRECTORY */}
-            {(isSuperAdmin || isAdmin) && (
+            {effectiveIsAdmin && (
               <button
                 type="button"
                 onClick={() => selectTab('dealers-directory')}
@@ -2418,7 +2493,7 @@ export default function AdminSuperDashboard({
             )}
 
             {/* TAB 9: TURNKEY INSTALLATION LEADS */}
-            {(isSuperAdmin || isAdmin) && (
+            {effectiveIsAdmin && (
               <button
                 type="button"
                 onClick={() => selectTab('installation-leads')}
@@ -2738,7 +2813,7 @@ export default function AdminSuperDashboard({
                         <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">My Active Ads</p>
                         <Package className="w-3.5 h-3.5 text-gray-400 group-hover:text-amber-500 transition-colors" />
                       </div>
-                      <p className="text-2xl font-black text-amber-500 mt-1">{myAds.length}</p>
+                      <p className="text-2xl font-black text-amber-500 mt-1">{effectiveIsAdmin ? listingsList.length : myAds.length}</p>
                       <span className="text-[10px] text-amber-500 dark:text-amber-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 mt-1">
                         Drill down →
                       </span>
@@ -2785,7 +2860,7 @@ export default function AdminSuperDashboard({
                         <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">My Total Ads</p>
                         <Package className="w-3.5 h-3.5 text-gray-400 group-hover:text-amber-500 transition-colors" />
                       </div>
-                      <p className="text-2xl font-black text-gray-900 dark:text-white mt-1">{myAds.length}</p>
+                      <p className="text-2xl font-black text-gray-900 dark:text-white mt-1">{effectiveIsAdmin ? listingsList.length : myAds.length}</p>
                       <span className="text-[10px] text-amber-500 dark:text-amber-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 mt-1">
                         Drill down →
                       </span>
@@ -2904,7 +2979,7 @@ export default function AdminSuperDashboard({
                       My Solar Equipment
                     </h3>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      You currently have {myAds.length} solar listings on the SellSolar marketplace.
+                      {effectiveIsAdmin ? `Viewing all ${listingsList.length} solar listings live across Pakistan (${myAds.length} personal).` : `You currently have ${myAds.length} solar listings on the SellSolar marketplace.`}
                     </p>
                   </div>
                   <button
@@ -2912,11 +2987,11 @@ export default function AdminSuperDashboard({
                     onClick={() => setActiveTab('my-ads')}
                     className="mt-4 btn-secondary text-xs w-full py-2"
                   >
-                    Manage My Ads ({myAds.length})
+                    {effectiveIsAdmin ? `Manage All Platform Ads (${listingsList.length})` : `Manage My Ads (${myAds.length})`}
                   </button>
                 </div>
 
-                {isSuperAdmin ? (
+                {effectiveIsSuperAdmin ? (
                   <div className="p-5 rounded-2xl border border-purple-200 dark:border-purple-900/60 bg-purple-50/50 dark:bg-purple-950/20 flex flex-col justify-between">
                     <div>
                       <h3 className="font-bold text-sm text-purple-900 dark:text-purple-200 flex items-center gap-2">
@@ -2958,7 +3033,7 @@ export default function AdminSuperDashboard({
               </div>
 
               {/* Quick Navigation Cards for Administrative Modules */}
-              {isSuperAdmin && (
+              {effectiveIsSuperAdmin && (
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="p-5 rounded-2xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/40 dark:bg-emerald-950/20 flex flex-col justify-between">
                     <div>
@@ -6388,211 +6463,448 @@ export default function AdminSuperDashboard({
           )}
 
           {/* TAB 7: DAILY PRICE BENCHMARKS & SHEETS */}
-          {activeTab === 'daily-rates' && (isSuperAdmin || isAdmin) && (
+          {activeTab === 'daily-rates' && effectiveIsAdmin && (
             <AdminDailyRatesModule />
           )}
 
           {/* TAB 8: VERIFIED SOLAR DEALERS DIRECTORY */}
-          {activeTab === 'dealers-directory' && (isSuperAdmin || isAdmin) && (
+          {activeTab === 'dealers-directory' && effectiveIsAdmin && (
             <AdminDealersModule />
           )}
 
           {/* TAB 9: TURNKEY SOLAR INSTALLATION LEADS */}
-          {activeTab === 'installation-leads' && (isSuperAdmin || isAdmin) && (
+          {activeTab === 'installation-leads' && effectiveIsAdmin && (
             <AdminInstallationsModule />
           )}
 
-          {/* TAB: MY SOLAR ADS */}
-          {activeTab === 'my-ads' && (
-            <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <h1 className="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-2">
-                    <Package className="h-6 w-6 text-amber-500" />
-                    My Solar Ads
-                  </h1>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Manage your personal equipment listings, mark items as sold, or post new solar hardware.
-                  </p>
-                </div>
-                {onPostAd && (
-                  <button
-                    type="button"
-                    onClick={onPostAd}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-md shadow-amber-500/20 transition-all"
-                  >
-                    <PlusCircle className="h-4 w-4" />
-                    <span>Post New Solar Ad</span>
-                  </button>
-                )}
-              </div>
+          {/* TAB: MY SOLAR ADS & PLATFORM EQUIPMENT */}
+          {activeTab === 'my-ads' && (() => {
+            const currentScope = (effectiveIsAdmin && adsScope === 'all') ? 'all' : 'my';
+            const baseList = currentScope === 'all' ? listingsList : myAds;
+            
+            const filteredAds = baseList.filter((ad) => {
+              if (myAdsFilter === 'active') {
+                if (ad.is_sold || ad.status === 'sold') return false;
+              } else if (myAdsFilter === 'sold') {
+                if (!ad.is_sold && ad.status !== 'sold') return false;
+              } else if (myAdsFilter === 'pending') {
+                if (ad.status !== 'pending') return false;
+              } else if (myAdsFilter === 'featured') {
+                if (!ad.is_featured && !ad.featured) return false;
+              } else if (myAdsFilter === 'hot_sell') {
+                if (!ad.is_hot_sell) return false;
+              }
 
-              {/* Filter Pills */}
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setMyAdsFilter('all')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
-                    myAdsFilter === 'all'
-                      ? 'bg-amber-500 text-white'
-                      : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
-                  }`}
-                >
-                  All ({myAds.length})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMyAdsFilter('active')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
-                    myAdsFilter === 'active'
-                      ? 'bg-emerald-600 text-white'
-                      : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
-                  }`}
-                >
-                  Active ({myAds.filter((a) => !a.is_sold && a.status !== 'sold').length})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMyAdsFilter('sold')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
-                    myAdsFilter === 'sold'
-                      ? 'bg-gray-700 text-white'
-                      : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
-                  }`}
-                >
-                  Sold ({myAds.filter((a) => a.is_sold || a.status === 'sold').length})
-                </button>
-              </div>
+              if (adsSearchQuery && adsSearchQuery.trim()) {
+                const q = adsSearchQuery.toLowerCase().trim();
+                const titleMatch = (ad.title || '').toLowerCase().includes(q);
+                const brandMatch = (ad.brand || '').toLowerCase().includes(q);
+                const cityMatch = (ad.city || '').toLowerCase().includes(q);
+                const sellerNameMatch = (ad.seller_name || '').toLowerCase().includes(q);
+                const sellerPhoneMatch = (ad.seller_phone || ad.phone || '').includes(q);
+                return titleMatch || brandMatch || cityMatch || sellerNameMatch || sellerPhoneMatch;
+              }
+              return true;
+            });
 
-              {/* My Ads Grid */}
-              {myAds.length === 0 ? (
-                <div className="text-center py-16 px-4 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
-                  <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-500 flex items-center justify-center mb-3">
-                    <Package className="w-7 h-7" />
+            const totalInScope = baseList.length;
+            const activeInScope = baseList.filter((a) => !a.is_sold && a.status !== 'sold').length;
+            const soldInScope = baseList.filter((a) => a.is_sold || a.status === 'sold').length;
+            const pendingInScope = baseList.filter((a) => a.status === 'pending').length;
+            const featuredInScope = baseList.filter((a) => a.is_featured || a.featured).length;
+
+            return (
+              <div className="space-y-6">
+                {/* Header & Controls */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <h1 className="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-2">
+                      <Package className="h-6 w-6 text-amber-500" />
+                      {effectiveIsAdmin && currentScope === 'all'
+                        ? 'All Platform Solar Ads'
+                        : 'My Solar Ads'}
+                    </h1>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      {effectiveIsAdmin && currentScope === 'all'
+                        ? `Super Admin Control: Managing ${listingsList.length} solar equipment ads across Pakistan live in Supabase.`
+                        : `Manage your personal equipment listings, mark items as sold, or post new solar hardware.`}
+                    </p>
                   </div>
-                  <h3 className="text-base font-black text-gray-900 dark:text-white">No Ads Posted Yet</h3>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 max-w-sm mx-auto">
-                    You haven't listed any solar panels, inverters, or batteries yet. Start selling across Pakistan for free!
-                  </p>
                   {onPostAd && (
                     <button
                       type="button"
                       onClick={onPostAd}
-                      className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs"
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-md shadow-amber-500/20 transition-all cursor-pointer"
                     >
                       <PlusCircle className="h-4 w-4" />
-                      <span>Post Your First Ad Now</span>
+                      <span>Post New Solar Ad</span>
                     </button>
                   )}
                 </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {myAds
-                    .filter((ad) => {
-                      if (myAdsFilter === 'active') return !ad.is_sold && ad.status !== 'sold';
-                      if (myAdsFilter === 'sold') return !!ad.is_sold || ad.status === 'sold';
-                      return true;
-                    })
-                    .map((ad) => (
-                      <div
-                        key={ad.id}
-                        className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 flex flex-col justify-between shadow-xs hover:border-amber-400/50 transition-all"
+
+                {/* Scope Switcher for Super Admin / Admin */}
+                {effectiveIsAdmin && (
+                  <div className="flex flex-wrap items-center gap-2 p-1.5 bg-gray-100 dark:bg-gray-800/80 rounded-2xl w-fit">
+                    <button
+                      type="button"
+                      onClick={() => setAdsScope('all')}
+                      className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer ${
+                        adsScope === 'all'
+                          ? 'bg-amber-500 text-white shadow-xs'
+                          : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                      }`}
+                    >
+                      <Globe className="w-3.5 h-3.5" />
+                      <span>All Platform Ads</span>
+                      <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-amber-600 text-white font-mono">
+                        {listingsList.length}
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAdsScope('my')}
+                      className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer ${
+                        adsScope === 'my'
+                          ? 'bg-amber-500 text-white shadow-xs'
+                          : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                      }`}
+                    >
+                      <User className="w-3.5 h-3.5" />
+                      <span>My Personal Ads</span>
+                      <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-amber-600 text-white font-mono">
+                        {myAds.length}
+                      </span>
+                    </button>
+                  </div>
+                )}
+
+                {/* Search & Filter Toolbar */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pt-1">
+                  {/* Search Bar */}
+                  <div className="relative flex-1 max-w-md">
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      value={adsSearchQuery}
+                      onChange={(e) => setAdsSearchQuery(e.target.value)}
+                      placeholder={
+                        effectiveIsAdmin && currentScope === 'all'
+                          ? 'Search by title, brand, city, seller name or phone...'
+                          : 'Search your ads...'
+                      }
+                      className="w-full pl-10 pr-8 py-2 rounded-xl text-xs bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    />
+                    {adsSearchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => setAdsSearchQuery('')}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs cursor-pointer"
                       >
-                        <div>
-                          <div className="flex items-start gap-3 mb-3">
-                            <div className="w-16 h-16 rounded-xl bg-gray-100 dark:bg-gray-800 shrink-0 overflow-hidden flex items-center justify-center">
-                              {ad.image_url ? (
-                                <img
-                                  src={ad.image_url}
-                                  alt={ad.title}
-                                  referrerPolicy="no-referrer"
-                                  className="w-full h-full object-cover"
-                                  onError={(e) => {
-                                    e.currentTarget.onerror = null;
-                                    e.currentTarget.src = getEquipmentFallbackImage(ad.category, ad.title);
-                                  }}
-                                />
-                              ) : (
-                                <Package className="w-6 h-6 text-gray-400" />
-                              )}
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center gap-1.5 flex-wrap">
-                                <span
-                                  className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
-                                    ad.is_sold || ad.status === 'sold'
-                                      ? 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                                      : 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300'
-                                  }`}
-                                >
-                                  {ad.is_sold || ad.status === 'sold' ? 'Sold' : 'Active'}
-                                </span>
-                                {ad.is_featured && (
-                                  <span className="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300">
-                                    ⭐ Featured
-                                  </span>
+                        ✕
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Filter Pills */}
+                  <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+                    <button
+                      type="button"
+                      onClick={() => setMyAdsFilter('all')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer shrink-0 ${
+                        myAdsFilter === 'all'
+                          ? 'bg-amber-500 text-white shadow-xs'
+                          : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
+                      }`}
+                    >
+                      All ({totalInScope})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMyAdsFilter('active')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer shrink-0 ${
+                        myAdsFilter === 'active'
+                          ? 'bg-emerald-600 text-white shadow-xs'
+                          : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
+                      }`}
+                    >
+                      Active ({activeInScope})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMyAdsFilter('sold')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer shrink-0 ${
+                        myAdsFilter === 'sold'
+                          ? 'bg-gray-700 text-white shadow-xs'
+                          : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
+                      }`}
+                    >
+                      Sold ({soldInScope})
+                    </button>
+                    {pendingInScope > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setMyAdsFilter('pending')}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer shrink-0 ${
+                          myAdsFilter === 'pending'
+                            ? 'bg-amber-600 text-white shadow-xs'
+                            : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
+                        }`}
+                      >
+                        Pending ({pendingInScope})
+                      </button>
+                    )}
+                    {featuredInScope > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setMyAdsFilter('featured')}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer shrink-0 ${
+                          myAdsFilter === 'featured'
+                            ? 'bg-purple-600 text-white shadow-xs'
+                            : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
+                        }`}
+                      >
+                        Featured ({featuredInScope})
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Ads Grid */}
+                {filteredAds.length === 0 ? (
+                  <div className="text-center py-16 px-4 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+                    <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-500 flex items-center justify-center mb-3">
+                      <Package className="w-7 h-7" />
+                    </div>
+                    <h3 className="text-base font-black text-gray-900 dark:text-white">
+                      {adsSearchQuery ? 'No Ads Match Your Search' : 'No Ads Found'}
+                    </h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 max-w-sm mx-auto">
+                      {adsSearchQuery
+                        ? `No listings matched "${adsSearchQuery}". Try adjusting your search or filters.`
+                        : currentScope === 'all'
+                        ? 'No listings found on the platform under this filter.'
+                        : "You haven't listed any solar panels, inverters, or batteries yet."}
+                    </p>
+                    {adsSearchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => setAdsSearchQuery('')}
+                        className="mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-xs font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-200 cursor-pointer"
+                      >
+                        Clear Search Filter
+                      </button>
+                    )}
+                    {!adsSearchQuery && onPostAd && (
+                      <button
+                        type="button"
+                        onClick={onPostAd}
+                        className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs cursor-pointer"
+                      >
+                        <PlusCircle className="h-4 w-4" />
+                        <span>Post New Ad Now</span>
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {filteredAds.map((ad) => {
+                      const isSold = ad.is_sold || ad.status === 'sold';
+                      const isPending = ad.status === 'pending';
+                      const isRejected = ad.status === 'rejected';
+                      const contactPhone = ad.seller_phone || ad.phone;
+
+                      return (
+                        <div
+                          key={ad.id}
+                          className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 flex flex-col justify-between shadow-xs hover:border-amber-400/50 transition-all"
+                        >
+                          <div>
+                            <div className="flex items-start gap-3 mb-2.5">
+                              <div className="w-16 h-16 rounded-xl bg-gray-100 dark:bg-gray-800 shrink-0 overflow-hidden flex items-center justify-center">
+                                {ad.image_url ? (
+                                  <img
+                                    src={ad.image_url}
+                                    alt={ad.title}
+                                    referrerPolicy="no-referrer"
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                      e.currentTarget.onerror = null;
+                                      e.currentTarget.src = getEquipmentFallbackImage(ad.category, ad.title);
+                                    }}
+                                  />
+                                ) : (
+                                  <Package className="w-6 h-6 text-gray-400" />
                                 )}
-                                {ad.is_hot_sell && (
-                                  <span className="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300">
-                                    🔥 Hot Sell
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-1 flex-wrap">
+                                  <span
+                                    className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                                      isSold
+                                        ? 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                                        : isPending
+                                        ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300'
+                                        : isRejected
+                                        ? 'bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300'
+                                        : 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300'
+                                    }`}
+                                  >
+                                    {isSold ? 'Sold' : isPending ? 'Pending' : isRejected ? 'Rejected' : 'Active'}
+                                  </span>
+                                  {(ad.is_featured || ad.featured) && (
+                                    <span className="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300">
+                                      ⭐ Featured
+                                    </span>
+                                  )}
+                                  {ad.is_hot_sell && (
+                                    <span className="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300">
+                                      🔥 Hot Sell
+                                    </span>
+                                  )}
+                                </div>
+                                <h4 className="font-bold text-sm text-gray-900 dark:text-white mt-1 line-clamp-1">
+                                  {ad.title}
+                                </h4>
+                                <p className="text-xs font-black text-amber-600 dark:text-amber-400 mt-0.5">
+                                  {formatPrice(ad.price)}
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* Meta: City, Views, Brand */}
+                            <div className="flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-100 dark:border-gray-800">
+                              <span>
+                                {ad.brand ? `${ad.brand} • ` : ''}{ad.city || 'Pakistan'}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Eye className="w-3.5 h-3.5" />
+                                {ad.views || 0} views
+                              </span>
+                            </div>
+
+                            {/* Seller Contact Info Card */}
+                            <div className="mt-2.5 pt-2 border-t border-gray-100 dark:border-gray-800 text-xs bg-gray-50/70 dark:bg-gray-800/40 p-2 rounded-xl">
+                              <div className="flex items-center justify-between gap-1 text-[11px]">
+                                <span className="font-semibold text-gray-700 dark:text-gray-300 truncate">
+                                  👤 {ad.seller_name || 'Individual Seller'}
+                                </span>
+                                {ad.condition && (
+                                  <span className="px-1.5 py-0.2 rounded text-[10px] font-semibold uppercase bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                                    {ad.condition}
                                   </span>
                                 )}
                               </div>
-                              <h4 className="font-bold text-sm text-gray-900 dark:text-white mt-1 line-clamp-1">
-                                {ad.title}
-                              </h4>
-                              <p className="text-xs font-black text-amber-600 dark:text-amber-400 mt-0.5">
-                                {formatPrice(ad.price)}
-                              </p>
+                              {contactPhone && (
+                                <div className="mt-1 flex items-center justify-between gap-2 text-[11px]">
+                                  <a
+                                    href={`tel:${contactPhone}`}
+                                    className="text-amber-600 dark:text-amber-400 font-mono font-bold flex items-center gap-1 hover:underline"
+                                    title="Call Seller"
+                                  >
+                                    <Phone className="w-3 h-3" />
+                                    <span>{contactPhone}</span>
+                                  </a>
+                                  <a
+                                    href={`https://wa.me/92${String(contactPhone).replace(/\D/g, '').replace(/^0/, '')}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-emerald-600 dark:text-emerald-400 font-bold hover:underline"
+                                  >
+                                    WhatsApp ↗
+                                  </a>
+                                </div>
+                              )}
                             </div>
                           </div>
 
-                          <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-100 dark:border-gray-800">
-                            <span>{ad.city || 'Pakistan'}</span>
-                            <span className="flex items-center gap-1">
-                              <Eye className="w-3.5 h-3.5" />
-                              {ad.views || 0} views
-                            </span>
+                          {/* Action Controls */}
+                          <div className="space-y-2 pt-3 mt-3 border-t border-gray-100 dark:border-gray-800">
+                            {/* Primary row */}
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => handleToggleSold(ad.id)}
+                                className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                                  isSold
+                                    ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950/50 dark:text-emerald-300'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300'
+                                }`}
+                              >
+                                {isSold ? 'Mark Available' : 'Mark Sold'}
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => onNavigateToListing?.(ad.id)}
+                                className="p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                                title="View on Marketplace"
+                              >
+                                <ExternalLink className="w-4 h-4" />
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => (effectiveIsAdmin ? handleDeleteListing(ad.id) : handleDeleteMyAd(ad.id))}
+                                className="p-1.5 rounded-lg border border-rose-200 dark:border-rose-900 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors cursor-pointer"
+                                title="Delete Ad Permanently"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+
+                            {/* Admin Quick Badges Row */}
+                            {effectiveIsAdmin && (
+                              <div className="flex items-center gap-1.5 pt-1 border-t border-gray-100 dark:border-gray-800/60">
+                                <button
+                                  type="button"
+                                  onClick={() => handleToggleFeatured(ad.id)}
+                                  className={`flex-1 py-1 px-2 rounded-lg text-[10px] font-black transition-all flex items-center justify-center gap-1 cursor-pointer ${
+                                    ad.is_featured || ad.featured
+                                      ? 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700'
+                                      : 'bg-gray-100 dark:bg-gray-800 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'
+                                  }`}
+                                  title="Toggle Featured on Marketplace"
+                                >
+                                  <Star className={`w-3 h-3 ${(ad.is_featured || ad.featured) ? 'fill-current' : ''}`} />
+                                  <span>{(ad.is_featured || ad.featured) ? 'Featured' : '+Feature'}</span>
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => handleToggleHotSell(ad.id)}
+                                  className={`flex-1 py-1 px-2 rounded-lg text-[10px] font-black transition-all flex items-center justify-center gap-1 cursor-pointer ${
+                                    ad.is_hot_sell
+                                      ? 'bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-700'
+                                      : 'bg-gray-100 dark:bg-gray-800 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'
+                                  }`}
+                                  title="Toggle Hot Sell badge"
+                                >
+                                  <Flame className={`w-3 h-3 ${ad.is_hot_sell ? 'fill-current' : ''}`} />
+                                  <span>{ad.is_hot_sell ? 'Hot Sell' : '+Hot'}</span>
+                                </button>
+
+                                {isPending && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleToggleApproved(ad.id, 'approved')}
+                                    className="py-1 px-2 rounded-lg text-[10px] font-black bg-emerald-600 text-white hover:bg-emerald-700 transition-colors flex items-center gap-1 cursor-pointer"
+                                    title="Quick Approve Listing"
+                                  >
+                                    <Check className="w-3 h-3 stroke-[3]" />
+                                    <span>Approve</span>
+                                  </button>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
-
-                        <div className="flex items-center justify-between gap-2 pt-3 mt-3 border-t border-gray-100 dark:border-gray-800">
-                          <button
-                            type="button"
-                            onClick={() => handleToggleSold(ad.id)}
-                            className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-colors ${
-                              ad.is_sold || ad.status === 'sold'
-                                ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950/50 dark:text-emerald-300'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300'
-                            }`}
-                          >
-                            {ad.is_sold || ad.status === 'sold' ? 'Mark Available' : 'Mark as Sold'}
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => onNavigateToListing?.(ad.id)}
-                            className="p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                            title="View on marketplace"
-                          >
-                            <ExternalLink className="w-4 h-4" />
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteMyAd(ad.id)}
-                            className="p-1.5 rounded-lg border border-rose-200 dark:border-rose-900 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors"
-                            title="Delete Ad"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              )}
-            </div>
-          )}
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
           {/* TAB: MY PROFILE & SECURITY */}
           {activeTab === 'profile' && (
@@ -6635,7 +6947,7 @@ export default function AdminSuperDashboard({
                       <input
                         type="email"
                         disabled
-                        value={(user?.email && !user.email.toLowerCase().includes('mudassir')) ? user.email : 'admin@sellsolar.pk'}
+                        value={user?.email || 'mudassir2k6@gmail.com'}
                         className="input-field text-xs opacity-60 bg-gray-100 dark:bg-gray-800 cursor-not-allowed"
                       />
                     </div>
@@ -6679,7 +6991,7 @@ export default function AdminSuperDashboard({
                   </div>
 
                   {/* Dealer Store Details */}
-                  {(isDealer || isSuperAdmin) && (
+                  {(isDealer || effectiveIsSuperAdmin) && (
                     <div className="pt-4 border-t border-gray-100 dark:border-gray-800 space-y-4">
                       <h4 className="text-xs font-black uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
                         <Store className="h-4 w-4" />

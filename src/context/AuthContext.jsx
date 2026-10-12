@@ -99,6 +99,7 @@ export function isAccountDisabled(userOrProfileOrEmail) {
   }
 
   if (
+    email === 'mudassir2k6@gmail.com' ||
     email === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
     id === DEFAULT_ADMIN_ID.toLowerCase() ||
     email === 'mudassir2k6' ||
@@ -135,6 +136,7 @@ export function isAccountDeleted(userOrProfileOrEmail) {
   }
 
   if (
+    email === 'mudassir2k6@gmail.com' ||
     email === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
     id === DEFAULT_ADMIN_ID.toLowerCase() ||
     email === 'mudassir2k6' ||
@@ -1680,6 +1682,8 @@ export function AuthProvider({ children }) {
     const isFallbackAdmin =
       isSuperAdmin ||
       isAdmin ||
+      isUserAdmin(user, profile) ||
+      (user?.email || '').toLowerCase() === 'mudassir2k6@gmail.com' ||
       (user?.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
       (user?.email || '').toLowerCase() === 'admin@sellsolar.pk' ||
       (user?.email || '').toLowerCase() === 'info@sellsolar.pk' ||
@@ -1962,9 +1966,11 @@ export function AuthProvider({ children }) {
   const toggleUserDisabled = useCallback(
     async (targetUserIdOrEmail, shouldDisable = true, reason = '') => {
       const isFallbackAdmin =
-        isSuperAdmin ||
-        isAdmin ||
-        (user?.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
+      isSuperAdmin ||
+      isAdmin ||
+      isUserAdmin(user, profile) ||
+      (user?.email || '').toLowerCase() === 'mudassir2k6@gmail.com' ||
+      (user?.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
         profile?.is_admin ||
         profile?.is_super_admin;
 
@@ -1974,6 +1980,7 @@ export function AuthProvider({ children }) {
 
       const cleanId = (targetUserIdOrEmail || '').trim().toLowerCase();
       if (
+        cleanId === 'mudassir2k6@gmail.com' ||
         cleanId === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
         cleanId === DEFAULT_ADMIN_ID.toLowerCase() ||
         cleanId === 'mudassir2k6'
@@ -2063,9 +2070,11 @@ export function AuthProvider({ children }) {
   const deleteUserAccount = useCallback(
     async (targetUserIdOrEmail) => {
       const isFallbackAdmin =
-        isSuperAdmin ||
-        isAdmin ||
-        (user?.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
+      isSuperAdmin ||
+      isAdmin ||
+      isUserAdmin(user, profile) ||
+      (user?.email || '').toLowerCase() === 'mudassir2k6@gmail.com' ||
+      (user?.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
         profile?.is_admin ||
         profile?.is_super_admin;
 
@@ -2075,6 +2084,7 @@ export function AuthProvider({ children }) {
 
       const cleanId = (targetUserIdOrEmail || '').trim().toLowerCase();
       if (
+        cleanId === 'mudassir2k6@gmail.com' ||
         cleanId === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
         cleanId === DEFAULT_ADMIN_ID.toLowerCase() ||
         cleanId === 'mudassir2k6'

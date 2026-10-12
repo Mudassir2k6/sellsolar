@@ -167,7 +167,7 @@ function Xy({
         u?.is_super_admin ||
         u?.role === 'super_admin' ||
         u?.role === 'admin' ||
-        c?.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase())
+        c?.email?.toLowerCase() === 'mudassir2k6@gmail.com' || c?.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase())
   );
   const { settings } = useSiteSettings();
   const mobileMenuRef = useRef(null);
@@ -655,16 +655,7 @@ function Xy({
                                         className:
                                           'truncate text-xs text-gray-500 dark:text-gray-400',
                                         children:
-                                          (String(c?.email || '').toLowerCase().includes('mudassir') || String(u?.username || '').toLowerCase().includes('mudassir'))
-                                            ? (isUserAdmin ? 'admin@sellsolar.pk' : '')
-                                            : (u?.username ||
-                                               (c?.email?.endsWith('@sellsolar.local')
-                                                 ? c.email.replace(
-                                                     '@sellsolar.local',
-                                                     ''
-                                                   )
-                                                 : c?.email) ||
-                                               ''),
+                                          (c?.email ? (c.email.endsWith('@sellsolar.local') ? c.email.replace('@sellsolar.local', '') : c.email) : (u?.username || '')),
                                       }),
                                       (u == null ? void 0 : u.account_type) ===
                                         'dealer' &&
@@ -688,10 +679,7 @@ function Xy({
                                           jsx(LayoutDashboard, {
                                             className: 'h-4 w-4 text-amber-500',
                                           }),
-                                          u?.is_super_admin ||
-                                          u?.role === 'super_admin' ||
-                                          c?.email?.toLowerCase() ===
-                                            DEFAULT_ADMIN_EMAIL.toLowerCase()
+                                          c?.email?.toLowerCase() === 'mudassir2k6@gmail.com' || u?.is_super_admin || u?.role === 'super_admin' || c?.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase()
                                             ? '👑 Super Admin Dashboard'
                                             : u?.is_admin || u?.role === 'admin'
                                             ? '🛡️ Admin Dashboard'
@@ -971,9 +959,7 @@ function Xy({
                                     className:
                                       'text-xs text-gray-500 dark:text-gray-400 truncate',
                                     children:
-                                      (String(c?.email || '').toLowerCase().includes('mudassir'))
-                                        ? (isUserAdmin ? 'admin@sellsolar.pk' : '')
-                                        : (c?.email || ''),
+                                      (c?.email ? (c.email.endsWith('@sellsolar.local') ? c.email.replace('@sellsolar.local', '') : c.email) : ''),
                                   }),
                                   jsx('span', {
                                     className:
@@ -1296,10 +1282,7 @@ function Xy({
                                           }),
                                           jsx('span', {
                                             children:
-                                              u?.is_super_admin ||
-                                              u?.role === 'super_admin' ||
-                                              c?.email?.toLowerCase() ===
-                                                DEFAULT_ADMIN_EMAIL.toLowerCase()
+                                              c?.email?.toLowerCase() === 'mudassir2k6@gmail.com' || u?.is_super_admin || u?.role === 'super_admin' || c?.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase()
                                                 ? '👑 Super Admin Dashboard'
                                                 : u?.is_admin ||
                                                   u?.role === 'admin'
@@ -4910,6 +4893,7 @@ function yx({
         effectiveUserId = DEFAULT_ADMIN_ID;
       }
     }
+    const isPlatformAdmin = Boolean(e?.email?.toLowerCase() === 'mudassir2k6@gmail.com' || e?.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() || r?.is_admin || r?.is_super_admin);
     const hasValidDbUuid = isValidUuid(effectiveUserId);
 
     let P = { data: [] };
@@ -4920,9 +4904,7 @@ function yx({
     if (hasValidDbUuid) {
       try {
         [P, Q, de, te] = await Promise.all([
-          supabase.from("solar_listings").select("*").eq("user_id", effectiveUserId).order("created_at", {
-            ascending: false
-          }),
+          isPlatformAdmin ? supabase.from("solar_listings").select("*").order("created_at", { ascending: false }) : supabase.from("solar_listings").select("*").eq("user_id", effectiveUserId).order("created_at", { ascending: false }),
           supabase.from("enquiries").select("*").or(`sender_id.eq.${effectiveUserId},receiver_id.eq.${effectiveUserId}`).order("created_at", {
             ascending: false
           }),
@@ -4944,12 +4926,7 @@ function yx({
       if (raw) {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed)) {
-          localListings = parsed.filter(item => 
-            item.user_id === effectiveUserId || 
-            item.user_id === e.id || 
-            (r?.full_name && item.seller_name === r.full_name) ||
-            (r?.phone && item.seller_phone === r.phone)
-          );
+          localListings = isPlatformAdmin ? parsed : parsed.filter(item => item.user_id === effectiveUserId || item.user_id === e.id || (r?.full_name && item.seller_name === r.full_name) || (r?.phone && item.seller_phone === r.phone));
         }
       }
     } catch (err) {}

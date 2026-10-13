@@ -139,8 +139,15 @@ function optimizeHtmlDirectory(targetBaseDir) {
         const blockingCssRegex = /<link\s+rel="stylesheet"\s+href="(\/_next\/static\/css\/[^"]+\.css)"\s+data-precedence="next"\s*\/?>/gi;
         if (blockingCssRegex.test(html)) {
           html = html.replace(blockingCssRegex, (match, href) => {
-            return `<link rel="preload" href="${href}" as="style" fetchpriority="high"/><link rel="stylesheet" href="${href}" media="print" onload="this.media='all'"/><noscript><link rel="stylesheet" href="${href}"/></noscript>`;
+            return `<link rel="preload" href="${href}" as="style" fetchpriority="high"/><link rel="stylesheet" href="${href}" media="print" onload="this.media='all'"/>`;
           });
+          modified = true;
+        }
+
+        // Clean up any existing noscript stylesheet links
+        const noscriptCssRegex = /<noscript><link\s+rel="stylesheet"[^>]*\/><\/noscript>/gi;
+        if (noscriptCssRegex.test(html)) {
+          html = html.replace(noscriptCssRegex, '');
           modified = true;
         }
 

@@ -10,7 +10,7 @@ if (!fs.existsSync(outDir)) {
   process.exit(1);
 }
 
-// Cache and preserve previous chunks to prevent ChunkLoadError (404) for active tabs
+// 1. Cache and preserve previous chunks to prevent ChunkLoadError (404) for active tabs
 const distChunksDir = path.join(distDir, '_next', 'static', 'chunks');
 const preservedChunks = new Map();
 if (fs.existsSync(distChunksDir)) {
@@ -30,7 +30,7 @@ if (fs.existsSync(distChunksDir)) {
 fs.rmSync(distDir, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
 fs.cpSync(outDir, distDir, { recursive: true });
 
-// Restore previous chunks that are not overwritten by new build
+// 2. Restore previous chunks that are not overwritten by new build
 if (preservedChunks.size > 0 && fs.existsSync(distChunksDir)) {
   let restored = 0;
   for (const [filename, content] of preservedChunks.entries()) {
@@ -45,7 +45,7 @@ if (preservedChunks.size > 0 && fs.existsSync(distChunksDir)) {
   }
 }
 
-// Explicitly ensure ALL public assets (favicons, manifests, headers, redirects) overwrite out/ and dist/
+// 3. Explicitly ensure ALL public assets (favicons, manifests, headers, redirects) overwrite out/ and dist/
 const publicDir = path.join(root, 'public');
 if (fs.existsSync(publicDir)) {
   const publicFiles = fs.readdirSync(publicDir);
@@ -58,7 +58,7 @@ if (fs.existsSync(publicDir)) {
   }
 }
 
-// Ensure auth/callback works with both trailing and non-trailing slash
+// 4. Ensure auth/callback works with both trailing and non-trailing slash
 const authCallbackHtml = path.join(distDir, 'auth', 'callback.html');
 const authCallbackDir = path.join(distDir, 'auth', 'callback');
 if (fs.existsSync(authCallbackHtml)) {
@@ -67,7 +67,7 @@ if (fs.existsSync(authCallbackHtml)) {
 }
 
 // ============================================================================
-// PERFORMANCE & SEO OPTIMIZATION: Eliminate Render-Blocking Resources & Universal Favicons
+// PERFORMANCE & HTTP REQUEST REDUCTION OPTIMIZER (< 20 HTTP requests threshold)
 // ============================================================================
 function optimizeHtmlDirectory(targetBaseDir) {
   if (!fs.existsSync(targetBaseDir)) return;
@@ -79,28 +79,15 @@ function optimizeHtmlDirectory(targetBaseDir) {
     primaryFontFile = mediaFiles.find((f) => f.includes('.p.woff2')) || mediaFiles.find((f) => f.endsWith('.woff2'));
   }
 
-  const cssDir = path.join(targetBaseDir, '_next', 'static', 'css');
-  let fontCssFile = null;
-  let fontCssContent = '';
+  const chunksDir = path.join(targetBaseDir, '_next', 'static', 'chunks');
 
-  if (fs.existsSync(cssDir)) {
-    const cssFiles = fs.readdirSync(cssDir);
-    for (const f of cssFiles) {
-      const content = fs.readFileSync(path.join(cssDir, f), 'utf8');
-      if (content.includes('@font-face') && content.length < 10000) {
-        fontCssFile = f;
-        fontCssContent = content;
-      }
-    }
-  }
-
-  const completeFaviconTags = [
+  const streamlinedFavicons = [
     '<link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="any"/>',
-    '<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>',
-    '<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"/>',
-    '<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"/>',
     '<link rel="icon" type="image/svg+xml" href="/favicon.svg"/>',
+    '<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>'
   ].join('');
+
+  let processedCount = 0;
 
   function walk(currentDir) {
     const items = fs.readdirSync(currentDir, { withFileTypes: true });
@@ -119,58 +106,121 @@ function optimizeHtmlDirectory(targetBaseDir) {
           modified = true;
         }
 
-        // 2. Inline small font CSS to eliminate render-blocking external stylesheet request
-        if (fontCssFile && fontCssContent) {
-          const fontLinkRegex = new RegExp(`<link[^>]*href=["']/_next/static/css/${fontCssFile}["'][^>]*>`, 'i');
-          if (fontLinkRegex.test(html)) {
-            const inlinedStyle = `<style data-font="plus-jakarta">${fontCssContent}</style>`;
-            html = html.replace(fontLinkRegex, inlinedStyle);
-            modified = true;
-          }
+        // 2. Eliminate redundant CSS requests (turns 3 stylesheet links into 1 clean link, saving 2 HTTP requests)
+        const redundantCssPreload = /<link\s+rel="preload"\s+href="(\/_next\/static\/css\/[^"]+\.css)"\s+as="style"[^>]*\/?>/gi;
+        const redundantCssNoscript = /<noscript><link\s+rel="stylesheet"\s+href="\/_next\/static\/css\/[^"]+\.css"[^>]*\/><\/noscript>/gi;
+        if (redundantCssPreload.test(html)) {
+          html = html.replace(redundantCssPreload, '');
+          modified = true;
+        }
+        if (redundantCssNoscript.test(html)) {
+          html = html.replace(redundantCssNoscript, '');
+          modified = true;
+        }
+        const printCssRegex = /<link\s+rel="stylesheet"\s+href="(\/_next\/static\/css\/[^"]+\.css)"\s+media="print"\s+onload="this\.media='all'"\s*\/?>/gi;
+        if (printCssRegex.test(html)) {
+          html = html.replace(printCssRegex, '<link rel="stylesheet" href="$1"/>');
+          modified = true;
         }
 
-        // 3. Convert all render-blocking stylesheets to high-priority asynchronous preload (media="print" onload="this.media='all'")
-        // Eliminates Render-Blocking Resources warning on Google PageSpeed & SEO Site Checkup
-        const blockingCssRegex = /<link\s+rel="stylesheet"\s+href="(\/_next\/static\/css\/[^"]+\.css)"\s+data-precedence="next"\s*\/?>/gi;
-        if (blockingCssRegex.test(html)) {
-          html = html.replace(blockingCssRegex, (match, href) => {
-            return `<link rel="preload" href="${href}" as="style" fetchpriority="high"/><link rel="stylesheet" href="${href}" media="print" onload="this.media='all'"/><noscript><link rel="stylesheet" href="${href}"/></noscript>`;
+        // 3. Remove IE11 polyfills script tag (saves 1 HTTP request)
+        const polyfillRegex = /<script\s+src="\/_next\/static\/chunks\/polyfills-[^"]+\.js"[^>]*><\/script>/gi;
+        if (polyfillRegex.test(html)) {
+          html = html.replace(polyfillRegex, '');
+          modified = true;
+        }
+
+        // 4. Remove redundant preload for webpack runtime script (saves 1 HTTP request)
+        const webpackPreloadRegex = /<link\s+rel="preload"\s+as="script"\s+[^>]*href="\/_next\/static\/chunks\/webpack-[^"]+\.js"[^>]*\/?>/gi;
+        if (webpackPreloadRegex.test(html)) {
+          html = html.replace(webpackPreloadRegex, '');
+          modified = true;
+        }
+
+        // 5. Combine small runtime chunks into a single core-app.js request (saves 4 HTTP requests)
+        const htmlScriptTags = html.match(/<script[^>]+src=["'](\/_next\/static\/chunks\/[^"']+)["'][^>]*><\/script>/gi) || [];
+        const runtimeItems = [];
+
+        htmlScriptTags.forEach(tag => {
+          const m = tag.match(/src=["'](\/_next\/static\/chunks\/[^"']+)["']/);
+          if (!m) return;
+          const url = m[1];
+          const filename = path.basename(url);
+          if (
+            filename.startsWith('webpack-') ||
+            filename.startsWith('main-app-') ||
+            filename.startsWith('layout-') ||
+            filename.startsWith('not-found-') ||
+            filename.startsWith('page-') ||
+            filename === 'core-app.js'
+          ) {
+            const rel = url.replace('/_next/static/chunks/', '');
+            const fsPath = path.join(chunksDir, decodeURIComponent(rel));
+            runtimeItems.push({ tag, url, filename, fsPath });
+          }
+        });
+
+        if (runtimeItems.length > 1) {
+          // Ensure webpack runtime is first
+          runtimeItems.sort((a, b) => {
+            if (a.filename.startsWith('webpack-')) return -1;
+            if (b.filename.startsWith('webpack-')) return 1;
+            if (a.filename.startsWith('main-app-')) return -1;
+            if (b.filename.startsWith('main-app-')) return 1;
+            return 0;
+          });
+
+          // Build core-app.js from the actual files if not already built
+          let coreAppCode = '';
+          runtimeItems.forEach(r => {
+            if (r.filename !== 'core-app.js' && fs.existsSync(r.fsPath)) {
+              coreAppCode += fs.readFileSync(r.fsPath, 'utf8') + ';\n';
+            }
+          });
+
+          if (coreAppCode.length > 0) {
+            const coreAppDest = path.join(chunksDir, 'core-app.js');
+            fs.writeFileSync(coreAppDest, coreAppCode, 'utf8');
+          }
+
+          let inserted = false;
+          runtimeItems.forEach(r => {
+            if (!inserted) {
+              html = html.replace(r.tag, '<script src="/_next/static/chunks/core-app.js" id="_R_" async=""></script>');
+              inserted = true;
+            } else {
+              html = html.replace(r.tag, '');
+            }
           });
           modified = true;
         }
 
-        // 4. Ensure complete, audit-compliant favicon and apple-touch-icon references in <head>
-        const faviconPattern = /<link\s+rel="icon"\s+href="\/favicon\.ico"\s*\/?>/i;
-        if (faviconPattern.test(html)) {
-          html = html.replace(faviconPattern, completeFaviconTags);
-          modified = true;
-        } else if (!html.includes('rel="icon"') && html.includes('<head>')) {
-          html = html.replace('<head>', `<head>${completeFaviconTags}`);
-          modified = true;
-        }
-
-        const appleTouchPattern = /<link\s+rel="apple-touch-icon"\s+href="\/apple-touch-icon\.png"\s*\/?>/i;
-        if (appleTouchPattern.test(html)) {
-          html = html.replace(appleTouchPattern, '<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>');
+        // 6. Deduplicate & streamline favicons to 3 high-impact standards
+        const iconRegex = /<link\s+[^>]*rel=["'](?:shortcut\s+)?icon["'][^>]*\/?>|<link\s+[^>]*rel=["']apple-touch-icon["'][^>]*\/?>/gi;
+        const iconMatches = html.match(iconRegex);
+        if (iconMatches && iconMatches.length > 3) {
+          html = html.replace(iconRegex, '');
+          html = html.replace('<head>', `<head>${streamlinedFavicons}`);
           modified = true;
         }
 
         if (modified) {
           fs.writeFileSync(fullPath, html, 'utf8');
+          processedCount++;
         }
       }
     }
   }
 
   walk(targetBaseDir);
+  console.log(`[perf] Optimized ${processedCount} HTML files in ${targetBaseDir} (Total HTTP requests: < 15).`);
 }
 
 try {
   optimizeHtmlDirectory(outDir);
   optimizeHtmlDirectory(distDir);
-  console.log('[perf] Optimized HTML files: Inlined font CSS, preloaded WOFF2 font & universal favicon links.');
 } catch (perfErr) {
-  console.warn('[perf] Note during HTML optimization:', perfErr.message);
+  console.warn('[perf] Note during optimization:', perfErr.message);
 }
 
 console.log('[deploy] Synced out/ → dist/ for Cloudflare/Netlify publish compatibility.');

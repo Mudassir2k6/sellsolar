@@ -45,13 +45,16 @@ if (preservedChunks.size > 0 && fs.existsSync(distChunksDir)) {
   }
 }
 
-// Explicitly ensure _headers and _redirects are in dist/
+// Explicitly ensure ALL public assets (favicons, manifests, headers, redirects) overwrite out/ and dist/
 const publicDir = path.join(root, 'public');
-for (const specialFile of ['_headers', '_redirects', 'ads.txt']) {
-  const src = path.join(publicDir, specialFile);
-  const dest = path.join(distDir, specialFile);
-  if (fs.existsSync(src)) {
-    fs.copyFileSync(src, dest);
+if (fs.existsSync(publicDir)) {
+  const publicFiles = fs.readdirSync(publicDir);
+  for (const file of publicFiles) {
+    const src = path.join(publicDir, file);
+    if (fs.statSync(src).isFile()) {
+      fs.copyFileSync(src, path.join(outDir, file));
+      fs.copyFileSync(src, path.join(distDir, file));
+    }
   }
 }
 
@@ -64,7 +67,7 @@ if (fs.existsSync(authCallbackHtml)) {
 }
 
 // ============================================================================
-// PERFORMANCE OPTIMIZATION: Eliminate Render-Blocking Resources & Accelerate LCP
+// PERFORMANCE & SEO OPTIMIZATION: Eliminate Render-Blocking Resources & Universal Favicons
 // ============================================================================
 function optimizeHtmlDirectory(targetBaseDir) {
   if (!fs.existsSync(targetBaseDir)) return;
@@ -90,6 +93,14 @@ function optimizeHtmlDirectory(targetBaseDir) {
       }
     }
   }
+
+  const completeFaviconTags = [
+    '<link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="any"/>',
+    '<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>',
+    '<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"/>',
+    '<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"/>',
+    '<link rel="icon" type="image/svg+xml" href="/favicon.svg"/>',
+  ].join('');
 
   function walk(currentDir) {
     const items = fs.readdirSync(currentDir, { withFileTypes: true });
@@ -128,6 +139,22 @@ function optimizeHtmlDirectory(targetBaseDir) {
           modified = true;
         }
 
+        // 4. Ensure complete, audit-compliant favicon and apple-touch-icon references in <head>
+        const faviconPattern = /<link\s+rel="icon"\s+href="\/favicon\.ico"\s*\/?>/i;
+        if (faviconPattern.test(html)) {
+          html = html.replace(faviconPattern, completeFaviconTags);
+          modified = true;
+        } else if (!html.includes('rel="icon"') && html.includes('<head>')) {
+          html = html.replace('<head>', `<head>${completeFaviconTags}`);
+          modified = true;
+        }
+
+        const appleTouchPattern = /<link\s+rel="apple-touch-icon"\s+href="\/apple-touch-icon\.png"\s*\/?>/i;
+        if (appleTouchPattern.test(html)) {
+          html = html.replace(appleTouchPattern, '<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>');
+          modified = true;
+        }
+
         if (modified) {
           fs.writeFileSync(fullPath, html, 'utf8');
         }
@@ -141,7 +168,7 @@ function optimizeHtmlDirectory(targetBaseDir) {
 try {
   optimizeHtmlDirectory(outDir);
   optimizeHtmlDirectory(distDir);
-  console.log('[perf] Optimized HTML files: Inlined font CSS, preloaded WOFF2 font & eliminated render-blocking stylesheets.');
+  console.log('[perf] Optimized HTML files: Inlined font CSS, preloaded WOFF2 font & universal favicon links.');
 } catch (perfErr) {
   console.warn('[perf] Note during HTML optimization:', perfErr.message);
 }

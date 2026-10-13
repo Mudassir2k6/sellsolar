@@ -68,6 +68,7 @@ if (fs.existsSync(authCallbackHtml)) {
 
 // ============================================================================
 // PERFORMANCE & HTTP REQUEST REDUCTION OPTIMIZER (< 20 HTTP requests threshold)
+// & ELIMINATE RENDER-BLOCKING RESOURCES (Google PageSpeed / Lighthouse 100%)
 // ============================================================================
 function optimizeHtmlDirectory(targetBaseDir) {
   if (!fs.existsSync(targetBaseDir)) return;
@@ -77,6 +78,23 @@ function optimizeHtmlDirectory(targetBaseDir) {
   if (fs.existsSync(mediaDir)) {
     const mediaFiles = fs.readdirSync(mediaDir);
     primaryFontFile = mediaFiles.find((f) => f.includes('.p.woff2')) || mediaFiles.find((f) => f.endsWith('.woff2'));
+  }
+
+  // Detect font CSS file to inline directly into HTML (<style data-font="plus-jakarta">)
+  const cssDir = path.join(targetBaseDir, '_next', 'static', 'css');
+  let fontCssFile = null;
+  let fontCssContent = '';
+  if (fs.existsSync(cssDir)) {
+    const cssFiles = fs.readdirSync(cssDir);
+    for (const f of cssFiles) {
+      const fullPath = path.join(cssDir, f);
+      const content = fs.readFileSync(fullPath, 'utf8');
+      if (content.includes('@font-face') && content.length < 10000) {
+        fontCssFile = f;
+        fontCssContent = content;
+        break;
+      }
+    }
   }
 
   const chunksDir = path.join(targetBaseDir, '_next', 'static', 'chunks');
@@ -106,38 +124,41 @@ function optimizeHtmlDirectory(targetBaseDir) {
           modified = true;
         }
 
-        // 2. Eliminate redundant CSS requests (turns 3 stylesheet links into 1 clean link, saving 2 HTTP requests)
-        const redundantCssPreload = /<link\s+rel="preload"\s+href="(\/_next\/static\/css\/[^"]+\.css)"\s+as="style"[^>]*\/?>/gi;
-        const redundantCssNoscript = /<noscript><link\s+rel="stylesheet"\s+href="\/_next\/static\/css\/[^"]+\.css"[^>]*\/><\/noscript>/gi;
-        if (redundantCssPreload.test(html)) {
-          html = html.replace(redundantCssPreload, '');
-          modified = true;
+        // 2. Inline small font CSS to eliminate render-blocking external request
+        if (fontCssFile && fontCssContent) {
+          const fontLinkRegex = new RegExp(`<link[^>]*href=["']/_next/static/css/${fontCssFile}["'][^>]*>`, 'gi');
+          if (fontLinkRegex.test(html)) {
+            const inlinedStyle = `<style data-font="plus-jakarta">${fontCssContent}</style>`;
+            html = html.replace(fontLinkRegex, inlinedStyle);
+            modified = true;
+          }
         }
-        if (redundantCssNoscript.test(html)) {
-          html = html.replace(redundantCssNoscript, '');
-          modified = true;
-        }
-        const printCssRegex = /<link\s+rel="stylesheet"\s+href="(\/_next\/static\/css\/[^"]+\.css)"\s+media="print"\s+onload="this\.media='all'"\s*\/?>/gi;
-        if (printCssRegex.test(html)) {
-          html = html.replace(printCssRegex, '<link rel="stylesheet" href="$1"/>');
+
+        // 3. Convert all remaining render-blocking stylesheets to high-priority asynchronous preload (media="print" onload="this.media='all'")
+        // Completely eliminates "Render-Blocking Resources" warning on PageSpeed & SEO Site Checkup
+        const blockingCssRegex = /<link\s+rel="stylesheet"\s+href="(\/_next\/static\/css\/[^"]+\.css)"\s+data-precedence="next"\s*\/?>/gi;
+        if (blockingCssRegex.test(html)) {
+          html = html.replace(blockingCssRegex, (match, href) => {
+            return `<link rel="preload" href="${href}" as="style" fetchpriority="high"/><link rel="stylesheet" href="${href}" media="print" onload="this.media='all'"/><noscript><link rel="stylesheet" href="${href}"/></noscript>`;
+          });
           modified = true;
         }
 
-        // 3. Remove IE11 polyfills script tag (saves 1 HTTP request)
+        // 4. Remove IE11 polyfills script tag (saves 1 HTTP request)
         const polyfillRegex = /<script\s+src="\/_next\/static\/chunks\/polyfills-[^"]+\.js"[^>]*><\/script>/gi;
         if (polyfillRegex.test(html)) {
           html = html.replace(polyfillRegex, '');
           modified = true;
         }
 
-        // 4. Remove redundant preload for webpack runtime script (saves 1 HTTP request)
+        // 5. Remove redundant preload for webpack runtime script (saves 1 HTTP request)
         const webpackPreloadRegex = /<link\s+rel="preload"\s+as="script"\s+[^>]*href="\/_next\/static\/chunks\/webpack-[^"]+\.js"[^>]*\/?>/gi;
         if (webpackPreloadRegex.test(html)) {
           html = html.replace(webpackPreloadRegex, '');
           modified = true;
         }
 
-        // 5. Combine small runtime chunks into a single core-app.js request (saves 4 HTTP requests)
+        // 6. Combine small runtime chunks into a single core-app.js request (saves 4 HTTP requests)
         const htmlScriptTags = html.match(/<script[^>]+src=["'](\/_next\/static\/chunks\/[^"']+)["'][^>]*><\/script>/gi) || [];
         const runtimeItems = [];
 
@@ -195,7 +216,7 @@ function optimizeHtmlDirectory(targetBaseDir) {
           modified = true;
         }
 
-        // 6. Deduplicate & streamline favicons to 3 high-impact standards
+        // 7. Deduplicate & streamline favicons to 3 high-impact standards
         const iconRegex = /<link\s+[^>]*rel=["'](?:shortcut\s+)?icon["'][^>]*\/?>|<link\s+[^>]*rel=["']apple-touch-icon["'][^>]*\/?>/gi;
         const iconMatches = html.match(iconRegex);
         if (iconMatches && iconMatches.length > 3) {
@@ -213,7 +234,7 @@ function optimizeHtmlDirectory(targetBaseDir) {
   }
 
   walk(targetBaseDir);
-  console.log(`[perf] Optimized ${processedCount} HTML files in ${targetBaseDir} (Total HTTP requests: < 15).`);
+  console.log(`[perf] Optimized ${processedCount} HTML files in ${targetBaseDir} (Eliminated render-blocking CSS & bundled runtime).`);
 }
 
 try {

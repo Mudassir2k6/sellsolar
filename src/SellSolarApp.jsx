@@ -2886,19 +2886,29 @@ function yx({
   const resolvedPhone = useMemo(() => {
     const email = (seller?.email || r?.email || '').toLowerCase();
     if (email === 'mudassir2k6@gmail.com') return '0334-5453761';
-    if (r?.phone) return r.phone;
-    if (seller?.user_metadata?.phone) return seller.user_metadata.phone;
+
+    // 1. Profile phone from useAuth (disallow stale 03345453762)
+    const profPhone = (r?.phone || '').trim();
+    if (profPhone && profPhone.replace(/\D/g, '') !== '03345453762') {
+      return profPhone;
+    }
+
+    if (seller?.user_metadata?.phone && seller.user_metadata.phone.replace(/\D/g, '') !== '03345453762') {
+      return seller.user_metadata.phone;
+    }
+
     try {
       const id = (seller?.id || r?.id || '').toLowerCase();
       const pMap = typeof getUserPhonesMap === 'function' ? getUserPhonesMap() : {};
-      if (email && pMap[email]) return pMap[email];
-      if (id && pMap[id]) return pMap[id];
+      if (email && pMap[email] && pMap[email].replace(/\D/g, '') !== '03345453762') return pMap[email];
+      if (id && pMap[id] && pMap[id].replace(/\D/g, '') !== '03345453762') return pMap[id];
 
       const stored = typeof getStoredUsers === 'function' ? getStoredUsers() : {};
-      if (email && stored[email]?.profile?.phone) return stored[email].profile.phone;
-      if (email && stored[email]?.user?.user_metadata?.phone) return stored[email].user.user_metadata.phone;
+      if (email && stored[email]?.profile?.phone && stored[email].profile.phone.replace(/\D/g, '') !== '03345453762') return stored[email].profile.phone;
+      if (email && stored[email]?.user?.user_metadata?.phone && stored[email].user.user_metadata.phone.replace(/\D/g, '') !== '03345453762') return stored[email].user.user_metadata.phone;
     } catch {}
-    return r?.phone || '';
+
+    return (profPhone && profPhone.replace(/\D/g, '') !== '03345453762') ? profPhone : '';
   }, [r, seller]);
 
   useEffect(() => {

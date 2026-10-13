@@ -430,11 +430,23 @@ export function AuthProvider({ children }) {
         }
         const { data, error } = await query.maybeSingle();
         if (!error && data) {
-          // If remote phone is missing or if user has persistent phone recorded in user_phones map
-          const fallbackPhone = phoneMap[targetEmail] || (userId ? phoneMap[userId] : '') || '';
-          if (fallbackPhone && (!data.phone || targetEmail === 'mudassir2k6@gmail.com' || isDefaultAdmin)) {
-            data.phone = fallbackPhone;
-            supabase.from('profiles').update({ phone: fallbackPhone }).eq('id', data.id).catch(() => {});
+          // Enforce correct verified phone for owner mudassir2k6@gmail.com
+          if (targetEmail === 'mudassir2k6@gmail.com') {
+            const rawPhone = (data.phone || '').replace(/\D/g, '');
+            if (!data.phone || rawPhone === '03345453762' || rawPhone === '03001234588') {
+              data.phone = '0334-5453761';
+            }
+            if (phoneMap[targetEmail] && phoneMap[targetEmail].replace(/\D/g, '') === '03345453762') {
+              phoneMap[targetEmail] = '0334-5453761';
+              saveUserPhonesMap(phoneMap);
+            }
+          } else {
+            // If remote phone is missing or if user has persistent phone recorded in user_phones map
+            const fallbackPhone = phoneMap[targetEmail] || (userId ? phoneMap[userId] : '') || '';
+            if (fallbackPhone && !data.phone) {
+              data.phone = fallbackPhone;
+              supabase.from('profiles').update({ phone: fallbackPhone }).eq('id', data.id).catch(() => {});
+            }
           }
           // Ensure Super Admin has is_admin = true in remote database
           if (isDefaultAdmin && !data.is_admin) {

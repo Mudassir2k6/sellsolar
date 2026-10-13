@@ -77,9 +77,31 @@ export default function AuthCallbackPage() {
           sessionStorage.removeItem('auth_redirect_to');
         } catch {}
 
+        const syncProfileToCloud = async (sess) => {
+          if (!sess?.user || !supabase) return;
+          try {
+            const u = sess.user;
+            const meta = u.user_metadata || {};
+            const cleanEmail = (u.email || '').toLowerCase();
+            const fullName = meta.full_name || meta.name || (cleanEmail ? cleanEmail.split('@')[0] : 'Google User');
+            const upsertPayload = {
+              id: u.id,
+              email: cleanEmail,
+              full_name: fullName,
+              account_type: 'individual',
+              created_at: u.created_at || new Date().toISOString()
+            };
+            if (meta.phone) upsertPayload.phone = meta.phone;
+            await supabase.from('profiles').upsert(upsertPayload, { onConflict: 'id' });
+          } catch (upsertErr) {
+            console.warn('[AuthCallback] Supabase profiles upsert notice:', upsertErr);
+          }
+        };
+
         if (currentSession?.user) {
           if (!active) return;
           setStatus('success');
+          await syncProfileToCloud(currentSession);
 
           // Notify opener window if opened in a popup
           if (window.opener && !window.opener.closed) {
@@ -117,6 +139,7 @@ export default function AuthCallbackPage() {
           const authListener = supabase.auth.onAuthStateChange((event, session) => {
             if (session?.user && active) {
               setStatus('success');
+              syncProfileToCloud(session).catch(() => {});
               if (window.opener && !window.opener.closed) {
                 try {
                   window.opener.postMessage(
@@ -146,6 +169,7 @@ export default function AuthCallbackPage() {
             const finalCheck = await supabase.auth.getSession();
             if (finalCheck.data?.session?.user) {
               setStatus('success');
+              await syncProfileToCloud(finalCheck.data.session);
               if (window.opener && !window.opener.closed) {
                 window.opener.postMessage(
                   {

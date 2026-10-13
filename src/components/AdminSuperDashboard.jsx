@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef, Component } from 'react';
 import {
   LayoutDashboard,
+  Calendar,
   Users,
   Store,
   Tag,
@@ -331,6 +332,11 @@ export default function AdminSuperDashboard({
   // Pure Real Data Mode (Zero Fake Baseline):
   // When active, all simulated traffic, seed demo accounts, and mock equipment listings are 0.
   // Real Installation Leads are strictly preserved and live.
+  // Analytics Date-wise Filtering State
+  const [analyticsDateFilter, setAnalyticsDateFilter] = useState('all');
+  const [analyticsCustomStart, setAnalyticsCustomStart] = useState('');
+  const [analyticsCustomEnd, setAnalyticsCustomEnd] = useState('');
+
   const [zeroDashboardMode, setZeroDashboardMode] = useState(() => {
     if (typeof window === 'undefined') return true;
     return localStorage.getItem('sellsolar_zero_dashboard_mode') !== 'false';
@@ -678,7 +684,7 @@ export default function AdminSuperDashboard({
 
     // 2. Listings (Clean Real Custom Listings or Supabase, NO fake seed fallback)
     let fetchedListings = [];
-    if (!zeroDashboardMode && isSupabaseConfigured()) {
+    if (isSupabaseConfigured()) {
       try {
         const { data: remoteListings, error: listErr } = await supabase
           .from('solar_listings')
@@ -691,6 +697,43 @@ export default function AdminSuperDashboard({
         console.warn('Supabase solar_listings query notice:', sbListErr);
       }
     }
+
+    // Populate sellers from remote listings so every real user who posted an ad shows in the dashboard
+    try {
+      fetchedListings.forEach((item) => {
+        const sellerEmail = (item.seller_email || item.email || '').toLowerCase();
+        const sellerPhone = item.seller_phone || item.phone || '';
+        const sellerId = item.user_id;
+        const sellerName = item.seller_name || 'Solar Seller';
+        if (sellerEmail && usersMap.has(sellerEmail)) {
+          const ex = usersMap.get(sellerEmail);
+          if (!ex.phone && sellerPhone) ex.phone = sellerPhone;
+          return;
+        }
+        if (sellerId && usersMap.has(String(sellerId).toLowerCase())) {
+          const ex = usersMap.get(String(sellerId).toLowerCase());
+          if (!ex.phone && sellerPhone) ex.phone = sellerPhone;
+          return;
+        }
+        const sellerKey = (sellerEmail || sellerId || sellerPhone).toLowerCase();
+        if (sellerKey && !deletedUsersMap[sellerKey] && !usersMap.has(sellerKey)) {
+          usersMap.set(sellerKey, {
+            id: sellerId || `seller_${sellerPhone || Math.random().toString(36).slice(2, 8)}`,
+            email: sellerEmail || `${sellerName.toLowerCase().replace(/[^a-z0-9]/g, '') || 'user'}@sellsolar.seller`,
+            name: sellerName,
+            phone: sellerPhone,
+            city: item.city || item.location || 'Lahore',
+            role: 'dealer',
+            is_verified_dealer: !!item.is_verified_seller,
+            account_type: 'dealer',
+            created_at: item.created_at || '2026-02-01T00:00:00Z',
+            is_disabled: false,
+            isCurrentSession: false,
+            source: 'supabase_listings',
+          });
+        }
+      });
+    } catch {}
 
     try {
       const rawListings = localStorage.getItem('sellsolar_custom_listings');
@@ -718,6 +761,47 @@ export default function AdminSuperDashboard({
       let allInstReqs = [];
       try {
         allInstReqs = getStoredInstallationRequests() || [];
+      } catch {}
+      if (isSupabaseConfigured()) {
+        try {
+          const { data: remoteInst } = await supabase
+            .from('installation_requests')
+            .select('*')
+            .order('created_at', { ascending: false });
+          if (Array.isArray(remoteInst) && remoteInst.length > 0) {
+            remoteInst.forEach((r) => {
+              if (!allInstReqs.some((x) => x.id === r.id)) allInstReqs.push(r);
+            });
+          }
+        } catch (instErr) {
+          console.warn('Supabase installation_requests query notice:', instErr);
+        }
+      }
+
+      // Add installation request leads as users in directory
+      try {
+        allInstReqs.forEach((req) => {
+          const reqEmail = (req.email || '').toLowerCase();
+          const reqPhone = req.phone || '';
+          const reqName = req.full_name || req.name || 'Solar Customer';
+          const reqKey = (reqEmail || reqPhone || req.id || '').toLowerCase();
+          if (reqKey && !deletedUsersMap[reqKey] && !usersMap.has(reqKey) && (reqEmail ? !usersMap.has(reqEmail) : true)) {
+            usersMap.set(reqKey, {
+              id: req.id || `lead_${reqPhone || Math.random().toString(36).slice(2, 8)}`,
+              email: reqEmail || `${reqName.toLowerCase().replace(/[^a-z0-9]/g, '') || 'customer'}@sellsolar.lead`,
+              name: reqName,
+              phone: reqPhone,
+              city: req.city || 'Lahore',
+              role: 'customer',
+              is_verified_dealer: false,
+              account_type: 'individual',
+              created_at: req.created_at || '2026-03-01T00:00:00Z',
+              is_disabled: false,
+              isCurrentSession: false,
+              source: 'installation_lead',
+            });
+          }
+        });
       } catch {}
 
       usersMap.forEach((uObj) => {
@@ -858,7 +942,10 @@ export default function AdminSuperDashboard({
     }
   }, []);
 
-  const analytics = useMemo(() => getAnalyticsSummary(listingsList), [listingsList, analyticsTick]);
+  const analytics = useMemo(
+    () => getAnalyticsSummary(listingsList, analyticsDateFilter, analyticsCustomStart, analyticsCustomEnd),
+    [listingsList, analyticsTick, analyticsDateFilter, analyticsCustomStart, analyticsCustomEnd]
+  );
 
   // Uniqueness & Phone Metrics for Filters
   const userStats = useMemo(() => {
@@ -3855,6 +3942,93 @@ export default function AdminSuperDashboard({
                     Live Tracking Active
                   </span>
                 </div>
+              </div>
+
+              {/* Modern Date Filter Bar */}
+              <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-xs space-y-3">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <div className="h-8 w-8 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
+                      <Calendar className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <span>Date Range Filter</span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800">
+                          {analytics.activeFilterLabel || 'All Time'}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                        Select predefined time periods or choose custom dates to analyze site performance.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Filter Pills */}
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {[
+                      { id: 'all', label: 'All Time' },
+                      { id: 'today', label: 'Today' },
+                      { id: 'last_day', label: 'Yesterday' },
+                      { id: 'last_week', label: 'Last 7 Days' },
+                      { id: 'this_month', label: 'This Month' },
+                      { id: 'last_month', label: 'Last Month' },
+                      { id: 'custom', label: 'Custom Range' },
+                    ].map((pill) => {
+                      const isActive = analyticsDateFilter === pill.id;
+                      return (
+                        <button
+                          key={pill.id}
+                          type="button"
+                          onClick={() => setAnalyticsDateFilter(pill.id)}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                            isActive
+                              ? 'bg-amber-500 text-white shadow-xs scale-102 ring-2 ring-amber-300 dark:ring-amber-700'
+                              : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 border border-transparent'
+                          }`}
+                        >
+                          {pill.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Custom Date Pickers Row (Visible when Custom Range selected) */}
+                {analyticsDateFilter === 'custom' && (
+                  <div className="pt-2 border-t border-gray-100 dark:border-gray-800 flex flex-wrap items-center gap-3">
+                    <div className="flex items-center gap-2">
+                      <label className="text-xs font-semibold text-gray-600 dark:text-gray-400">From:</label>
+                      <input
+                        type="date"
+                        value={analyticsCustomStart}
+                        onChange={(e) => setAnalyticsCustomStart(e.target.value)}
+                        className="px-3 py-1.5 text-xs font-semibold rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-xs font-semibold text-gray-600 dark:text-gray-400">To:</label>
+                      <input
+                        type="date"
+                        value={analyticsCustomEnd}
+                        onChange={(e) => setAnalyticsCustomEnd(e.target.value)}
+                        className="px-3 py-1.5 text-xs font-semibold rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      />
+                    </div>
+                    {(analyticsCustomStart || analyticsCustomEnd) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAnalyticsCustomStart('');
+                          setAnalyticsCustomEnd('');
+                        }}
+                        className="text-xs text-rose-500 hover:underline font-semibold cursor-pointer"
+                      >
+                        Clear Dates
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Metric Cards */}

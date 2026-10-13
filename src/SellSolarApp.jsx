@@ -2884,10 +2884,11 @@ function yx({
   }, [r, seller, isSignedIn]);
 
   const resolvedPhone = useMemo(() => {
+    const email = (seller?.email || r?.email || '').toLowerCase();
+    if (email === 'mudassir2k6@gmail.com') return '0334-5453761';
     if (r?.phone) return r.phone;
     if (seller?.user_metadata?.phone) return seller.user_metadata.phone;
     try {
-      const email = (seller?.email || r?.email || '').toLowerCase();
       const id = (seller?.id || r?.id || '').toLowerCase();
       const pMap = typeof getUserPhonesMap === 'function' ? getUserPhonesMap() : {};
       if (email && pMap[email]) return pMap[email];
@@ -2896,19 +2897,6 @@ function yx({
       const stored = typeof getStoredUsers === 'function' ? getStoredUsers() : {};
       if (email && stored[email]?.profile?.phone) return stored[email].profile.phone;
       if (email && stored[email]?.user?.user_metadata?.phone) return stored[email].user.user_metadata.phone;
-
-      const rawListings = typeof localStorage !== 'undefined' ? localStorage.getItem('sellsolar_custom_listings') : null;
-      if (rawListings) {
-        const parsed = JSON.parse(rawListings);
-        if (Array.isArray(parsed)) {
-          const match = parsed.find(
-            (item) =>
-              (item.seller_email && item.seller_email.toLowerCase() === email) ||
-              (item.user_id && item.user_id === id)
-          );
-          if (match?.seller_phone || match?.phone) return match.seller_phone || match.phone;
-        }
-      }
     } catch {}
     return r?.phone || '';
   }, [r, seller]);
@@ -2925,7 +2913,7 @@ function yx({
 
   // When signed in, Name is locked. Mobile Number is locked only if the user already has one.
   const isNameLocked = Boolean(isSignedIn);
-  const isPhoneLocked = Boolean(isSignedIn && resolvedPhone && resolvedPhone.trim().length > 0);
+  const isPhoneLocked = false;
 
   const [fieldErrors, setFieldErrors] = useState({});
   const titleInputRef = useRef(null);
@@ -3154,11 +3142,39 @@ function yx({
         const{
           error:A
         }=await supabase.from("solar_listings").insert({
-          user_id: safeUserId,title:u.trim(),brand:h.trim(),category:y,condition:j,price:_,city:m.trim(),capacity_kw:k?parseFloat(k):null,warranty_years:S !== null && S !== "" && !isNaN(Number(S)) ? parseFloat(Number(S).toFixed(4)) : null,image_url:finalCover,image_urls:finalImageUrls.length > 0 ? finalImageUrls : (finalCover ? [finalCover] : []),description:Y.trim()||null,featured:!1,seller_name:(isSignedIn ? (resolvedName || ye.trim()) : ye.trim())||(r==null?void 0:r.full_name)||null,seller_phone:(isSignedIn && resolvedPhone ? resolvedPhone : le.trim())||(r==null?void 0:r.phone)||null,views:0,status:"approved",is_sold:!1
+          user_id: safeUserId,title:u.trim(),brand:h.trim(),category:y,condition:j,price:_,city:m.trim(),capacity_kw:k?parseFloat(k):null,warranty_years:S !== null && S !== "" && !isNaN(Number(S)) ? parseFloat(Number(S).toFixed(4)) : null,image_url:finalCover,image_urls:finalImageUrls.length > 0 ? finalImageUrls : (finalCover ? [finalCover] : []),description:Y.trim()||null,featured:!1,seller_name:(isSignedIn ? (resolvedName || ye.trim()) : ye.trim())||(r==null?void 0:r.full_name)||null,seller_phone: (le.trim() || resolvedPhone || (r==null?void 0:r.phone) || null),views:0,status:"approved",is_sold:!1
         });
         if(A)console.warn("Supabase insert notice:", A);
       } catch(err) {
         console.warn("Supabase insert error:", err);
+      }
+
+      // Auto-save submitted phone number to user profile so next time it is remembered
+      try {
+        const submittedPhoneClean = (le || resolvedPhone || '').trim();
+        if (submittedPhoneClean) {
+          const userEmail = (seller?.email || r?.email || '').toLowerCase();
+          const userId = seller?.id || r?.id;
+          if (r) r.phone = submittedPhoneClean;
+          if (seller?.user_metadata) seller.user_metadata.phone = submittedPhoneClean;
+
+          const pMap = typeof getUserPhonesMap === 'function' ? getUserPhonesMap() : {};
+          if (userEmail) pMap[userEmail] = submittedPhoneClean;
+          if (userId) pMap[userId] = submittedPhoneClean;
+          saveUserPhonesMap(pMap);
+
+          const stored = typeof getStoredUsers === 'function' ? getStoredUsers() : {};
+          if (userEmail && stored[userEmail]?.profile) {
+            stored[userEmail].profile.phone = submittedPhoneClean;
+            saveStoredUsers(stored);
+          }
+
+          if (userId && isValidUuid(userId)) {
+            supabase.from('profiles').update({ phone: submittedPhoneClean }).eq('id', userId).catch(() => {});
+          }
+        }
+      } catch (savePhoneErr) {
+        console.warn('Profile phone auto-save notice:', savePhoneErr);
       }
       c(!0),setTimeout(()=>{
         e()
@@ -3509,30 +3525,20 @@ function yx({
                         if(isPhoneLocked) e.preventDefault();
                       },
                       placeholder:"03001234567",
-                      className:isPhoneLocked
-                        ? "input-field pl-11 pr-10 font-mono font-bold bg-gray-100 dark:bg-gray-800/80 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-700 cursor-not-allowed select-none shadow-none focus:ring-0 focus:border-gray-300 dark:focus:border-gray-700 pointer-events-none"
-                        : `input-field pl-11 font-mono font-bold ${fieldErrors.sellerPhone ? "border-2 border-red-500 ring-2 ring-red-200 dark:ring-red-950/60 dark:border-red-500 focus:border-red-500 focus:ring-red-400" : ""}`
+                      className:`input-field pl-11 pr-10 font-mono font-bold bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 ${fieldErrors.sellerPhone ? "border-2 border-red-500 ring-2 ring-red-200 dark:ring-red-950/60 dark:border-red-500 focus:border-red-500 focus:ring-red-400" : ""}`
                     }),
-                    isPhoneLocked && jsx(Lock,{
-                      className:"absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500",
-                      title:"Mobile number locked"
+                    jsx(FilePen,{
+                      className:"absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-emerald-600 dark:text-emerald-400 pointer-events-none",
+                      title:"Editable mobile number"
                     })
                   ]
                 }),
                 fieldErrors.sellerPhone && jsx("p",{className:"mt-1 text-xs font-semibold text-red-600 dark:text-red-400",children:fieldErrors.sellerPhone}),
-                isPhoneLocked ? jsxs("p",{
-                  className:"mt-1 text-[11px] text-gray-500 dark:text-gray-400 flex items-center gap-1",
+                jsxs("p",{
+                  className:"mt-1 text-[11px] text-emerald-700 dark:text-emerald-400 flex items-center gap-1 font-medium",
                   children:[
                     jsx(ShieldCheck,{className:"h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 shrink-0"}),
-                    "Mobile number is verified and linked to your profile."
-                  ]
-                }) : jsxs("p",{
-                  className:`mt-1 text-[11px] flex items-center gap-1 font-semibold ${isSignedIn ? "text-primary-600 dark:text-primary-400" : "text-amber-700 dark:text-amber-400"}`,
-                  children:[
-                    isSignedIn ? jsx(ShieldCheck,{className:"h-3.5 w-3.5 text-primary-600 dark:text-primary-400 shrink-0"}) : null,
-                    isSignedIn
-                      ? "Google / Gmail Account: Please enter your 11-digit mobile number. It will be permanently saved to your user profile."
-                      : "Please enter your 11-digit WhatsApp/calling number (e.g. 03001234567)."
+                    "Editable: Enter your WhatsApp/calling mobile number (e.g. 03001234567). Auto-saves to your profile upon posting."
                   ]
                 })]
               })]

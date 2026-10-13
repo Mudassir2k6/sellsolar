@@ -4,6 +4,9 @@ import { checkRateLimit, recordRateLimitAttempt, sanitizeText } from './security
 import { sendContactMessage } from '../services/inboxService';
 
 export const ADMIN_NOTIFICATION_EMAIL = 'info@sellsolar.pk';
+export const INSTALLATION_ALERT_PHONE = '0308-3888043';
+export const INSTALLATION_ALERT_PHONE_RAW = '03083888043';
+export const INSTALLATION_ALERT_WHATSAPP = '923083888043';
 
 export const INSTALLATION_STATUSES = {
   pending: { label: 'Pending Review', color: 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300' },
@@ -214,6 +217,8 @@ export async function submitInstallationRequest({
       status: 'pending',
       createdAt: new Date().toISOString(),
       notes: safeNotes || `System Requirement: ${safeSystemSize}`,
+      alertPhone: INSTALLATION_ALERT_PHONE,
+      alertWhatsApp: INSTALLATION_ALERT_WHATSAPP,
     };
 
     const existingV2 = getStoredInstallationRequests();
@@ -273,7 +278,7 @@ export async function submitInstallationRequest({
       email: `${cleanPhone}@sellsolar-lead.pk`,
       phone: cleanPhone,
       subject: `⚡ Turnkey Installation Request: ${safeSystemSize} (${safeCity})`,
-      message: `Customer: ${safeFullName}\nPhone: ${cleanPhone}\nCity: ${safeCity}\nProperty: ${safePropertyType}\nSystem Size: ${safeSystemSize}\nAddress: ${safeAddress}\n\nClient Notes:\n${safeNotes || 'None'}`,
+      message: `Customer: ${safeFullName}\nPhone: ${cleanPhone}\nCity: ${safeCity}\nProperty: ${safePropertyType}\nSystem Size: ${safeSystemSize}\nAddress: ${safeAddress}\nWhatsApp Alert Sent: 0308-3888043 (923083888043)\n\nClient Notes:\n${safeNotes || 'None'}`,
       category: 'Installation Request',
       recipientEmail: ADMIN_NOTIFICATION_EMAIL,
     });
@@ -285,5 +290,8 @@ export async function submitInstallationRequest({
     success: true,
     data: dbResult,
     emailStatus,
+    trackingCode,
+    alertPhone: INSTALLATION_ALERT_PHONE,
+    alertWhatsApp: INSTALLATION_ALERT_WHATSAPP,
   };
 }

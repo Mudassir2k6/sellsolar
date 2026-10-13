@@ -27,7 +27,7 @@ if (fs.existsSync(distChunksDir)) {
   }
 }
 
-fs.rmSync(distDir, { recursive: true, force: true });
+fs.rmSync(distDir, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
 fs.cpSync(outDir, distDir, { recursive: true });
 
 // Restore previous chunks that are not overwritten by new build

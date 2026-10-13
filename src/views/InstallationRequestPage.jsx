@@ -18,7 +18,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { digitsOnlyPhone, isValidPhone, normalizePhone } from '../lib/auth';
 import { CITIES } from '../lib/constants';
-import { submitInstallationRequest } from '../lib/installation';
+import { submitInstallationRequest, ADMIN_NOTIFICATION_EMAIL, INSTALLATION_ALERT_PHONE, INSTALLATION_ALERT_WHATSAPP } from '../lib/installation';
 
 const PAKISTAN_CITIES = [
   ...CITIES,
@@ -151,6 +151,9 @@ export default function InstallationRequestPage({ onBack, onNavigate, hasOuterNa
         systemSize,
         propertyType,
         notes: notes.trim(),
+        trackingCode: res.trackingCode || `SOL-${actualCity.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`,
+        alertPhone: res.alertPhone || INSTALLATION_ALERT_PHONE,
+        alertWhatsApp: res.alertWhatsApp || INSTALLATION_ALERT_WHATSAPP,
         adminEmail: ADMIN_NOTIFICATION_EMAIL,
         emailStatus: res.emailStatus,
         submittedAt: new Date().toLocaleDateString('en-PK', {
@@ -222,8 +225,52 @@ export default function InstallationRequestPage({ onBack, onNavigate, hasOuterNa
                 Thank you, <strong className="text-gray-900 dark:text-white">{submittedData.fullName}</strong>! Your solar installation request has been submitted successfully.
               </p>
 
+              {/* WHATSAPP ALERT TO 0308-3888043 (TURNKEY DESK) */}
+              <div className="mt-6 rounded-2xl border-2 border-emerald-500/30 dark:border-emerald-500/40 bg-gradient-to-br from-emerald-50 via-teal-50/40 to-emerald-50 dark:from-emerald-950/40 dark:via-teal-950/20 dark:to-emerald-950/40 p-5 sm:p-6 text-left shadow-lg shadow-emerald-500/10">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-start gap-3.5">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-md shadow-emerald-600/30">
+                      <Phone className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="text-base font-black text-gray-900 dark:text-white">
+                          WhatsApp Turnkey Alert Desk
+                        </h3>
+                        <span className="rounded-full bg-emerald-600 text-white px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider shadow-xs">
+                          0308-3888043
+                        </span>
+                      </div>
+                      <p className="mt-1 text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                        Alert target configured for <strong className="text-emerald-700 dark:text-emerald-300 font-mono">0308-3888043</strong>. Click below to immediately open WhatsApp and send your turnkey requirements directly to the lead installation engineer.
+                      </p>
+                    </div>
+                  </div>
+                  <a
+                    href={`https://wa.me/923083888043?text=${encodeURIComponent(
+                      `Salam SellSolar Team! New Turnkey Solar Installation Request Registered:\n` +
+                      `• Tracking Code: ${submittedData.trackingCode || 'Turnkey Lead'}\n` +
+                      `• Customer Name: ${submittedData.fullName}\n` +
+                      `• Contact Phone: ${submittedData.phone}\n` +
+                      `• City: ${submittedData.city}\n` +
+                      `• System Size: ${submittedData.systemSize}\n` +
+                      `• Property Type: ${submittedData.propertyType}\n` +
+                      `• Site Address: ${submittedData.address}\n` +
+                      (submittedData.notes ? `• Customer Notes: ${submittedData.notes}\n` : '') +
+                      `• Date: ${submittedData.submittedAt}`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-600/25 transition-all transform hover:-translate-y-0.5 shrink-0 cursor-pointer"
+                  >
+                    <Phone className="h-4 w-4" />
+                    <span>Send WhatsApp Alert (0308-3888043)</span>
+                  </a>
+                </div>
+              </div>
+
               {/* ADMIN EMAIL NOTIFICATION BADGE */}
-              <div className="mt-6 rounded-2xl border border-primary-200 dark:border-primary-800/80 bg-gradient-to-r from-primary-50/80 via-amber-50/60 to-primary-50/80 dark:from-primary-950/40 dark:via-amber-950/20 dark:to-primary-950/40 p-4 sm:p-5 text-left shadow-sm">
+              <div className="mt-4 rounded-2xl border border-primary-200 dark:border-primary-800/80 bg-gradient-to-r from-primary-50/80 via-amber-50/60 to-primary-50/80 dark:from-primary-950/40 dark:via-amber-950/20 dark:to-primary-950/40 p-4 sm:p-5 text-left shadow-sm">
                 <div className="flex items-start gap-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-500 text-white shadow-md shadow-primary-500/30">
                     <Mail className="h-5 w-5" />
@@ -238,7 +285,7 @@ export default function InstallationRequestPage({ onBack, onNavigate, hasOuterNa
                       </span>
                     </div>
                     <p className="mt-1 text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
-                      Instant notification with your site requirements and contact info has been emailed to the lead administrator at{' '}
+                      Instant notification with your site requirements and contact info has been emailed to{' '}
                       <span className="font-bold text-primary-700 dark:text-primary-300">
                         {ADMIN_NOTIFICATION_EMAIL}
                       </span>.
@@ -309,9 +356,21 @@ export default function InstallationRequestPage({ onBack, onNavigate, hasOuterNa
               {/* Badge & Header */}
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 dark:border-gray-800 pb-5">
                 <div>
-                  <div className="inline-flex items-center gap-2 rounded-full bg-secondary-50 dark:bg-secondary-950/60 border border-secondary-200/60 dark:border-secondary-800/60 px-3 py-1 text-xs font-bold text-secondary-800 dark:text-secondary-300">
-                    <Wrench className="h-3.5 w-3.5" />
-                    Turnkey Engineering Service
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <div className="inline-flex items-center gap-2 rounded-full bg-secondary-50 dark:bg-secondary-950/60 border border-secondary-200/60 dark:border-secondary-800/60 px-3 py-1 text-xs font-bold text-secondary-800 dark:text-secondary-300">
+                      <Wrench className="h-3.5 w-3.5" />
+                      Turnkey Engineering Service
+                    </div>
+                    <a
+                      href="https://wa.me/923083888043?text=Assalam-o-Alaikum%20SellSolar%20Team%2C%20I%20have%20an%20inquiry%20regarding%20Turnkey%20Solar%20Installation."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200 text-xs font-bold hover:bg-emerald-100 dark:hover:bg-emerald-900 transition-colors shadow-xs"
+                      title="Direct WhatsApp Turnkey Assistance"
+                    >
+                      <Phone className="h-3 w-3 text-emerald-600" />
+                      <span>WhatsApp Alert Desk: <strong>0308-3888043</strong></span>
+                    </a>
                   </div>
                   <h1 className="mt-2.5 text-2xl sm:text-3xl font-black tracking-tight text-gray-900 dark:text-white">
                     Request Complete Installation

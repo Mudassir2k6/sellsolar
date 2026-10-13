@@ -17,12 +17,16 @@ import {
   ExternalLink,
   ChevronDown,
   ChevronUp,
+  Download,
+  Share2,
 } from 'lucide-react';
 import {
   getStoredInstallationRequests,
   updateInstallationRequestStatus,
   deleteInstallationRequest,
   INSTALLATION_STATUSES,
+  INSTALLATION_ALERT_PHONE,
+  INSTALLATION_ALERT_WHATSAPP,
 } from '../lib/installation';
 import { useToast } from '../context/ToastContext';
 import { CITIES, formatPrice } from '../lib/constants';
@@ -44,6 +48,37 @@ export default function AdminInstallationsModule() {
   const loadRequests = () => {
     const list = getStoredInstallationRequests();
     setRequests(list);
+  };
+
+  const handleExportCSV = () => {
+    if (!filteredRequests || filteredRequests.length === 0) {
+      showToast('No installation leads available to export.', 'info');
+      return;
+    }
+    const headers = ['Tracking Code', 'Date', 'Customer Name', 'Phone', 'City', 'System Capacity (kW)', 'System Type', 'Monthly Bill', 'Roof Type', 'Status', 'Address', 'Notes'];
+    const rows = filteredRequests.map((req) => [
+      `"${req.trackingCode || ''}"`,
+      `"${new Date(req.createdAt).toISOString()}"`,
+      `"${(req.fullName || '').replace(/"/g, '""')}"`,
+      `"${req.phone || ''}"`,
+      `"${(req.city || '').replace(/"/g, '""')}"`,
+      `"${req.systemCapacityKw || ''}"`,
+      `"${(req.systemType || '').replace(/"/g, '""')}"`,
+      `"${req.monthlyBill || ''}"`,
+      `"${(req.roofType || '').replace(/"/g, '""')}"`,
+      `"${req.status || ''}"`,
+      `"${(req.address || '').replace(/"/g, '""')}"`,
+      `"${(req.notes || '').replace(/"/g, '""')}"`,
+    ]);
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `sellsolar-installation-leads-${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast('Installation leads CSV downloaded successfully!', 'success');
   };
 
   useEffect(() => {
@@ -118,6 +153,29 @@ export default function AdminInstallationsModule() {
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
             Track user requests for residential & commercial net-metering, rooftop site inspections, EPC feasibility, and certified solar setups.
           </p>
+        </div>
+
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <a
+            href="https://wa.me/923083888043?text=Assalam-o-Alaikum%20SellSolar%20Installation%20Desk"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200 text-xs font-bold hover:bg-emerald-100 transition-colors shadow-xs"
+            title="Official WhatsApp Turnkey Alert Line"
+          >
+            <Phone className="h-3.5 w-3.5 text-emerald-600" />
+            <span>Alert Desk: <strong>0308-3888043</strong></span>
+          </a>
+
+          <button
+            type="button"
+            onClick={handleExportCSV}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs font-bold transition-colors shadow-xs cursor-pointer"
+            title="Download all leads as CSV spreadsheet"
+          >
+            <Download className="h-3.5 w-3.5 text-indigo-600" />
+            <span>Export Leads CSV</span>
+          </button>
         </div>
       </div>
 
@@ -278,6 +336,24 @@ export default function AdminInstallationsModule() {
                             title="Chat on WhatsApp"
                           >
                             <Phone className="h-3.5 w-3.5" />
+                          </a>
+                          <a
+                            href={`https://wa.me/923083888043?text=${encodeURIComponent(
+                              `⚡ *Turnkey Installation Lead [${req.trackingCode}]*\n` +
+                              `• Customer: ${req.fullName}\n` +
+                              `• Phone: ${req.phone}\n` +
+                              `• City: ${req.city}\n` +
+                              `• Capacity: ${req.systemCapacityKw ? req.systemCapacityKw + ' kW' : 'Custom'}\n` +
+                              `• System Type: ${req.systemType?.replace('_', ' ') || 'On-Grid'}\n` +
+                              `• Address: ${req.address || 'N/A'}\n` +
+                              `• Notes: ${req.notes || 'None'}`
+                            )}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 hover:bg-indigo-100"
+                            title="Forward Lead to Turnkey Alert Desk (0308-3888043)"
+                          >
+                            <Share2 className="h-3.5 w-3.5" />
                           </a>
                           <button
                             type="button"

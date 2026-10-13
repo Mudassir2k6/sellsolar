@@ -1003,6 +1003,43 @@ export default function AdminSuperDashboard({
     }
   };
 
+  // 1-Click Export Users Directory to CSV
+  const handleExportUsersCSV = () => {
+    const list = filteredUsersList && filteredUsersList.length > 0 ? filteredUsersList : usersList || [];
+    if (!list || list.length === 0) {
+      showToast({
+        title: 'Export Info',
+        message: 'No users found to export.',
+        type: 'info',
+      });
+      return;
+    }
+    const headers = ['User ID', 'Name', 'Email', 'Phone', 'City', 'Account Type', 'Role', 'Status'];
+    const rows = list.map((u) => [
+      `"${u.id || ''}"`,
+      `"${(u.name || '').replace(/"/g, '""')}"`,
+      `"${(u.email || '').replace(/"/g, '""')}"`,
+      `"${u.phone || ''}"`,
+      `"${(u.city || '').replace(/"/g, '""')}"`,
+      `"${u.account_type || ''}"`,
+      `"${u.role || ''}"`,
+      `"${u.is_disabled ? 'Disabled' : 'Active'}"`,
+    ]);
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `sellsolar-users-directory-${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast({
+      title: 'Export Complete',
+      message: `${list.length} users successfully exported to CSV spreadsheet.`,
+      type: 'success',
+    });
+  };
+
   // Create or add new user directly from Admin
   const handleCreateNewUser = async (e) => {
     e?.preventDefault();
@@ -4140,6 +4177,18 @@ export default function AdminSuperDashboard({
                               >
                                 🔥 {item.is_hot_sell ? 'Hot' : 'Hot Sell'}
                               </button>
+                              <button
+                                type="button"
+                                onClick={() => handleToggleSold(item.id)}
+                                className={`px-2 py-1 rounded text-[10px] font-bold transition-all ${
+                                  item.is_sold || item.status === 'sold'
+                                    ? 'bg-gray-700 text-white dark:bg-gray-700'
+                                    : 'bg-emerald-500 text-white'
+                                }`}
+                                title="Click to toggle Sold / Active status"
+                              >
+                                {item.is_sold || item.status === 'sold' ? '🏷️ Sold' : '✅ Active'}
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -5540,11 +5589,20 @@ export default function AdminSuperDashboard({
                     Manage permissions for all platform users across <strong>Super Admin</strong>, <strong>Admin</strong>, <strong>Verified Dealer</strong>, and <strong>Customer</strong> tiers.
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={handleExportUsersCSV}
+                    className="btn-secondary text-xs px-3 py-2 flex items-center gap-1.5 cursor-pointer"
+                    title="Export users directory as CSV spreadsheet"
+                  >
+                    <Download className="h-3.5 w-3.5 text-purple-600" />
+                    <span>Export Users CSV</span>
+                  </button>
                   <button
                     type="button"
                     onClick={() => loadData()}
-                    className="btn-secondary text-xs px-3 py-2 flex items-center gap-1.5"
+                    className="btn-secondary text-xs px-3 py-2 flex items-center gap-1.5 cursor-pointer"
                     title="Refresh user list"
                   >
                     <RefreshCw className="h-3.5 w-3.5" />

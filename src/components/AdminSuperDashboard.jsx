@@ -908,11 +908,14 @@ export default function AdminSuperDashboard({
       }
 
       if (!userSearchQuery) return true;
-      const q = userSearchQuery.toLowerCase();
+      const q = userSearchQuery.toLowerCase().trim();
+      const qDigits = q.replace(/\D/g, '');
+      const userPhoneDigits = (u.phone || '').replace(/\D/g, '');
+      const phoneMatched = (u.phone || '').toLowerCase().includes(q) || (qDigits.length >= 3 && userPhoneDigits.includes(qDigits));
       return (
         (u.name || '').toLowerCase().includes(q) ||
         (u.email || '').toLowerCase().includes(q) ||
-        (u.phone || '').toLowerCase().includes(q) ||
+        phoneMatched ||
         (u.city || '').toLowerCase().includes(q) ||
         (u.id || '').toLowerCase().includes(q)
       );
@@ -2161,8 +2164,10 @@ export default function AdminSuperDashboard({
                 <p className="text-xs font-bold text-gray-900 dark:text-white truncate max-w-[140px]">
                   {profile?.full_name || userEmail.split('@')[0]}
                 </p>
-                <p className="text-[10px] text-gray-400 capitalize">
-                  {effectiveIsSuperAdmin
+                <p className="text-[10px] text-gray-400 capitalize font-medium">
+                  {userEmail === 'mudassir2k6@gmail.com'
+                    ? '👑 Platform Owner'
+                    : effectiveIsSuperAdmin
                     ? 'Super Administrator'
                     : effectiveIsAdmin
                     ? 'Administrator'
@@ -2183,15 +2188,13 @@ export default function AdminSuperDashboard({
                 <div className="absolute right-0 mt-2 w-64 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-2 shadow-2xl z-50 animate-in fade-in duration-150">
                   <div className="px-3 py-2.5 border-b border-gray-100 dark:border-gray-800 mb-1">
                     <p className="text-xs font-bold text-gray-900 dark:text-white truncate">
-                      {((profile?.full_name || user?.user_metadata?.full_name || '').toLowerCase().includes('mudassir'))
-                        ? 'SellSolar Administrator'
-                        : (profile?.full_name || user?.user_metadata?.full_name || 'Admin User')}
+                      {profile?.full_name || user?.user_metadata?.full_name || 'mudassir nisar'}
                     </p>
                     <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate font-mono">
                       {userEmail || 'mudassir2k6@gmail.com'}
                     </p>
-                    <span className="mt-1 inline-block text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">
-                      {effectiveIsSuperAdmin ? '👑 Super Admin' : effectiveIsAdmin ? '🛡️ Admin' : '👤 User'}
+                    <span className="mt-1 inline-block text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700">
+                      {userEmail === 'mudassir2k6@gmail.com' ? '👑 Platform Owner' : effectiveIsSuperAdmin ? '👑 Super Admin' : effectiveIsAdmin ? '🛡️ Admin' : '👤 User'}
                     </span>
                   </div>
 
@@ -5393,7 +5396,14 @@ export default function AdminSuperDashboard({
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                      {filteredListings.map((item) => (
+                      {filteredListings.length === 0 ? (
+                        <tr>
+                          <td colSpan="6" className="p-8 text-center text-gray-400">
+                            No solar equipment listings found matching this filter.
+                          </td>
+                        </tr>
+                      ) : (
+                        filteredListings.map((item) => (
                         <tr key={item.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
                           <td className="p-3.5">
                             <div className="flex items-center gap-3">
@@ -5507,7 +5517,8 @@ export default function AdminSuperDashboard({
                             </div>
                           </td>
                         </tr>
-                      ))}
+                      ))
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -5610,6 +5621,7 @@ export default function AdminSuperDashboard({
                 <button
                   type="button"
                   onClick={() => {
+                    setUserUniquenessFilter('all');
                     if (userMetricFilter === 'dealers') {
                       setUserMetricFilter('all');
                       setUserRoleFilter('all');
@@ -5643,6 +5655,7 @@ export default function AdminSuperDashboard({
                 <button
                   type="button"
                   onClick={() => {
+                    setUserUniquenessFilter('all');
                     if (userMetricFilter === 'admins') {
                       setUserMetricFilter('all');
                       setUserRoleFilter('all');

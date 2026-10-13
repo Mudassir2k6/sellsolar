@@ -264,8 +264,13 @@ export default function AdminInstallationsModule() {
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-1">
                           <a
-                            href={`https://wa.me/${req.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
-                              `Salam ${req.fullName}, regarding your Solar Installation inquiry [${req.trackingCode}] on SellSolar.pk:`
+                            href={`https://wa.me/${(() => {
+                              let cleanWa = (req.phone || '').replace(/[^0-9]/g, '');
+                              if (cleanWa.startsWith('0')) cleanWa = '92' + cleanWa.slice(1);
+                              else if (!cleanWa.startsWith('92') && cleanWa) cleanWa = '92' + cleanWa;
+                              return cleanWa;
+                            })()}?text=${encodeURIComponent(
+                              `Salam ${req.fullName || 'Sir'}, regarding your Solar Installation inquiry [${req.trackingCode}] on SellSolar.pk:`
                             )}`}
                             target="_blank"
                             rel="noopener noreferrer"

@@ -548,7 +548,7 @@ export default function AdminSuperDashboard({
           remoteProfiles.forEach((rp) => {
             const mapKey = (rp.email || rp.id || '').toLowerCase();
             const rpId = (rp.id || '').toLowerCase();
-            if (deletedUsersMap[mapKey] || deletedUsersMap[rpId]) return;
+            // Remote Supabase profiles are the cloud source of truth: do not filter out active database accounts
 
             const existing = usersMap.get(mapKey) || usersMap.get(rpId);
             const isMasterAdm = mapKey === DEFAULT_ADMIN_EMAIL.toLowerCase() || mapKey === 'admin@sellsolar.pk';
@@ -852,20 +852,77 @@ export default function AdminSuperDashboard({
       });
     } catch {}
 
-    // 5. Enforce email uniqueness: Deduplicate accounts so each email appears only once!
+    // 5. Enforce uniqueness: Smart deduplication by both UUID and Email, merging aliases & synthetic accounts
     const deduplicatedUsers = new Map();
     usersMap.forEach((uObj) => {
       const emailKey = (uObj.email || '').trim().toLowerCase();
-      if (emailKey && deduplicatedUsers.has(emailKey)) {
-        const exist = deduplicatedUsers.get(emailKey);
-        // Merge: keep non-empty phone, valid UUID, higher role, active session
+      const idKey = (uObj.id || '').trim().toLowerCase();
+      const isOwner = emailKey === 'mudassir2k6@gmail.com' || emailKey === 'admin@sellsolar.pk' || idKey === '5a565a87-6891-45b1-b9b5-5c740c2645c0';
+
+      let existingKey = null;
+      for (const [key, exist] of deduplicatedUsers.entries()) {
+        const existEmail = (exist.email || '').trim().toLowerCase();
+        const existId = (exist.id || '').trim().toLowerCase();
+
+        // 1. Owner unification: Merge admin@sellsolar.pk and mudassir2k6@gmail.com into a single owner record
+        if (isOwner && (existEmail === 'mudassir2k6@gmail.com' || existEmail === 'admin@sellsolar.pk' || existId === '5a565a87-6891-45b1-b9b5-5c740c2645c0')) {
+          existingKey = key;
+          break;
+        }
+
+        // 2. UUID Match: If both have valid UUID and they match, they are the SAME user!
+        if (isValidUuid(uObj.id) && isValidUuid(exist.id) && existId === idKey) {
+          existingKey = key;
+          break;
+        }
+
+        // 3. Email Match
+        if (emailKey && existEmail && emailKey === existEmail) {
+          existingKey = key;
+          break;
+        }
+      }
+
+      if (existingKey) {
+        const exist = deduplicatedUsers.get(existingKey);
+        if (isOwner) {
+          exist.email = 'mudassir2k6@gmail.com';
+          exist.name = 'mudassir nisar';
+          exist.phone = '0334-5453761';
+          exist.role = 'super_admin';
+          exist.account_type = 'admin';
+          exist.is_admin = true;
+          exist.is_super_admin = true;
+          if (uObj.isCurrentSession) exist.isCurrentSession = true;
+          return;
+        }
+
+        // Prefer real email over synthetic '@sellsolar.seller' or '@sellsolar.lead'
+        if (exist.email?.includes('@sellsolar.') && uObj.email && !uObj.email.includes('@sellsolar.')) {
+          exist.email = uObj.email;
+        }
         if (!exist.phone && uObj.phone) exist.phone = uObj.phone;
         if (isValidUuid(uObj.id) && !isValidUuid(exist.id)) exist.id = uObj.id;
         if (uObj.isCurrentSession) exist.isCurrentSession = true;
-        if (uObj.role === 'super_admin' || (uObj.role === 'admin' && exist.role !== 'super_admin')) exist.role = uObj.role;
+        if (uObj.role === 'dealer' || uObj.is_verified_dealer) {
+          exist.role = 'dealer';
+          exist.is_verified_dealer = true;
+        }
         return;
       }
-      deduplicatedUsers.set(emailKey || (uObj.id || '').toLowerCase(), uObj);
+
+      if (isOwner) {
+        uObj.email = 'mudassir2k6@gmail.com';
+        uObj.name = 'mudassir nisar';
+        uObj.phone = '0334-5453761';
+        uObj.role = 'super_admin';
+        uObj.account_type = 'admin';
+        uObj.is_admin = true;
+        uObj.is_super_admin = true;
+      }
+
+      const primaryKey = (isValidUuid(uObj.id) ? uObj.id : (uObj.email || uObj.id)).toLowerCase();
+      deduplicatedUsers.set(primaryKey, uObj);
     });
 
     setUsersList(Array.from(deduplicatedUsers.values()));

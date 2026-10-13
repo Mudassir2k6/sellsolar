@@ -340,26 +340,7 @@ export function getStoredSession() {
       modified = true;
     }
 
-    // Sanitize any personal name/email/phone from session
-    if (session.user.email && session.user.email.toLowerCase().includes('mudassir')) {
-      session.user.email = DEFAULT_ADMIN_EMAIL;
-      if (session.profile) {
-        session.profile.email = DEFAULT_ADMIN_EMAIL;
-      }
-      modified = true;
-    }
-    if (session.profile?.full_name && session.profile.full_name.toLowerCase().includes('mudassir')) {
-      session.profile.full_name = 'SellSolar Administrator';
-      modified = true;
-    }
-    if (session.profile?.username && session.profile.username.toLowerCase().includes('mudassir')) {
-      session.profile.username = 'admin';
-      modified = true;
-    }
-    if (session.profile?.phone === '03001234567') {
-      session.profile.phone = '';
-      modified = true;
-    }
+    // Mudassir is verified owner: preserve mudassir2k6@gmail.com and 0334-5453761
 
     if (modified) {
       saveStoredSession(session);

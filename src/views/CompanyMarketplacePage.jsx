@@ -961,7 +961,7 @@ function PressContent({ onNavigate }) {
               Email our press desk for comments, market data, and expert solar analysis.
             </p>
           </div>
-          <button type="button" onClick={() => { window.location.href = "mailto:" + ["press", "sellsolar.pk"].join("@"); }} className="btn-primary text-xs px-4 py-2 inline-flex items-center gap-1.5 shadow-xs cursor-pointer"><Mail className="h-3.5 w-3.5" /><span dangerouslySetInnerHTML={{ __html: "press@sellsolar.pk".split("").map(c => "&#" + c.charCodeAt(0) + ";").join("") }} /></button>
+          <button type="button" onClick={() => { window.location.href = "mailto:" + ["press", "sellsolar.pk"].join("@"); }} className="btn-primary text-xs px-4 py-2 inline-flex items-center gap-1.5 shadow-xs cursor-pointer"><Mail className="h-3.5 w-3.5" /><span className="inline-flex items-baseline"><span>press</span><span className="email-protect-at" aria-hidden="true"></span><span>sellsolar.pk</span></span></button>
         </div>
       </div>
 
@@ -2079,7 +2079,7 @@ function ContactUsContent() {
                 <a
                   href={
                     submissionLinks?.mailtoUrl ||
-                    `mailto:info@sellsolar.pk?subject=[${ticketNo}]%20${encodeURIComponent(
+                    `mailto:' + ['info', 'sellsolar.pk'].join('@') + '?subject=[${ticketNo}]%20${encodeURIComponent(
                       form.subject
                     )}&body=${encodeURIComponent(
                       `Name: ${form.name}\nEmail: ${form.email}\nPhone: ${form.phone}\nTicket: ${ticketNo}\n\nMessage:\n${form.message}`
@@ -2541,7 +2541,7 @@ function PrivacyContent() {
           <section>
             <h3 className="font-bold text-gray-900 dark:text-white text-base">3. Account Deletion & Rights</h3>
             <p className="mt-1">
-              You can modify or remove your listings at any time through your dashboard. To request permanent account deletion, contact our privacy desk at <code dangerouslySetInnerHTML={{ __html: "privacy@sellsolar.pk".split("").map(c => "&#" + c.charCodeAt(0) + ";").join("") }} />.
+              You can modify or remove your listings at any time through your dashboard. To request permanent account deletion, contact our privacy desk at <code className="inline-flex items-baseline"><span>privacy</span><span className="email-protect-at" aria-hidden="true"></span><span>sellsolar.pk</span></code>.
             </p>
           </section>
         </div>

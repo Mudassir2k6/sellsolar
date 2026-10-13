@@ -4,7 +4,7 @@
 
 ## Site
 - Homepage: https://sellsolar.pk/
-- Contact: info@sellsolar.pk
+- Contact: https://sellsolar.pk/contact
 - Location: Islamabad, Pakistan
 
 ## Key intents

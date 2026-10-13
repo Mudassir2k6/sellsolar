@@ -2570,7 +2570,7 @@ function hx({
                         className: "flex items-center gap-2.5 text-gray-300 hover:text-primary-400 transition-colors cursor-pointer text-left group",
                         children: [
                           jsx(Mail, { className: "h-4 w-4 text-primary-400 group-hover:scale-110 transition-transform shrink-0" }),
-                          jsx("span", { className: "group-hover:underline", dangerouslySetInnerHTML: { __html: supportEmail.split("").map(c => `&#${c.charCodeAt(0)};`).join("") } })
+                          jsx("span", { className: "group-hover:underline inline-flex items-baseline", "aria-label": "Support Desk", children: [jsx("span", { children: "info" }), jsx("span", { className: "email-protect-at", "aria-hidden": "true" }), jsx("span", { children: "sellsolar.pk" })] })
                         ]
                       }),
                       /* Phone Call (Hidden per user request) */

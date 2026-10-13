@@ -1,3 +1,5 @@
+import Script from 'next/script';
+import { GA_MEASUREMENT_ID } from '@/lib/analytics';
 import Providers from './providers';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import '@/index.css';
@@ -151,8 +153,29 @@ export default function RootLayout({ children }) {
       <head>
         <link rel="preconnect" href="https://zgfycrnmivfybbclflwf.supabase.co" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://zgfycrnmivfybbclflwf.supabase.co" />
+        <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
       </head>
       <body className="font-sans antialiased" suppressHydrationWarning>
+        {/* Google Analytics 4 (GA4) Tag for SEO Diagnostics & Traffic Attribution */}
+        {GA_MEASUREMENT_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics-init" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${GA_MEASUREMENT_ID}', {
+                  page_path: window.location.pathname,
+                });
+              `}
+            </Script>
+          </>
+        )}
         <Providers>{children}</Providers>
       </body>
     </html>

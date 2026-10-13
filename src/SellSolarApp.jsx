@@ -1573,18 +1573,18 @@ function nx({
             className:"mx-auto mt-3.5 sm:mt-4 max-w-5xl lg:max-w-6xl w-full",children:jsxs("div",{
               className:"card overflow-hidden border border-gray-200/90 dark:border-gray-800 shadow-xl dark:bg-gray-900",children:[
                 jsxs("div",{
-                  className:"relative flex items-center border-b border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-900/90",children:[
+                  className:"relative flex items-center border-b border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-900/90 px-1",children:[
                     jsx("button",{
                       type:"button",
                       onClick:()=>scrollSearchTabs("left"),
                       "aria-label":"Scroll categories left",
                       title:"Scroll left (بائیں اسکرول کریں)",
-                      className:"flex items-center justify-center h-8 w-8 ml-1 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-95 transition-all shadow-xs border border-gray-200/90 dark:border-gray-700 shrink-0 z-10 cursor-pointer",
-                      children:jsx(ChevronLeft,{ className:"h-4 w-4" })
+                      className:"flex items-center justify-center h-8 w-8 sm:h-7 sm:w-7 rounded-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-90 transition-all shadow-md border border-gray-300 dark:border-gray-700 shrink-0 z-10 cursor-pointer",
+                      children:jsx(ChevronLeft,{ className:"h-4 w-4 text-primary-600 dark:text-primary-400" })
                     }),
                     jsx("div",{
                       ref:searchTabsScrollRef,
-                      className:"flex-1 flex gap-1 overflow-x-auto p-1.5 sm:p-2 scrollbar-hide scroll-smooth",children:Zy.map(s=>{
+                      className:"flex-1 flex gap-1 overflow-x-auto p-1.5 sm:p-2 scrollbar-none scroll-smooth",children:Zy.map(s=>{
                         const a=s.icon,l=t.category===s.value;
                         return jsxs("button",{
                           onClick:()=>e("category",s.value),className:`flex shrink-0 items-center gap-1.5 sm:gap-2 rounded-lg px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-bold transition-all cursor-pointer ${
@@ -1601,8 +1601,8 @@ function nx({
                       onClick:()=>scrollSearchTabs("right"),
                       "aria-label":"Scroll categories right",
                       title:"Scroll right (دائیں اسکرول کریں)",
-                      className:"flex items-center justify-center h-8 w-8 mr-1 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-95 transition-all shadow-xs border border-gray-200/90 dark:border-gray-700 shrink-0 z-10 cursor-pointer",
-                      children:jsx(ChevronRight,{ className:"h-4 w-4" })
+                      className:"flex items-center justify-center h-8 w-8 sm:h-7 sm:w-7 rounded-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-90 transition-all shadow-md border border-gray-300 dark:border-gray-700 shrink-0 z-10 cursor-pointer",
+                      children:jsx(ChevronRight,{ className:"h-4 w-4 text-primary-600 dark:text-primary-400" })
                     })
                   ]
                 }),

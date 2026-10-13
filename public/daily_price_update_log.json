@@ -1,5 +1,44 @@
 [
   {
+    "updated_at": "14-Oct-2026, 4:10:03 am",
+    "iso": "2026-10-13T23:10:03.570Z",
+    "date_str": "14 October 2026",
+    "panels_count": 27,
+    "inverters_count": 57,
+    "batteries_count": 39,
+    "systems_count": 5,
+    "structures_count": 4,
+    "average_panel_rate": "Rs 33.00 – 44.50 / W",
+    "average_inverter_rate": "Rs 112,000 – 549,000",
+    "average_battery_lithium_rate": "Rs 238,500 – 564,000",
+    "average_battery_tubular_rate": "Rs 31,500 – 51,500",
+    "average_system_rate": "Rs 825,000 – 2,340,000",
+    "average_structure_rate": "Rs 210 – 18,500",
+    "categories_benchmarked": [
+      "Solar Panels (Plates)",
+      "Solar Inverters",
+      "Solar Batteries",
+      "Turnkey Complete Systems",
+      "Structures & BOS Accessories"
+    ],
+    "tags_active": [
+      "Tier-1 N-Type TOPCon",
+      "Bifacial Double Glass",
+      "Pakistan #1 Hybrid",
+      "Net Metering Approved",
+      "Dual MPPT IP65",
+      "Top Lithium 6000 Cycles",
+      "Tall Tubular 27-Plates",
+      "AI Smart AFCI",
+      "Turnkey Net-Metering 10kW",
+      "Hot-Dip Galvanized GI",
+      "Pure Copper TUV DC Cable"
+    ],
+    "customer_dealer_ads_protected": true,
+    "ads_modified_count": 0,
+    "status": "SUCCESS"
+  },
+  {
     "updated_at": "13-Oct-2026, 6:01:57 am",
     "iso": "2026-10-13T01:01:57.898Z",
     "date_str": "13 October 2026",
@@ -1125,33 +1164,6 @@
       "Turnkey Net-Metering 10kW",
       "Hot-Dip Galvanized GI",
       "Pure Copper TUV DC Cable"
-    ],
-    "customer_dealer_ads_protected": true,
-    "ads_modified_count": 0,
-    "status": "SUCCESS"
-  },
-  {
-    "updated_at": "15-Sept-2026, 3:12:33 am",
-    "iso": "2026-09-14T22:12:33.403Z",
-    "date_str": "15 September 2026",
-    "panels_count": 22,
-    "inverters_count": 15,
-    "batteries_count": 11,
-    "average_panel_rate": "Rs 33.00 – 44.50 / W",
-    "average_inverter_rate": "Rs 112,000 – 549,000",
-    "average_battery_lithium_rate": "Rs 238,500 – 564,000",
-    "average_battery_tubular_rate": "Rs 31,500 – 51,500",
-    "categories_benchmarked": [
-      "Solar Panels (Plates)",
-      "Solar Inverters",
-      "Solar Batteries"
-    ],
-    "tags_active": [
-      "Pakistan #1 Hybrid",
-      "Net Metering Approved",
-      "Top Lithium 6000 Cycles",
-      "Tall Tubular 27-Plates",
-      "AI Smart AFCI"
     ],
     "customer_dealer_ads_protected": true,
     "ads_modified_count": 0,

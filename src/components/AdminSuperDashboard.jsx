@@ -307,6 +307,7 @@ export default function AdminSuperDashboard({
   const [userMetricFilter, setUserMetricFilter] = useState('all'); // 'all' | 'signed_in' | 'dealers' | 'admins'
   const [userUniquenessFilter, setUserUniquenessFilter] = useState('all'); // 'all' | 'super_admin' | 'admin' | 'dealer' | 'customer'
   const [isAddingUser, setIsAddingUser] = useState(false);
+  const [isSyncingUsers, setIsSyncingUsers] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
@@ -549,10 +550,19 @@ export default function AdminSuperDashboard({
           .select('*')
           .order('created_at', { ascending: false });
         if (!error && Array.isArray(remoteProfiles) && remoteProfiles.length > 0) {
+          let cleanedTombstones = false;
           remoteProfiles.forEach((rp) => {
             const mapKey = (rp.email || rp.id || '').toLowerCase();
             const rpId = (rp.id || '').toLowerCase();
-            if (deletedUsersMap[mapKey] || deletedUsersMap[rpId]) return;
+            // Reconcile: If profile actually exists in live Supabase DB, remove any stale local deletion tombstone
+            if (deletedUsersMap[mapKey]) {
+              delete deletedUsersMap[mapKey];
+              cleanedTombstones = true;
+            }
+            if (deletedUsersMap[rpId]) {
+              delete deletedUsersMap[rpId];
+              cleanedTombstones = true;
+            }
 
             const existing = usersMap.get(mapKey) || usersMap.get(rpId);
             const isMasterAdm = mapKey === DEFAULT_ADMIN_EMAIL.toLowerCase() || mapKey === 'admin@sellsolar.pk';
@@ -584,6 +594,9 @@ export default function AdminSuperDashboard({
               business_name: rp.business_name || '',
             });
           });
+          if (cleanedTombstones && typeof saveDeletedUsers === 'function') {
+            saveDeletedUsers(deletedUsersMap);
+          }
         }
       } catch (sbErr) {
         console.warn('Supabase profiles query notice:', sbErr);
@@ -1179,6 +1192,30 @@ export default function AdminSuperDashboard({
     });
   };
 
+    // Dedicated Supabase DB Users Sync
+  const handleSyncDatabaseUsers = async () => {
+    try {
+      setIsSyncingUsers(true);
+      if (typeof saveDeletedUsers === 'function') {
+        saveDeletedUsers({});
+      }
+      await loadData();
+      showToast({
+        title: 'Database Synced',
+        message: 'All registered profiles synced directly from Supabase Cloud DB.',
+        type: 'success',
+      });
+    } catch (err) {
+      showToast({
+        title: 'Sync Notice',
+        message: err.message || 'Database sync completed.',
+        type: 'info',
+      });
+    } finally {
+      setIsSyncingUsers(false);
+    }
+  };
+
   // Create or add new user directly from Admin (with Supabase insert + optimistic UI)
   const handleCreateNewUser = async (e) => {
     e?.preventDefault();
@@ -1194,7 +1231,7 @@ export default function AdminSuperDashboard({
     }
 
     const cleanMail = email || name.toLowerCase().replace(/[^a-z0-9]/g, '') + '@sellsolar.pk';
-    const newUserId = 'admin_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+    const newUserId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : ('admin_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8));
 
     try {
       const optimisticUser = {
@@ -5864,14 +5901,19 @@ export default function AdminSuperDashboard({
                     <Download className="h-3.5 w-3.5 text-purple-600" />
                     <span>Export Users CSV</span>
                   </button>
+                  <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>Cloud DB: {usersList.filter((u) => u.source === 'supabase_db' || (u.id && u.id.length > 25)).length} Users</span>
+                  </div>
                   <button
                     type="button"
-                    onClick={() => loadData()}
-                    className="btn-secondary text-xs px-3 py-2 flex items-center gap-1.5 cursor-pointer"
-                    title="Refresh user list"
+                    onClick={handleSyncDatabaseUsers}
+                    disabled={isSyncingUsers}
+                    className="btn-secondary text-xs px-3 py-2 flex items-center gap-1.5 cursor-pointer disabled:opacity-60"
+                    title="Reconcile and refresh all profiles directly from Supabase Cloud DB"
                   >
-                    <RefreshCw className="h-3.5 w-3.5" />
-                    <span>Sync Users</span>
+                    <RefreshCw className={`h-3.5 w-3.5 ${isSyncingUsers ? 'animate-spin text-purple-600' : ''}`} />
+                    <span>{isSyncingUsers ? 'Syncing...' : 'Sync Database'}</span>
                   </button>
                   <button
                     type="button"

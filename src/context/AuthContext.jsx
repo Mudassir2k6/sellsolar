@@ -79,6 +79,27 @@ export function saveUserPhonesMap(map) {
   }
 }
 
+const LOCAL_USER_CITIES_KEY = 'sellsolar_user_cities_map';
+
+export function getUserCitiesMap() {
+  if (typeof window === 'undefined') return {};
+  try {
+    const raw = localStorage.getItem(LOCAL_USER_CITIES_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+export function saveUserCitiesMap(map) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(LOCAL_USER_CITIES_KEY, JSON.stringify(map || {}));
+  } catch (err) {
+    console.error('Failed to save user cities map:', err);
+  }
+}
+
 export function isAccountDisabled(userOrProfileOrEmail) {
   if (!userOrProfileOrEmail) return false;
   let email = '';

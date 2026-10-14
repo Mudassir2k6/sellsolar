@@ -92,7 +92,7 @@ import AdminDailyRatesModule from './AdminDailyRatesModule';
 import AdminDealersModule from './AdminDealersModule';
 import AdminInstallationsModule from './AdminInstallationsModule';
 import AdminDrillDownModal from './AdminDrillDownModal';
-import { getStoredInstallationRequests } from '../lib/installation';
+import { getStoredInstallationRequests, fetchInstallationRequests } from '../lib/installation';
 import { VERIFIED_DEALERS } from '../data/dealersData';
 import { SEED_LISTINGS } from '../data/seedListings';
 import {
@@ -356,6 +356,9 @@ export default function AdminSuperDashboard({
       try {
         setInstallationRequests(getStoredInstallationRequests());
       } catch (e) {}
+      fetchInstallationRequests().then((res) => {
+        if (Array.isArray(res)) setInstallationRequests(res);
+      }).catch(() => {});
     };
     loadLeads();
     if (typeof window !== 'undefined') {
@@ -761,22 +764,9 @@ export default function AdminSuperDashboard({
       const allInboxMsgs = getInboxMessages() || [];
       let allInstReqs = [];
       try {
+        allInstReqs = (await fetchInstallationRequests()) || getStoredInstallationRequests() || [];
+      } catch {
         allInstReqs = getStoredInstallationRequests() || [];
-      } catch {}
-      if (isSupabaseConfigured()) {
-        try {
-          const { data: remoteInst } = await supabase
-            .from('installation_requests')
-            .select('*')
-            .order('created_at', { ascending: false });
-          if (Array.isArray(remoteInst) && remoteInst.length > 0) {
-            remoteInst.forEach((r) => {
-              if (!allInstReqs.some((x) => x.id === r.id)) allInstReqs.push(r);
-            });
-          }
-        } catch (instErr) {
-          console.warn('Supabase installation_requests query notice:', instErr);
-        }
       }
 
       // Add installation request leads as users in directory

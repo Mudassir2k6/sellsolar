@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   Wrench,
   Search,
@@ -19,9 +19,14 @@ import {
   ChevronUp,
   Download,
   Share2,
+  RefreshCw,
+  Trash2,
+  Calendar,
+  Layers,
 } from 'lucide-react';
 import {
   getStoredInstallationRequests,
+  fetchInstallationRequests,
   updateInstallationRequestStatus,
   deleteInstallationRequest,
   INSTALLATION_STATUSES,
@@ -44,11 +49,29 @@ export default function AdminInstallationsModule() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [cityFilter, setCityFilter] = useState('all');
   const [expandedId, setExpandedId] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const loadRequests = () => {
-    const list = getStoredInstallationRequests();
-    setRequests(list);
-  };
+  const loadRequests = useCallback(async (isManual = false) => {
+    if (isManual) setIsRefreshing(true);
+    // Instant local load
+    const local = getStoredInstallationRequests();
+    setRequests(local);
+
+    try {
+      // Async database load
+      const latest = await fetchInstallationRequests();
+      setRequests(latest);
+      if (isManual) {
+        showToast(`Synced with Database: ${latest.length} active leads loaded.`, 'success');
+      }
+    } catch (e) {
+      if (isManual) {
+        showToast('Database sync notice: ' + (e?.message || 'Check connection'), 'info');
+      }
+    } finally {
+      if (isManual) setIsRefreshing(false);
+    }
+  }, [showToast]);
 
   const handleExportCSV = () => {
     if (!filteredRequests || filteredRequests.length === 0) {
@@ -83,7 +106,23 @@ export default function AdminInstallationsModule() {
 
   useEffect(() => {
     loadRequests();
-  }, []);
+
+    // Listen to local update events (submission or edits)
+    const handleUpdate = () => {
+      loadRequests(false);
+    };
+    window.addEventListener('sellsolar_installation_updated', handleUpdate);
+
+    // Auto-refresh every 30 seconds to catch leads submitted from other devices
+    const timer = setInterval(() => {
+      loadRequests(false);
+    }, 30000);
+
+    return () => {
+      window.removeEventListener('sellsolar_installation_updated', handleUpdate);
+      clearInterval(timer);
+    };
+  }, [loadRequests]);
 
   const filteredRequests = useMemo(() => {
     return (requests || []).filter((req) => {
@@ -97,7 +136,9 @@ export default function AdminInstallationsModule() {
         const matchCity = (req.city || '').toLowerCase().includes(q);
         const matchType = (req.systemType || '').toLowerCase().includes(q);
         const matchTracking = (req.trackingCode || '').toLowerCase().includes(q);
-        if (!matchName && !matchPhone && !matchCity && !matchType && !matchTracking) return false;
+        const matchNotes = (req.notes || '').toLowerCase().includes(q);
+        const matchAddress = (req.address || '').toLowerCase().includes(q);
+        if (!matchName && !matchPhone && !matchCity && !matchType && !matchTracking && !matchNotes && !matchAddress) return false;
       }
       return true;
     });
@@ -106,10 +147,12 @@ export default function AdminInstallationsModule() {
   const handleStatusChange = (trackingCode, newStatus) => {
     try {
       updateInstallationRequestStatus(trackingCode, newStatus, 'Status updated via Admin Super Dashboard');
-      loadRequests();
+      setRequests((prev) =>
+        prev.map((r) => (r.trackingCode === trackingCode ? { ...r, status: newStatus } : r))
+      );
       showToast({
         title: 'Status Updated',
-        message: `Request [${trackingCode}] set to "${INSTALLATION_STATUSES[newStatus]?.label || newStatus}".`,
+        message: `Lead [${trackingCode}] set to "${INSTALLATION_STATUSES[newStatus]?.label || newStatus}".`,
         type: 'success',
       });
     } catch (err) {
@@ -121,8 +164,8 @@ export default function AdminInstallationsModule() {
     if (!confirm('Are you sure you want to permanently delete this installation lead?')) return;
     try {
       deleteInstallationRequest(trackingCode);
-      loadRequests();
-      showToast({ title: 'Lead Deleted', message: `Lead [${trackingCode}] removed.`, type: 'info' });
+      setRequests((prev) => prev.filter((r) => r.trackingCode !== trackingCode && r.id !== trackingCode));
+      showToast({ title: 'Lead Deleted', message: `Lead [${trackingCode}] permanently removed.`, type: 'info' });
     } catch (err) {
       showToast({ title: 'Error', message: err.message, type: 'error' });
     }
@@ -151,11 +194,22 @@ export default function AdminInstallationsModule() {
             </span>
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            Track user requests for residential & commercial net-metering, rooftop site inspections, EPC feasibility, and certified solar setups.
+            Real customer requests submitted through the /install portal, synced directly with Supabase database.
           </p>
         </div>
 
         <div className="flex items-center gap-2.5 flex-wrap">
+          <button
+            type="button"
+            onClick={() => loadRequests(true)}
+            disabled={isRefreshing}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 text-xs font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50"
+            title="Refresh and sync leads directly from Supabase Cloud Database"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 text-indigo-600 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <span>{isRefreshing ? 'Syncing...' : 'Sync Database'}</span>
+          </button>
+
           <a
             href="https://wa.me/923083888043?text=Assalam-o-Alaikum%20SellSolar%20Installation%20Desk"
             target="_blank"
@@ -174,7 +228,7 @@ export default function AdminInstallationsModule() {
             title="Download all leads as CSV spreadsheet"
           >
             <Download className="h-3.5 w-3.5 text-indigo-600" />
-            <span>Export Leads CSV</span>
+            <span>Export CSV</span>
           </button>
         </div>
       </div>
@@ -258,35 +312,55 @@ export default function AdminInstallationsModule() {
             <tbody className="divide-y divide-gray-100 dark:divide-gray-800/60">
               {filteredRequests.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-10 text-gray-400 text-xs">
+                  <td colSpan={6} className="text-center py-12 text-gray-400 text-xs">
+                    <Wrench className="h-8 w-8 mx-auto text-gray-300 dark:text-gray-700 mb-2 opacity-50" />
                     No installation leads found matching your criteria.
                   </td>
                 </tr>
               ) : (
                 filteredRequests.map((req) => {
                   const statusMeta = INSTALLATION_STATUSES[req.status] || { label: req.status, color: 'bg-gray-100 text-gray-700' };
-                  const isExpanded = expandedId === req.trackingCode;
+                  const isExpanded = expandedId === (req.trackingCode || req.id);
 
                   return (
-                    <tr key={req.trackingCode} className="hover:bg-gray-50/60 dark:hover:bg-gray-800/40 transition-colors">
+                    <tr key={req.trackingCode || req.id} className="hover:bg-gray-50/60 dark:hover:bg-gray-800/40 transition-colors">
                       <td className="px-4 py-3">
-                        <div className="font-mono font-bold text-indigo-600 dark:text-indigo-400">
-                          {req.trackingCode}
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400">
+                            {req.trackingCode}
+                          </span>
+                          {req.source === 'supabase_db' && (
+                            <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300" title="Live Supabase Cloud DB Record">
+                              DB
+                            </span>
+                          )}
                         </div>
                         <div className="text-[10px] text-gray-400 mt-0.5">
-                          {new Date(req.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                          {new Date(req.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                         </div>
                       </td>
 
                       <td className="px-4 py-3">
-                        <div className="font-black text-gray-900 dark:text-white">{req.fullName}</div>
+                        <div className="font-black text-gray-900 dark:text-white flex items-center gap-1.5">
+                          <span>{req.fullName}</span>
+                        </div>
                         <div className="text-[11px] text-gray-500 dark:text-gray-400 flex items-center gap-2 mt-0.5">
-                          <a href={`tel:${req.phone}`} className="hover:underline font-semibold text-primary-600 dark:text-primary-400">
-                            Call Client
+                          <a href={`tel:${req.phone}`} className="hover:underline font-semibold text-primary-600 dark:text-primary-400 font-mono">
+                            {req.phone || 'No Phone'}
                           </a>
                           <span>•</span>
-                          <span>{req.city}</span>
+                          <span className="font-medium text-gray-700 dark:text-gray-300">{req.city}</span>
                         </div>
+                        {req.address && (
+                          <div className="text-[10px] text-gray-400 truncate max-w-xs mt-0.5" title={req.address}>
+                            📍 {req.address}
+                          </div>
+                        )}
+                        {req.notes && (
+                          <div className="text-[10px] text-indigo-600 dark:text-indigo-400 italic truncate max-w-xs mt-0.5" title={req.notes}>
+                            📝 {req.notes}
+                          </div>
+                        )}
                       </td>
 
                       <td className="px-4 py-3">
@@ -303,14 +377,14 @@ export default function AdminInstallationsModule() {
                           {req.monthlyBill ? formatPrice(req.monthlyBill) : '—'}
                         </div>
                         <div className="text-[10px] text-gray-400">
-                          {req.roofType || 'Concrete Roof'}
+                          {req.roofType || 'Residential Roof'}
                         </div>
                       </td>
 
                       <td className="px-4 py-3">
                         <select
                           value={req.status}
-                          onChange={(e) => handleStatusChange(req.trackingCode, e.target.value)}
+                          onChange={(e) => handleStatusChange(req.trackingCode || req.id, e.target.value)}
                           className={`px-2.5 py-1 rounded-full text-[10px] font-bold border-0 cursor-pointer ${statusMeta.color}`}
                         >
                           {Object.entries(INSTALLATION_STATUSES).map(([k, v]) => (
@@ -332,14 +406,14 @@ export default function AdminInstallationsModule() {
                             )}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 hover:bg-emerald-100"
-                            title="Chat on WhatsApp"
+                            className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 hover:bg-emerald-100 transition-colors"
+                            title="Chat with Customer on WhatsApp"
                           >
                             <Phone className="h-3.5 w-3.5" />
                           </a>
                           <a
                             href={`https://wa.me/923083888043?text=${encodeURIComponent(
-                              `⚡ *Turnkey Installation Lead [${req.trackingCode}]*\n` +
+                              `🎯 *Turnkey Installation Lead [${req.trackingCode}]*\n` +
                               `• Customer: ${req.fullName}\n` +
                               `• Phone: ${req.phone}\n` +
                               `• City: ${req.city}\n` +
@@ -350,18 +424,18 @@ export default function AdminInstallationsModule() {
                             )}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 hover:bg-indigo-100"
+                            className="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 hover:bg-indigo-100 transition-colors"
                             title="Forward Lead to Turnkey Alert Desk (0308-3888043)"
                           >
                             <Share2 className="h-3.5 w-3.5" />
                           </a>
                           <button
                             type="button"
-                            onClick={() => handleDelete(req.trackingCode)}
-                            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-rose-600"
-                            title="Delete Lead"
+                            onClick={() => handleDelete(req.trackingCode || req.id)}
+                            className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
+                            title="Delete Lead Permanently"
                           >
-                            <X className="h-3.5 w-3.5" />
+                            <Trash2 className="h-3.5 w-3.5" />
                           </button>
                         </div>
                       </td>

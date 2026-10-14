@@ -507,43 +507,8 @@ export default function AdminSuperDashboard({
     const disabledUsersMap = getDisabledUsers();
     const deletedUsersMap = getDeletedUsers();
 
-    // 1A. Stored Local Users
-    const rawUsers = getStoredUsers();
-    Object.entries(rawUsers).forEach(([key, val]) => {
-      const p = val.profile || {};
-      const u = val.user || {};
-      const id = p.id || u.id || key;
-      const email = p.email || u.email || (key.includes('@') ? key : '');
-      const mapKey = (email || id).toLowerCase();
-      const idKey = (id || '').toLowerCase();
-      if (deletedUsersMap[mapKey] || deletedUsersMap[idKey]) return;
-
-      const isDisabled = Boolean(
-        disabledUsersMap[mapKey]?.is_disabled ||
-        disabledUsersMap[idKey]?.is_disabled ||
-        p.is_disabled ||
-        val.is_disabled ||
-        p.status === 'disabled'
-      );
-
-      const resolvedPhone = p.phone || u.user_metadata?.phone || phoneMap[mapKey] || phoneMap[idKey] || '';
-
-      usersMap.set(mapKey, {
-        id,
-        email,
-        name: p.full_name || u.user_metadata?.full_name || p.username || (email ? email.split('@')[0] : key),
-        phone: resolvedPhone,
-        city: p.city || u.user_metadata?.city || 'Lahore',
-        role: (email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ? 'super_admin' : (p.role || (p.is_super_admin ? 'super_admin' : p.is_admin ? 'admin' : p.account_type === 'dealer' || p.is_verified_dealer ? 'dealer' : 'customer')),
-        is_verified_dealer: (email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ? false : !!p.is_verified_dealer,
-        account_type: (email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ? 'admin' : (p.account_type || 'individual'),
-        created_at: p.created_at || '2026-01-01T00:00:00Z',
-        is_disabled: isDisabled,
-        isCurrentSession: false,
-      });
-    });
-
-    // 1B. Supabase remote profiles (if configured)
+    // 1A. Fetch registered profiles directly from Supabase DB (Primary Source of Truth)
+    let fetchedSupabaseProfiles = false;
     if (isSupabaseConfigured()) {
       try {
         const { data: remoteProfiles, error } = await supabase
@@ -551,6 +516,7 @@ export default function AdminSuperDashboard({
           .select('*')
           .order('created_at', { ascending: false });
         if (!error && Array.isArray(remoteProfiles) && remoteProfiles.length > 0) {
+          fetchedSupabaseProfiles = true;
           let cleanedTombstones = false;
           remoteProfiles.forEach((rp) => {
             const mapKey = (rp.email || rp.id || '').toLowerCase();
@@ -565,10 +531,6 @@ export default function AdminSuperDashboard({
               cleanedTombstones = true;
             }
 
-            const existing = usersMap.get(mapKey) || usersMap.get(rpId);
-            const isMasterAdm = mapKey === DEFAULT_ADMIN_EMAIL.toLowerCase() || mapKey === 'admin@sellsolar.pk';
-            const computedRole = isMasterAdm ? 'super_admin' : (rp.is_admin ? 'admin' : (rp.account_type === 'dealer' || rp.is_verified_dealer) ? 'dealer' : 'customer');
-
             const isDisabled = Boolean(
               disabledUsersMap[mapKey]?.is_disabled ||
               disabledUsersMap[rpId]?.is_disabled ||
@@ -576,18 +538,16 @@ export default function AdminSuperDashboard({
               rp.status === 'disabled'
             );
 
-            const resolvedPhone = rp.phone || rp.mobile || rp.phone_number || rp.contact_phone || rp.contact_number || rp.raw_user_meta_data?.phone || existing?.phone || phoneMap[mapKey] || phoneMap[rpId] || '';
-
             usersMap.set(mapKey, {
-              id: rp.id || existing?.id,
-              email: rp.email || existing?.email || '',
-              name: rp.full_name || rp.username || existing?.name || (rp.email ? rp.email.split('@')[0] : 'User'),
-              phone: resolvedPhone,
-              city: rp.city || existing?.city || 'Lahore',
-              role: isMasterAdm ? 'super_admin' : (rp.role || computedRole),
-              is_verified_dealer: !isMasterAdm && Boolean(rp.is_verified_dealer || rp.account_type === 'dealer'),
-              account_type: isMasterAdm ? 'admin' : (rp.account_type || existing?.account_type || 'individual'),
-              created_at: rp.created_at || existing?.created_at || '2026-01-01T00:00:00Z',
+              id: rp.id,
+              email: rp.email || '',
+              name: rp.full_name || rp.username || (rp.email ? rp.email.split('@')[0] : 'User'),
+              phone: rp.phone || phoneMap[mapKey] || phoneMap[rpId] || '',
+              city: rp.city || 'Lahore',
+              role: (rp.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ? 'super_admin' : (rp.role || 'customer'),
+              is_verified_dealer: (rp.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ? false : !!rp.is_verified_dealer,
+              account_type: (rp.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ? 'admin' : (rp.account_type || 'individual'),
+              created_at: rp.created_at || '2026-01-01T00:00:00Z',
               is_disabled: isDisabled,
               isCurrentSession: false,
               source: 'supabase_db',
@@ -599,107 +559,93 @@ export default function AdminSuperDashboard({
           }
         }
       } catch (sbErr) {
-        console.warn('Supabase profiles query notice:', sbErr);
+        console.warn('Supabase profiles query error:', sbErr);
       }
     }
 
-    // 1C. Active Signed-in User Session (Highlight with isCurrentSession: true)
-    if (user || profile) {
-      const activeEmail = (user?.email || profile?.email || user?.user_metadata?.email || '').toLowerCase();
-      const activeId = user?.id || profile?.id;
+    // 1B. Fallback to Stored Local Users ONLY when Supabase is not configured or query returned 0 records
+    if (!fetchedSupabaseProfiles) {
+      const rawUsers = getStoredUsers();
+      Object.entries(rawUsers).forEach(([key, val]) => {
+        const p = val.profile || {};
+        const u = val.user || {};
+        const id = p.id || u.id || key;
+        const email = p.email || u.email || (key.includes('@') ? key : '');
+        const mapKey = (email || id).toLowerCase();
+        const idKey = (id || '').toLowerCase();
+        if (deletedUsersMap[mapKey] || deletedUsersMap[idKey]) return;
+
+        const isDisabled = Boolean(
+          disabledUsersMap[mapKey]?.is_disabled ||
+          disabledUsersMap[idKey]?.is_disabled ||
+          p.is_disabled ||
+          val.is_disabled ||
+          p.status === 'disabled'
+        );
+
+        const resolvedPhone = p.phone || u.user_metadata?.phone || phoneMap[mapKey] || phoneMap[idKey] || '';
+
+        usersMap.set(mapKey, {
+          id,
+          email,
+          name: p.full_name || u.user_metadata?.full_name || p.username || (email ? email.split('@')[0] : key),
+          phone: resolvedPhone,
+          city: p.city || u.user_metadata?.city || 'Lahore',
+          role: (email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ? 'super_admin' : (p.role || (p.is_super_admin ? 'super_admin' : p.is_admin ? 'admin' : p.account_type === 'dealer' || p.is_verified_dealer ? 'dealer' : 'customer')),
+          is_verified_dealer: (email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ? false : !!p.is_verified_dealer,
+          account_type: (email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ? 'admin' : (p.account_type || 'individual'),
+          created_at: p.created_at || '2026-01-01T00:00:00Z',
+          is_disabled: isDisabled,
+          isCurrentSession: false,
+        });
+      });
+    }
+
+    // 1C. Authenticated User Profile (always ensure currently logged in user is represented)
+    if (user && (user.email || user.id)) {
+      const activeEmail = (user.email || profile?.email || '').toLowerCase();
+      const activeId = user.id || profile?.id;
       const activeKey = (activeEmail || activeId || '').toLowerCase();
-      if (activeKey) {
+      if (activeKey && !deletedUsersMap[activeKey]) {
+        const effectiveIsSuperAdmin =
+          activeEmail === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
+          activeEmail === 'mudassir2k6@gmail.com' ||
+          isSuperAdmin ||
+          profile?.role === 'super_admin';
+
         const existing = usersMap.get(activeKey) || (activeId && usersMap.get(String(activeId).toLowerCase())) || (activeEmail && usersMap.get(activeEmail));
         const resolvedActivePhone =
           (activeId && phoneMap[activeId]) ||
-          (activeId && phoneMap[String(activeId).toLowerCase()]) ||
           (activeEmail && phoneMap[activeEmail]) ||
           profile?.phone ||
           user?.user_metadata?.phone ||
           existing?.phone ||
           '';
 
-        usersMap.set(activeKey, {
-          id: activeId || existing?.id || DEFAULT_ADMIN_ID,
-          email: activeEmail || existing?.email || '',
-          name: profile?.full_name || user?.user_metadata?.full_name || existing?.name || (activeEmail ? activeEmail.split('@')[0] : 'You'),
-          phone: resolvedActivePhone,
-          city: profile?.city || existing?.city || 'Lahore',
-          role: effectiveIsSuperAdmin ? 'super_admin' : (profile?.role || (isSuperAdmin ? 'super_admin' : isAdmin ? 'admin' : isDealer ? 'dealer' : existing?.role || 'customer')),
-          is_verified_dealer: effectiveIsSuperAdmin ? false : (!!profile?.is_verified_dealer || isDealer),
-          account_type: effectiveIsSuperAdmin ? 'admin' : (profile?.account_type || existing?.account_type || 'individual'),
-          created_at: profile?.created_at || existing?.created_at || new Date().toISOString(),
-          is_disabled: false,
-          isCurrentSession: true,
-        });
-      }
-    }
-
-    // 1D. Sellers from Listings (anyone who listed solar products on the platform)
-    try {
-      const rawListings = localStorage.getItem('sellsolar_custom_listings');
-      if (rawListings) {
-        const parsed = JSON.parse(rawListings);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setListingsList(parsed);
-          parsed.forEach((item) => {
-            const sellerEmail = (item.seller_email || item.email || '').toLowerCase();
-            const sellerPhone = item.seller_phone || item.phone || '';
-            const sellerId = item.user_id;
-            // Deduplicate with existing accounts before adding a seller account
-            if (sellerEmail && usersMap.has(sellerEmail)) {
-              const ex = usersMap.get(sellerEmail);
-              if (!ex.phone && sellerPhone) ex.phone = sellerPhone;
-              return;
-            }
-            if (sellerId && usersMap.has(String(sellerId).toLowerCase())) {
-              const ex = usersMap.get(String(sellerId).toLowerCase());
-              if (!ex.phone && sellerPhone) ex.phone = sellerPhone;
-              return;
-            }
-            const sellerKey = (sellerEmail || sellerId || sellerPhone).toLowerCase();
-            if (sellerKey && !deletedUsersMap[sellerKey] && !usersMap.has(sellerKey)) {
-              usersMap.set(sellerKey, {
-                id: sellerId || `seller_${sellerPhone || Math.random().toString(36).slice(2, 8)}`,
-                email: sellerEmail || `${(item.seller_name || 'seller').toLowerCase().replace(/\s+/g, '')}@sellsolar.seller`,
-                name: item.seller_name || 'Solar Seller',
-                phone: sellerPhone,
-                city: item.city || item.location || 'Lahore',
-                role: 'dealer',
-                is_verified_dealer: !!item.is_verified_seller,
-                account_type: 'dealer',
-                created_at: item.created_at || '2026-02-01T00:00:00Z',
-                is_disabled: false,
-                isCurrentSession: false,
-              });
-            }
-          });
-        }
-      }
-    } catch {}
-
-    // 1E. Verified dealers & default community users
-    // When zeroDashboardMode is enabled (default), NO fake seed accounts are injected!
-    if (!zeroDashboardMode && usersMap.size <= 1) {
-      const seedAccounts = [
-        { id: 'usr_dlr_lahore', name: 'Tariq Solar Solutions', email: 'tariq@solarpk.com', phone: '03008451290', city: 'Lahore', role: 'dealer', is_verified_dealer: true, account_type: 'dealer' },
-        { id: 'usr_dlr_karachi', name: 'Sindh Green Energy', email: 'sales@sindhgreen.pk', phone: '03214567890', city: 'Karachi', role: 'dealer', is_verified_dealer: true, account_type: 'dealer' },
-        { id: 'usr_adm_support', name: 'SellSolar Staff Ops', email: 'support@sellsolar.pk', phone: '03001234567', city: 'Islamabad', role: 'admin', is_verified_dealer: false, account_type: 'admin' },
-        { id: 'usr_cst_rawalpindi', name: 'Engr. Usman Khan', email: 'usman.solar@gmail.com', phone: '03335551234', city: 'Rawalpindi', role: 'customer', is_verified_dealer: false, account_type: 'individual' },
-      ];
-      seedAccounts.forEach((s) => {
-        if (!usersMap.has(s.email.toLowerCase()) && !deletedUsersMap[s.email.toLowerCase()]) {
-          usersMap.set(s.email.toLowerCase(), {
-            ...s,
-            created_at: '2026-01-15T00:00:00Z',
+        if (existing) {
+          existing.isCurrentSession = true;
+          if (resolvedActivePhone && !existing.phone) existing.phone = resolvedActivePhone;
+          if (profile?.full_name) existing.name = profile.full_name;
+        } else {
+          usersMap.set(activeKey, {
+            id: activeId || DEFAULT_ADMIN_ID,
+            email: activeEmail || '',
+            name: profile?.full_name || user?.user_metadata?.full_name || (activeEmail ? activeEmail.split('@')[0] : 'You'),
+            phone: resolvedActivePhone,
+            city: profile?.city || 'Lahore',
+            role: effectiveIsSuperAdmin ? 'super_admin' : (profile?.role || (isSuperAdmin ? 'super_admin' : isAdmin ? 'admin' : isDealer ? 'dealer' : 'customer')),
+            is_verified_dealer: effectiveIsSuperAdmin ? false : (!!profile?.is_verified_dealer || isDealer),
+            account_type: effectiveIsSuperAdmin ? 'admin' : (profile?.account_type || 'individual'),
+            created_at: profile?.created_at || new Date().toISOString(),
             is_disabled: false,
-            isCurrentSession: false,
+            isCurrentSession: true,
+            source: 'session',
           });
         }
-      });
+      }
     }
 
-    // 2. Listings (Clean Real Custom Listings or Supabase, NO fake seed fallback)
+    // 2. Solar Ads & Listings (For Listings Tab ONLY - never inject synthetic accounts into usersMap)
     let fetchedListings = [];
     if (isSupabaseConfigured()) {
       try {
@@ -715,43 +661,6 @@ export default function AdminSuperDashboard({
       }
     }
 
-    // Populate sellers from remote listings so every real user who posted an ad shows in the dashboard
-    try {
-      fetchedListings.forEach((item) => {
-        const sellerEmail = (item.seller_email || item.email || '').toLowerCase();
-        const sellerPhone = item.seller_phone || item.phone || '';
-        const sellerId = item.user_id;
-        const sellerName = item.seller_name || 'Solar Seller';
-        if (sellerEmail && usersMap.has(sellerEmail)) {
-          const ex = usersMap.get(sellerEmail);
-          if (!ex.phone && sellerPhone) ex.phone = sellerPhone;
-          return;
-        }
-        if (sellerId && usersMap.has(String(sellerId).toLowerCase())) {
-          const ex = usersMap.get(String(sellerId).toLowerCase());
-          if (!ex.phone && sellerPhone) ex.phone = sellerPhone;
-          return;
-        }
-        const sellerKey = (sellerEmail || sellerId || sellerPhone).toLowerCase();
-        if (sellerKey && !deletedUsersMap[sellerKey] && !usersMap.has(sellerKey)) {
-          usersMap.set(sellerKey, {
-            id: sellerId || `seller_${sellerPhone || Math.random().toString(36).slice(2, 8)}`,
-            email: sellerEmail || `${sellerName.toLowerCase().replace(/[^a-z0-9]/g, '') || 'user'}@sellsolar.seller`,
-            name: sellerName,
-            phone: sellerPhone,
-            city: item.city || item.location || 'Lahore',
-            role: 'dealer',
-            is_verified_dealer: !!item.is_verified_seller,
-            account_type: 'dealer',
-            created_at: item.created_at || '2026-02-01T00:00:00Z',
-            is_disabled: false,
-            isCurrentSession: false,
-            source: 'supabase_listings',
-          });
-        }
-      });
-    } catch {}
-
     try {
       const rawListings = localStorage.getItem('sellsolar_custom_listings');
       if (rawListings) {
@@ -766,59 +675,34 @@ export default function AdminSuperDashboard({
       }
     } catch {}
 
-    // Only inject seed listings if zeroDashboardMode is explicitly false
     if (!zeroDashboardMode && fetchedListings.length === 0) {
       fetchedListings = [...SEED_LISTINGS];
     }
     setListingsList(fetchedListings);
 
-    // Enrich any missing user phones from listings, inbox/enquiries, and installation requests
+    // 3. Installation Requests (For Installation Tab ONLY - never inject synthetic accounts into usersMap)
+    let allInstReqs = [];
+    try {
+      allInstReqs = (await fetchInstallationRequests()) || getStoredInstallationRequests() || [];
+    } catch {
+      allInstReqs = getStoredInstallationRequests() || [];
+    }
+
+    // 4. Enrich existing registered users with missing phones from listings, messages, or installation requests
     try {
       const allInboxMsgs = getInboxMessages() || [];
-      let allInstReqs = [];
-      try {
-        allInstReqs = (await fetchInstallationRequests()) || getStoredInstallationRequests() || [];
-      } catch {
-        allInstReqs = getStoredInstallationRequests() || [];
-      }
-
-      // Add installation request leads as users in directory
-      try {
-        allInstReqs.forEach((req) => {
-          const reqEmail = (req.email || '').toLowerCase();
-          const reqPhone = req.phone || '';
-          const reqName = req.full_name || req.name || 'Solar Customer';
-          const reqKey = (reqEmail || reqPhone || req.id || '').toLowerCase();
-          if (reqKey && !deletedUsersMap[reqKey] && !usersMap.has(reqKey) && (reqEmail ? !usersMap.has(reqEmail) : true)) {
-            usersMap.set(reqKey, {
-              id: req.id || `lead_${reqPhone || Math.random().toString(36).slice(2, 8)}`,
-              email: reqEmail || `${reqName.toLowerCase().replace(/[^a-z0-9]/g, '') || 'customer'}@sellsolar.lead`,
-              name: reqName,
-              phone: reqPhone,
-              city: req.city || 'Lahore',
-              role: 'customer',
-              is_verified_dealer: false,
-              account_type: 'individual',
-              created_at: req.created_at || '2026-03-01T00:00:00Z',
-              is_disabled: false,
-              isCurrentSession: false,
-              source: 'installation_lead',
-            });
-          }
-        });
-      } catch {}
 
       usersMap.forEach((uObj) => {
         const uEmail = (uObj.email || '').toLowerCase();
         const uId = uObj.id;
 
-        // 1. Fallback from phoneMap if not yet set
+        // Fallback from phoneMap if not yet set
         if (!uObj.phone && phoneMap) {
           if (uEmail && phoneMap[uEmail]) uObj.phone = phoneMap[uEmail];
           else if (uId && phoneMap[uId]) uObj.phone = phoneMap[uId];
         }
 
-        // 2. Fallback from listings
+        // Fallback from listings
         if (!uObj.phone) {
           const match = fetchedListings.find(
             (l) =>
@@ -831,7 +715,7 @@ export default function AdminSuperDashboard({
           }
         }
 
-        // 3. Fallback from inbox / enquiries
+        // Fallback from inbox / enquiries
         if (!uObj.phone && Array.isArray(allInboxMsgs)) {
           const matchMsg = allInboxMsgs.find(
             (m) =>
@@ -844,7 +728,7 @@ export default function AdminSuperDashboard({
           }
         }
 
-        // 4. Fallback from installation requests
+        // Fallback from installation requests
         if (!uObj.phone && Array.isArray(allInstReqs)) {
           const matchInst = allInstReqs.find(
             (req) => req.email && req.email.toLowerCase() === uEmail
@@ -856,7 +740,7 @@ export default function AdminSuperDashboard({
       });
     } catch {}
 
-    // 5. Enforce uniqueness: Smart deduplication by both UUID and Email, merging aliases & synthetic accounts
+    // 5. Enforce uniqueness: Smart deduplication by both UUID and Email
     const deduplicatedUsers = new Map();
     usersMap.forEach((uObj) => {
       const emailKey = (uObj.email || '').trim().toLowerCase();
@@ -901,10 +785,6 @@ export default function AdminSuperDashboard({
           return;
         }
 
-        // Prefer real email over synthetic '@sellsolar.seller' or '@sellsolar.lead'
-        if (exist.email?.includes('@sellsolar.') && uObj.email && !uObj.email.includes('@sellsolar.')) {
-          exist.email = uObj.email;
-        }
         if (!exist.phone && uObj.phone) exist.phone = uObj.phone;
         if (isValidUuid(uObj.id) && !isValidUuid(exist.id)) exist.id = uObj.id;
         if (uObj.isCurrentSession) exist.isCurrentSession = true;

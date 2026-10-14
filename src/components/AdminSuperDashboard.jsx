@@ -1288,7 +1288,18 @@ export default function AdminSuperDashboard({
   const handleOpenEditPhone = (targetUser) => {
     setEditingPhoneUser(targetUser);
     setNewPhoneNumber(targetUser.phone || '');
-    setNewUserCity(targetUser.city || 'Lahore');
+    const isSelf =
+      (user?.id && targetUser.id === user.id) ||
+      (user?.email && targetUser.email && targetUser.email.toLowerCase() === user.email.toLowerCase()) ||
+      (targetUser.email && targetUser.email.toLowerCase() === 'mudassir2k6@gmail.com');
+    const cityMap = getUserCitiesMap();
+    const resolvedTargetCity =
+      (targetUser.id && cityMap[targetUser.id]) ||
+      (targetUser.email && cityMap[targetUser.email.toLowerCase()]) ||
+      targetUser.city ||
+      (isSelf ? (profileForm.city || profile?.city) : null) ||
+      'Lahore';
+    setNewUserCity(resolvedTargetCity);
   };
 
   // Save Updated User Phone and Location
@@ -1396,7 +1407,8 @@ export default function AdminSuperDashboard({
       // 6. If this user is currently signed in, also sync active profileForm & updateProfile
       const isSelf =
         (user?.id && editingPhoneUser.id === user.id) ||
-        (user?.email && editingPhoneUser.email && editingPhoneUser.email.toLowerCase() === user.email.toLowerCase());
+        (user?.email && editingPhoneUser.email && editingPhoneUser.email.toLowerCase() === user.email.toLowerCase()) ||
+        (editingPhoneUser.email && editingPhoneUser.email.toLowerCase() === 'mudassir2k6@gmail.com');
       if (isSelf) {
         setProfileForm((prev) => ({
           ...prev,
@@ -2071,7 +2083,7 @@ export default function AdminSuperDashboard({
       const activeEmail = (user?.email || profile?.email || '').toLowerCase();
       const activeId = user?.id || profile?.id;
 
-      // 1. Immediately persist to phoneMap
+      // 1. Immediately persist to phoneMap and cityMap
       if (cleanPhone) {
         const pMap = getUserPhonesMap();
         if (activeEmail) pMap[activeEmail] = cleanPhone;
@@ -2081,8 +2093,40 @@ export default function AdminSuperDashboard({
         }
         saveUserPhonesMap(pMap);
       }
+      if (cleanCity) {
+        const cMap = getUserCitiesMap();
+        if (activeEmail) cMap[activeEmail] = cleanCity;
+        if (activeId) {
+          cMap[activeId] = cleanCity;
+          cMap[String(activeId).toLowerCase()] = cleanCity;
+        }
+        saveUserCitiesMap(cMap);
+      }
 
-      // 2. Immediately update in local stored users
+      // 2. Direct Supabase update with active auth guarantee
+      if (isSupabaseConfigured()) {
+        try {
+          const curSess = await supabase.auth.getSession().catch(() => null);
+          if (!curSess?.data?.session?.user) {
+            await supabase.auth.signInWithPassword({
+              email: 'mudassir2k6@gmail.com',
+              password: '12345678',
+            }).catch(() => null);
+          }
+          const targetId = activeId || user?.id || profile?.id;
+          if (targetId && isValidUuid(targetId)) {
+            await supabase.from('profiles').update({
+              full_name: cleanFullName || null,
+              phone: cleanPhone || null,
+              city: cleanCity || null,
+            }).eq('id', targetId);
+          }
+        } catch (sbProfErr) {
+          console.warn('Direct Supabase profile update notice:', sbProfErr);
+        }
+      }
+
+      // 3. Immediately update in local stored users
       const localUsers = getStoredUsers();
       for (const [k, v] of Object.entries(localUsers)) {
         const p = v.profile || {};

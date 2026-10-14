@@ -165,63 +165,6 @@ function optimizeHtmlDirectory(targetBaseDir) {
           modified = true;
         }
 
-        // 6. Combine small runtime chunks into a single core-app.js request (saves 4 HTTP requests)
-        const htmlScriptTags = html.match(/<script[^>]+src=["'](\/_next\/static\/chunks\/[^"']+)["'][^>]*><\/script>/gi) || [];
-        const runtimeItems = [];
-
-        htmlScriptTags.forEach(tag => {
-          const m = tag.match(/src=["'](\/_next\/static\/chunks\/[^"']+)["']/);
-          if (!m) return;
-          const url = m[1];
-          const filename = path.basename(url);
-          if (
-            filename.startsWith('webpack-') ||
-            filename.startsWith('main-app-') ||
-            filename.startsWith('layout-') ||
-            filename.startsWith('not-found-') ||
-            filename.startsWith('page-') ||
-            filename === 'core-app.js'
-          ) {
-            const rel = url.replace('/_next/static/chunks/', '');
-            const fsPath = path.join(chunksDir, decodeURIComponent(rel));
-            runtimeItems.push({ tag, url, filename, fsPath });
-          }
-        });
-
-        if (runtimeItems.length > 1) {
-          // Ensure webpack runtime is first
-          runtimeItems.sort((a, b) => {
-            if (a.filename.startsWith('webpack-')) return -1;
-            if (b.filename.startsWith('webpack-')) return 1;
-            if (a.filename.startsWith('main-app-')) return -1;
-            if (b.filename.startsWith('main-app-')) return 1;
-            return 0;
-          });
-
-          // Build core-app.js from the actual files if not already built
-          let coreAppCode = '';
-          runtimeItems.forEach(r => {
-            if (r.filename !== 'core-app.js' && fs.existsSync(r.fsPath)) {
-              coreAppCode += fs.readFileSync(r.fsPath, 'utf8') + ';\n';
-            }
-          });
-
-          if (coreAppCode.length > 0) {
-            const coreAppDest = path.join(chunksDir, 'core-app.js');
-            fs.writeFileSync(coreAppDest, coreAppCode, 'utf8');
-          }
-
-          let inserted = false;
-          runtimeItems.forEach(r => {
-            if (!inserted) {
-              html = html.replace(r.tag, '<script src="/_next/static/chunks/core-app.js" id="_R_" async=""></script>');
-              inserted = true;
-            } else {
-              html = html.replace(r.tag, '');
-            }
-          });
-          modified = true;
-        }
 
         // 7. Deduplicate & streamline favicons to 3 high-impact standards
         const iconRegex = /<link\s+[^>]*rel=["'](?:shortcut\s+)?icon["'][^>]*\/?>|<link\s+[^>]*rel=["']apple-touch-icon["'][^>]*\/?>/gi;

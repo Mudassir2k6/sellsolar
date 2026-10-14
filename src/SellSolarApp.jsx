@@ -6671,7 +6671,7 @@ export default function App({ initialPathname, initialSlug }){
   const {
     user: t, profile: e, loading: r, passwordRecovery: pr, isSuperAdmin, isAdmin
   } = useAuth();
-  const isUserAdmin = Boolean(t && (isSuperAdmin || isAdmin || e?.is_admin || e?.is_super_admin || e?.role === 'super_admin' || e?.role === 'admin' || t?.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase()));
+  const isUserAdmin = Boolean(t && (isSuperAdmin || isAdmin || e?.is_admin || e?.is_super_admin || e?.role === 'super_admin' || e?.role === 'admin' || t?.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() || t?.email?.toLowerCase() === 'mudassir2k6@gmail.com' || t?.email?.toLowerCase() === 'admin@sellsolar.pk'));
   
   const getInitialLocation = () => {
     if (typeof window !== 'undefined') {

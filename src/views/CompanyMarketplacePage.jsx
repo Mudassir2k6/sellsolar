@@ -2079,7 +2079,7 @@ function ContactUsContent() {
                 <a
                   href={
                     submissionLinks?.mailtoUrl ||
-                    `mailto:' + ['info', 'sellsolar.pk'].join('@') + '?subject=[${ticketNo}]%20${encodeURIComponent(
+                    `mailto:info@sellsolar.pk?subject=[${ticketNo}]%20${encodeURIComponent(
                       form.subject
                     )}&body=${encodeURIComponent(
                       `Name: ${form.name}\nEmail: ${form.email}\nPhone: ${form.phone}\nTicket: ${ticketNo}\n\nMessage:\n${form.message}`

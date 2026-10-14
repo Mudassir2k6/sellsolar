@@ -1,4 +1,4 @@
-import { GoogleGenAI } from '@google/genai';
+// GoogleGenAI import removed to eliminate external build dependency; uses native fetch
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-static';

@@ -2009,6 +2009,21 @@ export function AuthProvider({ children }) {
         delete disabledMap[cleanId];
       }
 
+      // Also resolve email if cleanId is a UUID
+      if (cleanId && !cleanId.includes('@') && isSupabaseConfigured()) {
+        try {
+          const { data: dbUser } = await supabase.from('profiles').select('email').eq('id', cleanId).maybeSingle();
+          if (dbUser?.email) {
+            const dbEmail = dbUser.email.toLowerCase().trim();
+            if (shouldDisable) {
+              disabledMap[dbEmail] = { is_disabled: true, disabled: true, updatedAt: new Date().toISOString() };
+            } else {
+              delete disabledMap[dbEmail];
+            }
+          }
+        } catch {}
+      }
+
       // 2. Update local users store
       const localUsers = getStoredUsers();
       let foundEmail = cleanId.includes('@') ? cleanId : null;

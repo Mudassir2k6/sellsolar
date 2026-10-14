@@ -75,6 +75,7 @@ import {
   DEFAULT_ADMIN_ID,
   DEFAULT_ADMIN_EMAIL,
   getDisabledUsers,
+  saveDisabledUsers,
   getDeletedUsers,
   getUserPhonesMap,
   saveUserPhonesMap,
@@ -518,11 +519,11 @@ export default function AdminSuperDashboard({
       if (deletedUsersMap[mapKey] || deletedUsersMap[idKey]) return;
 
       const isDisabled = Boolean(
+        disabledUsersMap[mapKey]?.is_disabled ||
+        disabledUsersMap[idKey]?.is_disabled ||
         p.is_disabled ||
         val.is_disabled ||
-        p.status === 'disabled' ||
-        disabledUsersMap[mapKey]?.is_disabled ||
-        disabledUsersMap[idKey]?.is_disabled
+        p.status === 'disabled'
       );
 
       const resolvedPhone = p.phone || u.user_metadata?.phone || phoneMap[mapKey] || phoneMap[idKey] || '';
@@ -569,11 +570,10 @@ export default function AdminSuperDashboard({
             const computedRole = isMasterAdm ? 'super_admin' : (rp.is_admin ? 'admin' : (rp.account_type === 'dealer' || rp.is_verified_dealer) ? 'dealer' : 'customer');
 
             const isDisabled = Boolean(
-              rp.is_disabled ||
-              rp.status === 'disabled' ||
               disabledUsersMap[mapKey]?.is_disabled ||
               disabledUsersMap[rpId]?.is_disabled ||
-              existing?.is_disabled
+              rp.is_disabled ||
+              rp.status === 'disabled'
             );
 
             const resolvedPhone = rp.phone || rp.mobile || rp.phone_number || rp.contact_phone || rp.contact_number || rp.raw_user_meta_data?.phone || existing?.phone || phoneMap[mapKey] || phoneMap[rpId] || '';
@@ -911,6 +911,9 @@ export default function AdminSuperDashboard({
         if (uObj.role === 'dealer' || uObj.is_verified_dealer) {
           exist.role = 'dealer';
           exist.is_verified_dealer = true;
+        }
+        if (uObj.is_disabled !== undefined) {
+          exist.is_disabled = uObj.is_disabled;
         }
         return;
       }
@@ -1300,18 +1303,38 @@ export default function AdminSuperDashboard({
 
     try {
       setIsSubmittingUserAction(true);
-      // Optimistic update
+      const uId = (targetUser.id || '').trim().toLowerCase();
+      const uEmail = (targetUser.email || '').trim().toLowerCase();
+
+      // 1. Direct registry update in disabled map for both ID and Email
+      const disabledMap = getDisabledUsers();
+      if (shouldDisable) {
+        if (uId) disabledMap[uId] = { is_disabled: true, disabled: true, updatedAt: new Date().toISOString() };
+        if (uEmail) disabledMap[uEmail] = { is_disabled: true, disabled: true, updatedAt: new Date().toISOString() };
+      } else {
+        if (uId) delete disabledMap[uId];
+        if (uEmail) delete disabledMap[uEmail];
+      }
+      if (typeof saveDisabledUsers === 'function') {
+        saveDisabledUsers(disabledMap);
+      }
+
+      // 2. Optimistic update in React state
       setUsersList((prev) =>
         prev.map((u) => {
-          if (u.id === targetUser.id || (u.email && u.email.toLowerCase() === (targetUser.email || '').toLowerCase())) {
+          const match =
+            (uId && (u.id || '').toLowerCase() === uId) ||
+            (uEmail && (u.email || '').toLowerCase() === uEmail);
+          if (match) {
             return { ...u, is_disabled: shouldDisable };
           }
           return u;
         })
       );
 
-      if (toggleUserDisabled) {
-        await toggleUserDisabled(targetIdentifier, shouldDisable);
+      // 3. Delegate to toggleUserDisabled in AuthContext
+      if (typeof toggleUserDisabled === 'function') {
+        await toggleUserDisabled(targetIdentifier, shouldDisable).catch(() => {});
       }
 
       await loadData();

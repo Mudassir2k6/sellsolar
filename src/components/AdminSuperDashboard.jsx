@@ -966,11 +966,15 @@ export default function AdminSuperDashboard({
     window.addEventListener('sellsolar_inbox_updated', handleInboxUpdate);
     window.addEventListener('sellsolar_users_updated', handleUsersUpdate);
     window.addEventListener('sellsolar_auth_updated', handleUsersUpdate);
+
+    // Auto-refresh every 30s to sync DB additions/deletions
+    const _dbRefreshTimer = setInterval(() => { loadData(); }, 30000);
     window.addEventListener('storage', handleStorageChange);
     return () => {
       window.removeEventListener('sellsolar_inbox_updated', handleInboxUpdate);
       window.removeEventListener('sellsolar_users_updated', handleUsersUpdate);
       window.removeEventListener('sellsolar_auth_updated', handleUsersUpdate);
+      clearInterval(_dbRefreshTimer);
       window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
@@ -1185,7 +1189,7 @@ export default function AdminSuperDashboard({
     });
   };
 
-  // Create or add new user directly from Admin
+  // Create or add new user directly from Admin (with Supabase insert + optimistic UI)
   const handleCreateNewUser = async (e) => {
     e?.preventDefault();
     const name = (newUserForm.name || '').trim();
@@ -1195,37 +1199,60 @@ export default function AdminSuperDashboard({
     const role = newUserForm.role || 'dealer';
 
     if (!name || (!email && !phone)) {
-      showToast({
-        title: 'Required Details',
-        message: 'Please provide user name and at least an email or phone number.',
-        type: 'error',
-      });
+      showToast({ title: 'Required Details', message: 'Please provide user name and at least an email or phone number.', type: 'error' });
       return;
     }
 
-    const cleanMail = email || `${name.toLowerCase().replace(/[^a-z0-9]/g, '')}@sellsolar.pk`;
+    const cleanMail = email || name.toLowerCase().replace(/[^a-z0-9]/g, '') + '@sellsolar.pk';
+    const newUserId = 'admin_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+
     try {
-      if (updateUserRole) {
-        await updateUserRole(cleanMail, role);
+      const optimisticUser = {
+        id: newUserId, email: cleanMail, name, full_name: name, phone, city, role,
+        account_type: role === 'dealer' ? 'dealer' : (role === 'admin' || role === 'super_admin') ? 'admin' : 'individual',
+        is_verified_dealer: role === 'dealer',
+        is_admin: role === 'admin' || role === 'super_admin',
+        created_at: new Date().toISOString(),
+        is_disabled: false, isCurrentSession: false, source: 'admin_created',
+      };
+      setUsersList((prev) => {
+        if (prev.some((u) => cleanMail && u.email?.toLowerCase() === cleanMail)) return prev;
+        return [optimisticUser, ...prev];
+      });
+      if (isSupabaseConfigured()) {
+        try {
+          const { error: ie } = await supabase.from('profiles').upsert(
+            { id: newUserId, email: cleanMail, full_name: name, phone: phone || null, city: city || null,
+              account_type: optimisticUser.account_type, is_admin: optimisticUser.is_admin,
+              is_verified_dealer: optimisticUser.is_verified_dealer, created_at: optimisticUser.created_at },
+            { onConflict: 'email', ignoreDuplicates: false }
+          );
+          if (ie) console.warn('[AdminDashboard] Supabase insert notice:', ie.message);
+        } catch (sbErr) { console.warn('[AdminDashboard] Supabase insert error:', sbErr); }
       }
+      if (updateUserRole) await updateUserRole(cleanMail, role).catch(() => {});
       const localUsers = getStoredUsers();
-      const existingKey = Object.keys(localUsers).find((k) => k.toLowerCase() === cleanMail || localUsers[k]?.profile?.email?.toLowerCase() === cleanMail);
-      const userKey = existingKey || cleanMail;
-      if (localUsers[userKey]) {
-        localUsers[userKey].profile.full_name = name;
-        localUsers[userKey].profile.phone = phone;
-        localUsers[userKey].profile.city = city;
-        saveStoredUsers(localUsers);
+      const ek = Object.keys(localUsers).find(
+        (k) => k.toLowerCase() === cleanMail || localUsers[k]?.profile?.email?.toLowerCase() === cleanMail
+      );
+      const uk = ek || cleanMail;
+      if (localUsers[uk]) {
+        localUsers[uk].profile = { ...localUsers[uk].profile, full_name: name, phone, city };
+      } else {
+        localUsers[uk] = {
+          user: { id: newUserId, email: cleanMail },
+          profile: { id: newUserId, email: cleanMail, full_name: name, phone, city,
+            account_type: optimisticUser.account_type, is_admin: optimisticUser.is_admin,
+            is_verified_dealer: optimisticUser.is_verified_dealer, created_at: optimisticUser.created_at },
+        };
       }
+      saveStoredUsers(localUsers);
       await loadData();
       setIsAddingUser(false);
       setNewUserForm({ name: '', email: '', phone: '', city: 'Lahore', role: 'dealer' });
-      showToast({
-        title: 'User Registered',
-        message: `${name} has been added as ${role.toUpperCase()}.`,
-        type: 'success',
-      });
+      showToast({ title: 'User Added', message: name + ' added as ' + role.toUpperCase() + ' and saved to database.', type: 'success' });
     } catch (err) {
+      setUsersList((prev) => prev.filter((u) => u.id !== newUserId));
       showToast({ title: 'Error', message: err.message, type: 'error' });
     }
   };

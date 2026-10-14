@@ -110,14 +110,8 @@ let cachedResult = null;
 let lastFetchTime = 0;
 const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes cache
 
-export async function GET(request) {
-  let forceRefresh = false;
-  try {
-    if (request?.url) {
-      const url = new URL(request.url);
-      forceRefresh = url.searchParams.get('refresh') === 'true';
-    }
-  } catch {}
+export async function GET() {
+  const forceRefresh = false;
   const now = Date.now();
 
   if (!forceRefresh && cachedResult && now - lastFetchTime < CACHE_TTL_MS) {

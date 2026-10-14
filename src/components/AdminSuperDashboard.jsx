@@ -81,6 +81,7 @@ import {
   isAccountDisabled,
   isAccountDeleted,
 } from '../context/AuthContext';
+import { isValidUuid } from '../lib/auth';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { useToast } from '../context/ToastContext';
 import { useSiteSettings, DEFAULT_SITE_SETTINGS } from '../context/SiteSettingsContext';
@@ -548,7 +549,7 @@ export default function AdminSuperDashboard({
           remoteProfiles.forEach((rp) => {
             const mapKey = (rp.email || rp.id || '').toLowerCase();
             const rpId = (rp.id || '').toLowerCase();
-            // Remote Supabase profiles are the cloud source of truth: do not filter out active database accounts
+            if (deletedUsersMap[mapKey] || deletedUsersMap[rpId]) return;
 
             const existing = usersMap.get(mapKey) || usersMap.get(rpId);
             const isMasterAdm = mapKey === DEFAULT_ADMIN_EMAIL.toLowerCase() || mapKey === 'admin@sellsolar.pk';
@@ -2589,6 +2590,22 @@ export default function AdminSuperDashboard({
               }`}
             >
               CMS Pages
+            </button>
+
+            <button
+              type="button"
+              onClick={() => selectTab('roles')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 transition-colors flex items-center gap-1.5 ${
+                activeTab === 'roles'
+                  ? 'bg-purple-600 text-white shadow-xs'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+              }`}
+            >
+              <ShieldCheck className="h-3.5 w-3.5 text-purple-400" />
+              <span>Roles & Permissions</span>
+              <span className="px-1.5 py-0.2 rounded-full text-[9px] font-mono bg-purple-950/60 text-purple-200">
+                {usersList.length}
+              </span>
             </button>
 
             <button
@@ -6074,8 +6091,21 @@ export default function AdminSuperDashboard({
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                       {filteredUsersList.length === 0 ? (
                         <tr>
-                          <td colSpan="6" className="p-8 text-center text-gray-400">
-                            No users found matching your search.
+                          <td colSpan="6" className="p-8 text-center">
+                            <p className="font-semibold text-gray-700 dark:text-gray-300">No users found matching your search or filters.</p>
+                            <p className="text-xs text-gray-500 mt-1">There are {usersList.length} total registered accounts in the system.</p>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setUserSearchQuery('');
+                                setUserRoleFilter('all');
+                                setUserMetricFilter('all');
+                                setUserUniquenessFilter('all');
+                              }}
+                              className="mt-3 px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition-colors cursor-pointer"
+                            >
+                              Reset Filters & Show All {usersList.length} Users
+                            </button>
                           </td>
                         </tr>
                       ) : (
@@ -6478,6 +6508,25 @@ export default function AdminSuperDashboard({
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {activeTab === 'roles' && !effectiveIsAdmin && (
+            <div className="p-8 text-center bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 max-w-lg mx-auto space-y-4 my-8 shadow-sm">
+              <div className="w-16 h-16 rounded-3xl bg-purple-100 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 mx-auto flex items-center justify-center">
+                <ShieldCheck className="h-8 w-8" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Admin Privileges Required</h2>
+              <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                You need Super Admin or Administrator privileges to manage roles & permissions. Please make sure you are logged in with your administrator account (<strong>mudassir2k6@gmail.com</strong>).
+              </p>
+              <button
+                type="button"
+                onClick={() => selectTab('dashboard')}
+                className="btn-primary text-xs px-4 py-2 bg-purple-600 hover:bg-purple-700"
+              >
+                Return to Dashboard
+              </button>
             </div>
           )}
 

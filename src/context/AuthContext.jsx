@@ -635,7 +635,12 @@ export function AuthProvider({ children }) {
               getUserCitiesMap()[userEmail] ||
               getUserCitiesMap()[userId] ||
               '';
-            const isOAuthAdmin = (session.user.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() || (session.user.email || '').toLowerCase() === 'admin@sellsolar.pk';
+            const cleanUserEmail = (session.user.email || '').toLowerCase();
+            const isOAuthAdmin =
+              cleanUserEmail === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
+              cleanUserEmail === 'admin@sellsolar.pk' ||
+              cleanUserEmail === 'mudassir2k6@gmail.com' ||
+              cleanUserEmail === 'mudassirkhan78907890@gmail.com';
             const metaAccountType = isOAuthAdmin ? 'admin' : (session.user.user_metadata?.account_type || 'individual');
             const metaCnic = session.user.user_metadata?.cnic || null;
             const metaBusinessName = session.user.user_metadata?.business_name || null;
@@ -698,7 +703,7 @@ export function AuthProvider({ children }) {
                 full_name: metaName,
                 account_type: metaAccountType,
                 is_verified_dealer: metaAccountType === 'dealer',
-                is_admin: (session.user.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase(),
+                is_admin: isOAuthAdmin,
               };
               if (metaPhone) upsertData.phone = metaPhone;
               if (metaCity) upsertData.city = metaCity;

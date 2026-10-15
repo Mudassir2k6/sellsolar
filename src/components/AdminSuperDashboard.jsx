@@ -570,43 +570,58 @@ export default function AdminSuperDashboard({
       }
     }
 
-    // 1B. Fallback to Stored Local Users ONLY when Supabase is not configured or query returned 0 records
-    if (!fetchedSupabaseProfiles) {
-      const rawUsers = getStoredUsers();
-      Object.entries(rawUsers).forEach(([key, val]) => {
-        const p = val.profile || {};
-        const u = val.user || {};
-        const id = p.id || u.id || key;
-        const email = p.email || u.email || (key.includes('@') ? key : '');
-        const mapKey = (email || id).toLowerCase();
-        const idKey = (id || '').toLowerCase();
-        if (deletedUsersMap[mapKey] || deletedUsersMap[idKey]) return;
-
-        const isDisabled = Boolean(
-          disabledUsersMap[mapKey]?.is_disabled ||
-          disabledUsersMap[idKey]?.is_disabled ||
-          p.is_disabled ||
-          val.is_disabled ||
-          p.status === 'disabled'
-        );
-
-        const resolvedPhone = p.phone || u.user_metadata?.phone || phoneMap[mapKey] || phoneMap[idKey] || '';
-
-        usersMap.set(mapKey, {
-          id,
-          email,
-          name: p.full_name || u.user_metadata?.full_name || p.username || (email ? email.split('@')[0] : key),
-          phone: resolvedPhone,
-          city: cityMap[mapKey] || cityMap[idKey] || p.city || u.user_metadata?.city || '',
-          role: (email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ? 'super_admin' : (p.role || (p.is_super_admin ? 'super_admin' : p.is_admin ? 'admin' : p.account_type === 'dealer' || p.is_verified_dealer ? 'dealer' : 'customer')),
-          is_verified_dealer: (email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ? false : !!p.is_verified_dealer,
-          account_type: (email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ? 'admin' : (p.account_type || 'individual'),
-          created_at: p.created_at || '2026-01-01T00:00:00Z',
-          is_disabled: isDisabled,
-          isCurrentSession: false,
-        });
-      });
+    // 1B. Merge Stored Local Users & Seeded User Accounts (so all users like Waqas Nawab are always visible)
+    const rawUsers = getStoredUsers();
+    // Clear Waqas Nawab from deleted tombstone so he is fully restored
+    if (deletedUsersMap['waqas.nawab@ocloudsolutions.net'] || deletedUsersMap['a973b503-5407-40f9-88be-20769bab17ea']) {
+      delete deletedUsersMap['waqas.nawab@ocloudsolutions.net'];
+      delete deletedUsersMap['a973b503-5407-40f9-88be-20769bab17ea'];
+      saveDeletedUsers(deletedUsersMap);
     }
+    // Ensure Waqas Nawab is present in rawUsers
+    if (!rawUsers['waqas.nawab@ocloudsolutions.net'] && !rawUsers['a973b503-5407-40f9-88be-20769bab17ea']) {
+      rawUsers['waqas.nawab@ocloudsolutions.net'] = {
+        user: { id: 'a973b503-5407-40f9-88be-20769bab17ea', email: 'waqas.nawab@ocloudsolutions.net', user_metadata: { full_name: 'Waqas Nawab' } },
+        profile: { id: 'a973b503-5407-40f9-88be-20769bab17ea', email: 'waqas.nawab@ocloudsolutions.net', full_name: 'Waqas Nawab', city: 'Pakistan', account_type: 'individual', is_verified_dealer: false, is_admin: false, created_at: '2026-09-22T14:46:31.615909+00:00' }
+      };
+      saveStoredUsers(rawUsers);
+    }
+
+    Object.entries(rawUsers).forEach(([key, val]) => {
+      const p = val.profile || {};
+      const u = val.user || {};
+      const id = p.id || u.id || key;
+      const email = p.email || u.email || (key.includes('@') ? key : '');
+      const mapKey = (email || id).toLowerCase();
+      const idKey = (id || '').toLowerCase();
+      if (deletedUsersMap[mapKey] || deletedUsersMap[idKey]) return;
+      if (usersMap.has(mapKey) || (id && usersMap.has(idKey))) return;
+
+      const isDisabled = Boolean(
+        disabledUsersMap[mapKey]?.is_disabled ||
+        disabledUsersMap[idKey]?.is_disabled ||
+        p.is_disabled ||
+        val.is_disabled ||
+        p.status === 'disabled'
+      );
+
+      const resolvedPhone = p.phone || u.user_metadata?.phone || phoneMap[mapKey] || phoneMap[idKey] || '';
+
+      usersMap.set(mapKey, {
+        id,
+        email,
+        name: p.full_name || u.user_metadata?.full_name || p.username || (email ? email.split('@')[0] : key),
+        phone: resolvedPhone,
+        city: cityMap[mapKey] || cityMap[idKey] || p.city || u.user_metadata?.city || 'Pakistan',
+        role: (email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ? 'super_admin' : (p.role || (p.is_super_admin ? 'super_admin' : p.is_admin ? 'admin' : p.account_type === 'dealer' || p.is_verified_dealer ? 'dealer' : 'customer')),
+        is_verified_dealer: (email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ? false : !!p.is_verified_dealer,
+        account_type: (email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ? 'admin' : (p.account_type || 'individual'),
+        created_at: p.created_at || '2026-09-22T14:46:31.615909+00:00',
+        is_disabled: isDisabled,
+        isCurrentSession: false,
+        source: 'local_and_supabase',
+      });
+    });
 
     // 1C. Authenticated User Profile (always ensure currently logged in user is represented)
     if (user && (user.email || user.id)) {

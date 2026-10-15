@@ -769,6 +769,21 @@ export function AuthProvider({ children }) {
 
       if (isSupabaseConfigured()) {
         try {
+          // Pre-check uniqueness via contact_already_exists RPC to reject duplicate email or mobile
+          if (cleanEmail || cleanPhone) {
+            const { data: contactCheck } = await supabase.rpc('contact_already_exists', {
+              p_email: cleanEmail,
+              p_phone: cleanPhone,
+            });
+            const checkResult = Array.isArray(contactCheck) ? contactCheck[0] : contactCheck;
+            if (checkResult?.email_exists) {
+              throw new Error('This Email Address (' + cleanEmail + ') is already registered. Please log in or use a different email.');
+            }
+            if (checkResult?.phone_exists) {
+              throw new Error('This Mobile / WhatsApp number (' + cleanPhone + ') is already registered with another account. Please use a different phone number.');
+            }
+          }
+
           const { data, error } = await supabase.auth.signUp({
             email: cleanEmail,
             password: cleanPass,

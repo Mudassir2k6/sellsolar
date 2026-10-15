@@ -1117,6 +1117,65 @@ export default function AdminSuperDashboard({
     }
 
     const cleanMail = email || name.toLowerCase().replace(/[^a-z0-9]/g, '') + '@sellsolar.pk';
+    const cleanPhoneDigits = phone ? phone.replace(/\D/g, '') : '';
+
+    // Uniqueness Check 1: Check existing users in current dashboard
+    if (cleanMail) {
+      const emailConflict = usersList.find(
+        (u) => u.email && u.email.toLowerCase() === cleanMail
+      );
+      if (emailConflict) {
+        showToast({
+          title: 'Duplicate Email Address',
+          message: `The email "${cleanMail}" is already assigned to "${emailConflict.name || 'User'}". A 2nd user cannot be created with the same email.`,
+          type: 'error',
+        });
+        return;
+      }
+    }
+
+    if (cleanPhoneDigits && cleanPhoneDigits.length >= 10) {
+      const phoneConflict = usersList.find(
+        (u) => u.phone && u.phone.replace(/\D/g, '') === cleanPhoneDigits
+      );
+      if (phoneConflict) {
+        showToast({
+          title: 'Duplicate Mobile Number',
+          message: `The mobile number "${phone}" is already assigned to "${phoneConflict.name || phoneConflict.email}". A 2nd user cannot be created with the same mobile number.`,
+          type: 'error',
+        });
+        return;
+      }
+    }
+
+    // Uniqueness Check 2: Check live database via contact_already_exists RPC
+    if (isSupabaseConfigured() && (cleanMail || cleanPhoneDigits)) {
+      try {
+        const { data: contactCheck } = await supabase.rpc('contact_already_exists', {
+          p_email: cleanMail,
+          p_phone: cleanPhoneDigits,
+        });
+        const checkResult = Array.isArray(contactCheck) ? contactCheck[0] : contactCheck;
+        if (checkResult?.email_exists) {
+          showToast({
+            title: 'Duplicate Email Address',
+            message: `The email "${cleanMail}" is already registered in the database. Please enter a different email.`,
+            type: 'error',
+          });
+          return;
+        }
+        if (checkResult?.phone_exists) {
+          showToast({
+            title: 'Duplicate Mobile Number',
+            message: `The mobile number "${phone}" is already registered in the database. Please enter a different phone number.`,
+            type: 'error',
+          });
+          return;
+        }
+      } catch (dbCheckErr) {
+        console.warn('Database uniqueness check notice:', dbCheckErr);
+      }
+    }
     const newUserId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : ('admin_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8));
 
     try {
@@ -1309,6 +1368,26 @@ export default function AdminSuperDashboard({
     const targetIdentifier = editingPhoneUser.id || editingPhoneUser.email;
     const cleanPhone = newPhoneNumber.trim();
     const cleanCity = newUserCity.trim() || 'Lahore';
+    const cleanPhoneDigits = cleanPhone.replace(/\D/g, '');
+
+    // Uniqueness Check: Ensure another user does not already use this mobile number
+    if (cleanPhoneDigits && cleanPhoneDigits.length >= 10) {
+      const conflict = usersList.find(
+        (u) =>
+          u.id !== editingPhoneUser.id &&
+          u.email?.toLowerCase() !== editingPhoneUser.email?.toLowerCase() &&
+          u.phone &&
+          u.phone.replace(/\D/g, '') === cleanPhoneDigits
+      );
+      if (conflict) {
+        showToast({
+          title: 'Duplicate Mobile Number',
+          message: `This mobile number (${cleanPhone}) is already assigned to "${conflict.name || conflict.email}". A 2nd user cannot have the same mobile number.`,
+          type: 'error',
+        });
+        return;
+      }
+    }
 
     try {
       setIsSubmittingUserAction(true);

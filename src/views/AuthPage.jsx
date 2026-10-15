@@ -156,6 +156,28 @@ async function contactAlreadyExists({ username, email, phone, cnic }) {
         }
       }
 
+      if (cleanEmail || cleanPhone) {
+        try {
+          const { data: contactCheck } = await supabase.rpc('contact_already_exists', {
+            p_email: cleanEmail,
+            p_phone: cleanPhone,
+          });
+          const checkResult = Array.isArray(contactCheck) ? contactCheck[0] : contactCheck;
+          if (checkResult?.email_exists) {
+            return {
+              field: 'signupEmail',
+              message: 'This Email Address is already registered. Please log in or use a different email.',
+            };
+          }
+          if (checkResult?.phone_exists) {
+            return {
+              field: 'phone',
+              message: 'This Phone Number is already registered. Please use another number or log in.',
+            };
+          }
+        } catch {}
+      }
+
       if (cleanEmail) {
         const { data: emailRow } = await supabase
           .from('profiles')
@@ -176,12 +198,7 @@ async function contactAlreadyExists({ username, email, phone, cnic }) {
           .select('id, email, username')
           .eq('phone', cleanPhone)
           .maybeSingle();
-        if (
-          phoneRow?.id &&
-          phoneRow.id !== DEFAULT_ADMIN_ID &&
-          phoneRow.email?.toLowerCase() !== DEFAULT_ADMIN_EMAIL.toLowerCase() &&
-          phoneRow.username?.toLowerCase() !== 'mudassir2k6'
-        ) {
+        if (phoneRow?.id) {
           return {
             field: 'phone',
             message: 'This Phone Number is already registered. Please use another number or log in.',

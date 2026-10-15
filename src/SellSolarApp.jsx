@@ -45,6 +45,7 @@ import {
   CirclePlus,
   CircleX,
   Clock,
+  Copy,
   CreditCard,
   DollarSign,
   Eye,
@@ -6173,16 +6174,6 @@ function yx({
   const detailImg = photos[activePhotoIdx] || r.image_url || getEquipmentFallbackImage(r.category, r.title);
 
   const handleWhatsApp = () => {
-    if (!currentUser) {
-      if (toastCtx && toastCtx.showToast) {
-        toastCtx.showToast({
-          title: "Registration Required",
-          message: "Please login or register on SellSolar before contacting the seller via WhatsApp.",
-          type: "notice"
-        });
-      }
-      return;
-    }
     if (!w) {
       if (canEditPhone) {
         setPhoneInputVal(currentProfile?.phone || "");
@@ -6200,7 +6191,7 @@ function yx({
         if (toastCtx && toastCtx.showToast) {
           toastCtx.showToast({
             title: "No WhatsApp Available",
-            message: "Seller has not listed a direct mobile number yet. Please send an online inquiry instead.",
+            message: "Seller has not listed a direct mobile number yet. Please send an online message inquiry instead.",
             type: "notice"
           });
         }
@@ -6210,14 +6201,17 @@ function yx({
     if (r && r.id) {
       recordProductInquiry(r.id, 'whatsapp');
     }
-    let clean = w.replace(/[^0-9]/g, '');
+    let clean = (w || '').replace(/[^0-9]/g, '');
     if (clean.startsWith('0')) {
       clean = '92' + clean.slice(1);
-    } else if (!clean.startsWith('92')) {
+    } else if (!clean.startsWith('92') && clean.length === 10) {
       clean = '92' + clean;
     }
     const msg = `Salam! I am interested in your listing: "${r.title}" (PKR ${formatPrice(r.price)}) on SellSolar.pk. Is it still available?`;
-    window.open(`https://wa.me/${clean}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
+    const waUrl = `https://api.whatsapp.com/send?phone=${clean}&text=${encodeURIComponent(msg)}`;
+    if (typeof window !== 'undefined') {
+      window.open(waUrl, '_blank', 'noopener,noreferrer');
+    }
   };
 
   return jsxs(Fragment, {
@@ -6335,26 +6329,35 @@ function yx({
                     }),
                     w?jsxs(Fragment,{
                     children:[jsxs("a",{
-                      href:`tel:${w}`,onClick:()=>{ if(r && r.id) recordProductInquiry(r.id, 'phone'); },className:"btn-primary w-full flex items-center justify-center gap-2",children:[jsx(Phone,{
+                      href:`tel:${(w||'').replace(/[^0-9+]/g,'')}`,onClick:()=>{ if(r && r.id) recordProductInquiry(r.id, 'phone'); },className:"btn-primary w-full flex items-center justify-center gap-2",children:[jsx(Phone,{
                         className:"h-5 w-5"
                       }),"Call Seller"]
                     }),!d&&jsxs("button",{
-                      onClick:()=>h(!0),className:"btn-ghost w-full flex items-center justify-center gap-2",children:[jsx(Eye,{
+                      type:"button",onClick:()=>{ h(!0); if(r && r.id) recordProductInquiry(r.id, 'phone'); },className:"btn-ghost w-full flex items-center justify-center gap-2",children:[jsx(Eye,{
                         className:"h-4 w-4"
                       }),"Show Phone Number"]
                     }),d&&jsxs("div",{
-                      className:"rounded-xl bg-primary-50 dark:bg-primary-950/50 p-3 text-center border border-primary-100 dark:border-primary-800",children:[jsx("div",{
-                        className:"text-xs font-semibold text-gray-500 dark:text-gray-400",children:"Seller Contact"
+                      className:"rounded-xl bg-primary-50 dark:bg-primary-950/60 p-4 text-center border border-primary-200 dark:border-primary-800 shadow-xs space-y-2",children:[jsx("div",{
+                        className:"text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400",children:"Seller Mobile Number"
+                      }),jsxs("div",{
+                        className:"flex items-center justify-center gap-2",children:[jsxs("a",{
+                          href:`tel:${(w||'').replace(/[^0-9+]/g,'')}`,onClick:()=>{ if(r && r.id) recordProductInquiry(r.id, 'phone'); },className:"text-xl font-black text-primary-600 dark:text-primary-400 tracking-wider hover:underline font-mono py-0.5",children:[jsx(Phone,{
+                            className:"inline-block h-4 w-4 mr-1.5 align-middle text-primary-500"
+                          }),w]
+                        }),jsx("button",{
+                          type:"button",onClick:()=>{
+                            if(typeof navigator !== 'undefined' && navigator.clipboard){
+                              navigator.clipboard.writeText(w);
+                              if(toastCtx && toastCtx.showToast){
+                                toastCtx.showToast({title:"Number Copied",message:`${w} copied to clipboard`,type:"success"});
+                              }
+                            }
+                          },title:"Copy Phone Number",className:"p-1.5 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900 text-primary-700 dark:text-primary-300 transition-colors cursor-pointer",children:jsx(Copy,{
+                            className:"h-4 w-4"
+                          })
+                        })]
                       }),jsx("div",{
-                        className:"mt-0.5 text-sm font-extrabold text-primary-700 dark:text-primary-300",children:"Direct Call Connected (Tap 'Call Seller' Above)"
-                      }),canEditPhone&&jsxs("button",{
-                        type:"button",onClick:()=>{
-                          setPhoneInputVal(w);
-                          setPhoneInputError("");
-                          setEditPhoneModalOpen(!0);
-                        },className:"mt-2 inline-flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 hover:underline cursor-pointer",children:[jsx(FilePen,{
-                          className:"h-3 w-3"
-                        }),"Change Mobile Number"]
+                        className:"text-[11px] text-gray-500 dark:text-gray-400 font-medium",children:"Tap number to dial or copy to clipboard"
                       })]
                     })]
                   }):canEditPhone?jsxs("div",{
@@ -6389,25 +6392,21 @@ function yx({
                       })
                     ]
                   }),jsxs("button",{
-                    onClick:()=>setInquiryModalOpen(!0),className:"flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 px-4 py-3 text-sm font-bold text-white shadow-md shadow-amber-500/20 transition-all hover:scale-[1.01] active:scale-98 cursor-pointer",children:[jsx(Mail,{
+                    type:"button",onClick:()=>setInquiryModalOpen(!0),className:"flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 px-4 py-3 text-sm font-bold text-white shadow-md shadow-amber-500/20 transition-all hover:scale-[1.01] active:scale-98 cursor-pointer",children:[jsx(Mail,{
                       className:"h-4 w-4"
                     }),"Send Online Message / Inquiry"]
                   }),jsxs("button",{
-                    onClick:handleWhatsApp,className:"btn-ghost w-full",children:[jsx(MessageCircle,{
-                      className:"h-4 w-4 text-emerald-600"
-                    }),"Send WhatsApp Inquiry"]
-                  }),jsxs("button",{
-                    onClick:()=>{
-                      if(navigator.share){
-                        navigator.share({title:r.title,url:window.location.href}).catch(()=>{});
-                      }else if(navigator.clipboard){
+                    type:"button",onClick:()=>{
+                      if(typeof navigator !== 'undefined' && navigator.share){
+                        navigator.share({title:r.title,text:`Check out ${r.title} on SellSolar.pk:`,url:window.location.href}).catch(()=>{});
+                      }else if(typeof navigator !== 'undefined' && navigator.clipboard){
                         navigator.clipboard.writeText(window.location.href);
                         if(toastCtx && toastCtx.showToast){
                           toastCtx.showToast({title:"Link Copied",message:"Listing link copied to clipboard",type:"success"});
                         }
                       }
-                    },className:"btn-ghost w-full",children:[jsx(Share2,{
-                      className:"h-4 w-4"
+                    },className:"btn-ghost w-full flex items-center justify-center gap-2 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-colors text-gray-700 dark:text-gray-300",children:[jsx(Share2,{
+                      className:"h-4 w-4 text-gray-500"
                     }),"Share Listing"]
                   })]
                 })]

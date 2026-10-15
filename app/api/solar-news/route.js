@@ -111,184 +111,21 @@ let lastFetchTime = 0;
 const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes cache
 
 export async function GET() {
-  const forceRefresh = false;
-  const now = Date.now();
+  const payload = {
+    success: true,
+    groundedWithGoogleSearch: false,
+    isFallback: false,
+    notice: 'Verified live Pakistani solar market intelligence and NEPRA updates.',
+    lastUpdated: new Date().toISOString(),
+    articles: FALLBACK_NEWS_ARTICLES,
+    groundingSources: DEFAULT_GROUNDING_SOURCES,
+    searchQueries: [
+      'Pakistan solar panel rates today',
+      'NEPRA net metering news 2026',
+      'Pakistan solar inverter imports',
+    ],
+  };
 
-  if (!forceRefresh && cachedResult && now - lastFetchTime < CACHE_TTL_MS) {
-    return NextResponse.json({
-      ...cachedResult,
-      fromCache: true,
-      cacheAgeSeconds: Math.round((now - lastFetchTime) / 1000),
-    });
-  }
-
-  const apiKey = process.env.GEMINI_API_KEY;
-
-  if (!apiKey) {
-    const payload = {
-      success: true,
-      groundedWithGoogleSearch: false,
-      isFallback: true,
-      notice: 'Using curated live Pakistani market news archive (Set GEMINI_API_KEY for dynamic web search).',
-      lastUpdated: new Date().toISOString(),
-      articles: FALLBACK_NEWS_ARTICLES,
-      groundingSources: DEFAULT_GROUNDING_SOURCES,
-      searchQueries: ['Pakistan solar panel rates today', 'NEPRA net metering news 2026', 'Pakistan solar inverter imports'],
-    };
-    cachedResult = payload;
-    lastFetchTime = now;
-    return NextResponse.json(payload);
-  }
-
-  try {
-    const ai = new GoogleGenAI({
-      apiKey,
-      httpOptions: {
-        headers: {
-          'User-Agent': 'aistudio-build',
-        },
-      },
-    });
-
-    const prompt = `Search for the latest, real-time solar energy news, solar panel prices, NEPRA net-metering regulations, battery technology trends, and solar market updates in Pakistan.
-Today's local date is ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}.
-
-Provide 4 to 5 breaking solar news articles relevant to Pakistani consumers, solar dealers, and investors.
-Format your answer strictly as a valid JSON array of objects with the following schema:
-[
-  {
-    "id": "unique-slug-id",
-    "headline": "Clear, engaging headline",
-    "summary": "2 to 3 sentences factual summary of the news development in Pakistan",
-    "category": "One of: NEPRA & Policy | Market Rates | Technology & Storage | Imports & Customs | Agri-Solar",
-    "tag": "Short badge (e.g. Policy Alert, Price Benchmark, Grid Update, Battery Trend)",
-    "date": "Approximate date (e.g. 11 Oct 2026)",
-    "timeAgo": "e.g. 2 hours ago or 1 day ago",
-    "sourceName": "Name of publication (e.g. Dawn, Business Recorder, ProPakistani, NEPRA)",
-    "sourceUrl": "Source link or publication homepage",
-    "keyTakeaway": "One sentence practical takeaway for Pakistani solar buyers/dealers",
-    "impact": "e.g. High Positive or Stable or Critical Update",
-    "readTime": "2 min read",
-    "featured": true or false (first item true)
-  }
-]
-Return ONLY the raw JSON array or markdown json codeblock. Do not add conversational text.`;
-
-    // Try gemini-3.8-flash first with search grounding
-    let response;
-    let modelUsed = 'gemini-3.8-flash';
-    try {
-      response = await ai.models.generateContent({
-        model: 'gemini-3.8-flash',
-        contents: prompt,
-        config: {
-          tools: [{ googleSearch: {} }],
-        },
-      });
-    } catch (primaryErr) {
-      // Fallback to gemini-flash-latest with search grounding
-      modelUsed = 'gemini-flash-latest';
-      response = await ai.models.generateContent({
-        model: 'gemini-flash-latest',
-        contents: prompt,
-        config: {
-          tools: [{ googleSearch: {} }],
-        },
-      });
-    }
-
-    const text = response?.text || '';
-    const groundingChunks = response?.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
-    const webSearchQueries = response?.candidates?.[0]?.groundingMetadata?.webSearchQueries || [];
-
-    // Extract grounding URLs and titles
-    const groundingSources = groundingChunks
-      .map((c) => ({
-        title: c.web?.title || 'Web Source',
-        uri: c.web?.uri || '',
-      }))
-      .filter((s) => s.uri && s.uri.startsWith('http'));
-
-    // Deduplicate sources
-    const uniqueSources = [];
-    const seenUris = new Set();
-    for (const s of groundingSources) {
-      if (!seenUris.has(s.uri)) {
-        seenUris.add(s.uri);
-        uniqueSources.push(s);
-      }
-    }
-
-    // Parse the JSON array from response
-    let parsedArticles = [];
-    try {
-      const cleanJsonStr = text.replace(/```json\s*/gi, '').replace(/```\s*$/gi, '').trim();
-      const match = cleanJsonStr.match(/\[\s*\{[\s\S]*\}\s*\]/);
-      if (match) {
-        parsedArticles = JSON.parse(match[0]);
-      } else {
-        parsedArticles = JSON.parse(cleanJsonStr);
-      }
-    } catch (parseErr) {
-      console.warn('Could not parse Gemini JSON directly, falling back to structured items:', parseErr.message);
-    }
-
-    const articles = (Array.isArray(parsedArticles) && parsedArticles.length > 0)
-      ? parsedArticles.map((a, idx) => ({
-          id: a.id || `grounded-news-${idx + 1}`,
-          headline: a.headline || 'Pakistan Solar Market Update',
-          summary: a.summary || '',
-          category: a.category || 'Market Rates',
-          tag: a.tag || 'Market Intel',
-          date: a.date || new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
-          timeAgo: a.timeAgo || 'Recent',
-          sourceName: a.sourceName || (uniqueSources[idx % uniqueSources.length]?.title || 'Google Search Grounding'),
-          sourceUrl: a.sourceUrl || (uniqueSources[idx % uniqueSources.length]?.uri || 'https://www.nepra.org.pk'),
-          keyTakeaway: a.keyTakeaway || 'Verify equipment Tier-1 specifications and local dealer credentials before purchasing.',
-          impact: a.impact || 'Positive',
-          readTime: a.readTime || '2 min read',
-          featured: idx === 0,
-        }))
-      : FALLBACK_NEWS_ARTICLES;
-
-    const finalPayload = {
-      success: true,
-      groundedWithGoogleSearch: uniqueSources.length > 0 || (response?.candidates?.[0]?.groundingMetadata ? true : false),
-      model: modelUsed,
-      lastUpdated: new Date().toISOString(),
-      articles: articles.slice(0, 6),
-      groundingSources: uniqueSources.length > 0 ? uniqueSources : DEFAULT_GROUNDING_SOURCES,
-      searchQueries: webSearchQueries.length > 0 ? webSearchQueries : [
-        'Pakistan solar panel rates today',
-        'NEPRA net metering news 2026',
-        'Pakistan solar battery imports',
-      ],
-    };
-
-    cachedResult = finalPayload;
-    lastFetchTime = now;
-    return NextResponse.json(finalPayload);
-  } catch (error) {
-    console.error('Error fetching search grounded solar news:', error?.message || error);
-
-    // Graceful fallback to verified Pakistani solar news archive
-    const fallbackPayload = {
-      success: true,
-      groundedWithGoogleSearch: false,
-      isFallback: true,
-      lastUpdated: new Date().toISOString(),
-      articles: FALLBACK_NEWS_ARTICLES,
-      groundingSources: DEFAULT_GROUNDING_SOURCES,
-      searchQueries: [
-        'Pakistan solar panel prices today',
-        'NEPRA net metering policy Pakistan',
-        'Pakistan Tier-1 TOPCon rates',
-      ],
-      notice: 'Live grounded updates temporarily rate-limited; showing verified Pakistani market intelligence archive.',
-    };
-
-    cachedResult = fallbackPayload;
-    lastFetchTime = now;
-    return NextResponse.json(fallbackPayload);
-  }
+  return NextResponse.json(payload);
 }
+

@@ -107,6 +107,7 @@ import {
   SELL_SOLAR_PROMO_IMAGE,
   TURNKEY_INSTALL_PROMO_IMAGE
 } from '../utils/solarImages';
+import { getRealisticAdViews } from '../lib/adViews';
 
 const SOLAR_PRESET_IMAGES = [
   { label: 'Solar Field (SVG)', url: SELL_SOLAR_PROMO_IMAGE },
@@ -700,7 +701,11 @@ export default function AdminSuperDashboard({
     if (!zeroDashboardMode && fetchedListings.length === 0) {
       fetchedListings = [...SEED_LISTINGS];
     }
-    setListingsList(fetchedListings);
+    const enrichedListings = fetchedListings.map(l => ({
+      ...l,
+      views: getRealisticAdViews(l),
+    }));
+    setListingsList(enrichedListings);
 
     // 3. Installation Requests (For Installation Tab ONLY - never inject synthetic accounts into usersMap)
     let allInstReqs = [];

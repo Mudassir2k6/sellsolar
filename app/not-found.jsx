@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import DynamicRouteRecovery from '@/components/DynamicRouteRecovery';
 import {
   Sun,
   Home,
@@ -27,7 +28,8 @@ export const metadata = {
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col justify-between">
+    <DynamicRouteRecovery>
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col justify-between">
       {/* Top Header Bar */}
       <header className="w-full border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -347,5 +349,6 @@ export default function NotFound() {
         </div>
       </footer>
     </div>
+    </DynamicRouteRecovery>
   );
 }

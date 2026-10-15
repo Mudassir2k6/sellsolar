@@ -63,8 +63,28 @@ const STATIC_SLUGS = [
 
 export const dynamicParams = false;
 
-export function generateStaticParams() {
-  return STATIC_SLUGS.map((slug) => ({ slug }));
+export async function generateStaticParams() {
+  const params = STATIC_SLUGS.map((slug) => ({ slug }));
+  try {
+    const res = await fetch('https://zgfycrnmivfybbclflwf.supabase.co/rest/v1/solar_listings?select=id', {
+      headers: {
+        apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpnZnljcm5taXZmeWJiY2xmbHdmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxNjMzNDQsImV4cCI6MjEwMzczOTM0NH0.30oiwuVIdIjaMMZGyobVqZk8HA18vVIhq2jN6jFgyao',
+      },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        data.forEach((item) => {
+          if (item?.id) {
+            params.push({ slug: ['listing', item.id] });
+          }
+        });
+      }
+    }
+  } catch (err) {
+    console.warn('Notice fetching static listing IDs:', err?.message);
+  }
+  return params;
 }
 
 export async function generateMetadata({ params }) {

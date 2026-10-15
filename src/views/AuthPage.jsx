@@ -286,9 +286,22 @@ function getPasswordStrength(pass) {
 }
 
 export default function AuthPage({ onSuccess, onBack, onForgotPassword, initialView = 'login', hasOuterNavbar = false, onNavigate }) {
-  const { signIn, signInWithGoogle, signUp, resendConfirmationEmail, updatePassword, refreshProfile, completePasswordRecovery, requestPasswordResetOtp } = useAuth();
+  const { user, signIn, signInWithGoogle, signUp, resendConfirmationEmail, updatePassword, refreshProfile, completePasswordRecovery, requestPasswordResetOtp } = useAuth();
   const { showToast } = useToast();
   const [view, setView] = useState(initialView);
+
+  useEffect(() => {
+    if (user && view !== 'reset' && view !== 'forgot') {
+      const timer = setTimeout(() => {
+        if (typeof onSuccess === 'function') {
+          onSuccess();
+        } else if (typeof onNavigate === 'function') {
+          onNavigate('dashboard');
+        }
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [user, view, onSuccess, onNavigate]);
   const [accountType, setAccountType] = useState('individual');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);

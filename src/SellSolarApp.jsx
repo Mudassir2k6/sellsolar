@@ -6808,6 +6808,20 @@ export default function App({ initialPathname, initialSlug }){
     recordPageView(typeof window !== 'undefined' ? window.location.pathname : '/');
   }, [n, a]);
 
+  // If user is already authenticated and visits login/signup, redirect automatically
+  useEffect(() => {
+    if (t && (n === "login" || n === "signup")) {
+      const userEmail = (t?.email || '').toLowerCase();
+      const isAdminUser = Boolean(
+        isUserAdmin ||
+        userEmail === 'mudassir2k6@gmail.com' ||
+        userEmail === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
+        userEmail === 'admin@sellsolar.pk'
+      );
+      o(isAdminUser ? "admin-dashboard" : "dashboard");
+    }
+  }, [t, n, isUserAdmin]);
+
   useEffect(() => {
     const handlePopState = () => {
       const loc = parseLocation(window.location.pathname, window.location.hash);

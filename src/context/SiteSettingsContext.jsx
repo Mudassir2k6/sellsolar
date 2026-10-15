@@ -43,7 +43,7 @@ export const DEFAULT_SITE_SETTINGS = {
 
   // Social Media Links
   socialLinks: {
-    facebook: 'https://facebook.com/sellsolar.pk',
+    facebook: 'https://www.facebook.com/profile.php?id=61595656010103',
     twitter: 'https://twitter.com/sellsolarpk',
     instagram: 'https://instagram.com/sellsolar.pk',
     youtube: 'https://youtube.com/@sellsolarpk',
@@ -141,6 +141,9 @@ export function SiteSettingsProvider({ children }) {
             socialLinks: {
               ...prev.socialLinks,
               ...(parsed.socialLinks || {}),
+              facebook: (parsed.socialLinks?.facebook && !parsed.socialLinks.facebook.includes('sellsolar.pk'))
+                ? parsed.socialLinks.facebook
+                : 'https://www.facebook.com/profile.php?id=61595656010103',
             },
             homePageCms: {
               ...prev.homePageCms,

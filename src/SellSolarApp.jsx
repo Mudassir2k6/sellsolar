@@ -2459,7 +2459,14 @@ function hx({
 
   const socialLinksList = [
     { label: "WhatsApp Support", href: waUrl, Icon: MessageCircle, isExternal: true },
-    settings?.socialLinks?.facebook ? { label: "Facebook", href: settings.socialLinks.facebook, Icon: Facebook, isExternal: true } : null,
+    {
+      label: "Facebook",
+      href: (settings?.socialLinks?.facebook && !settings.socialLinks.facebook.includes('sellsolar.pk'))
+        ? settings.socialLinks.facebook
+        : 'https://www.facebook.com/profile.php?id=61595656010103',
+      Icon: Facebook,
+      isExternal: true
+    },
     settings?.socialLinks?.instagram ? { label: "Instagram", href: settings.socialLinks.instagram, Icon: Instagram, isExternal: true } : null,
     settings?.socialLinks?.linkedin ? { label: "LinkedIn", href: settings.socialLinks.linkedin, Icon: Linkedin, isExternal: true } : null,
     settings?.socialLinks?.youtube ? { label: "YouTube", href: settings.socialLinks.youtube, Icon: Youtube, isExternal: true } : null,

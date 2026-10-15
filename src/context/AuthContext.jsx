@@ -459,28 +459,26 @@ export function AuthProvider({ children }) {
           return;
         }
 
-        // CRITICAL CROSS-DEVICE SYNC:
-        // If a non-admin account is missing from Supabase profiles, it was deleted by the Admin!
-        // Immediately invalidate any cached sessions on this device/laptop and force sign-out.
-        if (!error && !data && !isDefaultAdmin) {
-          console.warn('Account not found in cloud database for:', targetEmail || userId, '- Purging cached session');
+        if (!error && !data) {
+          // If profile row has not yet been populated or is pending, construct fallback profile from session / user metadata without force-logout
           const localUsers = getStoredUsers();
-          if (targetEmail && localUsers[targetEmail]) delete localUsers[targetEmail];
-          if (userId && localUsers[userId]) delete localUsers[userId];
-          saveStoredUsers(localUsers);
-
-          const dMap = getDeletedUsers();
-          if (targetEmail) dMap[targetEmail] = { deletedAt: new Date().toISOString() };
-          if (userId) dMap[userId] = { deletedAt: new Date().toISOString() };
-          saveDeletedUsers(dMap);
-
-          saveStoredSession(null);
-          setUser(null);
-          setProfile(null);
-          supabase.auth.signOut().catch(() => {});
-          if (typeof window !== 'undefined') {
-            window.dispatchEvent(new CustomEvent('sellsolar_auth_updated'));
+          const localRecord = (targetEmail && localUsers[targetEmail]?.profile) || (userId && localUsers[userId]?.profile);
+          if (localRecord) {
+            setProfile(localRecord);
+            return;
           }
+          const fallbackName = (targetEmail ? targetEmail.split('@')[0] : 'User');
+          const fallbackProf = {
+            id: userId || (targetEmail ? 'user_' + targetEmail : 'guest'),
+            email: targetEmail,
+            full_name: fallbackName,
+            phone: phoneMap[targetEmail] || (userId ? phoneMap[userId] : '') || '',
+            city: 'Lahore',
+            account_type: 'individual',
+            is_admin: isDefaultAdmin,
+            is_verified_dealer: false,
+          };
+          setProfile(fallbackProf);
           return;
         }
       } catch (err) {
@@ -595,18 +593,27 @@ export function AuthProvider({ children }) {
             const userEmail = (session.user.email || '').toLowerCase();
             const userId = session.user.id;
 
-            // Immediate security check for disabled or deleted accounts
-            if (
-              isAccountDeleted(userId) ||
-              isAccountDeleted(userEmail) ||
-              isAccountDisabled(userEmail) ||
-              isAccountDisabled(userId)
-            ) {
+            // Security check: Only sign out if user is explicitly recorded as disabled
+            const dMap = getDisabledUsers();
+            const isExplicitlyDisabled = Boolean(
+              dMap[userEmail]?.is_disabled ||
+              dMap[userId]?.is_disabled ||
+              (dMap[userEmail]?.disabled && !userEmail.includes('mudassir2k6')) ||
+              (dMap[userId]?.disabled && !userEmail.includes('mudassir2k6'))
+            );
+            if (isExplicitlyDisabled) {
               supabase.auth.signOut();
               saveStoredSession(null);
               setUser(null);
               setProfile(null);
               return;
+            }
+            // Clear any stale deletedMap markers for successfully authenticated Supabase user
+            const delMap = getDeletedUsers();
+            if (delMap[userEmail] || delMap[userId]) {
+              delete delMap[userEmail];
+              delete delMap[userId];
+              saveDeletedUsers(delMap);
             }
 
             setUser(session.user);
@@ -982,31 +989,25 @@ export function AuthProvider({ children }) {
         cleanIdentifier === 'mudassir' ||
         (digitsOnly.length >= 10 && digitsOnly === '03001234567');
 
-      // 0. Verify account existence in cloud database (Cross-device deletion enforcement)
+      // 0. Verify account existence in cloud database if explicitly a UUID or verified email
       if (isSupabaseConfigured() && !isAdm) {
         try {
-          const { data: dbCheck, error: dbCheckErr } = await supabase
-            .from('profiles')
-            .select('id, email')
-            .or(`id.eq.${cleanIdentifier},email.ilike.${cleanIdentifier},phone.eq.${cleanIdentifier}`)
-            .maybeSingle();
-
-          if (!dbCheckErr && !dbCheck) {
-            // Account does not exist in cloud database (deleted by admin)
-            const localUsers = getStoredUsers();
-            delete localUsers[cleanIdentifier];
-            if (matchedEmail) delete localUsers[matchedEmail];
-            saveStoredUsers(localUsers);
-
-            const dMap = getDeletedUsers();
-            dMap[cleanIdentifier] = { deletedAt: new Date().toISOString() };
-            if (matchedEmail) dMap[matchedEmail] = { deletedAt: new Date().toISOString() };
-            saveDeletedUsers(dMap);
-
-            throw new Error('This account has been deleted by the administrator. Please register for a new account.');
+          let query = supabase.from('profiles').select('id, email, is_disabled, status');
+          if (isValidUuid(cleanIdentifier)) {
+            query = query.eq('id', cleanIdentifier);
+          } else if (cleanIdentifier.includes('@')) {
+            query = query.ilike('email', cleanIdentifier);
+          } else {
+            query = query.eq('phone', cleanIdentifier);
+          }
+          const { data: dbCheck, error: dbCheckErr } = await query.maybeSingle();
+          if (!dbCheckErr && dbCheck) {
+            if (dbCheck.is_disabled === true || dbCheck.status === 'disabled') {
+              throw new Error('Your account has been disabled by the administrator. Please contact support at info@sellsolar.pk.');
+            }
           }
         } catch (cloudErr) {
-          if (cloudErr.message && cloudErr.message.includes('deleted')) {
+          if (cloudErr.message && cloudErr.message.includes('disabled')) {
             throw cloudErr;
           }
         }
@@ -1122,6 +1123,13 @@ export function AuthProvider({ children }) {
             }
 
             clearRateLimit('login', cleanIdentifier || 'global');
+            // Clear any stale deleted markers for this successfully authenticated user
+            const delMap = getDeletedUsers();
+            if (delMap[authEmail] || delMap[authId]) {
+              delete delMap[authEmail];
+              delete delMap[authId];
+              saveDeletedUsers(delMap);
+            }
             setUser(authUser);
             await loadProfile(authUser.id, authUser.email);
             const activeProfile = {

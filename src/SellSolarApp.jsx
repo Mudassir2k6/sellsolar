@@ -6878,7 +6878,17 @@ export default function App({ initialPathname, initialSlug }){
     }), jsx("main", {
       id: "main",
       children: jsx(Bn, {
-        onSuccess: () => o("home"), onBack: () => {
+        onSuccess: () => {
+          const authUser = (typeof getStoredSession === 'function' ? getStoredSession()?.user : null) || t;
+          const userEmail = (authUser?.email || '').toLowerCase();
+          const isAdminUser = Boolean(
+            isUserAdmin ||
+            userEmail === 'mudassir2k6@gmail.com' ||
+            userEmail === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
+            userEmail === 'admin@sellsolar.pk'
+          );
+          o(isAdminUser ? "admin-dashboard" : "dashboard");
+        }, onBack: () => {
     try {
       if (typeof window !== 'undefined') {
         window.history.pushState({}, '', '/');

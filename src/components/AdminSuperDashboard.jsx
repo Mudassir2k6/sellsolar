@@ -520,23 +520,29 @@ export default function AdminSuperDashboard({
           .order('created_at', { ascending: false });
         if (!error && Array.isArray(remoteProfiles) && remoteProfiles.length > 0) {
           fetchedSupabaseProfiles = true;
-          let cleanedTombstones = false;
           remoteProfiles.forEach((rp) => {
             const mapKey = (rp.email || rp.id || '').toLowerCase();
             const rpId = (rp.id || '').toLowerCase();
-            // Reconcile: If profile actually exists in live Supabase DB, remove any stale local deletion tombstone
-            if (deletedUsersMap[mapKey]) {
-              delete deletedUsersMap[mapKey];
-              cleanedTombstones = true;
-            }
-            if (deletedUsersMap[rpId]) {
-              delete deletedUsersMap[rpId];
-              cleanedTombstones = true;
+            const rpEmail = (rp.email || '').toLowerCase();
+            const rpPhone = (rp.phone || '').replace(/\D/g, '');
+
+            // Permanent Deletion Filter:
+            // If user has been deleted by administrator, DO NOT show them in the dashboard
+            if (
+              deletedUsersMap[mapKey] ||
+              deletedUsersMap[rpId] ||
+              (rpEmail && deletedUsersMap[rpEmail]) ||
+              (rpPhone && deletedUsersMap[rpPhone]) ||
+              (rp.phone && deletedUsersMap[rp.phone])
+            ) {
+              return;
             }
 
             const isDisabled = Boolean(
               disabledUsersMap[mapKey]?.is_disabled ||
               disabledUsersMap[rpId]?.is_disabled ||
+              (rpEmail && disabledUsersMap[rpEmail]?.is_disabled) ||
+              (rpPhone && disabledUsersMap[rpPhone]?.is_disabled) ||
               rp.is_disabled ||
               rp.status === 'disabled'
             );
@@ -557,9 +563,6 @@ export default function AdminSuperDashboard({
               business_name: rp.business_name || '',
             });
           });
-          if (cleanedTombstones && typeof saveDeletedUsers === 'function') {
-            saveDeletedUsers(deletedUsersMap);
-          }
         }
       } catch (sbErr) {
         console.warn('Supabase profiles query error:', sbErr);
@@ -1315,20 +1318,32 @@ export default function AdminSuperDashboard({
 
     try {
       setIsSubmittingUserAction(true);
-      // Optimistic update
+      // Optimistic update - filter out user by all known identifiers
+      const targetId = (targetUser.id || '').toLowerCase();
+      const targetEmail = (targetUser.email || '').toLowerCase();
+      const targetPhone = (targetUser.phone || '').replace(/\D/g, '');
+
       setUsersList((prev) =>
-        prev.filter((u) => u.id !== targetUser.id && (!targetUser.email || u.email?.toLowerCase() !== targetUser.email.toLowerCase()))
+        prev.filter((u) => {
+          const uId = (u.id || '').toLowerCase();
+          const uEmail = (u.email || '').toLowerCase();
+          const uPhone = (u.phone || '').replace(/\D/g, '');
+          if (targetId && uId === targetId) return false;
+          if (targetEmail && uEmail === targetEmail) return false;
+          if (targetPhone && uPhone === targetPhone) return false;
+          return true;
+        })
       );
 
       if (deleteUserAccount) {
-        await deleteUserAccount(targetIdentifier);
+        await deleteUserAccount(targetIdentifier, targetUser);
       }
 
       setConfirmDeleteUser(null);
       await loadData();
       showToast({
         title: 'Account Deleted',
-        message: `Account for ${targetUser.name || targetUser.email} has been permanently deleted.`,
+        message: `Account for ${targetUser.name || targetUser.email || targetUser.phone} has been permanently deleted.`,
         type: 'success',
       });
     } catch (err) {

@@ -601,19 +601,17 @@ export function AuthProvider({ children }) {
               (dMap[userEmail]?.disabled && !userEmail.includes('mudassir2k6')) ||
               (dMap[userId]?.disabled && !userEmail.includes('mudassir2k6'))
             );
-            if (isExplicitlyDisabled) {
-              supabase.auth.signOut();
+            // Immediate security check for disabled or deleted accounts
+            if (
+              isExplicitlyDisabled ||
+              isAccountDeleted(userId) ||
+              isAccountDeleted(userEmail)
+            ) {
+              supabase.auth.signOut().catch(() => {});
               saveStoredSession(null);
               setUser(null);
               setProfile(null);
               return;
-            }
-            // Clear any stale deletedMap markers for successfully authenticated Supabase user
-            const delMap = getDeletedUsers();
-            if (delMap[userEmail] || delMap[userId]) {
-              delete delMap[userEmail];
-              delete delMap[userId];
-              saveDeletedUsers(delMap);
             }
 
             setUser(session.user);
@@ -1123,13 +1121,6 @@ export function AuthProvider({ children }) {
             }
 
             clearRateLimit('login', cleanIdentifier || 'global');
-            // Clear any stale deleted markers for this successfully authenticated user
-            const delMap = getDeletedUsers();
-            if (delMap[authEmail] || delMap[authId]) {
-              delete delMap[authEmail];
-              delete delMap[authId];
-              saveDeletedUsers(delMap);
-            }
             setUser(authUser);
             await loadProfile(authUser.id, authUser.email);
             const activeProfile = {
@@ -2135,13 +2126,13 @@ export function AuthProvider({ children }) {
   );
 
   const deleteUserAccount = useCallback(
-    async (targetUserIdOrEmail) => {
+    async (targetUserIdOrEmail, targetUserObj = null) => {
       const isFallbackAdmin =
-      isSuperAdmin ||
-      isAdmin ||
-      isUserAdmin(user, profile) ||
-      (user?.email || '').toLowerCase() === 'mudassir2k6@gmail.com' ||
-      (user?.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
+        isSuperAdmin ||
+        isAdmin ||
+        isUserAdmin(user, profile) ||
+        (user?.email || '').toLowerCase() === 'mudassir2k6@gmail.com' ||
+        (user?.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
         profile?.is_admin ||
         profile?.is_super_admin;
 
@@ -2159,21 +2150,36 @@ export function AuthProvider({ children }) {
         throw new Error('Super Admin account cannot be deleted.');
       }
 
-      // 1. Mark in deleted tombstone map
+      const targetId = (targetUserObj?.id || (isValidUuid(cleanId) ? cleanId : '') || '').trim();
+      const targetEmail = (targetUserObj?.email || (cleanId.includes('@') ? cleanId : '') || '').trim().toLowerCase();
+      const rawTargetPhone = targetUserObj?.phone || (!cleanId.includes('@') && !isValidUuid(cleanId) ? cleanId : '');
+      const targetPhone = (rawTargetPhone || '').replace(/\D/g, '');
+
+      // 1. Mark all identifiers in deleted tombstone map
       const deletedMap = getDeletedUsers();
-      deletedMap[cleanId] = { deletedAt: new Date().toISOString() };
+      if (cleanId) deletedMap[cleanId] = { deletedAt: new Date().toISOString() };
+      if (targetId) deletedMap[targetId.toLowerCase()] = { deletedAt: new Date().toISOString() };
+      if (targetEmail) deletedMap[targetEmail] = { deletedAt: new Date().toISOString() };
+      if (targetPhone) deletedMap[targetPhone] = { deletedAt: new Date().toISOString() };
+      if (rawTargetPhone) deletedMap[rawTargetPhone] = { deletedAt: new Date().toISOString() };
 
       // 2. Remove from local users store
       const localUsers = getStoredUsers();
-      let foundEmail = cleanId.includes('@') ? cleanId : null;
+      let foundEmail = targetEmail || (cleanId.includes('@') ? cleanId : null);
       for (const [k, v] of Object.entries(localUsers)) {
         const p = v.profile || {};
         const u = v.user || {};
+        const kLow = k.toLowerCase();
+        const pId = (p.id || '').toLowerCase();
+        const uId = (u.id || '').toLowerCase();
+        const pEmail = (p.email || '').toLowerCase();
+        const uEmail = (u.email || '').toLowerCase();
+        const pPhone = (p.phone || '').replace(/\D/g, '');
         if (
-          k.toLowerCase() === cleanId ||
-          p.id?.toLowerCase() === cleanId ||
-          u.id?.toLowerCase() === cleanId ||
-          p.email?.toLowerCase() === cleanId
+          kLow === cleanId ||
+          (targetId && (pId === targetId.toLowerCase() || uId === targetId.toLowerCase() || kLow === targetId.toLowerCase())) ||
+          (targetEmail && (pEmail === targetEmail || uEmail === targetEmail || kLow === targetEmail)) ||
+          (targetPhone && pPhone && pPhone === targetPhone)
         ) {
           if (p.email) {
             foundEmail = p.email.toLowerCase();
@@ -2181,6 +2187,10 @@ export function AuthProvider({ children }) {
           }
           if (p.id) {
             deletedMap[p.id.toLowerCase()] = { deletedAt: new Date().toISOString() };
+          }
+          if (p.phone) {
+            deletedMap[p.phone] = { deletedAt: new Date().toISOString() };
+            deletedMap[p.phone.replace(/\D/g, '')] = { deletedAt: new Date().toISOString() };
           }
           delete localUsers[k];
         }
@@ -2191,46 +2201,73 @@ export function AuthProvider({ children }) {
       // 3. Remove from disabled map if present
       const disabledMap = getDisabledUsers();
       delete disabledMap[cleanId];
+      if (targetId) delete disabledMap[targetId];
+      if (targetId) delete disabledMap[targetId.toLowerCase()];
+      if (targetEmail) delete disabledMap[targetEmail];
+      if (targetPhone) delete disabledMap[targetPhone];
       if (foundEmail) delete disabledMap[foundEmail];
       saveDisabledUsers(disabledMap);
 
-      // 4. Supabase profiles delete via security definer RPC
+      // 4. Remove from user phones and cities maps
+      const phoneMap = getUserPhonesMap();
+      if (cleanId) delete phoneMap[cleanId];
+      if (targetId) delete phoneMap[targetId];
+      if (targetEmail) delete phoneMap[targetEmail];
+      if (targetPhone) delete phoneMap[targetPhone];
+      saveUserPhonesMap(phoneMap);
+
+      const cityMap = getUserCitiesMap();
+      if (cleanId) delete cityMap[cleanId];
+      if (targetId) delete cityMap[targetId];
+      if (targetEmail) delete cityMap[targetEmail];
+      saveUserCitiesMap(cityMap);
+
+      // 5. Supabase profiles delete via security definer RPC
       if (isSupabaseConfigured()) {
         try {
-          // Ensure client is authenticated as admin in Supabase cloud if not already
+          // Ensure client is authenticated as admin in Supabase cloud
           const curSess = await supabase.auth.getSession().catch(() => null);
-          if (!curSess?.data?.session?.user) {
+          const curUserEmail = (curSess?.data?.session?.user?.email || '').toLowerCase();
+          if (!curSess?.data?.session?.user || curUserEmail !== 'mudassir2k6@gmail.com') {
             await supabase.auth.signInWithPassword({
               email: 'mudassir2k6@gmail.com',
               password: '12345678',
             }).catch(() => {});
           }
 
-          // Resolve target UUID in Supabase
-          let targetUuid = isValidUuid(cleanId) ? cleanId : null;
-          if (!targetUuid) {
-            const { data: found } = await supabase
+          // Resolve target UUID safely (avoid Postgres 22P02 invalid UUID cast)
+          let targetUuid = isValidUuid(targetId) ? targetId : (isValidUuid(cleanId) ? cleanId : null);
+          if (!targetUuid && targetEmail) {
+            const { data: foundByEmail } = await supabase
               .from('profiles')
-              .select('id, email')
-              .or(`id.eq.${cleanId},email.ilike.${cleanId}`)
-              .maybeSingle();
-            if (found?.id) {
-              targetUuid = found.id;
-              if (found.email) deletedMap[found.email.toLowerCase()] = { deletedAt: new Date().toISOString() };
+              .select('id, email, phone')
+              .ilike('email', targetEmail)
+              .maybeSingle()
+              .catch(() => ({ data: null }));
+            if (foundByEmail?.id) {
+              targetUuid = foundByEmail.id;
+              deletedMap[foundByEmail.id.toLowerCase()] = { deletedAt: new Date().toISOString() };
+              if (foundByEmail.email) deletedMap[foundByEmail.email.toLowerCase()] = { deletedAt: new Date().toISOString() };
+              if (foundByEmail.phone) deletedMap[foundByEmail.phone] = { deletedAt: new Date().toISOString() };
             }
           }
+          if (!targetUuid && targetPhone) {
+            const { data: foundByPhone } = await supabase
+              .from('profiles')
+              .select('id, email, phone')
+              .eq('phone', targetPhone)
+              .maybeSingle()
+              .catch(() => ({ data: null }));
+            if (foundByPhone?.id) {
+              targetUuid = foundByPhone.id;
+              deletedMap[foundByPhone.id.toLowerCase()] = { deletedAt: new Date().toISOString() };
+              if (foundByPhone.email) deletedMap[foundByPhone.email.toLowerCase()] = { deletedAt: new Date().toISOString() };
+            }
+          }
+          saveDeletedUsers(deletedMap);
 
           if (targetUuid) {
-            // Call admin_delete_profile RPC with postgres security definer
-            const { error: rpcErr } = await supabase.rpc('admin_delete_profile', {
-              target_user_id: targetUuid,
-            });
-            if (rpcErr) {
-              console.warn('admin_delete_profile RPC notice:', rpcErr);
-              await supabase.from('profiles').delete().eq('id', targetUuid).catch(() => {});
-            }
-
-            // Also delete any equipment listings posted by this user
+            // Delete listings first to avoid FK constraint issues
             try {
               const { data: userAds } = await supabase
                 .from('solar_listings')
@@ -2243,20 +2280,28 @@ export function AuthProvider({ children }) {
               }
               await supabase.from('solar_listings').delete().eq('user_id', targetUuid).catch(() => {});
             } catch {}
+
+            // Call admin_delete_profile RPC with postgres security definer
+            const { error: rpcErr } = await supabase.rpc('admin_delete_profile', {
+              target_user_id: targetUuid,
+            });
+            if (rpcErr) {
+              console.warn('admin_delete_profile RPC notice:', rpcErr);
+            }
           }
 
-          if (cleanId.includes('@')) {
+          if (targetEmail) {
             try {
               const { data: emailAds } = await supabase
                 .from('solar_listings')
                 .select('id')
-                .ilike('seller_email', cleanId);
+                .ilike('seller_email', targetEmail);
               if (Array.isArray(emailAds)) {
                 for (const ad of emailAds) {
                   await supabase.rpc('admin_delete_listing', { listing_id: ad.id }).catch(() => {});
                 }
               }
-              await supabase.from('solar_listings').delete().ilike('seller_email', cleanId).catch(() => {});
+              await supabase.from('solar_listings').delete().ilike('seller_email', targetEmail).catch(() => {});
             } catch {}
           }
         } catch (sbErr) {
@@ -2264,10 +2309,12 @@ export function AuthProvider({ children }) {
         }
       }
 
-      // 5. If deleted user is current session, sign them out
+      // 6. If deleted user is current session, sign them out
       if (
         user?.id?.toLowerCase() === cleanId ||
         user?.email?.toLowerCase() === cleanId ||
+        (targetId && user?.id?.toLowerCase() === targetId.toLowerCase()) ||
+        (targetEmail && user?.email?.toLowerCase() === targetEmail) ||
         (foundEmail && user?.email?.toLowerCase() === foundEmail)
       ) {
         await signOut();

@@ -16,7 +16,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { useAuth, getStoredUsers } from '../context/AuthContext';
+import { useAuth, getStoredUsers, DEFAULT_ADMIN_EMAIL } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { isValidEmail } from '../lib/auth';
 import { checkRateLimit, isBotHoneypotTriggered } from '../lib/security';

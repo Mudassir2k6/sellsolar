@@ -602,17 +602,21 @@ export function AuthProvider({ children }) {
               (dMap[userEmail]?.disabled && !userEmail.includes('mudassir2k6')) ||
               (dMap[userId]?.disabled && !userEmail.includes('mudassir2k6'))
             );
-            // Immediate security check for disabled or deleted accounts
-            if (
-              isExplicitlyDisabled ||
-              isAccountDeleted(userId) ||
-              isAccountDeleted(userEmail)
-            ) {
+            // Immediate security check for disabled accounts
+            if (isExplicitlyDisabled) {
               supabase.auth.signOut().catch(() => {});
               saveStoredSession(null);
               setUser(null);
               setProfile(null);
               return;
+            }
+
+            // User successfully authenticated via Supabase: clear any old local tombstone
+            const delMap = getDeletedUsers();
+            if (delMap[userId] || delMap[userEmail]) {
+              delete delMap[userId];
+              delete delMap[userEmail];
+              saveDeletedUsers(delMap);
             }
 
             setUser(session.user);

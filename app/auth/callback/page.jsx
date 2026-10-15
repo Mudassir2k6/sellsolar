@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Sun, LoaderCircle, CheckCircle, AlertCircle } from 'lucide-react';
+import { Sun, LoaderCircle, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
 
 export default function AuthCallbackPage() {
   const [status, setStatus] = useState('verifying'); // verifying | success | error
@@ -10,12 +10,14 @@ export default function AuthCallbackPage() {
 
   useEffect(() => {
     let active = true;
+    let pollInterval = null;
+    let timeoutTimer = null;
 
     async function processCallback() {
       try {
-        // Check for error in query or hash params
         const searchParams = new URLSearchParams(window.location.search);
-        const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+        const hashStr = window.location.hash.replace(/^#/, '');
+        const hashParams = new URLSearchParams(hashStr);
 
         const error = searchParams.get('error') || hashParams.get('error');
         const errorDesc =
@@ -30,167 +32,191 @@ export default function AuthCallbackPage() {
           return;
         }
 
-        // Supabase with detectSessionInUrl: true handles parsing tokens automatically.
-        // Retrieve the current session or exchange PKCE code if present.
         const code = searchParams.get('code');
         const accessToken = hashParams.get('access_token') || searchParams.get('access_token');
         const refreshToken = hashParams.get('refresh_token') || searchParams.get('refresh_token');
 
-        let currentSession = null;
-
-        // 1. Handle hash tokens (implicit flow)
-        if (accessToken && typeof supabase?.auth?.setSession === 'function') {
+        // 1. If explicit access_token and refresh_token are in hash, set session safely
+        if (accessToken && refreshToken && typeof supabase?.auth?.setSession === 'function') {
           try {
-            const { data, error: setErr } = await supabase.auth.setSession({
+            await supabase.auth.setSession({
               access_token: accessToken,
-              refresh_token: refreshToken || '',
+              refresh_token: refreshToken,
             });
-            if (!setErr && data?.session) {
-              currentSession = data.session;
-            }
           } catch (e) {
-            console.warn('[AuthCallback] setSession error:', e);
+            console.warn('[AuthCallback] setSession notice:', e);
           }
         }
 
-        // 2. Handle PKCE code exchange
-        if (!currentSession && code && typeof supabase?.auth?.exchangeCodeForSession === 'function') {
+        // 2. If PKCE code is in query params, try exchangeCodeForSession safely
+        if (code && typeof supabase?.auth?.exchangeCodeForSession === 'function') {
           try {
-            const { data, error: exchangeErr } = await supabase.auth.exchangeCodeForSession(code);
-            if (!exchangeErr && data?.session) {
-              currentSession = data.session;
-            }
+            await supabase.auth.exchangeCodeForSession(code);
           } catch (e) {
-            console.warn('[AuthCallback] exchangeCode error, falling back to getSession:', e);
+            // Might already have been exchanged by detectSessionInUrl
+            console.warn('[AuthCallback] exchangeCode notice:', e);
           }
-        }
-
-        // 3. Check existing session
-        if (!currentSession) {
-          const { data } = await supabase.auth.getSession();
-          currentSession = data?.session;
         }
 
         const returnPath =
           (typeof window !== 'undefined' && sessionStorage.getItem('auth_redirect_to')) || '/';
-        try {
-          sessionStorage.removeItem('auth_redirect_to');
-        } catch {}
 
-        const syncProfileToCloud = async (sess) => {
-          if (!sess?.user || !supabase) return;
+        const handleAuthSuccess = async (sess) => {
+          if (!active || !sess?.user) return;
+          setStatus('success');
+
+          if (pollInterval) clearInterval(pollInterval);
+          if (timeoutTimer) clearTimeout(timeoutTimer);
+
           try {
-            const u = sess.user;
-            const meta = u.user_metadata || {};
-            const cleanEmail = (u.email || '').toLowerCase();
-            const fullName = meta.full_name || meta.name || (cleanEmail ? cleanEmail.split('@')[0] : 'Google User');
-            const upsertPayload = {
+            sessionStorage.removeItem('auth_redirect_to');
+          } catch {}
+
+          const u = sess.user;
+          const cleanEmail = (u.email || '').toLowerCase();
+          const meta = u.user_metadata || {};
+          const fullName = meta.full_name || meta.name || (cleanEmail ? cleanEmail.split('@')[0] : 'Verified User');
+          const isOwnerAdmin =
+            cleanEmail === 'mudassir2k6@gmail.com' ||
+            cleanEmail === 'admin@sellsolar.pk' ||
+            cleanEmail === 'info@sellsolar.pk';
+
+          // Clear any deleted tombstone for this successfully authenticated user
+          try {
+            const rawDel = localStorage.getItem('sellsolar_deleted_users');
+            if (rawDel) {
+              const dMap = JSON.parse(rawDel);
+              if (dMap[u.id] || dMap[cleanEmail]) {
+                delete dMap[u.id];
+                delete dMap[cleanEmail];
+                localStorage.setItem('sellsolar_deleted_users', JSON.stringify(dMap));
+              }
+            }
+          } catch {}
+
+          // Cache active session immediately in localStorage for instantaneous boot
+          try {
+            const profObj = {
               id: u.id,
               email: cleanEmail,
+              username: cleanEmail ? cleanEmail.split('@')[0] : 'user',
               full_name: fullName,
-              account_type: 'individual',
-              created_at: u.created_at || new Date().toISOString()
+              phone: meta.phone || '',
+              city: meta.city || '',
+              account_type: isOwnerAdmin ? 'admin' : 'individual',
+              is_admin: isOwnerAdmin,
+              is_super_admin: isOwnerAdmin,
+              is_verified_dealer: false,
+              created_at: u.created_at || new Date().toISOString(),
             };
-            if (meta.phone) upsertPayload.phone = meta.phone;
-            await supabase.from('profiles').upsert(upsertPayload, { onConflict: 'id' });
-          } catch (upsertErr) {
-            console.warn('[AuthCallback] Supabase profiles upsert notice:', upsertErr);
+            localStorage.setItem('sellsolar_active_auth_session', JSON.stringify({ user: u, profile: profObj }));
+
+            const rawUsers = localStorage.getItem('sellsolar_custom_auth_users');
+            const usersMap = rawUsers ? JSON.parse(rawUsers) : {};
+            usersMap[cleanEmail] = { user: u, profile: profObj };
+            localStorage.setItem('sellsolar_custom_auth_users', JSON.stringify(usersMap));
+          } catch {}
+
+          // Sync with cloud profiles table
+          try {
+            if (supabase) {
+              const upsertPayload = {
+                id: u.id,
+                email: cleanEmail,
+                full_name: fullName,
+                account_type: isOwnerAdmin ? 'admin' : 'individual',
+                is_admin: isOwnerAdmin,
+                created_at: u.created_at || new Date().toISOString(),
+              };
+              if (meta.phone) upsertPayload.phone = meta.phone;
+              await supabase.from('profiles').upsert(upsertPayload, { onConflict: 'id' }).catch(() => {});
+            }
+          } catch (syncErr) {
+            console.warn('[AuthCallback] Cloud sync notice:', syncErr);
           }
-        };
 
-        if (currentSession?.user) {
-          if (!active) return;
-          setStatus('success');
-          await syncProfileToCloud(currentSession);
-
-          // Notify opener window if opened in a popup
+          // Notify opener if popup, otherwise full redirect
           if (window.opener && !window.opener.closed) {
             try {
               window.opener.postMessage(
                 {
                   type: 'SELLSOLAR_GOOGLE_AUTH_SUCCESS',
-                  session: currentSession,
+                  session: sess,
                 },
                 '*'
               );
-            } catch (postErr) {
-              console.warn('[AuthCallback] postMessage error:', postErr);
-            }
+            } catch {}
 
             setTimeout(() => {
               try {
                 window.close();
               } catch {}
-            }, 500);
+            }, 400);
 
             setTimeout(() => {
               if (typeof window !== 'undefined' && !window.closed) {
                 window.location.replace(returnPath);
               }
-            }, 1000);
+            }, 800);
           } else {
-            // Full-window direct redirect
             setTimeout(() => {
               window.location.replace(returnPath);
-            }, 350);
+            }, 300);
           }
-        } else {
-          // Wait up to 3 seconds for onAuthStateChange
-          const authListener = supabase.auth.onAuthStateChange((event, session) => {
-            if (session?.user && active) {
-              setStatus('success');
-              syncProfileToCloud(session).catch(() => {});
-              if (window.opener && !window.opener.closed) {
-                try {
-                  window.opener.postMessage(
-                    {
-                      type: 'SELLSOLAR_GOOGLE_AUTH_SUCCESS',
-                      session,
-                    },
-                    '*'
-                  );
-                } catch {}
-                setTimeout(() => {
-                  try {
-                    window.close();
-                  } catch {}
-                }, 400);
-              } else {
-                setTimeout(() => {
-                  window.location.replace(returnPath);
-                }, 350);
-              }
-            }
-          });
+        };
 
-          // Fallback check
-          setTimeout(async () => {
-            if (!active) return;
-            const finalCheck = await supabase.auth.getSession();
-            if (finalCheck.data?.session?.user) {
-              setStatus('success');
-              await syncProfileToCloud(finalCheck.data.session);
-              if (window.opener && !window.opener.closed) {
-                window.opener.postMessage(
-                  {
-                    type: 'SELLSOLAR_GOOGLE_AUTH_SUCCESS',
-                    session: finalCheck.data.session,
-                  },
-                  '*'
-                );
-                window.close();
-              } else {
-                window.location.replace(returnPath);
-              }
-            } else {
-              setStatus('error');
-              setErrorMessage('Authentication session could not be established. Please try signing in again.');
-            }
-            if (authListener?.data?.subscription) {
-              authListener.data.subscription.unsubscribe();
-            }
-          }, 2500);
+        // Check if session is already active
+        const { data: initialCheck } = await supabase.auth.getSession().catch(() => ({ data: { session: null } }));
+        if (initialCheck?.session?.user) {
+          await handleAuthSuccess(initialCheck.session);
+          return;
         }
+
+        // Listen for auth state change
+        const authSub = supabase.auth.onAuthStateChange(async (event, session) => {
+          if (session?.user && active) {
+            await handleAuthSuccess(session);
+          }
+        });
+
+        // Polling loop: Check every 250ms for up to 8 seconds
+        let attempts = 0;
+        const maxAttempts = 32; // 32 * 250ms = 8 seconds
+        pollInterval = setInterval(async () => {
+          if (!active) {
+            clearInterval(pollInterval);
+            return;
+          }
+          attempts++;
+          try {
+            const { data } = await supabase.auth.getSession();
+            if (data?.session?.user) {
+              clearInterval(pollInterval);
+              await handleAuthSuccess(data.session);
+            } else if (attempts >= maxAttempts) {
+              clearInterval(pollInterval);
+              if (active) {
+                setStatus('error');
+                setErrorMessage('Authentication session could not be established. Please try signing in again.');
+              }
+            }
+          } catch (pollErr) {
+            if (attempts >= maxAttempts) {
+              clearInterval(pollInterval);
+              if (active) {
+                setStatus('error');
+                setErrorMessage('Authentication request timed out. Please try signing in again.');
+              }
+            }
+          }
+        }, 250);
+
+        return () => {
+          if (pollInterval) clearInterval(pollInterval);
+          if (authSub?.data?.subscription) {
+            authSub.data.subscription.unsubscribe();
+          }
+        };
       } catch (err) {
         if (!active) return;
         setStatus('error');
@@ -202,8 +228,37 @@ export default function AuthCallbackPage() {
 
     return () => {
       active = false;
+      if (pollInterval) clearInterval(pollInterval);
+      if (timeoutTimer) clearTimeout(timeoutTimer);
     };
   }, []);
+
+  const handleRetryGoogle = async () => {
+    setStatus('verifying');
+    setErrorMessage('');
+    try {
+      const origin = typeof window !== 'undefined' && window.location?.origin ? window.location.origin : 'https://sellsolar.pk';
+      const redirectTo = `${origin}/auth/callback`;
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'select_account',
+          },
+          scopes: 'openid email profile',
+        },
+      });
+      if (error) throw error;
+      if (data?.url) {
+        window.location.assign(data.url);
+      }
+    } catch (retryErr) {
+      setStatus('error');
+      setErrorMessage(retryErr?.message || 'Failed to restart Google Sign-In.');
+    }
+  };
 
   return (
     <div
@@ -243,7 +298,7 @@ export default function AuthCallbackPage() {
               Sign-In Successful!
             </p>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Closing this window and taking you back to SellSolar...
+              Taking you back to SellSolar...
             </p>
           </div>
         )}
@@ -257,20 +312,31 @@ export default function AuthCallbackPage() {
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
               {errorMessage}
             </p>
-            <button
-              type="button"
-              id="auth-callback-close-btn"
-              onClick={() => {
-                if (window.opener) {
-                  window.close();
-                } else {
-                  window.location.replace('/login');
-                }
-              }}
-              className="mt-3 w-full py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition-colors"
-            >
-              {window.opener ? 'Close Window' : 'Back to Login'}
-            </button>
+            <div className="flex flex-col gap-2 pt-2">
+              <button
+                type="button"
+                id="auth-callback-retry-btn"
+                onClick={handleRetryGoogle}
+                className="w-full py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition-colors flex items-center justify-center gap-1.5 shadow-sm"
+              >
+                <RefreshCw className="h-3.5 w-3.5" />
+                Retry Google Sign-In
+              </button>
+              <button
+                type="button"
+                id="auth-callback-close-btn"
+                onClick={() => {
+                  if (window.opener) {
+                    window.close();
+                  } else {
+                    window.location.replace('/');
+                  }
+                }}
+                className="w-full py-2 px-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold transition-colors"
+              >
+                Back to Home
+              </button>
+            </div>
           </div>
         )}
       </div>

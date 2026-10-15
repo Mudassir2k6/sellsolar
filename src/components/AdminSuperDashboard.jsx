@@ -459,7 +459,8 @@ export default function AdminSuperDashboard({
   }, [user, profile]);
 
   const resolveActiveCity = useCallback(() => {
-    return profile?.city || user?.user_metadata?.city || 'Lahore';
+    const isOwner = (user?.email || profile?.email || '').toLowerCase() === 'mudassir2k6@gmail.com';
+    return profile?.city || user?.user_metadata?.city || (isOwner ? 'Lahore' : '');
   }, [user, profile]);
 
   const [profileForm, setProfileForm] = useState({
@@ -552,7 +553,7 @@ export default function AdminSuperDashboard({
               email: rp.email || '',
               name: rp.full_name || rp.username || (rp.email ? rp.email.split('@')[0] : 'User'),
               phone: rp.phone || phoneMap[mapKey] || phoneMap[rpId] || '',
-              city: cityMap[mapKey] || cityMap[rpId] || rp.city || 'Lahore',
+              city: cityMap[mapKey] || cityMap[rpId] || rp.city || '',
               role: (rp.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ? 'super_admin' : (rp.role || 'customer'),
               is_verified_dealer: (rp.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ? false : !!rp.is_verified_dealer,
               account_type: (rp.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ? 'admin' : (rp.account_type || 'individual'),
@@ -596,7 +597,7 @@ export default function AdminSuperDashboard({
           email,
           name: p.full_name || u.user_metadata?.full_name || p.username || (email ? email.split('@')[0] : key),
           phone: resolvedPhone,
-          city: cityMap[mapKey] || cityMap[idKey] || p.city || u.user_metadata?.city || 'Lahore',
+          city: cityMap[mapKey] || cityMap[idKey] || p.city || u.user_metadata?.city || '',
           role: (email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ? 'super_admin' : (p.role || (p.is_super_admin ? 'super_admin' : p.is_admin ? 'admin' : p.account_type === 'dealer' || p.is_verified_dealer ? 'dealer' : 'customer')),
           is_verified_dealer: (email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ? false : !!p.is_verified_dealer,
           account_type: (email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ? 'admin' : (p.account_type || 'individual'),
@@ -638,7 +639,7 @@ export default function AdminSuperDashboard({
             email: activeEmail || '',
             name: profile?.full_name || user?.user_metadata?.full_name || (activeEmail ? activeEmail.split('@')[0] : 'You'),
             phone: resolvedActivePhone,
-            city: profile?.city || 'Lahore',
+            city: profile?.city || user?.user_metadata?.city || (effectiveIsSuperAdmin ? 'Lahore' : ''),
             role: effectiveIsSuperAdmin ? 'super_admin' : (profile?.role || (isSuperAdmin ? 'super_admin' : isAdmin ? 'admin' : isDealer ? 'dealer' : 'customer')),
             is_verified_dealer: effectiveIsSuperAdmin ? false : (!!profile?.is_verified_dealer || isDealer),
             account_type: effectiveIsSuperAdmin ? 'admin' : (profile?.account_type || 'individual'),

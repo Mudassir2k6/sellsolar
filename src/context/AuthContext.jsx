@@ -468,12 +468,13 @@ export function AuthProvider({ children }) {
             return;
           }
           const fallbackName = (targetEmail ? targetEmail.split('@')[0] : 'User');
+          const cityMap = getUserCitiesMap();
           const fallbackProf = {
             id: userId || (targetEmail ? 'user_' + targetEmail : 'guest'),
             email: targetEmail,
             full_name: fallbackName,
             phone: phoneMap[targetEmail] || (userId ? phoneMap[userId] : '') || '',
-            city: 'Lahore',
+            city: (targetEmail && cityMap[targetEmail]) || (userId && cityMap[userId]) || '',
             account_type: 'individual',
             is_admin: isDefaultAdmin,
             is_verified_dealer: false,
@@ -625,7 +626,11 @@ export function AuthProvider({ children }) {
               getUserPhonesMap()[userEmail] ||
               getUserPhonesMap()[userId] ||
               '';
-            const metaCity = session.user.user_metadata?.city || 'Lahore';
+            const metaCity =
+              session.user.user_metadata?.city ||
+              getUserCitiesMap()[userEmail] ||
+              getUserCitiesMap()[userId] ||
+              '';
             const isOAuthAdmin = (session.user.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() || (session.user.email || '').toLowerCase() === 'admin@sellsolar.pk';
             const metaAccountType = isOAuthAdmin ? 'admin' : (session.user.user_metadata?.account_type || 'individual');
             const metaCnic = session.user.user_metadata?.cnic || null;
@@ -637,6 +642,13 @@ export function AuthProvider({ children }) {
               pMap[userEmail] = metaPhone;
               if (userId) pMap[userId] = metaPhone;
               saveUserPhonesMap(pMap);
+            }
+
+            if (metaCity) {
+              const cMap = getUserCitiesMap();
+              cMap[userEmail] = metaCity;
+              if (userId) cMap[userId] = metaCity;
+              saveUserCitiesMap(cMap);
             }
 
             const oauthProfile = {
@@ -1111,13 +1123,22 @@ export function AuthProvider({ children }) {
             const metaCity =
               authUser.user_metadata?.city ||
               record?.profile?.city ||
-              'Lahore';
+              getUserCitiesMap()[authEmail] ||
+              getUserCitiesMap()[authId] ||
+              '';
 
             if (metaPhone) {
               const pMap = getUserPhonesMap();
               pMap[authEmail] = metaPhone;
               pMap[authId] = metaPhone;
               saveUserPhonesMap(pMap);
+            }
+
+            if (metaCity) {
+              const cMap = getUserCitiesMap();
+              cMap[authEmail] = metaCity;
+              cMap[authId] = metaCity;
+              saveUserCitiesMap(cMap);
             }
 
             clearRateLimit('login', cleanIdentifier || 'global');

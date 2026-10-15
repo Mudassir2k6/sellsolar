@@ -2883,6 +2883,19 @@ function yx({
     return raw || (isSignedIn ? 'Verified Seller' : '');
   }, [r, seller, isSignedIn]);
 
+  const resolvedEmail = useMemo(() => {
+    const raw = (seller?.email || r?.email || '').trim().toLowerCase();
+    return raw.endsWith('@sellsolar.local') ? '' : raw;
+  }, [seller, r]);
+
+  const [sellerEmail, setSellerEmail] = useState(resolvedEmail);
+
+  useEffect(() => {
+    if (resolvedEmail && !sellerEmail) {
+      setSellerEmail(resolvedEmail);
+    }
+  }, [resolvedEmail]);
+
   const resolvedPhone = useMemo(() => {
     const email = (seller?.email || r?.email || '').toLowerCase();
     if (email === 'mudassir2k6@gmail.com') return '0334-5453761';
@@ -2915,14 +2928,18 @@ function yx({
     if (isSignedIn) {
       if (resolvedName) Be(resolvedName);
       if (resolvedPhone) We(resolvedPhone);
+      if (resolvedEmail) setSellerEmail(resolvedEmail);
+      if (r?.city && !m) v(r.city);
     } else {
       if (resolvedName && !ye) Be(resolvedName);
       if (resolvedPhone && !le) We(resolvedPhone);
+      if (resolvedEmail && !sellerEmail) setSellerEmail(resolvedEmail);
     }
-  }, [isSignedIn, resolvedName, resolvedPhone]);
+  }, [isSignedIn, resolvedName, resolvedPhone, resolvedEmail, r?.city]);
 
-  // When signed in, Name is locked. Mobile Number is locked only if the user already has one.
+  // When signed in, Name & Email are locked. Mobile Number is editable.
   const isNameLocked = Boolean(isSignedIn);
+  const isEmailLocked = Boolean(resolvedEmail);
   const isPhoneLocked = false;
 
   const [fieldErrors, setFieldErrors] = useState({});
@@ -2932,6 +2949,7 @@ function yx({
   const citySelectRef = useRef(null);
   const sellerNameRef = useRef(null);
   const sellerPhoneRef = useRef(null);
+  const sellerEmailRef = useRef(null);
   const photosRef = useRef(null);
   const descriptionRef = useRef(null);
 
@@ -2976,10 +2994,18 @@ function yx({
       newErrors.sellerName = "Seller Name is required.";
     }
 
+    const cleanPhoneDigits = (le || '').replace(/\D/g, '');
     if(!le.trim()){
-      newErrors.sellerPhone = "Mobile / WhatsApp Phone Number is required.";
-    } else if(!isValidPhone(le)){
+      newErrors.sellerPhone = "Mobile / WhatsApp Phone Number is required. No ad can be saved without a contact phone number.";
+    } else if(!isValidPhone(le) || cleanPhoneDigits.length !== 11){
       newErrors.sellerPhone = "Phone number must be exactly 11 digits (e.g. 03001234567).";
+    }
+
+    const effectiveEmail = (sellerEmail || resolvedEmail || '').trim().toLowerCase();
+    if(!effectiveEmail){
+      newErrors.sellerEmail = "Contact Email Address is required. No ad can be saved without an email address.";
+    } else if(!effectiveEmail.includes('@') || !effectiveEmail.includes('.') || effectiveEmail.length < 5){
+      newErrors.sellerEmail = "Please enter a valid email address (e.g. name@domain.com).";
     }
 
     if(uploadedFiles.length === 0 && !z.trim()){
@@ -3001,7 +3027,7 @@ function yx({
       const firstMsg = Object.values(newErrors)[0];
       l(firstMsg);
 
-      // Focus the first invalid field (especially Ad Title if title is missing)
+      // Focus the first invalid field
       if(newErrors.title && titleInputRef.current){
         titleInputRef.current.focus();
         titleInputRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -3020,6 +3046,9 @@ function yx({
       } else if(newErrors.sellerPhone && sellerPhoneRef.current){
         sellerPhoneRef.current.focus();
         sellerPhoneRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if(newErrors.sellerEmail && sellerEmailRef.current){
+        sellerEmailRef.current.focus();
+        sellerEmailRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } else if(newErrors.photos && photosRef.current){
         photosRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } else if(newErrors.description && descriptionRef.current){
@@ -3050,6 +3079,9 @@ function yx({
       }
 
       const safeUserId = (seller?.id && isValidUuid(seller.id)) ? seller.id : ((seller?.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase()) ? DEFAULT_ADMIN_ID : null);
+      const enteredPhone = le.trim();
+      const enteredCity = m.trim();
+      const targetEmail = (effectiveEmail || seller?.email || r?.email || '').trim().toLowerCase();
 
       const newListing = {
         id: 'cust-' + Date.now(),
@@ -3059,7 +3091,7 @@ function yx({
         category: y,
         condition: j,
         price: _,
-        city: m.trim(),
+        city: enteredCity,
         capacity_kw: k ? parseFloat(k) : null,
         warranty_years: S !== null && S !== "" && !isNaN(Number(S)) ? parseFloat(Number(S).toFixed(4)) : null,
         image_url: finalCover,
@@ -3067,7 +3099,8 @@ function yx({
         description: Y.trim() || null,
         featured: false,
         seller_name: (isSignedIn ? (resolvedName || ye.trim()) : ye.trim()) || (r == null ? void 0 : r.full_name) || "Solar Seller",
-        seller_phone: (isSignedIn && resolvedPhone ? resolvedPhone : le.trim()) || (r == null ? void 0 : r.phone) || null,
+        seller_phone: enteredPhone,
+        seller_email: targetEmail,
         views: 0,
         status: "approved",
         is_sold: false,
@@ -3080,111 +3113,122 @@ function yx({
         localStorage.setItem("sellsolar_custom_listings", JSON.stringify(list));
       } catch (err) {}
 
-      // Persist phone for Google/Gmail users and update user profile everywhere
-      const enteredPhone = le.trim();
-      if (enteredPhone) {
-        try {
-          // 1. Update phones map
+      // CRITICAL: Persist both City AND Phone for Google/OAuth/registered users and update profile everywhere
+      try {
+        if (enteredPhone) {
           const pMap = typeof getUserPhonesMap === 'function' ? getUserPhonesMap() : {};
-          if (seller?.email) pMap[seller.email.toLowerCase()] = enteredPhone;
-          if (r?.email) pMap[r.email.toLowerCase()] = enteredPhone;
+          if (targetEmail) pMap[targetEmail] = enteredPhone;
           if (safeUserId) pMap[safeUserId] = enteredPhone;
           if (typeof saveUserPhonesMap === 'function') saveUserPhonesMap(pMap);
+        }
 
-          // 2. Persist to Supabase profiles table (both by id and by email)
-          if (typeof isSupabaseConfigured === 'function' && isSupabaseConfigured()) {
-            const phoneUpdatePayload = {
-              phone: enteredPhone,
-              mobile: enteredPhone,
-              contact_phone: enteredPhone,
-            };
-            if (safeUserId && isValidUuid(safeUserId)) {
-              await supabase.from('profiles').update(phoneUpdatePayload).eq('id', safeUserId).catch(() => {});
-            }
-            if (seller?.email) {
-              await supabase.from('profiles').update(phoneUpdatePayload).ilike('email', seller.email).catch(() => {});
-            }
-            if (r?.email && r.email !== seller?.email) {
-              await supabase.from('profiles').update(phoneUpdatePayload).ilike('email', r.email).catch(() => {});
-            }
+        if (enteredCity) {
+          const cMap = typeof getUserCitiesMap === 'function' ? getUserCitiesMap() : {};
+          if (targetEmail) cMap[targetEmail] = enteredCity;
+          if (safeUserId) cMap[safeUserId] = enteredCity;
+          if (typeof saveUserCitiesMap === 'function') saveUserCitiesMap(cMap);
+        }
+
+        // Persist to Supabase profiles table
+        if (typeof isSupabaseConfigured === 'function' && isSupabaseConfigured()) {
+          const profileUpdatePayload = {};
+          if (enteredPhone) {
+            profileUpdatePayload.phone = enteredPhone;
+            profileUpdatePayload.mobile = enteredPhone;
+            profileUpdatePayload.contact_phone = enteredPhone;
+          }
+          if (enteredCity) {
+            profileUpdatePayload.city = enteredCity;
           }
 
-          // 3. Update local stored users
-          try {
-            const rawUsers = typeof getStoredUsers === 'function' ? getStoredUsers() : {};
-            const keysToMatch = [seller?.email, r?.email, safeUserId].filter(Boolean).map((k) => k.toLowerCase());
-            for (const [k, v] of Object.entries(rawUsers)) {
-              const uEmail = (v.user?.email || v.profile?.email || '').toLowerCase();
-              const uId = (v.user?.id || v.profile?.id || '').toLowerCase();
-              if (keysToMatch.includes(k.toLowerCase()) || (uEmail && keysToMatch.includes(uEmail)) || (uId && keysToMatch.includes(uId))) {
-                if (v.profile) v.profile.phone = enteredPhone;
-                if (v.user?.user_metadata) v.user.user_metadata.phone = enteredPhone;
+          if (Object.keys(profileUpdatePayload).length > 0) {
+            if (safeUserId && isValidUuid(safeUserId)) {
+              await supabase.from('profiles').update(profileUpdatePayload).eq('id', safeUserId).catch(() => {});
+            }
+            if (targetEmail) {
+              await supabase.from('profiles').update(profileUpdatePayload).ilike('email', targetEmail).catch(() => {});
+            }
+          }
+        }
+
+        // Update local stored users
+        try {
+          const rawUsers = typeof getStoredUsers === 'function' ? getStoredUsers() : {};
+          const keysToMatch = [targetEmail, safeUserId].filter(Boolean).map((k) => k.toLowerCase());
+          for (const [k, v] of Object.entries(rawUsers)) {
+            const uEmail = (v.user?.email || v.profile?.email || '').toLowerCase();
+            const uId = (v.user?.id || v.profile?.id || '').toLowerCase();
+            if (keysToMatch.includes(k.toLowerCase()) || (uEmail && keysToMatch.includes(uEmail)) || (uId && keysToMatch.includes(uId))) {
+              if (v.profile) {
+                if (enteredPhone) v.profile.phone = enteredPhone;
+                if (enteredCity) v.profile.city = enteredCity;
+              }
+              if (v.user?.user_metadata) {
+                if (enteredPhone) v.user.user_metadata.phone = enteredPhone;
+                if (enteredCity) v.user.user_metadata.city = enteredCity;
               }
             }
-            if (typeof saveStoredUsers === 'function') saveStoredUsers(rawUsers);
-          } catch (e) {}
-
-          // 4. Update in-memory auth profile if available
-          if (typeof updateProfile === 'function') {
-            try {
-              await updateProfile({
-                fullName: resolvedName || ye.trim() || r?.full_name || (seller?.email ? seller.email.split('@')[0] : 'User'),
-                phone: enteredPhone,
-                email: seller?.email || r?.email,
-                city: m.trim() || r?.city || 'Lahore',
-              });
-            } catch (pErr) {
-              console.warn('Post-ad profile update warning:', pErr);
-            }
           }
+          if (typeof saveStoredUsers === 'function') saveStoredUsers(rawUsers);
+        } catch (e) {}
 
-          // 5. Dispatch sync events so Admin dashboard updates immediately
-          if (typeof window !== 'undefined') {
-            window.dispatchEvent(new Event('sellsolar_users_updated'));
-            window.dispatchEvent(new Event('sellsolar_auth_updated'));
+        // Update in-memory auth profile if available
+        if (typeof updateProfile === 'function') {
+          try {
+            await updateProfile({
+              fullName: resolvedName || ye.trim() || r?.full_name || (targetEmail ? targetEmail.split('@')[0] : 'User'),
+              phone: enteredPhone || r?.phone || '',
+              email: targetEmail,
+              city: enteredCity || r?.city || '',
+            });
+          } catch (pErr) {
+            console.warn('Post-ad profile update warning:', pErr);
           }
-        } catch (phonePersistErr) {
-          console.warn('Phone persistence notice:', phonePersistErr);
         }
+
+        if (r) {
+          if (enteredPhone) r.phone = enteredPhone;
+          if (enteredCity) r.city = enteredCity;
+        }
+        if (seller?.user_metadata) {
+          if (enteredPhone) seller.user_metadata.phone = enteredPhone;
+          if (enteredCity) seller.user_metadata.city = enteredCity;
+        }
+
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('sellsolar_users_updated'));
+          window.dispatchEvent(new Event('sellsolar_auth_updated'));
+        }
+      } catch (persistErr) {
+        console.warn('Profile contact & location auto-save notice:', persistErr);
       }
 
       try {
         const{
           error:A
         }=await supabase.from("solar_listings").insert({
-          user_id: safeUserId,title:u.trim(),brand:h.trim(),category:y,condition:j,price:_,city:m.trim(),capacity_kw:k?parseFloat(k):null,warranty_years:S !== null && S !== "" && !isNaN(Number(S)) ? parseFloat(Number(S).toFixed(4)) : null,image_url:finalCover,image_urls:finalImageUrls.length > 0 ? finalImageUrls : (finalCover ? [finalCover] : []),description:Y.trim()||null,featured:!1,seller_name:(isSignedIn ? (resolvedName || ye.trim()) : ye.trim())||(r==null?void 0:r.full_name)||null,seller_phone: (le.trim() || resolvedPhone || (r==null?void 0:r.phone) || null),views:0,status:"approved",is_sold:!1
+          user_id: safeUserId,
+          title: u.trim(),
+          brand: h.trim(),
+          category: y,
+          condition: j,
+          price: _,
+          city: enteredCity,
+          capacity_kw: k ? parseFloat(k) : null,
+          warranty_years: S !== null && S !== "" && !isNaN(Number(S)) ? parseFloat(Number(S).toFixed(4)) : null,
+          image_url: finalCover,
+          image_urls: finalImageUrls.length > 0 ? finalImageUrls : (finalCover ? [finalCover] : []),
+          description: Y.trim() || null,
+          featured: !1,
+          seller_name: (isSignedIn ? (resolvedName || ye.trim()) : ye.trim()) || (r == null ? void 0 : r.full_name) || null,
+          seller_phone: enteredPhone,
+          views: 0,
+          status: "approved",
+          is_sold: !1
         });
         if(A)console.warn("Supabase insert notice:", A);
       } catch(err) {
         console.warn("Supabase insert error:", err);
-      }
-
-      // Auto-save submitted phone number to user profile so next time it is remembered
-      try {
-        const submittedPhoneClean = (le || resolvedPhone || '').trim();
-        if (submittedPhoneClean) {
-          const userEmail = (seller?.email || r?.email || '').toLowerCase();
-          const userId = seller?.id || r?.id;
-          if (r) r.phone = submittedPhoneClean;
-          if (seller?.user_metadata) seller.user_metadata.phone = submittedPhoneClean;
-
-          const pMap = typeof getUserPhonesMap === 'function' ? getUserPhonesMap() : {};
-          if (userEmail) pMap[userEmail] = submittedPhoneClean;
-          if (userId) pMap[userId] = submittedPhoneClean;
-          saveUserPhonesMap(pMap);
-
-          const stored = typeof getStoredUsers === 'function' ? getStoredUsers() : {};
-          if (userEmail && stored[userEmail]?.profile) {
-            stored[userEmail].profile.phone = submittedPhoneClean;
-            saveStoredUsers(stored);
-          }
-
-          if (userId && isValidUuid(userId)) {
-            supabase.from('profiles').update({ phone: submittedPhoneClean }).eq('id', userId).catch(() => {});
-          }
-        }
-      } catch (savePhoneErr) {
-        console.warn('Profile phone auto-save notice:', savePhoneErr);
       }
       c(!0),setTimeout(()=>{
         e()
@@ -3455,7 +3499,7 @@ function yx({
                 })]
               })]
             }),jsxs("div",{
-              className:"grid grid-cols-1 gap-4 sm:grid-cols-2",children:[jsxs("div",{
+              className:"grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3",children:[jsxs("div",{
                 children:[jsx("div",{
                   className:"flex items-center justify-between mb-1.5",
                   children:jsxs("label",{
@@ -3549,6 +3593,62 @@ function yx({
                   children:[
                     jsx(ShieldCheck,{className:"h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 shrink-0"}),
                     "Editable: Enter your WhatsApp/calling mobile number (e.g. 03001234567). Auto-saves to your profile upon posting."
+                  ]
+                })]
+              }),jsxs("div",{
+                className:"sm:col-span-2 lg:col-span-1",
+                children:[jsx("div",{
+                  className:"flex items-center justify-between mb-1.5",
+                  children:jsxs("label",{
+                    className:"block text-sm font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1",
+                    children:[
+                      "Contact Email",
+                      jsx("span",{className:"text-red-500 font-black",children:"*"})
+                    ]
+                  })
+                }),jsxs("div",{
+                  className:"relative",children:[
+                    jsx(Mail,{
+                      className:`absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 ${isEmailLocked ? "text-emerald-600 dark:text-emerald-400" : "text-gray-400"}`
+                    }),
+                    jsx("input",{
+                      ref:sellerEmailRef,
+                      type:"email",
+                      required:true,
+                      readOnly:isEmailLocked,
+                      tabIndex:isEmailLocked ? -1 : 0,
+                      value:sellerEmail,
+                      onChange:_=>{
+                        if(isEmailLocked) return;
+                        setSellerEmail(_.target.value);
+                        if(fieldErrors.sellerEmail) setFieldErrors(prev=>({...prev, sellerEmail:false}));
+                      },
+                      onKeyDown:e=>{
+                        if(isEmailLocked) e.preventDefault();
+                      },
+                      placeholder:"e.g. name@domain.com",
+                      className:isEmailLocked
+                        ? "input-field pl-11 pr-10 font-bold bg-gray-100 dark:bg-gray-800/80 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-700 cursor-not-allowed select-none shadow-none focus:ring-0 focus:border-gray-300 dark:focus:border-gray-700 pointer-events-none"
+                        : `input-field pl-11 font-medium ${fieldErrors.sellerEmail ? "border-2 border-red-500 ring-2 ring-red-200 dark:ring-red-950/60 dark:border-red-500 focus:border-red-500 focus:ring-red-400" : ""}`
+                    }),
+                    isEmailLocked && jsx(Lock,{
+                      className:"absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500",
+                      title:"Locked to your account"
+                    })
+                  ]
+                }),
+                fieldErrors.sellerEmail && jsx("p",{className:"mt-1 text-xs font-semibold text-red-600 dark:text-red-400",children:fieldErrors.sellerEmail}),
+                isEmailLocked ? jsxs("p",{
+                  className:"mt-1 text-[11px] text-gray-500 dark:text-gray-400 flex items-center gap-1",
+                  children:[
+                    jsx(ShieldCheck,{className:"h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 shrink-0"}),
+                    "Account Email is verified & tied to your listing."
+                  ]
+                }) : jsxs("p",{
+                  className:"mt-1 text-[11px] text-emerald-700 dark:text-emerald-400 flex items-center gap-1 font-medium",
+                  children:[
+                    jsx(ShieldCheck,{className:"h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 shrink-0"}),
+                    "Enter your email address to receive buyer inquiries."
                   ]
                 })]
               })]

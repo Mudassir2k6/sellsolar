@@ -961,7 +961,7 @@ function PressContent({ onNavigate }) {
               Email our press desk for comments, market data, and expert solar analysis.
             </p>
           </div>
-          <button type="button" onClick={() => { window.location.href = "mailto:" + ["press", "sellsolar.pk"].join("@"); }} className="btn-primary text-xs px-4 py-2 inline-flex items-center gap-1.5 shadow-xs cursor-pointer"><Mail className="h-3.5 w-3.5" /><span className="inline-flex items-baseline"><span>press</span><span className="email-protect-at" aria-hidden="true"></span><span>sellsolar.pk</span></span></button>
+          <button type="button" onClick={() => { window.location.href = "mailto:press@sellsolar.pk"; }} className="btn-primary text-xs px-4 py-2 inline-flex items-center gap-1.5 shadow-xs cursor-pointer"><Mail className="h-3.5 w-3.5" /><span>press@sellsolar.pk</span></button>
         </div>
       </div>
 
@@ -2541,7 +2541,7 @@ function PrivacyContent() {
           <section>
             <h3 className="font-bold text-gray-900 dark:text-white text-base">3. Account Deletion & Rights</h3>
             <p className="mt-1">
-              You can modify or remove your listings at any time through your dashboard. To request permanent account deletion, contact our privacy desk at <code className="inline-flex items-baseline"><span>privacy</span><span className="email-protect-at" aria-hidden="true"></span><span>sellsolar.pk</span></code>.
+              You can modify or remove your listings at any time through your dashboard. To request permanent account deletion, contact our privacy desk at <code className="font-semibold text-primary-600 dark:text-primary-400">privacy@sellsolar.pk</code>.
             </p>
           </section>
         </div>

@@ -3406,7 +3406,7 @@ export default function AdminSuperDashboard({
                         <Eye className="w-3.5 h-3.5 text-gray-400 group-hover:text-amber-500 transition-colors" />
                       </div>
                       <p className="text-2xl font-black text-amber-500 mt-1">
-                        {myAds.reduce((acc, curr) => acc + (curr.views || 0), 0)}
+                        {myAds.reduce((acc, curr) => acc + (getRealisticAdViews(curr) || 0), 0).toLocaleString()}
                       </p>
                       <span className="text-[10px] text-amber-500 dark:text-amber-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 mt-1">
                         Drill down →
@@ -7549,8 +7549,8 @@ export default function AdminSuperDashboard({
                                 {ad.brand ? `${ad.brand} • ` : ''}{ad.city || 'Pakistan'}
                               </span>
                               <span className="flex items-center gap-1">
-                                <Eye className="w-3.5 h-3.5" />
-                                {ad.views || 0} views
+                                <Eye className="w-3.5 h-3.5 text-amber-500" />
+                                {getRealisticAdViews(ad).toLocaleString()} views
                               </span>
                             </div>
 

@@ -4460,7 +4460,7 @@ function yx({
     } catch(err) {}
     a(q=>q.filter(V=>V.id!==b));
     k(null);
-  },we=s.filter(b=>b.account_type==="dealer"),Ve=l.filter(b=>b.status==="pending"),oe=l.filter(b=>b.status==="approved"),xt=l.filter(b=>b.status==="rejected"),yr=l.filter(b=>b.featured),Ft=l.filter(b=>b.sponsored),Ds=l.reduce((b,O)=>b+(O.views||0),0),Ms=l.filter(b=>{
+  },we=s.filter(b=>b.account_type==="dealer"),Ve=l.filter(b=>b.status==="pending"),oe=l.filter(b=>b.status==="approved"),xt=l.filter(b=>b.status==="rejected"),yr=l.filter(b=>b.featured),Ft=l.filter(b=>b.sponsored),Ds=l.reduce((b,O)=>b+(getRealisticAdViews(O)||0),0),Ms=l.filter(b=>{
     const O=!x||b.title.toLowerCase().includes(x.toLowerCase())||b.brand.toLowerCase().includes(x.toLowerCase())||b.city.toLowerCase().includes(x.toLowerCase()),q=L==="all"||b.status===L;
     return O&&q
   }),Us=[{
@@ -4572,8 +4572,8 @@ function yx({
           children:"•"
         }),jsxs("span",{
           className:"flex items-center gap-0.5",children:[jsx(Eye,{
-            className:"h-3 w-3"
-          }),b.views]
+            className:"h-3 w-3 text-amber-500"
+          }),getRealisticAdViews(b).toLocaleString()]
         }),b.featured&&jsx("span",{
           className:"rounded-full bg-primary-100 px-2 py-0.5 font-semibold text-primary-700",children:"Featured"
         }),b.sponsored&&jsx("span",{
@@ -5293,7 +5293,7 @@ function yx({
       password:X
     });
     P?m(P.message):(S("Password changed successfully"),St(""),Ve(""),setTimeout(()=>S(null),3e3)),k(null)
-  },Fs=l.filter(P=>P.status==="draft"),b=l.filter(P=>P.status==="pending"),O=l.filter(P=>P.status==="approved"),q=l.filter(P=>P.status==="rejected"),V=l.filter(P=>P.is_sold),_a=l.reduce((P,Q)=>P+(Q.views||0),0),Bs=p.filter(P=>!P.is_read),Mf=[{
+  },Fs=l.filter(P=>P.status==="draft"),b=l.filter(P=>P.status==="pending"),O=l.filter(P=>P.status==="approved"),q=l.filter(P=>P.status==="rejected"),V=l.filter(P=>P.is_sold),_a=l.reduce((P,Q)=>P+(getRealisticAdViews(Q)||0),0),Bs=p.filter(P=>!P.is_read),Mf=[{
     id:"dashboard",label:"Dashboard",icon:LayoutDashboard
   },{
     id:"profile",label:"My Profile",icon:User
@@ -5355,8 +5355,8 @@ function yx({
             children:"•"
           }),jsxs("span",{
             className:"flex items-center gap-0.5",children:[jsx(Eye,{
-              className:"h-3 w-3"
-            }),P.views]
+              className:"h-3 w-3 text-amber-500"
+            }),getRealisticAdViews(P).toLocaleString()]
           })]
         }),jsxs("div",{
           className:"mt-1.5 flex flex-wrap items-center gap-2",children:[jsx("span",{
@@ -6197,6 +6197,8 @@ function yx({
     label:"Warranty",value:formatWarrantyLong(r.warranty_years)
   },{
     label:"City",value:r.city
+  },{
+    label:"Total Views",value:`${(viewCount || getRealisticAdViews(r) || 0).toLocaleString()} views`
   }],g=new Date(r.created_at).toLocaleDateString("en-PK",{
     year:"numeric",month:"long",day:"numeric"
   });
@@ -6207,6 +6209,8 @@ function yx({
     const targetPhone = w || '03345453761';
     if (r && r.id) {
       recordProductInquiry(r.id, 'whatsapp');
+      const nextV = recordAndIncrementAdView(r);
+      setViewCount(prev => Math.max(prev, nextV));
     }
     let clean = targetPhone.replace(/[^0-9]/g, '');
     if (clean.startsWith('0')) {
@@ -6274,9 +6278,14 @@ function yx({
                     }),"Featured"]
                   })]
                 }),jsxs("div",{
-                  className:"absolute right-4 top-4 flex items-center gap-1.5 rounded-full bg-black/65 px-3 py-1 text-xs font-bold text-white backdrop-blur-md shadow-md border border-white/10 select-none",children:[jsx(Eye,{
-                    className:"h-3.5 w-3.5 text-amber-400 shrink-0"
-                  }),jsx("span",{className:"tabular-nums font-extrabold text-white"},(viewCount || getRealisticAdViews(r) || 0).toLocaleString())," views"]
+                  className:"absolute right-4 top-4 flex items-center gap-1.5 rounded-full bg-black/75 px-3 py-1 text-xs font-bold text-white backdrop-blur-md shadow-md border border-white/15 select-none ring-1 ring-white/10",children:[
+                    jsx("span",{className:"inline-block h-2 w-2 rounded-full bg-emerald-400 animate-pulse shrink-0"}),
+                    jsx(Eye,{
+                      className:"h-3.5 w-3.5 text-amber-400 shrink-0"
+                    }),
+                    jsx("span",{className:"tabular-nums font-extrabold text-white"},(viewCount || getRealisticAdViews(r) || 0).toLocaleString()),
+                    " views"
+                  ]
                 })]
               }),photos.length > 1 && jsx("div",{
                 className:"p-3 flex gap-2 overflow-x-auto bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800",children:photos.map((ph, idx)=>jsx("button",{
@@ -6317,7 +6326,7 @@ function yx({
                     className:"text-3xl font-extrabold text-primary-600 dark:text-primary-400",children:formatPrice(r.price)
                   })
                 }),jsxs("div",{
-                  className:"mt-3 flex flex-wrap items-center gap-3 text-sm text-gray-500 dark:text-gray-400",children:[jsxs("span",{
+                  className:"mt-3 flex flex-wrap items-center gap-2 sm:gap-3 text-sm text-gray-500 dark:text-gray-400",children:[jsxs("span",{
                     className:"flex items-center gap-1",children:[jsx(MapPin,{
                       className:"h-4 w-4 text-primary-500"
                     }),r.city]
@@ -6325,7 +6334,52 @@ function yx({
                     className:"flex items-center gap-1",children:[jsx(Calendar,{
                       className:"h-4 w-4"
                     }),g]
+                  }),jsxs("span",{
+                    className:"inline-flex items-center gap-1.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 px-2.5 py-0.5 text-xs font-bold border border-amber-200 dark:border-amber-800/80 shadow-xs",
+                    title:"Total Views (4 daily update cycles + real-time visitor tracking)",
+                    children:[
+                      jsx("span",{className:"inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse shrink-0"}),
+                      jsx(Eye,{className:"h-3.5 w-3.5 text-amber-500 shrink-0"}),
+                      jsx("span",{className:"tabular-nums font-black text-gray-900 dark:text-white"},(viewCount || getRealisticAdViews(r) || 0).toLocaleString()),
+                      " views"
+                    ]
                   })]
+                }),jsxs("div",{
+                  className:"mt-3.5 flex items-center justify-between rounded-xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent p-3.5 border border-amber-200/80 dark:border-amber-800/60 shadow-xs",
+                  children:[
+                    jsxs("div",{
+                      className:"flex items-center gap-2.5",
+                      children:[
+                        jsx("div",{
+                          className:"flex h-9 w-9 items-center justify-center rounded-lg bg-amber-500 text-white shadow-xs shrink-0",
+                          children:jsx(Eye,{className:"h-5 w-5"})
+                        }),
+                        jsxs("div",{
+                          children:[
+                            jsxs("div",{
+                              className:"flex items-center gap-2 text-sm font-extrabold text-gray-900 dark:text-white leading-tight",
+                              children:[
+                                jsx("span",{className:"text-base font-black tabular-nums text-amber-600 dark:text-amber-400"},(viewCount || getRealisticAdViews(r) || 0).toLocaleString()),
+                                " Total Views",
+                                jsx("span",{className:"inline-flex items-center gap-1 rounded bg-emerald-100 dark:bg-emerald-950/80 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300",children:[
+                                  jsx("span",{className:"h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"}),
+                                  "Live Now"
+                                ]})
+                              ]
+                            }),
+                            jsx("div",{
+                              className:"text-[11px] text-gray-500 dark:text-gray-400 font-medium",
+                              children:"Updated 4x daily (+10-25 views) • Real-time visitor tracking"
+                            })
+                          ]
+                        })
+                      ]
+                    }),
+                    jsx("span",{
+                      className:"text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/60 px-2 py-1 rounded-md border border-amber-200 dark:border-amber-800 shrink-0",
+                      children:"Active Ad"
+                    })
+                  ]
                 }),jsxs("div",{
                   className:"mt-5 space-y-3",children:[
                     jsxs("button",{
@@ -6337,14 +6391,27 @@ function yx({
                     }),
                     jsxs("a",{
                       href:`tel:${(w||'03345453761').replace(/[^0-9+]/g,'')}`,
-                      onClick:()=>{ if(r && r.id) recordProductInquiry(r.id, 'phone'); },
+                      onClick:()=>{
+                        if(r && r.id) {
+                          recordProductInquiry(r.id, 'phone');
+                          const nv = recordAndIncrementAdView(r);
+                          setViewCount(prev => Math.max(prev, nv));
+                        }
+                      },
                       className:"btn-primary w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-extrabold cursor-pointer",children:[jsx(Phone,{
                         className:"h-5 w-5"
                       }),"Call Seller"]
                     }),
                     !d?jsxs("button",{
                       type:"button",
-                      onClick:()=>{ h(!0); if(r && r.id) recordProductInquiry(r.id, 'phone'); },
+                      onClick:()=>{
+                        h(!0);
+                        if(r && r.id) {
+                          recordProductInquiry(r.id, 'phone');
+                          const nv = recordAndIncrementAdView(r);
+                          setViewCount(prev => Math.max(prev, nv));
+                        }
+                      },
                       className:"btn-ghost w-full flex items-center justify-center gap-2 border border-gray-200 dark:border-gray-700 py-3 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer",children:[jsx(Eye,{
                         className:"h-4 w-4 text-primary-500"
                       }),`Show Phone Number (${(w || '03345453761').slice(0, 4)} •••••••)`]

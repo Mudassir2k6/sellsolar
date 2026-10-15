@@ -29,6 +29,7 @@ import {
   TrendingUp,
   Package
 } from 'lucide-react';
+import { getRealisticAdViews } from '../lib/adViews';
 
 export default function AdminDrillDownModal({
   isOpen,
@@ -105,7 +106,7 @@ export default function AdminDrillDownModal({
         PricePKR: l.price || 0,
         City: l.city || '',
         Condition: l.condition || '',
-        Views: l.views || 0,
+        Views: getRealisticAdViews(l) || 0,
         Status: l.is_sold || l.status === 'sold' ? 'Sold' : 'Active',
         SellerName: l.seller_name || '',
         SellerPhone: l.seller_phone || '',
@@ -217,7 +218,7 @@ export default function AdminDrillDownModal({
       .sort((a, b) => {
         if (sortBy === 'price_asc') return (a.price || 0) - (b.price || 0);
         if (sortBy === 'price_desc') return (b.price || 0) - (a.price || 0);
-        if (sortBy === 'views_desc' || currentMetric === 'views') return (b.views || 0) - (a.views || 0);
+        if (sortBy === 'views_desc' || currentMetric === 'views') return (getRealisticAdViews(b) || 0) - (getRealisticAdViews(a) || 0);
         return new Date(b.created_at || 0) - new Date(a.created_at || 0);
       });
   }, [activeSourceListings, currentMetric, filterCategory, searchQuery, sortBy]);
@@ -261,7 +262,7 @@ export default function AdminDrillDownModal({
     { id: 'dealers', label: 'Verified Dealers', count: dealersList.length, icon: Store, tabTarget: 'dealers-directory' },
     { id: 'listings', label: 'Market Listings', count: listingsList.length, icon: Tag, tabTarget: 'products' },
     { id: 'my-ads', label: 'My Active Ads', count: myAds.length, icon: Package, tabTarget: 'my-ads' },
-    { id: 'views', label: 'Ad Views Breakdown', count: listingsList.reduce((acc, l) => acc + (l.views || 0), 0), icon: Eye, tabTarget: 'analytics' },
+    { id: 'views', label: 'Ad Views Breakdown', count: listingsList.reduce((acc, l) => acc + (getRealisticAdViews(l) || 0), 0), icon: Eye, tabTarget: 'analytics' },
     { id: 'hot-sell', label: 'Hot Sell Ads', count: listingsList.filter((l) => l.is_hot_sell || l.featured).length, icon: Flame, tabTarget: 'products' },
     { id: 'inbox', label: 'Inquiries & Messages', count: inboxMessages.length, icon: MessageSquare, tabTarget: 'inbox' },
   ];
@@ -704,8 +705,8 @@ export default function AdminDrillDownModal({
                         </td>
                         <td className="py-3 px-4 font-bold text-gray-800 dark:text-gray-200">
                           <span className="flex items-center gap-1">
-                            <Eye className="w-3.5 h-3.5 text-gray-400" />
-                            {item.views || 0}
+                            <Eye className="w-3.5 h-3.5 text-amber-500" />
+                            {getRealisticAdViews(item).toLocaleString()}
                           </span>
                         </td>
                         <td className="py-3 px-4">

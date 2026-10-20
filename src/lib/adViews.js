@@ -4,6 +4,7 @@
 // 2. Each update cycle adds a deterministic random increment between 10 and 25 views (average ~17.5 views/quarter, ~70 views/day)
 // 3. Real-time ad clicks and views are immediately added on top
 // 4. Strict guarantee: Views NEVER decrease under any condition (persisted in cache & DB)
+// 5. Robust Supabase DB synchronization with proper timeouts and error boundaries
 
 import { supabase, isSupabaseConfigured } from './supabase';
 import { isValidUuid } from './auth';
@@ -11,6 +12,12 @@ import { isValidUuid } from './auth';
 const STORAGE_CACHE_KEY = 'sellsolar_ad_views_cache';
 const STORAGE_CLICKS_KEY = 'sellsolar_ad_views_clicks';
 const STORAGE_FIRST_SEEN_KEY = 'sellsolar_ad_views_first_seen';
+
+// In-memory sync trackers to prevent redundant network calls and avoid flooding Supabase
+const activeSyncs = new Set();
+const lastSyncTimestamp = new Map();
+const SYNC_THROTTLE_MS = 8000; // Throttle sync to Supabase per ad to max once every 8s
+const SUPABASE_TIMEOUT_MS = 4000; // 4 second hard timeout for DB operations
 
 /**
  * 32-bit Murmur/FNV-style hash to produce high-entropy, well-distributed deterministic random numbers
@@ -198,6 +205,48 @@ export function getRealisticAdViews(listing) {
 }
 
 /**
+ * Asynchronously synchronizes ad views to Supabase with strict timeout, throttling, and error boundary
+ * @param {string} id - Ad Listing ID
+ * @param {number} views - New view count
+ */
+export async function syncViewsToDatabase(id, views) {
+  if (!id || typeof window === 'undefined') return;
+  if (!isValidUuid(id) || !isSupabaseConfigured() || !supabase) return;
+
+  const now = Date.now();
+  const lastSync = lastSyncTimestamp.get(id) || 0;
+  if (now - lastSync < SYNC_THROTTLE_MS) {
+    return; // Throttled to avoid network spam
+  }
+
+  if (activeSyncs.has(id)) {
+    return; // Sync already in-flight for this ad
+  }
+
+  activeSyncs.add(id);
+  lastSyncTimestamp.set(id, now);
+
+  try {
+    // Timeout promise to ensure DB call never hangs or delays app
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Supabase sync timeout')), SUPABASE_TIMEOUT_MS)
+    );
+
+    const updatePromise = supabase
+      .from('solar_listings')
+      .update({ views })
+      .eq('id', id);
+
+    await Promise.race([updatePromise, timeoutPromise]);
+  } catch (err) {
+    // Non-blocking: Silently handle DB timeouts, network drops, or RLS rejections
+    // Local storage and browser cache already ensure pristine UI experience
+  } finally {
+    activeSyncs.delete(id);
+  }
+}
+
+/**
  * Increment view count for an ad when viewed, and sync to DB/local storage in real-time
  * @param {object|string} listingOrId
  * @returns {number} updated view count
@@ -243,17 +292,8 @@ export function recordAndIncrementAdView(listingOrId) {
     }
   } catch {}
 
-  // 5. Update Supabase DB asynchronously if valid UUID
-  if (isValidUuid(id) && isSupabaseConfigured()) {
-    try {
-      supabase
-        .from('solar_listings')
-        .update({ views: finalViews })
-        .eq('id', id)
-        .then(() => {})
-        .catch(() => {});
-    } catch {}
-  }
+  // 5. Update Supabase DB safely with proper error boundary and timeout
+  syncViewsToDatabase(id, finalViews).catch(() => {});
 
   return finalViews;
 }

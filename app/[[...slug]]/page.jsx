@@ -66,12 +66,15 @@ export const dynamicParams = false;
 export async function generateStaticParams() {
   const params = STATIC_SLUGS.map((slug) => ({ slug }));
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3500);
     const res = await fetch('https://zgfycrnmivfybbclflwf.supabase.co/rest/v1/solar_listings?select=id', {
       headers: {
         apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpnZnljcm5taXZmeWJiY2xmbHdmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxNjMzNDQsImV4cCI6MjEwMzczOTM0NH0.30oiwuVIdIjaMMZGyobVqZk8HA18vVIhq2jN6jFgyao',
       },
-    });
-    if (res.ok) {
+      signal: controller.signal,
+    }).finally(() => clearTimeout(timeoutId));
+    if (res && res.ok) {
       const data = await res.json();
       if (Array.isArray(data)) {
         data.forEach((item) => {
@@ -82,7 +85,7 @@ export async function generateStaticParams() {
       }
     }
   } catch (err) {
-    console.warn('Notice fetching static listing IDs:', err?.message);
+    // Non-blocking fallback to static slugs if Supabase is unreachable or times out
   }
   return params;
 }

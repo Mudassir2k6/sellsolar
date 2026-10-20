@@ -5994,15 +5994,19 @@ function yx({
       o(!0),u(null);
       try{
         let found = null;
-        try {
-          const{
-            data:m,error:v
-          }=await supabase.from("solar_listings").select("*").eq("id",t).maybeSingle();
-          if(!v && m) found = m;
-        } catch(err) {
-          // ignore supabase error and try local
+        if (t && isValidUuid(t) && isSupabaseConfigured() && supabase) {
+          try {
+            const timeoutPromise = new Promise((_, reject) =>
+              setTimeout(() => reject(new Error('timeout')), 3500)
+            );
+            const queryPromise = supabase.from("solar_listings").select("*").eq("id", t).maybeSingle();
+            const { data: m, error: v } = await Promise.race([queryPromise, timeoutPromise]);
+            if (!v && m) found = m;
+          } catch(err) {
+            // ignore supabase error and try local
+          }
         }
-        if(!found) {
+        if (!found) {
           found = getLocalOrSeedListingById(t);
         }
         if(!found){
@@ -6016,12 +6020,14 @@ function yx({
         setViewCount(initialViews);
         recordProductView(k.id, k.title);
         applyPageSeo('listing-detail', { listing: k, listingId: t });
-        if(k.user_id && isValidUuid(k.user_id)){
+        if(k.user_id && isValidUuid(k.user_id) && isSupabaseConfigured() && supabase){
           try {
-            const{
-              data:x
-            }=await supabase.from("profiles").select("*").eq("id",k.user_id).maybeSingle();
-            x&&a(x);
+            const timeoutPromise = new Promise((_, reject) =>
+              setTimeout(() => reject(new Error('timeout')), 3500)
+            );
+            const queryPromise = supabase.from("profiles").select("*").eq("id", k.user_id).maybeSingle();
+            const { data: x } = await Promise.race([queryPromise, timeoutPromise]);
+            x && a(x);
           } catch(err) {}
         }
       }catch(m){

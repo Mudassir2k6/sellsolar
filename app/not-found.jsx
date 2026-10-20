@@ -1,5 +1,6 @@
+'use client';
+
 import Link from 'next/link';
-import DynamicRouteRecovery from '@/components/DynamicRouteRecovery';
 import {
   Sun,
   Home,
@@ -16,20 +17,10 @@ import {
   PlusCircle,
 } from 'lucide-react';
 
-export const metadata = {
-  title: 'Page Not Found (404) | SellSolar',
-  description:
-    'The requested page could not be found on SellSolar. Browse live solar rates, solar load calculator, and marketplace listings.',
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
 
 export default function NotFound() {
   return (
-    <DynamicRouteRecovery>
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col justify-between">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col justify-between">
       {/* Top Header Bar */}
       <header className="w-full border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -349,6 +340,5 @@ export default function NotFound() {
         </div>
       </footer>
     </div>
-    </DynamicRouteRecovery>
   );
 }

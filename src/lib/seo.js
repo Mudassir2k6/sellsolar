@@ -14,9 +14,9 @@ const NOINDEX = 'noindex,nofollow';
 
 export const PAGE_SEO = {
   home: {
-    title: 'Solar Plates, Inverters & Batteries in Pakistan | SellSolar',
+    title: 'Solar Plates, Inverters, Batteries in Pakistan | SellSolar',
     description:
-      "Pakistan's #1 solar marketplace. Buy & sell used solar plates, hybrid inverters & lithium batteries. Check live solar prices, verify panels & post free ads.",
+      'Pakistan #1 solar marketplace. Buy and sell used solar plates, hybrid inverters and lithium batteries. Check daily prices, verify panels and post free ads.',
     path: '/',
     robots: INDEXABLE,
     keywords:

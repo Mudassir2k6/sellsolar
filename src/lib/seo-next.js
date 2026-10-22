@@ -130,6 +130,17 @@ export function getGlobalJsonLd() {
         '@type': 'Country',
         name: 'Pakistan',
       },
+      slogan: "Pakistan's #1 Solar Marketplace & Pricing Benchmark",
+      knowsAbout: [
+        'Solar plate price in Pakistan',
+        'Tier-1 solar plates (Longi, Jinko, Canadian Solar, JA Solar, Astronergy)',
+        'Hybrid solar inverters (Inverex, Growatt, GoodWe, Knox, Solis, Huawei)',
+        'Lithium LiFePO4 solar batteries and tubular batteries',
+        'Used and second-hand solar panels in Pakistan',
+        'Home solar load calculation in Pakistan',
+        'Solar net metering and NEPRA regulations in Pakistan',
+        'Authorized solar equipment distributors in Lahore, Karachi, Islamabad',
+      ],
       description:
         "Pakistan's #1 used solar marketplace. Check live solar plates price in Pakistan, buy and sell used or new solar panels, hybrid inverters, and lithium solar batteries.",
     },
@@ -139,6 +150,11 @@ export function getGlobalJsonLd() {
       name: 'SellSolar.pk - Solar Plates, Inverters & Batteries Pakistan',
       alternateName: ['SellSolar', 'Sell Solar Pakistan'],
       url: SITE_URL,
+      about: [
+        { '@type': 'Thing', name: 'Solar Panels in Pakistan' },
+        { '@type': 'Thing', name: 'Solar Inverters' },
+        { '@type': 'Thing', name: 'Solar Energy in Pakistan' },
+      ],
       potentialAction: {
         '@type': 'SearchAction',
         target: `${SITE_URL}/?q={search_term_string}`,
@@ -302,6 +318,26 @@ export function getJsonLdForSlug(slug) {
             text: 'You can buy and sell verified used solar plates, inverters, and batteries directly on SellSolar.pk with zero commission across Lahore, Karachi, Islamabad, Faisalabad, and Rawalpindi.',
           },
         },
+      ],
+    });
+    schemas.push({
+      '@context': 'https://schema.org',
+      '@type': 'Dataset',
+      name: "Today's Solar Plates, Inverters and Batteries Market Benchmark Rates in Pakistan",
+      description: 'Daily verified wholesale benchmark per-watt rates for Tier-1 solar panels, hybrid inverters, and lithium solar batteries across Pakistan.',
+      url,
+      creator: {
+        '@type': 'Organization',
+        name: SITE_NAME,
+        url: SITE_URL,
+      },
+      spatialCoverage: 'Pakistan',
+      temporalCoverage: '2026',
+      variableMeasured: [
+        'Solar plate rate per watt (PKR/W)',
+        'Solar panel piece price (PKR)',
+        'Hybrid solar inverter rate (PKR)',
+        'Lithium LiFePO4 battery rate (PKR)',
       ],
     });
   } else if (key === 'solar-panels') {

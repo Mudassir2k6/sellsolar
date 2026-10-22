@@ -16,7 +16,7 @@ const plusJakarta = Plus_Jakarta_Sans({
 const SITE_URL = 'https://sellsolar.pk';
 const TITLE = 'Solar Plates, Inverters, Batteries in Pakistan | SellSolar';
 const DESCRIPTION =
-  'Pakistan #1 solar marketplace. Buy and sell used solar plates, hybrid inverters and lithium batteries. Check daily prices, verify panels and post free ads.';
+  'Pakistan #1 solar marketplace. Buy and sell used solar plates, hybrid inverters and lithium batteries. Check live prices and post free ads.';
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),

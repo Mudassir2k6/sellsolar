@@ -3453,6 +3453,104 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
             </div>
           )}
 
+          {/* Answer The Public & Semrush SEO Knowledge Hub FAQ Section */}
+          <div className="mt-10 pt-8 border-t border-gray-200 dark:border-gray-800">
+            <div className="mb-6">
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 px-3 py-1 text-xs font-bold text-amber-700 dark:text-amber-300 mb-2">
+                <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                Frequently Asked Questions (Solar FAQs Pakistan)
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white tracking-tight">
+                Solar Plates &amp; Rates in Pakistan — Top Searched Questions
+              </h2>
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
+                Verified answers to the most common questions searched on Google regarding solar plate rates, inverters, and battery costs in Pakistan.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <details className="group rounded-2xl border border-gray-200/80 dark:border-gray-800 bg-white dark:bg-gray-900/60 p-4 transition-all open:ring-1 open:ring-amber-500/40">
+                <summary className="flex cursor-pointer items-center justify-between text-xs sm:text-sm font-bold text-gray-900 dark:text-white select-none">
+                  <span>What is today's per-watt solar plate price in Pakistan?</span>
+                  <span className="ml-2 text-gray-400 group-open:rotate-180 transition-transform">▼</span>
+                </summary>
+                <div className="mt-3 text-xs text-gray-600 dark:text-gray-300 leading-relaxed border-t border-gray-100 dark:border-gray-800 pt-3">
+                  Today's verified wholesale benchmark rates for Tier-1 A-grade mono PERC and TopCon bi-facial solar plates (Canadian Solar, LONGi, Jinko, JA Solar, Astronergy) range between <strong>Rs 33.50 and Rs 43.50 per watt</strong> in Pakistan. A standard 585W panel costs around <strong>Rs 19,600 to Rs 24,500</strong>.
+                </div>
+              </details>
+
+              <details className="group rounded-2xl border border-gray-200/80 dark:border-gray-800 bg-white dark:bg-gray-900/60 p-4 transition-all open:ring-1 open:ring-amber-500/40">
+                <summary className="flex cursor-pointer items-center justify-between text-xs sm:text-sm font-bold text-gray-900 dark:text-white select-none">
+                  <span>Which solar panel brand is best in Pakistan?</span>
+                  <span className="ml-2 text-gray-400 group-open:rotate-180 transition-transform">▼</span>
+                </summary>
+                <div className="mt-3 text-xs text-gray-600 dark:text-gray-300 leading-relaxed border-t border-gray-100 dark:border-gray-800 pt-3">
+                  The top Tier-1 solar panel manufacturers in Pakistan are <strong>Canadian Solar</strong> (N-Type TopBiHiKu6), <strong>LONGi Solar</strong> (Hi-MO X6 / Hi-MO 7), <strong>Jinko Solar</strong> (Tiger Neo TopCon), and <strong>JA Solar</strong> (DeepBlue 4.0). All four offer 25-to-30-year linear performance warranties and 80%+ efficiency retention in Pakistan's high-temperature climate.
+                </div>
+              </details>
+
+              <details className="group rounded-2xl border border-gray-200/80 dark:border-gray-800 bg-white dark:bg-gray-900/60 p-4 transition-all open:ring-1 open:ring-amber-500/40">
+                <summary className="flex cursor-pointer items-center justify-between text-xs sm:text-sm font-bold text-gray-900 dark:text-white select-none">
+                  <span>How many solar plates are needed for a 1.5 ton inverter AC?</span>
+                  <span className="ml-2 text-gray-400 group-open:rotate-180 transition-transform">▼</span>
+                </summary>
+                <div className="mt-3 text-xs text-gray-600 dark:text-gray-300 leading-relaxed border-t border-gray-100 dark:border-gray-800 pt-3">
+                  A 1.5-ton DC inverter AC consumes approximately 1,200W to 1,800W during initial cooling and 700W to 1,000W once stabilized. To run one 1.5-ton AC alongside household fans and lights comfortably during the day, a <strong>3kW or 5kW solar system with 6 to 8 Tier-1 585W solar plates</strong> and a hybrid inverter is recommended. Use our free <button type="button" onClick={() => onNavigate && onNavigate('calculator')} className="text-primary-600 font-bold underline">Solar Load Calculator</button> to calculate exact wattage.
+                </div>
+              </details>
+
+              <details className="group rounded-2xl border border-gray-200/80 dark:border-gray-800 bg-white dark:bg-gray-900/60 p-4 transition-all open:ring-1 open:ring-amber-500/40">
+                <summary className="flex cursor-pointer items-center justify-between text-xs sm:text-sm font-bold text-gray-900 dark:text-white select-none">
+                  <span>What is the turnkey price of a 5kW and 10kW solar system in Pakistan?</span>
+                  <span className="ml-2 text-gray-400 group-open:rotate-180 transition-transform">▼</span>
+                </summary>
+                <div className="mt-3 text-xs text-gray-600 dark:text-gray-300 leading-relaxed border-t border-gray-100 dark:border-gray-800 pt-3">
+                  In 2026, a standard 5kW hybrid solar system costs approximately <strong>Rs 650,000 to Rs 850,000</strong> (including Tier-1 plates, 6kW hybrid inverter, mounting structure, and battery storage). A 10kW on-grid three-phase system with green net-metering costs approximately <strong>Rs 1,150,000 to Rs 1,450,000</strong>.
+                </div>
+              </details>
+
+              <details className="group rounded-2xl border border-gray-200/80 dark:border-gray-800 bg-white dark:bg-gray-900/60 p-4 transition-all open:ring-1 open:ring-amber-500/40">
+                <summary className="flex cursor-pointer items-center justify-between text-xs sm:text-sm font-bold text-gray-900 dark:text-white select-none">
+                  <span>What is the difference between On-Grid and Hybrid solar inverters?</span>
+                  <span className="ml-2 text-gray-400 group-open:rotate-180 transition-transform">▼</span>
+                </summary>
+                <div className="mt-3 text-xs text-gray-600 dark:text-gray-300 leading-relaxed border-t border-gray-100 dark:border-gray-800 pt-3">
+                  On-grid inverters (Huawei, Solis, Sungrow) feed excess daytime energy to WAPDA/K-Electric via green net-metering meters, but turn off during load shedding for line safety. Hybrid inverters (Inverex Nitrox, Knox, Growatt, GoodWe) connect simultaneously to the grid and batteries (lithium or tubular), ensuring zero interruption during load shedding.
+                </div>
+              </details>
+
+              <details className="group rounded-2xl border border-gray-200/80 dark:border-gray-800 bg-white dark:bg-gray-900/60 p-4 transition-all open:ring-1 open:ring-amber-500/40">
+                <summary className="flex cursor-pointer items-center justify-between text-xs sm:text-sm font-bold text-gray-900 dark:text-white select-none">
+                  <span>Lithium battery vs Tubular battery: which is better for solar in Pakistan?</span>
+                  <span className="ml-2 text-gray-400 group-open:rotate-180 transition-transform">▼</span>
+                </summary>
+                <div className="mt-3 text-xs text-gray-600 dark:text-gray-300 leading-relaxed border-t border-gray-100 dark:border-gray-800 pt-3">
+                  Lithium LiFePO4 batteries (48V 100Ah) provide 6,000+ cycle life (10 to 12 years), 90%+ usable depth of discharge, and zero maintenance. While tubular batteries cost less initially (Rs 32,000–Rs 55,000 per battery), they only last 2 to 3 years. Over a 10-year period, lithium batteries are 40% more cost-effective.
+                </div>
+              </details>
+
+              <details className="group rounded-2xl border border-gray-200/80 dark:border-gray-800 bg-white dark:bg-gray-900/60 p-4 transition-all open:ring-1 open:ring-amber-500/40">
+                <summary className="flex cursor-pointer items-center justify-between text-xs sm:text-sm font-bold text-gray-900 dark:text-white select-none">
+                  <span>How to check original Tier-1 solar plates and barcodes in Pakistan?</span>
+                  <span className="ml-2 text-gray-400 group-open:rotate-180 transition-transform">▼</span>
+                </summary>
+                <div className="mt-3 text-xs text-gray-600 dark:text-gray-300 leading-relaxed border-t border-gray-100 dark:border-gray-800 pt-3">
+                  Genuine Tier-1 solar panels feature an indelible QR barcode embedded directly under the front glass sheet, not a sticker on the exterior. You can scan the barcode and verify the serial number against official manufacturer databases using <button type="button" onClick={() => onNavigate && onNavigate('verification')} className="text-primary-600 font-bold underline">SellSolar Tier-1 Verification Portal</button>.
+                </div>
+              </details>
+
+              <details className="group rounded-2xl border border-gray-200/80 dark:border-gray-800 bg-white dark:bg-gray-900/60 p-4 transition-all open:ring-1 open:ring-amber-500/40">
+                <summary className="flex cursor-pointer items-center justify-between text-xs sm:text-sm font-bold text-gray-900 dark:text-white select-none">
+                  <span>Where can I buy and sell used solar plates in Pakistan?</span>
+                  <span className="ml-2 text-gray-400 group-open:rotate-180 transition-transform">▼</span>
+                </summary>
+                <div className="mt-3 text-xs text-gray-600 dark:text-gray-300 leading-relaxed border-t border-gray-100 dark:border-gray-800 pt-3">
+                  SellSolar.pk is Pakistan's #1 marketplace dedicated to used and new solar equipment. Verified sellers post second-hand solar plates (Rs 22–28/watt), used hybrid inverters, and batteries across Lahore, Karachi, Islamabad, Rawalpindi, and Faisalabad with direct buyer contact and zero broker commission.
+                </div>
+              </details>
+            </div>
+          </div>
+
           {/* Quick Actions & Navigation Bar */}
           <div className="mt-8 pt-6 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3">
             <span className="text-xs font-semibold text-gray-500">

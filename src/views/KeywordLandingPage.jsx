@@ -143,14 +143,38 @@ export default function KeywordLandingPage({ pageKey, onNavigate }) {
           <article className="prose prose-sm mt-12 max-w-none text-gray-600 dark:prose-invert dark:text-gray-300">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">Why SellSolar for this search?</h2>
             <p>
-              SellSolar.pk is built for Pakistan solar shoppers searching for solar price, used solar,
-              inverter and battery deals. Listings are organized for fast comparison, and sellers can
-              post free ads to reach buyers in major cities.
+              SellSolar.pk is Pakistan's #1 verified clean energy marketplace designed for solar shoppers comparing solar prices, used solar plates, hybrid inverters, and lithium battery rates across Lahore, Karachi, Islamabad, Rawalpindi, and Faisalabad.
             </p>
             <p>
-              Use today&apos;s rates page before you buy, run the load calculator for system sizing, then
-              contact verified dealers or individual sellers directly.
+              Check today&apos;s live wholesale per-watt rates before purchasing, use our free solar load calculator for system sizing, and verify Tier-1 barcodes directly on our portal.
             </p>
+
+            {/* Popular Related Searches (Ahrefs / Semrush Keyword Silo) */}
+            <div className="mt-8 not-prose rounded-2xl border border-gray-200/80 dark:border-gray-800 bg-white/60 dark:bg-gray-900/60 p-5">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">
+                Related Searches in Pakistan (Semrush &amp; Google Keywords)
+              </h3>
+              <div className="flex flex-wrap gap-2 text-xs">
+                <button type="button" onClick={() => onNavigate?.('prices')} className="rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-primary-50 dark:hover:bg-primary-950/60 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-2.5 py-1 transition-colors">
+                  Solar plate price in Pakistan today
+                </button>
+                <button type="button" onClick={() => onNavigate?.('prices')} className="rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-primary-50 dark:hover:bg-primary-950/60 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-2.5 py-1 transition-colors">
+                  Longi 585W solar panel price
+                </button>
+                <button type="button" onClick={() => onNavigate?.('prices')} className="rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-primary-50 dark:hover:bg-primary-950/60 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-2.5 py-1 transition-colors">
+                  Canadian solar plate per watt rate
+                </button>
+                <button type="button" onClick={() => onNavigate?.('calculator')} className="rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-primary-50 dark:hover:bg-primary-950/60 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-2.5 py-1 transition-colors">
+                  Solar load calculator Pakistan
+                </button>
+                <button type="button" onClick={() => onNavigate?.('verification')} className="rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-primary-50 dark:hover:bg-primary-950/60 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-2.5 py-1 transition-colors">
+                  Tier 1 solar plates verification
+                </button>
+                <button type="button" onClick={() => onNavigate?.('dealers')} className="rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-primary-50 dark:hover:bg-primary-950/60 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-2.5 py-1 transition-colors">
+                  Authorized solar dealers Lahore Karachi
+                </button>
+              </div>
+            </div>
           </article>
         </div>
       </main>

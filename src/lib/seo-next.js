@@ -89,6 +89,8 @@ export function buildMetadataForSlug(slug) {
     },
     twitter: {
       card: 'summary_large_image',
+      site: '@sellsolarpk',
+      creator: '@sellsolarpk',
       title,
       description,
       images: [DEFAULT_OG_IMAGE],
@@ -111,7 +113,19 @@ export function getGlobalJsonLd() {
         url: `${SITE_URL}/contact`,
         availableLanguage: ['English', 'Urdu'],
       },
-      sameAs: [],
+      sameAs: [
+        'https://www.facebook.com/profile.php?id=61595656010103',
+        'https://twitter.com/sellsolarpk',
+        'https://www.instagram.com/sellsolarpk',
+        'https://www.linkedin.com/company/sellsolar',
+        'https://www.youtube.com/@sellsolarpk',
+      ],
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'Islamabad',
+        addressRegion: 'Federal Capital',
+        addressCountry: 'PK',
+      },
       areaServed: {
         '@type': 'Country',
         name: 'Pakistan',
@@ -172,7 +186,38 @@ export function getJsonLdForSlug(slug) {
   });
 
   // Page-specific structured data
-  if (key === 'calculator') {
+  if (key === 'home') {
+    schemas.push({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: "What is today's solar plate price in Pakistan?",
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Tier-1 A-grade solar plate wholesale benchmark rates in Pakistan currently range between Rs 33.50 and Rs 43.50 per watt for Canadian Solar, Longi, Jinko, and JA Solar.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Can I buy and sell used solar plates on SellSolar?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: "Yes, SellSolar.pk is Pakistan's #1 marketplace for buying and selling new and used solar plates, hybrid inverters, and lithium batteries with zero listing commission.",
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How do I verify Tier-1 solar plates in Pakistan?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: "You can verify solar plate authenticity by scanning the official QR barcode embedded under the module glass and cross-checking serial numbers via SellSolar's Tier-1 verification portal.",
+          },
+        },
+      ],
+    });
+  } else if (key === 'calculator') {
     schemas.push({
       '@context': 'https://schema.org',
       '@type': 'WebApplication',

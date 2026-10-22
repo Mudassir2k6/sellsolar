@@ -14,95 +14,95 @@ const NOINDEX = 'noindex,nofollow';
 
 export const PAGE_SEO = {
   home: {
-    title: 'SellSolar: #1 Solar Marketplace in Pakistan | Buy & Sell Solar Plates, Inverters & Batteries',
+    title: 'Solar Plates, Inverters & Batteries in Pakistan | SellSolar',
     description:
-      "Welcome to SellSolar, Pakistan's premier solar marketplace. Buy and sell new & used Tier-1 solar plates, hybrid inverters, and lithium batteries. Check today's live solar plate prices and post free ads.",
+      "Pakistan's #1 solar marketplace. Buy & sell used solar plates, hybrid inverters & lithium batteries. Check live solar prices, verify panels & post free ads.",
     path: '/',
     robots: INDEXABLE,
     keywords:
       'buy solar panels in Pakistan, solar plates for sale, used solar panels Pakistan, sell used solar equipment, solar plate price in Pakistan today, solar inverter price, lithium solar batteries, Tier 1 solar panels, Longi Jinko Canadian Solar, SellSolar marketplace, 5kw solar system price Pakistan, 10kw solar system cost',
   },
   prices: {
-    title: 'Today Solar Plate Price in Pakistan | Live Rates for Panels, Inverters & Batteries',
+    title: 'Today Solar Plate Price in Pakistan | Live Rates | SellSolar',
     description:
-      'Check daily updated solar plate price in Pakistan. View live per-watt rates for Tier-1 solar panels (Longi, Jinko, Canadian Solar), hybrid inverters, and lithium / tubular batteries.',
+      'Check daily updated solar plate price in Pakistan. Live per-watt rates for Tier-1 panels (Longi, Jinko, Canadian Solar), hybrid inverters & lithium batteries.',
     path: '/prices',
     robots: INDEXABLE,
     keywords:
       'solar plate price in Pakistan today, solar panel price per watt, solar rates today Pakistan, hybrid solar inverter price, lithium battery price Pakistan, tubular battery price, Tier 1 solar plates price, Longi solar panel rate, Jinko solar plate cost, 5kw solar system price, 10kw solar inverter price',
   },
   calculator: {
-    title: 'Solar Load Calculator Pakistan | Free Solar System, Plates & Inverter Estimator',
+    title: 'Solar Load Calculator Pakistan | System Sizing | SellSolar',
     description:
-      'Use our free solar load calculator in Pakistan to estimate your home appliances kW load, required solar plates count, optimal inverter size, and battery backup needs instantly.',
+      'Calculate solar load for your home in Pakistan free. Estimate appliance kW wattage, required Tier-1 solar plates count, inverter size & battery backup hours.',
     path: '/calculator',
     robots: INDEXABLE,
     keywords:
       'calculate solar load, free solar load calculator Pakistan, estimate solar system load, how to calculate solar panels needed, inverter size calculator, solar battery backup calculator, 5kw solar load calculation, 10kw solar system estimation',
   },
   dealers: {
-    title: 'Authorized Solar Dealers in Pakistan | Verified Tier-1 Equipment Sellers',
+    title: 'Authorized Solar Dealers in Pakistan | SellSolar',
     description:
-      'Find verified and authorized solar dealers across Pakistan. Connect with trusted distributors of Tier-1 solar plates (Longi, Jinko, Canadian Solar) and premium inverters (Inverex, Growatt) in Lahore, Karachi, and Islamabad.',
+      'Find verified and authorized solar dealers across Pakistan. Connect with trusted distributors of Longi, Jinko, Canadian Solar & Inverex in Lahore & Karachi.',
     path: '/dealers',
     robots: INDEXABLE,
     keywords:
       'authorized solar dealers in Pakistan, verified solar distributors, Tier 1 solar panel sellers, Longi authorized dealer, Jinko solar distributor, Inverex dealer Lahore, Growatt dealer Karachi, buy authentic solar plates Pakistan',
   },
   install: {
-    title: 'Solar Installation Request | SellSolar',
+    title: 'Solar Installation & Net Metering Pakistan | SellSolar',
     description:
-      'Request professional solar installation. Share your name, address and contact number and SellSolar will arrange a site visit across Pakistan.',
+      'Request professional solar installation and net metering in Pakistan. Certified site survey, Tier-1 mounting, hybrid inverter wiring & WAPDA approvals.',
     path: '/install',
     robots: INDEXABLE,
   },
   news: {
-    title: 'Daily Solar News Pakistan | Live Solar Rates, NEPRA & Market Updates',
+    title: 'Daily Solar News Pakistan | Rates & Policies | SellSolar',
     description:
-      'Read daily updated solar energy news in Pakistan powered by Google search grounding. Get latest updates on NEPRA net-metering policies, solar plate rates, and import trends.',
+      'Daily updated solar energy news in Pakistan: live solar plate rates, NEPRA net-metering policies, inverter imports, and technology updates across Pakistan.',
     path: '/news',
     robots: INDEXABLE,
     keywords:
       'solar news Pakistan, daily solar rates update, NEPRA net metering news, solar plate price trends, Pakistan renewable energy updates',
   },
   'solar-news': {
-    title: 'Daily Solar News Pakistan | Live Solar Rates, NEPRA & Market Updates',
+    title: 'Daily Solar News Pakistan | Rates & Policies | SellSolar',
     description:
-      'Read daily updated solar energy news in Pakistan powered by Google search grounding. Get latest updates on NEPRA net-metering policies, solar plate rates, and import trends.',
+      'Daily updated solar energy news in Pakistan: live solar plate rates, NEPRA net-metering policies, inverter imports, and technology updates across Pakistan.',
     path: '/solar-news',
     robots: INDEXABLE,
     keywords:
       'solar news Pakistan, daily solar rates update, NEPRA net metering news, solar plate price trends, Pakistan renewable energy updates',
   },
   verification: {
-    title: 'Tier 1 Solar Plates Verification Pakistan | Official Barcode & Serial Check',
+    title: 'Tier 1 Solar Plates Verification Pakistan | SellSolar',
     description:
-      'Verify serial numbers and barcode authenticity for Tier-1 solar plates in Pakistan: Canadian Solar, Jinko, LONGi, JA Solar, Astronergy, Trina, Sunova, Huasun, and Yingli.',
+      'Verify serial numbers and barcode authenticity for Tier-1 solar plates in Pakistan: Canadian Solar, Jinko, LONGi, JA Solar, Astronergy, Trina and Sunova.',
     path: '/verification',
     robots: INDEXABLE,
     keywords:
       'Tier 1 solar plates verification, solar plate serial check, Canadian Solar serial check, Jinko authenticity portal, LONGi barcode verify, JA Solar warranty check, solar plate authenticity',
   },
   'tier-1-verification': {
-    title: 'Tier 1 Solar Plates Verification Pakistan | Official Barcode & Serial Check',
+    title: 'Tier 1 Solar Plates Verification Pakistan | SellSolar',
     description:
-      'Verify serial numbers and barcode authenticity for Tier-1 solar plates in Pakistan: Canadian Solar, Jinko, LONGi, JA Solar, Astronergy, Trina, Sunova, Huasun, and Yingli.',
+      'Verify serial numbers and barcode authenticity for Tier-1 solar plates in Pakistan: Canadian Solar, Jinko, LONGi, JA Solar, Astronergy, Trina and Sunova.',
     path: '/tier-1-verification',
     robots: INDEXABLE,
     keywords:
       'Tier 1 solar plates verification, solar plate serial check, verify solar plates Pakistan, Longi solar plate verify, Jinko barcode check, solar plate authenticity',
   },
   'used-solar': {
-    title: 'Used Solar Plates & Inverters for Sale in Pakistan | Buy & Sell',
+    title: 'Used Solar Plates & Inverters in Pakistan | SellSolar',
     description:
-      'Buy and sell used solar equipment in Pakistan. Browse affordable second-hand Tier-1 solar plates, hybrid inverters, and lithium batteries from verified local sellers.',
+      'Buy and sell verified used solar plates, hybrid inverters & lithium batteries in Pakistan. Direct contact with trusted sellers in Lahore, Karachi & Islamabad.',
     path: '/used-solar',
     robots: INDEXABLE,
     keywords:
       'used solar plates Pakistan, used solar panels for sale, buy second hand solar plates, used hybrid solar inverter, used lithium solar batteries, cheap solar plates Lahore Karachi Islamabad, sell used solar equipment, affordable solar system',
   },
   'solar-price': {
-    title: 'Solar Plate Price Today Pakistan | Live Per Watt & System Rates',
+    title: 'Solar Plate Price Today Pakistan | Live Rates | SellSolar',
     description:
       'Check solar plate price in Pakistan today for panels, inverters and batteries. Compare market rates before you buy used or new solar plates.',
     path: '/solar-price',
@@ -111,72 +111,72 @@ export const PAGE_SEO = {
       'solar plate price in Pakistan today, solar rates today, panel price per watt Pakistan, 550w solar plate price, 580w solar panel rate, Tier 1 solar plate price today, solar system cost Pakistan',
   },
   'solar-inverter': {
-    title: 'Solar Inverter Price in Pakistan | Hybrid, On-Grid & Used Inverters',
+    title: 'Solar Inverter Price in Pakistan | Hybrid Invertor',
     description:
-      'Find the best solar inverter price in Pakistan. Explore new and used hybrid, off-grid, and on-grid inverters from top brands like Inverex, Growatt, Solis, Knox, and Huawei.',
+      'Find best solar inverter price in Pakistan. Compare hybrid, off-grid and on-grid inverters from Inverex, Growatt, Solis, Knox & Huawei (3kW, 6kW, 10kW).',
     path: '/solar-inverter',
     robots: INDEXABLE,
     keywords:
       'solar inverter price Pakistan, hybrid solar inverter, Inverex inverter price, Growatt inverter price, 3kw solar inverter, 5kw hybrid inverter cost, 10kw on grid inverter price, used solar inverter Pakistan',
   },
   'solar-batteries': {
-    title: 'Solar Battery Price in Pakistan | Lithium & Tubular Batteries',
+    title: 'Solar Battery Price in Pakistan | Lithium & Tubular',
     description:
-      'Buy long-lasting solar batteries in Pakistan. Compare lithium LiFePO4, tubular, and gel battery prices. Find affordable new and used solar batteries for optimal backup.',
+      'Buy solar batteries in Pakistan. Compare 48V LiFePO4 lithium wall-mount battery packs and deep-cycle tubular backup batteries at verified market prices.',
     path: '/solar-batteries',
     robots: INDEXABLE,
     keywords:
       'solar battery price Pakistan, lithium battery price in Pakistan, tubular battery cost, LiFePO4 solar battery, used solar battery for sale, 100ah lithium battery price, 200ah tubular battery rate',
   },
   'solar-panels': {
-    title: 'Solar Panels in Pakistan | Tier-1 Solar Plates & Prices',
+    title: 'Solar Panels in Pakistan | Tier-1 Solar Plates | SellSolar',
     description:
-      'Top Tier-1 solar panels in Pakistan. Compare prices for new and used Longi, Jinko, JA Solar, and Canadian Solar modules. Calculate your solar setup cost today.',
+      'Compare Tier-1 solar panels in Pakistan. Find new and used Longi, Jinko, JA Solar and Canadian Solar modules at live wholesale per-watt market benchmark rates.',
     path: '/solar-panels',
     robots: INDEXABLE,
     keywords:
       'solar panels in Pakistan, solar panel price Pakistan, Tier 1 solar panels, Longi solar panels price, Jinko solar panels, JA Solar rate, Canadian solar price Pakistan, buy solar panels online',
   },
   'solar-plates': {
-    title: 'Solar Plates for Sale in Pakistan | Buy New & Used Solar Plates',
+    title: 'Solar Plates for Sale in Pakistan | Buy & Sell | SellSolar',
     description:
-      'Browse verified listings of new and used solar plates for sale in Pakistan. Find the best rates for Longi, Canadian Solar, Jinko, and JA Solar plates in Lahore, Karachi, and Islamabad.',
+      'Browse verified listings of new and used solar plates for sale in Pakistan. Find best rates for Longi, Canadian Solar & Jinko in Lahore, Karachi & Islamabad.',
     path: '/solar-plates',
     robots: INDEXABLE,
     keywords:
       'solar plates for sale Pakistan, buy solar plates, used solar plates, second hand solar plates, Tier 1 solar plates price, cheap solar plates, wholesale solar plates market',
   },
   'solar-plate': {
-    title: 'Solar Plate Prices & Models in Pakistan | 550W - 610W Rates',
+    title: 'Solar Plate Models & Prices in Pakistan (550W-610W)',
     description:
-      'Compare solar plate models, specifications, and prices (550W - 610W) in Pakistan. Buy and sell verified new and used Tier-1 solar plates on SellSolar.',
+      'Compare solar plate models, specifications & prices (550W-610W) in Pakistan. Buy and sell verified new & used Tier-1 solar plates on SellSolar.',
     path: '/solar-plate',
     robots: INDEXABLE,
     keywords:
       'solar plate, solar plate price in Pakistan, 550w solar plate price, 580w solar plate rate, 600w solar panel cost, Tier 1 solar plate, used solar plate',
   },
   'solar-plates-price': {
-    title: 'Solar Plates Price in Pakistan Today | Live Tier-1 Panel Rates',
+    title: 'Solar Plates Price in Pakistan Today | Live Rates',
     description:
-      'Daily updated solar plates price in Pakistan today. Check live per-watt rates for Tier-1 solar panels (Canadian Solar, Longi, Jinko, JA Solar) for 5kW to 20kW home setups.',
+      'Daily updated solar plates price in Pakistan today. Check live per-watt rates for Tier-1 solar panels (Canadian Solar, Longi, Jinko) for 5kW to 20kW setups.',
     path: '/solar-plates-price',
     robots: INDEXABLE,
     keywords:
       'solar plates price in Pakistan, solar plate price in Pakistan today, solar plates rate today, Tier 1 solar plates price, solar panel per watt price, Longi solar plates price, Jinko solar plate rate',
   },
   'today-prices': {
-    title: 'Today Solar Rates in Pakistan | Live Solar Plates & Inverter Prices',
+    title: 'Today Solar Rates in Pakistan | Live Benchmark Prices',
     description:
-      'Check today live solar rates in Pakistan: panel PKR/watt cost, on-grid and hybrid inverters, and lithium battery prices updated daily for accurate budget planning.',
+      'Check today live solar rates in Pakistan: panel PKR/watt cost, on-grid and hybrid inverters, and lithium battery prices updated daily for accurate budgeting.',
     path: '/prices',
     robots: INDEXABLE,
     keywords:
       'today solar rates, solar rates today Pakistan, solar plate price in Pakistan today, live solar rates Pakistan, today solar panel price, today inverter rate Pakistan',
   },
   'load-calculator': {
-    title: 'Calculate Solar Load Free in Pakistan | Solar System Load Calculator',
+    title: 'Calculate Solar Load in Pakistan Free | System Sizing',
     description:
-      'Calculate solar load in Pakistan free. Calculate your home appliances kW load, required solar plates count, inverter kW size, and battery backup.',
+      'Calculate solar load in Pakistan free. Estimate appliance kW wattage, required Tier-1 solar plates count, inverter size & battery backup hours instantly.',
     path: '/calculator',
     robots: INDEXABLE,
     keywords:
@@ -634,6 +634,8 @@ export function applyPageSeo(page, { listing, listingId } = {}) {
     content: title,
   });
   upsertMeta('meta[name="twitter:card"]', { name: 'twitter:card', content: 'summary_large_image' });
+  upsertMeta('meta[name="twitter:site"]', { name: 'twitter:site', content: '@sellsolarpk' });
+  upsertMeta('meta[name="twitter:creator"]', { name: 'twitter:creator', content: '@sellsolarpk' });
   upsertMeta('meta[name="twitter:title"]', { name: 'twitter:title', content: title });
   upsertMeta('meta[name="twitter:description"]', { name: 'twitter:description', content: description });
   upsertMeta('meta[name="twitter:image"]', { name: 'twitter:image', content: ogImage });

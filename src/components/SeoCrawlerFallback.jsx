@@ -7,7 +7,7 @@ export default function SeoCrawlerFallback({ slug = [], meta = {} }) {
   return (
     <div id="seo-static-crawler-snapshot" className="sr-only" aria-hidden="false">
       <header>
-        <h1>{heading}</h1>
+        <h2 className="text-xl font-bold">{heading}</h2>
         <p>
           Welcome to <strong>SellSolar.pk</strong> — Pakistan's #1 used solar marketplace and real-time solar equipment pricing directory. 
           Buy and sell used solar plates, second-hand hybrid inverters, solar batteries, and complete solar systems across Lahore, Karachi, Islamabad, Rawalpindi, Faisalabad, Multan, and throughout Pakistan.

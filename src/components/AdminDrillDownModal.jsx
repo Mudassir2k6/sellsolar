@@ -27,9 +27,16 @@ import {
   Check,
   Building,
   TrendingUp,
-  Package
+  Package,
+  FilePen,
+  Trash2,
+  Pause,
+  Play
 } from 'lucide-react';
 import { getRealisticAdViews } from '../lib/adViews';
+import EditSolarAdModal from './EditSolarAdModal';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { isValidUuid } from '../lib/auth';
 
 export default function AdminDrillDownModal({
   isOpen,
@@ -45,12 +52,131 @@ export default function AdminDrillDownModal({
   onSelectTab,
   onRefreshData,
   backendInfo = {},
+  onEditListing,
+  onDeleteListing,
+  onToggleStatus,
 }) {
   const [currentMetric, setCurrentMetric] = useState(initialMetric);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterCategory, setFilterCategory] = useState(initialFilter || 'all');
   const [sortBy, setSortBy] = useState('newest'); // 'newest' | 'price_asc' | 'price_desc' | 'views_desc' | 'name_asc'
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [editingAd, setEditingAd] = useState(null);
+  const [localListings, setLocalListings] = useState(listingsList);
+  const [localMyAds, setLocalMyAds] = useState(myAds);
+
+  React.useEffect(() => {
+    setLocalListings(listingsList);
+  }, [listingsList]);
+
+  React.useEffect(() => {
+    setLocalMyAds(myAds);
+  }, [myAds]);
+
+  const handleToggleActive = async (item) => {
+    const isCurrentlyActive = !item.is_sold && item.status !== 'inactive' && item.status !== 'sold';
+    const newStatus = isCurrentlyActive ? 'inactive' : 'approved';
+    const newIsSold = false;
+
+    setLocalListings((prev) =>
+      prev.map((l) => (l.id === item.id ? { ...l, status: newStatus, is_sold: newIsSold } : l))
+    );
+    setLocalMyAds((prev) =>
+      prev.map((l) => (l.id === item.id ? { ...l, status: newStatus, is_sold: newIsSold } : l))
+    );
+
+    if (onToggleStatus) {
+      await onToggleStatus(item.id);
+    } else {
+      try {
+        const raw = localStorage.getItem('sellsolar_custom_listings');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          const updated = parsed.map((l) => (l.id === item.id ? { ...l, status: newStatus, is_sold: newIsSold } : l));
+          localStorage.setItem('sellsolar_custom_listings', JSON.stringify(updated));
+        }
+      } catch {}
+
+      if (isValidUuid(item.id) && isSupabaseConfigured()) {
+        try {
+          await supabase.from('solar_listings').update({ status: newStatus, is_sold: newIsSold }).eq('id', item.id);
+        } catch (e) {
+          console.warn('Drill-down toggle error:', e);
+        }
+      }
+    }
+  };
+
+  const handleDeleteItem = async (item) => {
+    const title = item.title || 'this listing';
+    if (!confirm(`Are you sure you want to permanently delete "${title}"?`)) return;
+
+    setLocalListings((prev) => prev.filter((l) => l.id !== item.id));
+    setLocalMyAds((prev) => prev.filter((l) => l.id !== item.id));
+
+    if (onDeleteListing) {
+      await onDeleteListing(item.id);
+    } else {
+      try {
+        const raw = localStorage.getItem('sellsolar_custom_listings');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          const updated = parsed.filter((l) => l.id !== item.id);
+          localStorage.setItem('sellsolar_custom_listings', JSON.stringify(updated));
+        }
+      } catch {}
+
+      if (isValidUuid(item.id) && isSupabaseConfigured()) {
+        try {
+          await supabase.from('solar_listings').delete().eq('id', item.id);
+        } catch (e) {
+          console.warn('Drill-down delete error:', e);
+        }
+      }
+    }
+  };
+
+  const handleSaveAd = async (updatedAd) => {
+    setLocalListings((prev) => prev.map((l) => (l.id === updatedAd.id ? updatedAd : l)));
+    setLocalMyAds((prev) => prev.map((l) => (l.id === updatedAd.id ? updatedAd : l)));
+
+    if (onEditListing) {
+      await onEditListing(updatedAd);
+    } else {
+      try {
+        const raw = localStorage.getItem('sellsolar_custom_listings');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          const updated = parsed.map((l) => (l.id === updatedAd.id ? updatedAd : l));
+          localStorage.setItem('sellsolar_custom_listings', JSON.stringify(updated));
+        }
+      } catch {}
+
+      if (isValidUuid(updatedAd.id) && isSupabaseConfigured()) {
+        try {
+          await supabase.from('solar_listings').update({
+            title: updatedAd.title,
+            price: Number(updatedAd.price) || 0,
+            city: updatedAd.city,
+            category: updatedAd.category,
+            brand: updatedAd.brand,
+            condition: updatedAd.condition,
+            capacity_kw: updatedAd.capacity_kw || null,
+            warranty_years: updatedAd.warranty_years ? Number(updatedAd.warranty_years) : null,
+            description: updatedAd.description,
+            seller_name: updatedAd.seller_name,
+            seller_phone: updatedAd.seller_phone,
+            image_url: updatedAd.image_url,
+            status: updatedAd.status,
+            is_sold: Boolean(updatedAd.is_sold || updatedAd.status === 'sold'),
+          }).eq('id', updatedAd.id);
+        } catch (e) {
+          console.warn('Drill-down save ad error:', e);
+        }
+      }
+    }
+    setEditingAd(null);
+  };
 
   // Sync state if initialMetric or initialFilter changes when opened
   React.useEffect(() => {
@@ -194,7 +320,7 @@ export default function AdminDrillDownModal({
       });
   }, [dealersList, filterCategory, searchQuery, sortBy]);
 
-  const activeSourceListings = currentMetric === 'my-ads' ? myAds : listingsList;
+  const activeSourceListings = currentMetric === 'my-ads' ? localMyAds : localListings;
 
   const filteredListings = useMemo(() => {
     return activeSourceListings
@@ -714,25 +840,78 @@ export default function AdminDrillDownModal({
                             className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
                               item.is_sold || item.status === 'sold'
                                 ? 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+                                : item.status === 'inactive'
+                                ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
                                 : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
                             }`}
                           >
-                            {item.is_sold || item.status === 'sold' ? 'Sold' : 'Active'}
+                            {item.is_sold || item.status === 'sold' ? 'Sold' : item.status === 'inactive' ? 'Inactive' : 'Active'}
                           </span>
                         </td>
                         <td className="py-3 px-4 text-right">
-                          {onNavigateToListing && (
+                          <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                            {/* Toggle Active / Inactive / Pause */}
                             <button
                               type="button"
-                              onClick={() => {
-                                onNavigateToListing(item.id);
-                                onClose();
-                              }}
-                              className="px-2.5 py-1 rounded-lg bg-gray-100 hover:bg-amber-100 text-gray-700 hover:text-amber-800 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 text-[11px] font-bold transition-all cursor-pointer"
+                              onClick={() => handleToggleActive(item)}
+                              className={`px-2 py-1 rounded-lg text-[10px] font-extrabold transition-all cursor-pointer flex items-center gap-1 shadow-2xs ${
+                                item.status === 'inactive' || item.is_sold
+                                  ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
+                                  : 'bg-amber-50 hover:bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300 dark:border-amber-800'
+                              }`}
+                              title={item.status === 'inactive' || item.is_sold ? 'Make Active' : 'Make Inactive / Pause'}
                             >
-                              View
+                              {item.status === 'inactive' || item.is_sold ? (
+                                <>
+                                  <Check className="w-3 h-3 text-emerald-600" />
+                                  <span>Active</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Pause className="w-3 h-3 text-amber-600" />
+                                  <span>Pause</span>
+                                </>
+                              )}
                             </button>
-                          )}
+
+                            {/* Edit Ad Button */}
+                            <button
+                              type="button"
+                              onClick={() => setEditingAd(item)}
+                              className="px-2 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1 shadow-2xs active:scale-95"
+                              title="Edit Ad Details, Price, and Photos"
+                            >
+                              <FilePen className="w-3 h-3" />
+                              <span>Edit</span>
+                            </button>
+
+                            {/* Delete Ad Button */}
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteItem(item)}
+                              className="px-2 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-900 text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1 active:scale-95"
+                              title="Delete this ad permanently"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                              <span>Delete</span>
+                            </button>
+
+                            {/* View on Marketplace */}
+                            {onNavigateToListing && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  onNavigateToListing(item.id);
+                                  onClose();
+                                }}
+                                className="px-2 py-1 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1"
+                                title="View on Marketplace"
+                              >
+                                <ExternalLink className="w-3 h-3" />
+                                <span>View</span>
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -839,6 +1018,17 @@ export default function AdminDrillDownModal({
         </div>
 
       </div>
+
+      {/* Edit Solar Ad Modal */}
+      {editingAd && (
+        <EditSolarAdModal
+          isOpen={Boolean(editingAd)}
+          ad={editingAd}
+          onClose={() => setEditingAd(null)}
+          onSave={handleSaveAd}
+          onDelete={handleDeleteItem}
+        />
+      )}
     </div>
   );
 }

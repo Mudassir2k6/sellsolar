@@ -7,7 +7,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const isDev = process.env.NODE_ENV === 'development' || process.env.npm_lifecycle_event === 'dev';
 
 const nextConfig = {
-  output: 'export',
+  ...(isDev ? {} : { output: 'export' }),
   images: {
     unoptimized: true,
   },

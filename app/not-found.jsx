@@ -4,6 +4,7 @@ import Link from 'next/link';
 import {
   Sun,
   Home,
+  BookOpen,
   Search,
   TrendingUp,
   Calculator,
@@ -50,6 +51,14 @@ export default function NotFound() {
             >
               <TrendingUp className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
               <span>Live Rates</span>
+            </Link>
+            <Link
+              href="/blog"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/60 transition-colors"
+              id="not-found-header-blog"
+            >
+              <BookOpen className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+              <span>Blog</span>
             </Link>
             <Link
               href="/"

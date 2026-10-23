@@ -95,6 +95,7 @@ import AdminDailyRatesModule from './AdminDailyRatesModule';
 import AdminDealersModule from './AdminDealersModule';
 import AdminInstallationsModule from './AdminInstallationsModule';
 import AdminDrillDownModal from './AdminDrillDownModal';
+import EditSolarAdModal from './EditSolarAdModal';
 import { getStoredInstallationRequests, fetchInstallationRequests } from '../lib/installation';
 import { VERIFIED_DEALERS } from '../data/dealersData';
 import { SEED_LISTINGS } from '../data/seedListings';
@@ -325,8 +326,9 @@ export default function AdminSuperDashboard({
     }
   };
 
-  // Drill-Down Modal State
+  // Drill-Down & Edit Modal States
   const [drillDownModalOpen, setDrillDownModalOpen] = useState(false);
+  const [editingAd, setEditingAd] = useState(null);
   const [drillDownMetric, setDrillDownMetric] = useState('users');
   const [drillDownFilter, setDrillDownFilter] = useState('all');
   const openDrillDown = (metric, filter = 'all') => {
@@ -2187,6 +2189,85 @@ export default function AdminSuperDashboard({
     });
   };
 
+  // Edit & Save Listing (Update Ad live to Supabase + Local)
+  const handleSaveEditedAd = async (updatedAd) => {
+    const updated = listingsList.map((item) => (item.id === updatedAd.id ? updatedAd : item));
+    setListingsList(updated);
+    try {
+      localStorage.setItem('sellsolar_custom_listings', JSON.stringify(updated));
+    } catch {}
+
+    if (isValidUuid(updatedAd.id) && isSupabaseConfigured()) {
+      try {
+        await supabase
+          .from('solar_listings')
+          .update({
+            title: updatedAd.title,
+            price: Number(updatedAd.price) || 0,
+            city: updatedAd.city || 'Pakistan',
+            category: updatedAd.category || 'panel',
+            brand: updatedAd.brand || 'Tier-1',
+            condition: updatedAd.condition || 'used',
+            capacity_kw: updatedAd.capacity_kw || null,
+            warranty_years: updatedAd.warranty_years ? Number(updatedAd.warranty_years) : null,
+            description: updatedAd.description || '',
+            seller_name: updatedAd.seller_name || '',
+            seller_phone: updatedAd.seller_phone || updatedAd.phone || '',
+            image_url: updatedAd.image_url || '',
+            status: updatedAd.status || (updatedAd.is_sold ? 'sold' : 'approved'),
+            is_sold: Boolean(updatedAd.is_sold || updatedAd.status === 'sold'),
+          })
+          .eq('id', updatedAd.id);
+      } catch (sbErr) {
+        console.warn('Supabase update listing error:', sbErr);
+      }
+    }
+
+    showToast({
+      title: 'Ad Updated Successfully',
+      message: `"${updatedAd.title}" has been updated live on SellSolar.pk.`,
+      type: 'success',
+    });
+  };
+
+  // Toggle Active / Inactive (Pause / Resume listing)
+  const handleToggleActiveInactive = async (listingId) => {
+    let newStatus = 'approved';
+    const updated = listingsList.map((item) => {
+      if (item.id === listingId) {
+        const isCurrentlyActive = !item.is_sold && item.status !== 'inactive' && item.status !== 'sold';
+        newStatus = isCurrentlyActive ? 'inactive' : 'approved';
+        return {
+          ...item,
+          status: newStatus,
+          is_sold: false,
+        };
+      }
+      return item;
+    });
+    setListingsList(updated);
+    try {
+      localStorage.setItem('sellsolar_custom_listings', JSON.stringify(updated));
+    } catch {}
+
+    if (isValidUuid(listingId) && isSupabaseConfigured()) {
+      try {
+        await supabase
+          .from('solar_listings')
+          .update({ status: newStatus, is_sold: false })
+          .eq('id', listingId);
+      } catch (sbErr) {
+        console.warn('Supabase toggle active/inactive error:', sbErr);
+      }
+    }
+
+    showToast({
+      title: newStatus === 'approved' ? 'Ad Activated (اشتہار فعال)' : 'Ad Paused / Inactive (اشتہار روک دیا)',
+      message: newStatus === 'approved' ? 'Listing is now active on the marketplace.' : 'Listing is now paused and hidden from marketplace.',
+      type: newStatus === 'approved' ? 'success' : 'info',
+    });
+  };
+
   // Save Profile Info
   const handleSaveProfile = async (e) => {
     e?.preventDefault();
@@ -3646,26 +3727,82 @@ export default function AdminSuperDashboard({
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {myAds.slice(0, 3).map((ad) => (
-                      <div
-                        key={ad.id}
-                        className="p-3 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/40 flex items-center justify-between gap-3"
-                      >
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs font-bold text-gray-900 dark:text-white truncate">{ad.title}</p>
-                          <p className="text-xs font-black text-amber-600 dark:text-amber-400 mt-0.5">{formatPrice(ad.price)}</p>
-                        </div>
-                        <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                            ad.is_sold || ad.status === 'sold'
-                              ? 'bg-gray-200 text-gray-700'
-                              : 'bg-emerald-100 text-emerald-800'
-                          }`}
+                    {myAds.slice(0, 3).map((ad) => {
+                      const isAdSold = ad.is_sold || ad.status === 'sold';
+                      const isAdInactive = ad.status === 'inactive';
+                      return (
+                        <div
+                          key={ad.id}
+                          className="p-3.5 rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 flex flex-col justify-between gap-3 shadow-2xs hover:border-amber-300 transition-colors"
                         >
-                          {ad.is_sold || ad.status === 'sold' ? 'Sold' : 'Active'}
-                        </span>
-                      </div>
-                    ))}
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs font-bold text-gray-900 dark:text-white truncate" title={ad.title}>
+                                {ad.title}
+                              </p>
+                              <p className="text-xs font-black text-amber-600 dark:text-amber-400 mt-0.5">
+                                {formatPrice(ad.price)}
+                              </p>
+                            </div>
+                            <span
+                              className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider shrink-0 ${
+                                isAdSold
+                                  ? 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+                                  : isAdInactive
+                                  ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                                  : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                              }`}
+                            >
+                              {isAdSold ? 'Sold' : isAdInactive ? 'Inactive' : 'Active'}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 pt-2 border-t border-gray-200/60 dark:border-gray-700/60">
+                            <button
+                              type="button"
+                              onClick={() => handleToggleActiveInactive(ad.id)}
+                              className={`flex-1 py-1 px-2 rounded-lg text-[10px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                                isAdInactive || isAdSold
+                                  ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
+                                  : 'bg-amber-50 hover:bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300 dark:border-amber-800'
+                              }`}
+                              title={isAdInactive || isAdSold ? 'Activate Ad' : 'Pause Ad'}
+                            >
+                              {isAdInactive || isAdSold ? '▶ Active' : '⏸ Pause'}
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => setEditingAd(ad)}
+                              className="py-1 px-2.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
+                              title="Edit Ad Details"
+                            >
+                              <Edit3 className="w-3 h-3" />
+                              <span>Edit</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => onNavigateToListing?.(ad.id)}
+                              className="py-1 px-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 text-[10px] font-bold transition-all cursor-pointer flex items-center gap-1"
+                              title="View Ad on Marketplace"
+                            >
+                              <ExternalLink className="w-3 h-3" />
+                              <span>View</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteMyAd(ad.id)}
+                              className="p-1 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
+                              title="Delete Ad"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -7592,19 +7729,47 @@ export default function AdminSuperDashboard({
                           {/* Action Controls */}
                           <div className="space-y-2 pt-3 mt-3 border-t border-gray-100 dark:border-gray-800">
                             {/* Primary row */}
-                            <div className="flex items-center gap-1.5">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              {/* Toggle Active / Inactive Button */}
+                              <button
+                                type="button"
+                                onClick={() => handleToggleActiveInactive(ad.id)}
+                                className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                                  ad.status === 'inactive' || isSold
+                                    ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
+                                    : 'bg-amber-50 text-amber-800 hover:bg-amber-100 dark:bg-amber-950/50 dark:text-amber-300 border border-amber-300 dark:border-amber-800'
+                                }`}
+                                title={ad.status === 'inactive' || isSold ? 'Activate this ad' : 'Pause this ad (Make Inactive)'}
+                              >
+                                {ad.status === 'inactive' || isSold ? '▶ Active' : '⏸ Pause'}
+                              </button>
+
+                              {/* Mark Sold Button */}
                               <button
                                 type="button"
                                 onClick={() => handleToggleSold(ad.id)}
-                                className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                                className={`py-1.5 px-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
                                   isSold
-                                    ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950/50 dark:text-emerald-300'
+                                    ? 'bg-gray-700 text-white hover:bg-gray-800'
                                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300'
                                 }`}
+                                title={isSold ? 'Mark Product Available' : 'Mark Product Sold'}
                               >
-                                {isSold ? 'Mark Available' : 'Mark Sold'}
+                                {isSold ? 'Sold' : 'Mark Sold'}
                               </button>
 
+                              {/* Edit Ad Button */}
+                              <button
+                                type="button"
+                                onClick={() => setEditingAd(ad)}
+                                className="py-1.5 px-2.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
+                                title="Edit Ad Details, Price, and Description"
+                              >
+                                <Edit3 className="w-3.5 h-3.5" />
+                                <span>Edit</span>
+                              </button>
+
+                              {/* View on Marketplace */}
                               <button
                                 type="button"
                                 onClick={() => onNavigateToListing?.(ad.id)}
@@ -7614,6 +7779,7 @@ export default function AdminSuperDashboard({
                                 <ExternalLink className="w-4 h-4" />
                               </button>
 
+                              {/* Delete Ad Button */}
                               <button
                                 type="button"
                                 onClick={() => (effectiveIsAdmin ? handleDeleteListing(ad.id) : handleDeleteMyAd(ad.id))}
@@ -7839,24 +8005,38 @@ export default function AdminSuperDashboard({
       {/* Comprehensive Drill-Down Modal */}
       {drillDownModalOpen && (
         <AdminDrillDownModal
-        isOpen={drillDownModalOpen}
-        onClose={() => setDrillDownModalOpen(false)}
-        initialMetric={drillDownMetric}
-        initialFilter={drillDownFilter}
-        usersList={usersList}
-        listingsList={listingsList}
-        dealersList={zeroDashboardMode ? usersList.filter((u) => u.role === 'dealer' || u.is_verified_dealer) : VERIFIED_DEALERS}
-        myAds={myAds}
-        inboxMessages={inboxMessages}
-        onNavigateToListing={onNavigateToListing}
-        onSelectTab={selectTab}
-        onRefreshData={loadData}
-        backendInfo={{
-          connected: isSupabaseConfigured(),
-          totalUsers: usersList.length,
-          totalListings: listingsList.length,
-        }}
-      />
+          isOpen={drillDownModalOpen}
+          onClose={() => setDrillDownModalOpen(false)}
+          initialMetric={drillDownMetric}
+          initialFilter={drillDownFilter}
+          usersList={usersList}
+          listingsList={listingsList}
+          dealersList={zeroDashboardMode ? usersList.filter((u) => u.role === 'dealer' || u.is_verified_dealer) : VERIFIED_DEALERS}
+          myAds={myAds}
+          inboxMessages={inboxMessages}
+          onNavigateToListing={onNavigateToListing}
+          onSelectTab={selectTab}
+          onRefreshData={loadData}
+          onEditListing={handleSaveEditedAd}
+          onDeleteListing={effectiveIsAdmin ? handleDeleteListing : handleDeleteMyAd}
+          onToggleStatus={handleToggleActiveInactive}
+          backendInfo={{
+            connected: isSupabaseConfigured(),
+            totalUsers: usersList.length,
+            totalListings: listingsList.length,
+          }}
+        />
+      )}
+
+      {/* Edit Solar Ad Modal for Dashboard */}
+      {editingAd && (
+        <EditSolarAdModal
+          isOpen={Boolean(editingAd)}
+          ad={editingAd}
+          onClose={() => setEditingAd(null)}
+          onSave={handleSaveEditedAd}
+          onDelete={effectiveIsAdmin ? handleDeleteListing : handleDeleteMyAd}
+        />
       )}
     </div>
   );

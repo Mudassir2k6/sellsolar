@@ -32,6 +32,7 @@ import {
   BadgeCheck,
   BatteryCharging,
   Bell,
+  BookOpen,
   Boxes,
   Calculator,
   Calendar,
@@ -409,6 +410,11 @@ function Xy({
                       className: 'hover:text-emerald-400 text-emerald-400/90 font-semibold transition-colors cursor-pointer flex items-center gap-1',
                       children: 'Verify Solar Plates',
                     }),
+                    jsx('button', {
+                      onClick: () => h('blog'),
+                      className: 'hover:text-amber-400 text-amber-400/90 font-semibold transition-colors cursor-pointer flex items-center gap-1',
+                      children: 'Solar Blog',
+                    }),
                   ],
                 }),
               ],
@@ -519,6 +525,30 @@ function Xy({
                             : 'bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-200'
                         }`,
                         children: 'LIVE',
+                      }),
+                    ],
+                  }),
+                }),
+                jsx('button', {
+                  onClick: () => h('blog'),
+                  id: 'header-blog-btn',
+                  className: `flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all shadow-xs cursor-pointer shrink-0 ${
+                    e === 'blog'
+                      ? 'bg-amber-500 text-white shadow-amber-500/25'
+                      : 'bg-amber-50/80 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/60 hover:bg-amber-100 dark:hover:bg-amber-900/60'
+                  }`,
+                  children: jsxs(Fragment, {
+                    children: [
+                      jsx(BookOpen, {
+                        className: `h-4 w-4 shrink-0 ${
+                          e === 'blog'
+                            ? 'text-white'
+                            : 'text-amber-600 dark:text-amber-400'
+                        }`,
+                      }),
+                      jsx('span', {
+                        className: 'whitespace-nowrap',
+                        children: 'Blog',
                       }),
                     ],
                   }),
@@ -754,6 +784,17 @@ function Xy({
                                         className: 'h-4 w-4 text-gray-400',
                                       }),
                                       'View Dealers',
+                                    ],
+                                  }),
+                                  jsxs('button', {
+                                    onClick: () => h('blog'),
+                                    className:
+                                      'flex w-full items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer',
+                                    children: [
+                                      jsx(BookOpen, {
+                                        className: 'h-4 w-4 text-gray-400',
+                                      }),
+                                      'Solar Blog & Guides',
                                     ],
                                   }),
                                   jsxs('button', {
@@ -1128,6 +1169,42 @@ function Xy({
                                   }),
                                   jsx(ChevronRight, {
                                     className: 'h-4 w-4 text-gray-400',
+                                  }),
+                                ],
+                              }),
+                              // Solar Blog & Guides
+                              jsxs('button', {
+                                onClick: () => {
+                                  a(false);
+                                  h('blog');
+                                },
+                                className: `w-full flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-semibold transition-all cursor-pointer ${
+                                  e === 'blog'
+                                    ? 'bg-amber-500 text-white font-bold'
+                                    : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
+                                }`,
+                                children: [
+                                  jsxs('div', {
+                                    className: 'flex items-center gap-2.5',
+                                    children: [
+                                      jsx(BookOpen, {
+                                        className: `h-4.5 w-4.5 ${
+                                          e === 'blog'
+                                            ? 'text-white'
+                                            : 'text-amber-500'
+                                        }`,
+                                      }),
+                                      jsx('span', {
+                                        children: 'Solar Blog & Guides',
+                                      }),
+                                    ],
+                                  }),
+                                  jsx(ChevronRight, {
+                                    className: `h-4 w-4 ${
+                                      e === 'blog'
+                                        ? 'text-white/80'
+                                        : 'text-gray-400'
+                                    }`,
                                   }),
                                 ],
                               }),

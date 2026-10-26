@@ -485,12 +485,12 @@ function Xy({
               mobileOpen: isMobileSearchOpen,
               onCloseMobile: () => setIsMobileSearchOpen(!1),
               className:
-                'flex-1 min-w-0 md:min-w-[120px] lg:min-w-[150px] max-w-xs lg:max-w-sm xl:max-w-md mx-1 sm:mx-2 lg:mx-3',
+                'flex-1 min-w-0 md:min-w-[120px] lg:min-w-[150px] max-w-[240px] lg:max-w-sm xl:max-w-md mx-1 sm:mx-2 lg:mx-3',
             }),
 
             // Desktop Navigation Buttons (hidden on mobile, md:flex)
             jsxs('div', {
-              className: 'hidden md:flex items-center gap-1.5 lg:gap-2 xl:gap-2.5 shrink-0',
+              className: 'hidden md:flex items-center gap-1 lg:gap-1.5 xl:gap-2 shrink-0',
               children: [
                 jsx('button', {
                   onClick: () => h('prices'),
@@ -631,10 +631,10 @@ function Xy({
                         jsxs('button', {
                           onClick: () => h('post-ad'),
                           className:
-                            'btn-primary inline-flex items-center gap-1.5 px-2.5 sm:px-3 lg:px-3.5 py-1.5 text-xs sm:text-sm font-bold shadow-xs shrink-0 cursor-pointer whitespace-nowrap',
+                            'btn-primary inline-flex items-center gap-1 px-2 sm:px-2 lg:px-2.5 py-1.5 text-xs sm:text-sm font-bold shadow-xs shrink-0 cursor-pointer whitespace-nowrap',
                           children: [
                             jsx(CirclePlus, {
-                              className: 'h-4 w-4 shrink-0',
+                              className: 'h-4 w-4 shrink-0 hidden lg:flex',
                             }),
                             'Post an Ad',
                           ],

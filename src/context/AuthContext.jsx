@@ -21,6 +21,39 @@ const LOCAL_SESSION_KEY = 'sellsolar_active_auth_session';
 export const LOCAL_DISABLED_USERS_KEY = 'sellsolar_disabled_users';
 export const LOCAL_DELETED_USERS_KEY = 'sellsolar_deleted_users';
 export const LOCAL_USER_PHONES_KEY = 'sellsolar_user_phones';
+export const LOCAL_DELETED_ADS_KEY = 'sellsolar_deleted_ads';
+
+export function getDeletedAds() {
+  if (typeof window === 'undefined') return {};
+  try {
+    const raw = localStorage.getItem(LOCAL_DELETED_ADS_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+export function saveDeletedAds(map) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(LOCAL_DELETED_ADS_KEY, JSON.stringify(map || {}));
+  } catch (err) {
+    console.error('Failed to save deleted ads:', err);
+  }
+}
+
+export function markAdAsDeleted(adId) {
+  if (!adId || typeof window === 'undefined') return;
+  const map = getDeletedAds();
+  map[String(adId)] = { deletedAt: new Date().toISOString() };
+  saveDeletedAds(map);
+}
+
+export function isAdDeleted(adId) {
+  if (!adId || typeof window === 'undefined') return false;
+  const map = getDeletedAds();
+  return Boolean(map[String(adId)]);
+}
 
 export function getDisabledUsers() {
   if (typeof window === 'undefined') return {};

@@ -83,6 +83,8 @@ import {
   saveUserPhonesMap,
   isAccountDisabled,
   isAccountDeleted,
+  getDeletedAds,
+  markAdAsDeleted,
 } from '../context/AuthContext';
 import { isValidUuid } from '../lib/auth';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
@@ -718,6 +720,12 @@ export default function AdminSuperDashboard({
 
     if (!zeroDashboardMode && fetchedListings.length === 0) {
       fetchedListings = [...SEED_LISTINGS];
+    }
+
+    // Filter out permanently deleted ads (admin-deleted ads must never reappear)
+    const deletedAdsMap = getDeletedAds();
+    if (Object.keys(deletedAdsMap).length > 0) {
+      fetchedListings = fetchedListings.filter((item) => !deletedAdsMap[String(item.id)]);
     }
     const enrichedListings = fetchedListings.map(l => ({
       ...l,
@@ -2162,8 +2170,18 @@ export default function AdminSuperDashboard({
     if (!confirm('Are you sure you want to permanently delete this marketplace listing?')) return;
     const updated = listingsList.filter((item) => item.id !== listingId);
     setListingsList(updated);
+
+    // Permanently mark as deleted so it never reappears (even from SEED data or Supabase cache)
+    markAdAsDeleted(listingId);
+
     try {
-      localStorage.setItem('sellsolar_custom_listings', JSON.stringify(updated));
+      // Also remove from local custom listings store
+      const raw = localStorage.getItem('sellsolar_custom_listings');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const filtered = Array.isArray(parsed) ? parsed.filter((item) => item.id !== listingId) : [];
+        localStorage.setItem('sellsolar_custom_listings', JSON.stringify(filtered));
+      }
     } catch {}
 
     if (isValidUuid(listingId) && isSupabaseConfigured()) {
@@ -2186,8 +2204,17 @@ export default function AdminSuperDashboard({
     if (!confirm('Are you sure you want to remove this solar ad?')) return;
     const updated = listingsList.filter((item) => item.id !== listingId);
     setListingsList(updated);
+
+    // Permanently mark as deleted so it never reappears after refresh
+    markAdAsDeleted(listingId);
+
     try {
-      localStorage.setItem('sellsolar_custom_listings', JSON.stringify(updated));
+      const raw = localStorage.getItem('sellsolar_custom_listings');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const filtered = Array.isArray(parsed) ? parsed.filter((item) => item.id !== listingId) : [];
+        localStorage.setItem('sellsolar_custom_listings', JSON.stringify(filtered));
+      }
     } catch {}
 
     if (isValidUuid(listingId) && isSupabaseConfigured()) {

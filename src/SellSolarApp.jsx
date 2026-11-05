@@ -97,7 +97,7 @@ import {
   Youtube,
   Zap,
 } from 'lucide-react';
-import { useAuth, DEFAULT_ADMIN_ID, DEFAULT_ADMIN_EMAIL, getStoredUsers, saveStoredUsers, getUserPhonesMap, saveUserPhonesMap } from './context/AuthContext';
+import { useAuth, DEFAULT_ADMIN_ID, DEFAULT_ADMIN_EMAIL, getStoredUsers, saveStoredUsers, getUserPhonesMap, saveUserPhonesMap, getDeletedAds, markAdAsDeleted, isAdDeleted } from './context/AuthContext';
 import { useToast } from './context/ToastContext';
 import { supabase, isSupabaseConfigured } from './lib/supabase';
 import { BRANDS, CATEGORIES, CITIES, formatPrice } from './lib/constants';
@@ -5141,7 +5141,8 @@ function yx({
         combinedMap.set(item.id, item);
       }
     });
-    const combinedListings = Array.from(combinedMap.values());
+    const deletedMap = getDeletedAds();
+    const combinedListings = Array.from(combinedMap.values()).filter(item => !deletedMap[String(item.id)]);
     o(combinedListings);
 
     if (P.error && !P.error.message?.includes("invalid input syntax for type uuid")) {
@@ -5186,6 +5187,15 @@ function yx({
   const yr=async P=>{
     if(!confirm("Delete this listing?"))return;
     k(P);
+    markAdAsDeleted(P);
+    try {
+      const raw = localStorage.getItem('sellsolar_custom_listings');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const filtered = Array.isArray(parsed) ? parsed.filter((item) => item.id !== P) : [];
+        localStorage.setItem('sellsolar_custom_listings', JSON.stringify(filtered));
+      }
+    } catch {}
     const{
       error:Q
     }=await supabase.from("solar_listings").delete().eq("id",P);
@@ -6070,6 +6080,10 @@ function yx({
     (async()=>{
       o(!0),u(null);
       try{
+        if (isAdDeleted(t)) {
+          u("Listing has been removed or is no longer available");
+          return;
+        }
         let found = null;
         if (t && isValidUuid(t) && isSupabaseConfigured() && supabase) {
           try {
@@ -6078,7 +6092,7 @@ function yx({
             );
             const queryPromise = supabase.from("solar_listings").select("*").eq("id", t).maybeSingle();
             const { data: m, error: v } = await Promise.race([queryPromise, timeoutPromise]);
-            if (!v && m) found = m;
+            if (!v && m && !isAdDeleted(m.id)) found = m;
           } catch(err) {
             // ignore supabase error and try local
           }
@@ -6833,8 +6847,10 @@ function _x({
         }=await f.limit(16);
         if(!active) return;
         if(!v && m && m.length > 0){
-          s(m);
-          d(k || m.length);
+          const deletedMap = getDeletedAds();
+          const cleanM = m.filter(item => !deletedMap[String(item.id)]);
+          s(cleanM);
+          d(cleanM.length);
         } else {
           const fallback = getLocalOrSeedListings(e);
           s(fallback);

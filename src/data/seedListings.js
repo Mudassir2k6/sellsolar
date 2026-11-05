@@ -257,6 +257,7 @@ export const SEED_LISTINGS = [
 
 export function getLocalOrSeedListings(filters = {}) {
   let userCustomListings = [];
+  let deletedAdsMap = {};
   if (typeof window !== 'undefined') {
     try {
       const raw = localStorage.getItem('sellsolar_custom_listings');
@@ -266,11 +267,19 @@ export function getLocalOrSeedListings(filters = {}) {
     } catch (e) {
       console.warn('Could not read user custom listings:', e);
     }
+    try {
+      const deletedRaw = localStorage.getItem('sellsolar_deleted_ads');
+      if (deletedRaw) {
+        deletedAdsMap = JSON.parse(deletedRaw);
+      }
+    } catch {}
   }
 
   const all = [...userCustomListings, ...SEED_LISTINGS];
 
   return all.filter((item) => {
+    // Hide permanently deleted ads (admin-deleted blacklist)
+    if (deletedAdsMap[String(item.id)]) return false;
     // Hide disabled ads from marketplace display
     if (item.is_ad_disabled || item.status === 'disabled') return false;
     if (filters.category && item.category !== filters.category) return false;
@@ -294,6 +303,7 @@ export function getLocalOrSeedListings(filters = {}) {
 
 export function getLocalOrSeedListingById(id) {
   let userCustomListings = [];
+  let deletedAdsMap = {};
   if (typeof window !== 'undefined') {
     try {
       const raw = localStorage.getItem('sellsolar_custom_listings');
@@ -303,8 +313,15 @@ export function getLocalOrSeedListingById(id) {
     } catch (e) {
       console.warn('Could not read user custom listings:', e);
     }
+    try {
+      const deletedRaw = localStorage.getItem('sellsolar_deleted_ads');
+      if (deletedRaw) {
+        deletedAdsMap = JSON.parse(deletedRaw);
+      }
+    } catch {}
   }
 
+  if (deletedAdsMap[String(id)]) return null;
   const all = [...userCustomListings, ...SEED_LISTINGS];
   return all.find((item) => String(item.id) === String(id)) || null;
 }

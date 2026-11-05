@@ -1,14 +1,12 @@
 {
-  "timestamp": "2026-10-26T04:49:02.454Z",
+  "timestamp": "2026-11-05T06:14:38.660Z",
   "targetProject": "sellsolar",
   "summaryNotes": [
     "Token Status: [{\"code\":1000,\"message\":\"Invalid API Token\"}]",
     "Found 1 Cloudflare Pages project(s): sellsolar",
-    "Project \"sellsolar\" custom domains: sellsolar.pk (status: pending, ssl: unknown), www.sellsolar.pk (status: pending, ssl: unknown)",
-    "Domain \"sellsolar.pk\" details: status=pending, cert=undefined, verification={\"status\":\"pending\",\"error_message\":\"CNAME record not set\"}",
-    "Re-add \"sellsolar.pk\": Success (Provisioned)",
-    "Domain \"www.sellsolar.pk\" details: status=pending, cert=undefined, verification={\"status\":\"pending\",\"error_message\":\"CNAME record not set\"}",
-    "Re-add \"www.sellsolar.pk\": Success (Provisioned)",
+    "Project \"sellsolar\" custom domains: sellsolar.pk (status: deactivated, ssl: unknown), www.sellsolar.pk (status: deactivated, ssl: unknown)",
+    "Domain \"sellsolar.pk\" details: status=deactivated, cert=undefined, verification={\"status\":\"deactivated\"}",
+    "Domain \"www.sellsolar.pk\" details: status=deactivated, cert=undefined, verification={\"status\":\"deactivated\"}",
     "Zone ID for sellsolar.pk: ae99ef284906dbb7a46869b83c21e2e9",
     "DNS records lookup: [{\"code\":10000,\"message\":\"Authentication error\",\"documentation_url\":\"https://developers.cloudflare.com/api/resources/dns/subresources/records/methods/list\"}]",
     "Cache Purge for sellsolar.pk: [{\"code\":10000,\"message\":\"Authentication error\"}]"

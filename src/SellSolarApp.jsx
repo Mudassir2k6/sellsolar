@@ -6844,11 +6844,25 @@ function _x({
         e.category&&(f=f.eq("category",e.category)),e.brand&&(f=f.eq("brand",e.brand)),e.condition&&(f=f.eq("condition",e.condition)),e.city&&(f=f.eq("city",e.city)),e.minPrice&&(f=f.gte("price",parseFloat(e.minPrice))),e.maxPrice&&(f=f.lte("price",parseFloat(e.maxPrice))),e.query&&(f=f.or(`title.ilike.%${e.query}%,brand.ilike.%${e.query}%,description.ilike.%${e.query}%`));
         const{
           data:m,error:v,count:k
-        }=await f.limit(16);
+        }=await f.limit(100);
         if(!active) return;
         if(!v && m && m.length > 0){
+          let combined = [...m];
+          try {
+            const raw = localStorage.getItem('sellsolar_custom_listings');
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                parsed.forEach((item) => {
+                  if (!combined.some((c) => c.id === item.id)) {
+                    combined.unshift(item);
+                  }
+                });
+              }
+            }
+          } catch {}
           const deletedMap = getDeletedAds();
-          const cleanM = m.filter(item => !deletedMap[String(item.id)]);
+          const cleanM = combined.filter(item => !deletedMap[String(item.id)]);
           s(cleanM);
           d(cleanM.length);
         } else {

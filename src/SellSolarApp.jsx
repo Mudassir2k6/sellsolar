@@ -313,7 +313,7 @@ function Xy({
             className:
               'hidden lg:block bg-gray-950 text-gray-300 text-xs py-1.5 border-b border-gray-800',
             children: jsxs('div', {
-              className: 'container-page flex items-center justify-between',
+              className: 'w-full max-w-[1440px] mx-auto px-2 sm:px-4 lg:px-6 flex items-center justify-between',
               children: [
                 jsxs('div', {
                   className: 'flex items-center overflow-hidden whitespace-nowrap text-xs max-w-[68%] group select-none',
@@ -423,10 +423,10 @@ function Xy({
         : null,
 
       jsx('div', {
-        className: 'container-page max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 xl:px-8',
+        className: 'w-full max-w-[1440px] mx-auto px-2 sm:px-4 lg:px-6',
         children: jsxs('div', {
           className:
-            'flex h-16 items-center justify-between gap-1.5 sm:gap-2.5 lg:gap-3',
+            'flex h-16 items-center justify-between gap-1 sm:gap-2 lg:gap-2.5',
           children: [
             // Brand Logo
             jsxs('button', {
@@ -485,12 +485,12 @@ function Xy({
               mobileOpen: isMobileSearchOpen,
               onCloseMobile: () => setIsMobileSearchOpen(!1),
               className:
-                'flex-1 min-w-0 md:min-w-[120px] lg:min-w-[150px] max-w-[240px] lg:max-w-sm xl:max-w-md mx-1 sm:mx-2 lg:mx-3',
+                'flex-1 min-w-[90px] max-w-[180px] lg:max-w-[220px] xl:max-w-xs mx-1 sm:mx-2 lg:mx-2.5',
             }),
 
             // Desktop Navigation Buttons (hidden on mobile, md:flex)
             jsxs('div', {
-              className: 'hidden md:flex items-center gap-1 lg:gap-1.5 xl:gap-2 shrink-0',
+              className: 'hidden md:flex items-center gap-1 sm:gap-1.5 lg:gap-2 shrink-0',
               children: [
                 jsx('button', {
                   onClick: () => h('prices'),
@@ -532,7 +532,7 @@ function Xy({
                 jsx('button', {
                   onClick: () => h('blog'),
                   id: 'header-blog-btn',
-                  className: `flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all shadow-xs cursor-pointer shrink-0 ${
+                  className: `hidden xl:flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all shadow-xs cursor-pointer shrink-0 ${
                     e === 'blog'
                       ? 'bg-amber-500 text-white shadow-amber-500/25'
                       : 'bg-amber-50/80 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/60 hover:bg-amber-100 dark:hover:bg-amber-900/60'
@@ -631,29 +631,29 @@ function Xy({
                         jsxs('button', {
                           onClick: () => h('post-ad'),
                           className:
-                            'btn-primary inline-flex items-center gap-1 px-2 sm:px-2 lg:px-2.5 py-1.5 text-xs sm:text-sm font-bold shadow-xs shrink-0 cursor-pointer whitespace-nowrap',
+                            'btn-primary inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-bold shadow-xs shrink-0 cursor-pointer whitespace-nowrap',
                           children: [
                             jsx(CirclePlus, {
                               className: 'h-4 w-4 shrink-0 hidden lg:flex',
                             }),
-                            'Post an Ad',
+                            'Post Ad',
                           ],
                         }),
                         jsxs('div', {
-                          className: 'relative',
+                          className: 'relative shrink-0',
                           children: [
                             jsxs('button', {
                               onClick: () => o(!l),
                               className:
-                                'flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer',
+                                'flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-gray-700 px-2 sm:px-2.5 py-1.5 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer shrink-0',
                               children: [
                                 jsx('div', {
                                   className:
-                                    'flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-primary-400 to-primary-600 text-xs font-bold text-white',
+                                    'flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-primary-400 to-primary-600 text-xs font-bold text-white shrink-0',
                                   children: userInitial,
                                 }),
                                 jsx('span', {
-                                  className: 'max-w-[100px] truncate',
+                                  className: 'max-w-[70px] xl:max-w-[90px] truncate hidden sm:inline',
                                   children:
                                     ((w = u == null ? void 0 : u.full_name) ==
                                     null
@@ -661,7 +661,7 @@ function Xy({
                                       : w.split(' ')[0]) || 'User',
                                 }),
                                 jsx(ChevronDown, {
-                                  className: 'h-4 w-4 text-gray-400',
+                                  className: 'h-4 w-4 text-gray-400 shrink-0',
                                 }),
                               ],
                             }),
@@ -833,12 +833,12 @@ function Xy({
                           onClick: () => h('login'),
                           id: 'header-post-ad-btn',
                           className:
-                            'btn-primary inline-flex items-center gap-1.5 px-2.5 sm:px-3 lg:px-3.5 py-1.5 text-xs sm:text-sm font-bold shadow-xs shrink-0 cursor-pointer whitespace-nowrap',
+                            'btn-primary inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-bold shadow-xs shrink-0 cursor-pointer whitespace-nowrap',
                           children: [
                             jsx(CirclePlus, {
                               className: 'h-4 w-4 shrink-0',
                             }),
-                            'Post an Ad',
+                            'Post Ad',
                           ],
                         }),
                       ],

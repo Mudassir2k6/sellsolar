@@ -271,6 +271,8 @@ export function getLocalOrSeedListings(filters = {}) {
   const all = [...userCustomListings, ...SEED_LISTINGS];
 
   return all.filter((item) => {
+    // Hide disabled ads from marketplace display
+    if (item.is_ad_disabled || item.status === 'disabled') return false;
     if (filters.category && item.category !== filters.category) return false;
     if (filters.brand && item.brand !== filters.brand) return false;
     if (filters.condition && item.condition !== filters.condition) return false;

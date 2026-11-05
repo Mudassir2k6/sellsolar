@@ -524,23 +524,20 @@ export default function AdminSuperDashboard({
           .order('created_at', { ascending: false });
         if (!error && Array.isArray(remoteProfiles) && remoteProfiles.length > 0) {
           fetchedSupabaseProfiles = true;
+          let tombstoneCleaned = false;
           remoteProfiles.forEach((rp) => {
             const mapKey = (rp.email || rp.id || '').toLowerCase();
             const rpId = (rp.id || '').toLowerCase();
             const rpEmail = (rp.email || '').toLowerCase();
             const rpPhone = (rp.phone || '').replace(/\D/g, '');
 
-            // Permanent Deletion Filter:
-            // If user has been deleted by administrator, DO NOT show them in the dashboard
-            if (
-              deletedUsersMap[mapKey] ||
-              deletedUsersMap[rpId] ||
-              (rpEmail && deletedUsersMap[rpEmail]) ||
-              (rpPhone && deletedUsersMap[rpPhone]) ||
-              (rp.phone && deletedUsersMap[rp.phone])
-            ) {
-              return;
-            }
+            // Database Reconciliation: If user is actively present in Supabase Cloud DB,
+            // clean any stale deleted tombstones from browser localStorage
+            if (deletedUsersMap[mapKey]) { delete deletedUsersMap[mapKey]; tombstoneCleaned = true; }
+            if (deletedUsersMap[rpId]) { delete deletedUsersMap[rpId]; tombstoneCleaned = true; }
+            if (rpEmail && deletedUsersMap[rpEmail]) { delete deletedUsersMap[rpEmail]; tombstoneCleaned = true; }
+            if (rpPhone && deletedUsersMap[rpPhone]) { delete deletedUsersMap[rpPhone]; tombstoneCleaned = true; }
+            if (rp.phone && deletedUsersMap[rp.phone]) { delete deletedUsersMap[rp.phone]; tombstoneCleaned = true; }
 
             const isDisabled = Boolean(
               disabledUsersMap[mapKey]?.is_disabled ||
@@ -557,7 +554,9 @@ export default function AdminSuperDashboard({
               name: rp.full_name || rp.username || (rp.email ? rp.email.split('@')[0] : 'User'),
               phone: rp.phone || phoneMap[mapKey] || phoneMap[rpId] || '',
               city: cityMap[mapKey] || cityMap[rpId] || rp.city || '',
-              role: (rp.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ? 'super_admin' : (rp.role || 'customer'),
+              role: (rp.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase()
+                ? 'super_admin'
+                : (rp.account_type === 'admin' || rp.is_admin ? 'admin' : (rp.account_type === 'dealer' || rp.is_verified_dealer ? 'dealer' : (rp.role || 'customer'))),
               is_verified_dealer: (rp.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ? false : !!rp.is_verified_dealer,
               account_type: (rp.email || '').toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ? 'admin' : (rp.account_type || 'individual'),
               created_at: rp.created_at || '2026-01-01T00:00:00Z',
@@ -567,19 +566,36 @@ export default function AdminSuperDashboard({
               business_name: rp.business_name || '',
             });
           });
+          if (tombstoneCleaned) {
+            saveDeletedUsers(deletedUsersMap);
+          }
         }
       } catch (sbErr) {
         console.warn('Supabase profiles query error:', sbErr);
       }
     }
 
-    // 1B. Merge Stored Local Users & Seeded User Accounts (so all users like Waqas Nawab are always visible)
+    // 1B. Merge Stored Local Users & Seeded User Accounts (so all users like Naveed Ahmed & Waqas Nawab are always visible)
     const rawUsers = getStoredUsers();
-    // Clear Waqas Nawab from deleted tombstone so he is fully restored
+    // Clear Naveed Ahmed and Waqas Nawab from deleted tombstone so they are fully restored
+    if (deletedUsersMap['naveedahmed.rana@gmail.com'] || deletedUsersMap['14da7000-c6c8-49cd-b942-e8e765c2de71'] || deletedUsersMap['03457649616']) {
+      delete deletedUsersMap['naveedahmed.rana@gmail.com'];
+      delete deletedUsersMap['14da7000-c6c8-49cd-b942-e8e765c2de71'];
+      delete deletedUsersMap['03457649616'];
+      saveDeletedUsers(deletedUsersMap);
+    }
     if (deletedUsersMap['waqas.nawab@ocloudsolutions.net'] || deletedUsersMap['a973b503-5407-40f9-88be-20769bab17ea']) {
       delete deletedUsersMap['waqas.nawab@ocloudsolutions.net'];
       delete deletedUsersMap['a973b503-5407-40f9-88be-20769bab17ea'];
       saveDeletedUsers(deletedUsersMap);
+    }
+    // Ensure Naveed Ahmed is guaranteed present in rawUsers as fallback
+    if (!rawUsers['naveedahmed.rana@gmail.com'] && !rawUsers['14da7000-c6c8-49cd-b942-e8e765c2de71']) {
+      rawUsers['naveedahmed.rana@gmail.com'] = {
+        user: { id: '14da7000-c6c8-49cd-b942-e8e765c2de71', email: 'naveedahmed.rana@gmail.com', user_metadata: { full_name: 'Naveed Ahmed', phone: '03457649616', city: 'Islamabad' } },
+        profile: { id: '14da7000-c6c8-49cd-b942-e8e765c2de71', email: 'naveedahmed.rana@gmail.com', full_name: 'Naveed Ahmed', phone: '03457649616', city: 'Islamabad', account_type: 'individual', is_verified_dealer: false, is_admin: false, created_at: '2026-09-03T06:37:41.494579+00:00' }
+      };
+      saveStoredUsers(rawUsers);
     }
     // Ensure Waqas Nawab is present in rawUsers
     if (!rawUsers['waqas.nawab@ocloudsolutions.net'] && !rawUsers['a973b503-5407-40f9-88be-20769bab17ea']) {
@@ -2235,11 +2251,12 @@ export default function AdminSuperDashboard({
     let newStatus = 'approved';
     const updated = listingsList.map((item) => {
       if (item.id === listingId) {
-        const isCurrentlyActive = !item.is_sold && item.status !== 'inactive' && item.status !== 'sold';
+        const isCurrentlyActive = !item.is_sold && item.status !== 'inactive' && item.status !== 'disabled' && !item.is_ad_disabled;
         newStatus = isCurrentlyActive ? 'inactive' : 'approved';
         return {
           ...item,
           status: newStatus,
+          is_ad_disabled: newStatus === 'inactive',
           is_sold: false,
         };
       }
@@ -2254,7 +2271,7 @@ export default function AdminSuperDashboard({
       try {
         await supabase
           .from('solar_listings')
-          .update({ status: newStatus, is_sold: false })
+          .update({ status: newStatus, is_sold: false, is_ad_disabled: newStatus === 'inactive' })
           .eq('id', listingId);
       } catch (sbErr) {
         console.warn('Supabase toggle active/inactive error:', sbErr);
@@ -2267,6 +2284,7 @@ export default function AdminSuperDashboard({
       type: newStatus === 'approved' ? 'success' : 'info',
     });
   };
+  const handleToggleAdDisabled = handleToggleActiveInactive;
 
   // Save Profile Info
   const handleSaveProfile = async (e) => {
@@ -3729,7 +3747,7 @@ export default function AdminSuperDashboard({
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {myAds.slice(0, 3).map((ad) => {
                       const isAdSold = ad.is_sold || ad.status === 'sold';
-                      const isAdInactive = ad.status === 'inactive';
+                      const isAdInactive = ad.status === 'inactive' || ad.status === 'disabled' || ad.is_ad_disabled;
                       return (
                         <div
                           key={ad.id}
@@ -7393,7 +7411,7 @@ export default function AdminSuperDashboard({
             
             const filteredAds = baseList.filter((ad) => {
               if (myAdsFilter === 'active') {
-                if (ad.is_sold || ad.status === 'sold') return false;
+                if (ad.is_sold || ad.status === 'sold' || ad.is_ad_disabled || ad.status === 'disabled') return false;
               } else if (myAdsFilter === 'sold') {
                 if (!ad.is_sold && ad.status !== 'sold') return false;
               } else if (myAdsFilter === 'pending') {
@@ -7402,6 +7420,8 @@ export default function AdminSuperDashboard({
                 if (!ad.is_featured && !ad.featured) return false;
               } else if (myAdsFilter === 'hot_sell') {
                 if (!ad.is_hot_sell) return false;
+              } else if (myAdsFilter === 'disabled') {
+                if (!ad.is_ad_disabled && ad.status !== 'disabled') return false;
               }
 
               if (adsSearchQuery && adsSearchQuery.trim()) {
@@ -7417,10 +7437,11 @@ export default function AdminSuperDashboard({
             });
 
             const totalInScope = baseList.length;
-            const activeInScope = baseList.filter((a) => !a.is_sold && a.status !== 'sold').length;
+            const activeInScope = baseList.filter((a) => !a.is_sold && a.status !== 'sold' && !a.is_ad_disabled && a.status !== 'disabled').length;
             const soldInScope = baseList.filter((a) => a.is_sold || a.status === 'sold').length;
             const pendingInScope = baseList.filter((a) => a.status === 'pending').length;
             const featuredInScope = baseList.filter((a) => a.is_featured || a.featured).length;
+            const disabledInScope = baseList.filter((a) => a.is_ad_disabled || a.status === 'disabled').length;
 
             return (
               <div className="space-y-6">
@@ -7575,6 +7596,19 @@ export default function AdminSuperDashboard({
                         Featured ({featuredInScope})
                       </button>
                     )}
+                    {disabledInScope > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setMyAdsFilter('disabled')}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer shrink-0 ${
+                          myAdsFilter === 'disabled'
+                            ? 'bg-orange-600 text-white shadow-xs'
+                            : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
+                        }`}
+                      >
+                        Disabled ({disabledInScope})
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -7620,6 +7654,7 @@ export default function AdminSuperDashboard({
                       const isSold = ad.is_sold || ad.status === 'sold';
                       const isPending = ad.status === 'pending';
                       const isRejected = ad.status === 'rejected';
+                      const isAdDisabled = ad.is_ad_disabled || ad.status === 'disabled';
                       const contactPhone = ad.seller_phone || ad.phone;
 
                       return (
@@ -7649,7 +7684,9 @@ export default function AdminSuperDashboard({
                                 <div className="flex items-center gap-1 flex-wrap">
                                   <span
                                     className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
-                                      isSold
+                                      isAdDisabled
+                                        ? 'bg-orange-100 dark:bg-orange-950/60 text-orange-700 dark:text-orange-300'
+                                        : isSold
                                         ? 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                                         : isPending
                                         ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300'
@@ -7658,7 +7695,7 @@ export default function AdminSuperDashboard({
                                         : 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300'
                                     }`}
                                   >
-                                    {isSold ? 'Sold' : isPending ? 'Pending' : isRejected ? 'Rejected' : 'Active'}
+                                    {isAdDisabled ? '⏸ Disabled' : isSold ? 'Sold' : isPending ? 'Pending' : isRejected ? 'Rejected' : 'Active'}
                                   </span>
                                   {(ad.is_featured || ad.featured) && (
                                     <span className="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300">
@@ -7747,6 +7784,19 @@ export default function AdminSuperDashboard({
                               {/* Mark Sold Button */}
                               <button
                                 type="button"
+                                onClick={() => handleToggleAdDisabled(ad.id)}
+                                className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-1.5 ${
+                                  isAdDisabled
+                                    ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                                    : 'bg-orange-50 text-orange-700 hover:bg-orange-100 dark:bg-orange-950/50 dark:text-orange-300 border border-orange-200 dark:border-orange-800'
+                                }`}
+                                title={isAdDisabled ? 'Re-enable this ad on marketplace' : 'Pause this ad (hide from marketplace)'}
+                              >
+                                {isAdDisabled ? '▶ Enable Ad' : '⏸ Disable Ad'}
+                              </button>
+
+                              <button
+                                type="button"
                                 onClick={() => handleToggleSold(ad.id)}
                                 className={`py-1.5 px-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
                                   isSold
@@ -7757,7 +7807,10 @@ export default function AdminSuperDashboard({
                               >
                                 {isSold ? 'Sold' : 'Mark Sold'}
                               </button>
+                            </div>
 
+                            {/* Secondary row: Edit + View + Delete */}
+                            <div className="flex items-center gap-1.5">
                               {/* Edit Ad Button */}
                               <button
                                 type="button"
@@ -7768,25 +7821,25 @@ export default function AdminSuperDashboard({
                                 <Edit3 className="w-3.5 h-3.5" />
                                 <span>Edit</span>
                               </button>
-
-                              {/* View on Marketplace */}
                               <button
                                 type="button"
                                 onClick={() => onNavigateToListing?.(ad.id)}
-                                className="p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                                className="flex-1 p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer text-xs font-bold flex items-center justify-center gap-1.5"
                                 title="View on Marketplace"
                               >
-                                <ExternalLink className="w-4 h-4" />
+                                <ExternalLink className="w-3.5 h-3.5" />
+                                <span>View Ad</span>
                               </button>
 
                               {/* Delete Ad Button */}
                               <button
                                 type="button"
                                 onClick={() => (effectiveIsAdmin ? handleDeleteListing(ad.id) : handleDeleteMyAd(ad.id))}
-                                className="p-1.5 rounded-lg border border-rose-200 dark:border-rose-900 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors cursor-pointer"
+                                className="flex-1 p-1.5 rounded-lg border border-rose-200 dark:border-rose-900 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors cursor-pointer text-xs font-bold flex items-center justify-center gap-1.5"
                                 title="Delete Ad Permanently"
                               >
-                                <Trash2 className="w-4 h-4" />
+                                <Trash2 className="w-3.5 h-3.5" />
+                                <span>Delete Ad</span>
                               </button>
                             </div>
 

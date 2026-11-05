@@ -692,10 +692,14 @@ https://sellsolar.pk/calculator`;
                         <input
                           type="number"
                           step="1000"
-                          min="5000"
+                          min="0"
                           max="2000000"
-                          value={monthlyBillPkr}
-                          onChange={(e) => setMonthlyBillPkr(Number(e.target.value))}
+                          value={monthlyBillPkr === 0 ? '' : monthlyBillPkr}
+                          onFocus={(e) => e.target.select()}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/^0+(?=\d)/, '');
+                            setMonthlyBillPkr(val === '' ? 0 : Number(val));
+                          }}
                           placeholder="e.g. 65000"
                           className="w-full pl-11 pr-4 py-3.5 rounded-2xl border-2 border-primary-200 dark:border-primary-800/80 bg-gray-50 dark:bg-gray-800/60 focus:bg-white dark:focus:bg-gray-900 text-lg sm:text-xl font-black text-gray-900 dark:text-white focus:border-primary-500 outline-none transition-all"
                         />
@@ -729,10 +733,14 @@ https://sellsolar.pk/calculator`;
                         <input
                           type="number"
                           step="50"
-                          min="50"
+                          min="0"
                           max="25000"
-                          value={monthlyUnitsPkr}
-                          onChange={(e) => setMonthlyUnitsPkr(Number(e.target.value))}
+                          value={monthlyUnitsPkr === 0 ? '' : monthlyUnitsPkr}
+                          onFocus={(e) => e.target.select()}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/^0+(?=\d)/, '');
+                            setMonthlyUnitsPkr(val === '' ? 0 : Number(val));
+                          }}
                           placeholder="e.g. 1000"
                           className="w-full px-4 py-3.5 rounded-2xl border-2 border-primary-200 dark:border-primary-800/80 bg-gray-50 dark:bg-gray-800/60 focus:bg-white dark:focus:bg-gray-900 text-lg sm:text-xl font-black text-gray-900 dark:text-white focus:border-primary-500 outline-none transition-all"
                         />

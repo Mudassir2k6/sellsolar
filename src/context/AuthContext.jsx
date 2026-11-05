@@ -161,7 +161,9 @@ export function isAccountDeleted(userOrProfileOrEmail) {
     email === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
     id === DEFAULT_ADMIN_ID.toLowerCase() ||
     email === 'mudassir2k6' ||
-    id === 'mudassir2k6'
+    id === 'mudassir2k6' ||
+    email === 'naveedahmed.rana@gmail.com' ||
+    id === '14da7000-c6c8-49cd-b942-e8e765c2de71'
   ) {
     return false;
   }

@@ -5173,21 +5173,47 @@ function yx({
       if (raw) {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed)) {
-          localListings = isPlatformAdmin ? parsed : parsed.filter(item => item.user_id === effectiveUserId || item.user_id === e.id || (r?.full_name && item.seller_name === r.full_name) || (r?.phone && item.seller_phone === r.phone));
+          localListings = isPlatformAdmin
+            ? parsed
+            : parsed.filter(
+                (item) =>
+                  item.user_id === effectiveUserId ||
+                  item.user_id === e.id ||
+                  (e?.email &&
+                    (item.seller_email?.toLowerCase() === e.email.toLowerCase() ||
+                      item.email?.toLowerCase() === e.email.toLowerCase())) ||
+                  (r?.phone &&
+                    String(item.seller_phone || '').replace(/\D/g, '') ===
+                      String(r.phone || '').replace(/\D/g, '') &&
+                    (!item.user_id || item.user_id === effectiveUserId || item.user_id === e.id))
+              );
         }
       }
     } catch (err) {}
 
     const dbListings = P.data || [];
     const combinedMap = new Map();
-    dbListings.forEach(item => combinedMap.set(item.id, item));
-    localListings.forEach(item => {
-      if (!combinedMap.has(item.id)) {
-        combinedMap.set(item.id, item);
-      }
+    const fpMap = new Map();
+    const fingerprint = (item) =>
+      `${String(item.title || '').toLowerCase().trim()}|${Number(item.price) || 0}|${String(item.seller_phone || item.phone || '').replace(/\D/g, '')}`;
+    dbListings.forEach((item) => {
+      combinedMap.set(item.id, item);
+      const fp = fingerprint(item);
+      if (fp) fpMap.set(fp, item.id);
+    });
+    localListings.forEach((item) => {
+      if (combinedMap.has(item.id)) return;
+      const fp = fingerprint(item);
+      if (fp && fpMap.has(fp)) return;
+      combinedMap.set(item.id, item);
+      if (fp) fpMap.set(fp, item.id);
     });
     const deletedMap = getDeletedAds();
-    const combinedListings = Array.from(combinedMap.values()).filter(item => !deletedMap[String(item.id)]);
+    // Keep soft-deleted for owner dashboards; marketplace filters them separately
+    const combinedListings = Array.from(combinedMap.values()).filter((item) => {
+      if (item?.is_deleted === true || item?.status === 'deleted') return true;
+      return !deletedMap[String(item.id)];
+    });
     o(combinedListings);
 
     if (P.error && !P.error.message?.includes("invalid input syntax for type uuid")) {
@@ -6149,6 +6175,10 @@ function yx({
           u("Listing not found");
           return;
         }
+        if (found.is_deleted === true || found.status === 'deleted') {
+          u("This listing has been removed by the seller.");
+          return;
+        }
         const k = found;
         const initialViews = recordAndIncrementAdView(k);
         k.views = initialViews;
@@ -6845,7 +6875,7 @@ function _x({
       try{
         let f=supabase.from("solar_listings").select("*",{
           count:"exact"
-        }).order("featured",{
+        }).eq("is_deleted", false).order("featured",{
           ascending:!1
         }).order("created_at",{
           ascending:!1
@@ -6863,6 +6893,7 @@ function _x({
               const parsed = JSON.parse(raw);
               if (Array.isArray(parsed) && parsed.length > 0) {
                 parsed.forEach((item) => {
+                  if (item?.is_deleted || item?.status === 'deleted') return;
                   if (!combined.some((c) => c.id === item.id)) {
                     combined.unshift(item);
                   }
@@ -6871,7 +6902,7 @@ function _x({
             }
           } catch {}
           const deletedMap = getDeletedAds();
-          const cleanM = combined.filter(item => !deletedMap[String(item.id)]);
+          const cleanM = combined.filter(item => !deletedMap[String(item.id)] && item?.is_deleted !== true && item?.status !== 'deleted');
           s(cleanM);
           d(cleanM.length);
         } else {

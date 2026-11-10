@@ -126,6 +126,12 @@ import {
 } from '../utils/solarImages';
 import { getRealisticAdViews } from '../lib/adViews';
 import { formatListingDate, formatListingDateRelative } from '../lib/dateUtils';
+import {
+  listingBelongsToUser,
+  mergeListingsPreferRemote,
+  dedupeSellerAds,
+  isListingSoftDeleted,
+} from '../lib/listingsOwnership';
 
 const SOLAR_PRESET_IMAGES = [
   { label: 'Solar Field (SVG)', url: SELL_SOLAR_PROMO_IMAGE },
@@ -286,7 +292,7 @@ export default function AdminSuperDashboard({
   const [inboxSearchQuery, setInboxSearchQuery] = useState('');
   const [syncingInbox, setSyncingInbox] = useState(false);
   const [productFilter, setProductFilter] = useState('all'); // 'all' | 'featured' | 'hot_sell' | 'pending' | 'approved'
-  const [myAdsFilter, setMyAdsFilter] = useState('all'); // 'all' | 'active' | 'sold' | 'pending' | 'featured'
+  const [myAdsFilter, setMyAdsFilter] = useState('all'); // 'all' | 'active' | 'sold' | 'pending' | 'featured' | 'deleted'
   const [adsScope, setAdsScope] = useState('all'); // 'all' (All Platform Ads) | 'my' (My Personal Ads)
   const [adsSearchQuery, setAdsSearchQuery] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -506,21 +512,23 @@ export default function AdminSuperDashboard({
     }
   }, [profile, user, resolveActivePhone, resolveActiveCity]);
 
-  // Compute user's personal ads
-  const myAds = useMemo(() => {
+  // Compute user's personal ads (strict ownership + fingerprint dedupe; exclude soft-deleted from main counts)
+  const myAdsAll = useMemo(() => {
     if (!user) return [];
-    const uEmail = user.email?.toLowerCase();
-    const pName = profile?.full_name?.toLowerCase();
-    const pPhone = profile?.phone;
-    return listingsList.filter((item) => {
-      return (
-        item.user_id === user.id ||
-        (uEmail && (item.seller_email?.toLowerCase() === uEmail || item.email?.toLowerCase() === uEmail)) ||
-        (pName && item.seller_name?.toLowerCase() === pName) ||
-        (pPhone && item.seller_phone === pPhone)
-      );
-    });
+    return dedupeSellerAds(
+      listingsList.filter((item) => listingBelongsToUser(item, user, profile))
+    );
   }, [listingsList, user, profile]);
+
+  const myAds = useMemo(
+    () => myAdsAll.filter((item) => !isListingSoftDeleted(item)),
+    [myAdsAll]
+  );
+
+  const myDeletedAds = useMemo(
+    () => myAdsAll.filter((item) => isListingSoftDeleted(item)),
+    [myAdsAll]
+  );
 
   // Load users, listings, inquiries
   const loadData = async () => {
@@ -719,28 +727,29 @@ export default function AdminSuperDashboard({
       }
     }
 
+    let localListings = [];
     try {
       const rawListings = localStorage.getItem('sellsolar_custom_listings');
       if (rawListings) {
         const parsed = JSON.parse(rawListings);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          parsed.forEach((localItem) => {
-            if (!fetchedListings.some((r) => r.id === localItem.id)) {
-              fetchedListings.push(localItem);
-            }
-          });
-        }
+        if (Array.isArray(parsed) && parsed.length > 0) localListings = parsed;
       }
     } catch {}
+
+    fetchedListings = mergeListingsPreferRemote(fetchedListings, localListings);
 
     if (!zeroDashboardMode && fetchedListings.length === 0) {
       fetchedListings = [...SEED_LISTINGS];
     }
 
-    // Filter out permanently deleted ads (admin-deleted ads must never reappear)
+    // Keep soft-deleted ads in state (owner "Deleted Ads" tab).
+    // Only hide legacy hard-deleted tombstones that were never soft-deleted in DB.
     const deletedAdsMap = getDeletedAds();
     if (Object.keys(deletedAdsMap).length > 0) {
-      fetchedListings = fetchedListings.filter((item) => !deletedAdsMap[String(item.id)]);
+      fetchedListings = fetchedListings.filter((item) => {
+        if (isListingSoftDeleted(item)) return true;
+        return !deletedAdsMap[String(item.id)];
+      });
     }
     const enrichedListings = fetchedListings.map(l => ({
       ...l,
@@ -2233,71 +2242,146 @@ export default function AdminSuperDashboard({
     });
   };
 
-  // Delete Marketplace Listing (Admin Moderation)
-  const handleDeleteListing = async (listingId) => {
-    if (!confirm('Are you sure you want to permanently delete this marketplace listing?')) return;
-    const updated = listingsList.filter((item) => item.id !== listingId);
-    setListingsList(updated);
-
-    // Permanently mark as deleted so it never reappears (even from SEED data or Supabase cache)
-    markAdAsDeleted(listingId);
-
+  const softDeleteListingInState = (listingId) => {
+    const deletedAt = new Date().toISOString();
+    setListingsList((prev) =>
+      prev.map((item) =>
+        item.id === listingId
+          ? { ...item, is_deleted: true, deleted_at: deletedAt, status: 'deleted' }
+          : item
+      )
+    );
     try {
-      // Also remove from local custom listings store
       const raw = localStorage.getItem('sellsolar_custom_listings');
       if (raw) {
         const parsed = JSON.parse(raw);
-        const filtered = Array.isArray(parsed) ? parsed.filter((item) => item.id !== listingId) : [];
-        localStorage.setItem('sellsolar_custom_listings', JSON.stringify(filtered));
+        if (Array.isArray(parsed)) {
+          const next = parsed.map((item) =>
+            item.id === listingId
+              ? { ...item, is_deleted: true, deleted_at: deletedAt, status: 'deleted' }
+              : item
+          );
+          localStorage.setItem('sellsolar_custom_listings', JSON.stringify(next));
+        }
       }
     } catch {}
+  };
+
+  // Soft-delete Marketplace Listing (hidden from buyers, stays in DB + Deleted Ads)
+  const handleDeleteListing = async (listingId) => {
+    if (!confirm('Move this listing to Deleted Ads? It will stay in the database but be hidden from all buyers.')) return;
+    softDeleteListingInState(listingId);
+    markAdAsDeleted(listingId);
 
     if (isValidUuid(listingId) && isSupabaseConfigured()) {
       try {
-        await supabase.from('solar_listings').delete().eq('id', listingId);
+        const { error } = await supabase
+          .from('solar_listings')
+          .update({
+            is_deleted: true,
+            deleted_at: new Date().toISOString(),
+            deleted_by: user?.id || null,
+            status: 'deleted',
+          })
+          .eq('id', listingId);
+        if (error) console.warn('Supabase soft-delete listing error:', error.message);
       } catch (sbErr) {
-        console.warn('Supabase delete listing error:', sbErr);
+        console.warn('Supabase soft-delete listing error:', sbErr);
       }
     }
 
     showToast({
-      title: 'Listing Deleted',
-      message: 'The listing has been permanently removed from the marketplace.',
+      title: 'Moved to Deleted Ads',
+      message: 'Listing is hidden from the marketplace but kept in the database.',
       type: 'info',
     });
   };
 
-  // Delete Personal Ad
+  // Soft-delete Personal Ad — owner can still see it under Deleted Ads
   const handleDeleteMyAd = async (listingId) => {
-    if (!confirm('Are you sure you want to remove this solar ad?')) return;
-    const updated = listingsList.filter((item) => item.id !== listingId);
-    setListingsList(updated);
-
-    // Permanently mark as deleted so it never reappears after refresh
+    if (!confirm('Delete this solar ad? It will move to Deleted Ads and hide from all other users. It stays in the database.')) return;
+    softDeleteListingInState(listingId);
     markAdAsDeleted(listingId);
 
+    if (isValidUuid(listingId) && isSupabaseConfigured()) {
+      try {
+        const { error } = await supabase
+          .from('solar_listings')
+          .update({
+            is_deleted: true,
+            deleted_at: new Date().toISOString(),
+            deleted_by: user?.id || null,
+            status: 'deleted',
+          })
+          .eq('id', listingId);
+        if (error) console.warn('Supabase soft-delete my ad error:', error.message);
+      } catch (sbErr) {
+        console.warn('Supabase soft-delete my ad error:', sbErr);
+      }
+    }
+
+    showToast({
+      title: 'Moved to Deleted Ads',
+      message: 'Your ad is hidden from buyers. Open Deleted Ads to review it anytime.',
+      type: 'info',
+    });
+  };
+
+  const handleRestoreMyAd = async (listingId) => {
+    const restoredAt = new Date().toISOString();
+    setListingsList((prev) =>
+      prev.map((item) =>
+        item.id === listingId
+          ? { ...item, is_deleted: false, deleted_at: null, deleted_by: null, status: 'approved' }
+          : item
+      )
+    );
     try {
+      const tomb = getDeletedAds();
+      if (tomb[String(listingId)]) {
+        delete tomb[String(listingId)];
+        localStorage.setItem('sellsolar_deleted_ads', JSON.stringify(tomb));
+      }
       const raw = localStorage.getItem('sellsolar_custom_listings');
       if (raw) {
         const parsed = JSON.parse(raw);
-        const filtered = Array.isArray(parsed) ? parsed.filter((item) => item.id !== listingId) : [];
-        localStorage.setItem('sellsolar_custom_listings', JSON.stringify(filtered));
+        if (Array.isArray(parsed)) {
+          localStorage.setItem(
+            'sellsolar_custom_listings',
+            JSON.stringify(
+              parsed.map((item) =>
+                item.id === listingId
+                  ? { ...item, is_deleted: false, deleted_at: null, status: 'approved' }
+                  : item
+              )
+            )
+          );
+        }
       }
     } catch {}
 
     if (isValidUuid(listingId) && isSupabaseConfigured()) {
       try {
-        await supabase.from('solar_listings').delete().eq('id', listingId);
+        await supabase
+          .from('solar_listings')
+          .update({
+            is_deleted: false,
+            deleted_at: null,
+            deleted_by: null,
+            status: 'approved',
+          })
+          .eq('id', listingId);
       } catch (sbErr) {
-        console.warn('Supabase delete my ad error:', sbErr);
+        console.warn('Supabase restore ad error:', sbErr);
       }
     }
 
     showToast({
-      title: 'Ad Removed',
-      message: 'Your listing has been removed from SellSolar.',
-      type: 'info',
+      title: 'Ad Restored',
+      message: 'Your listing is live on the marketplace again.',
+      type: 'success',
     });
+    void restoredAt;
   };
 
   // Edit & Save Listing (Update Ad live to Supabase + Local)
@@ -3856,6 +3940,19 @@ export default function AdminSuperDashboard({
                     </button>
                   )}
                 </div>
+
+                {myDeletedAds.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMyAdsFilter('deleted');
+                      selectTab('my-ads');
+                    }}
+                    className="w-full mb-3 px-3 py-2 rounded-xl border border-rose-200 dark:border-rose-900/50 bg-rose-50/70 dark:bg-rose-950/30 text-left text-xs font-bold text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-950/50 transition-colors cursor-pointer"
+                  >
+                    {myDeletedAds.length} Deleted Ad{myDeletedAds.length === 1 ? '' : 's'} — open Deleted Ads
+                  </button>
+                )}
 
                 {myAds.length === 0 ? (
                   <div className="py-8 text-center border border-dashed border-gray-200 dark:border-gray-800 rounded-xl">
@@ -7546,9 +7643,18 @@ export default function AdminSuperDashboard({
           {/* TAB: MY SOLAR ADS & PLATFORM EQUIPMENT */}
           {activeTab === 'my-ads' && (() => {
             const currentScope = (effectiveIsAdmin && adsScope === 'all') ? 'all' : 'my';
-            const baseList = currentScope === 'all' ? listingsList : myAds;
+            const baseList =
+              currentScope === 'all'
+                ? listingsList.filter((ad) => !isListingSoftDeleted(ad) || myAdsFilter === 'deleted')
+                : myAdsFilter === 'deleted'
+                  ? myDeletedAds
+                  : myAds;
             
             const filteredAds = baseList.filter((ad) => {
+              if (myAdsFilter === 'deleted') {
+                return isListingSoftDeleted(ad);
+              }
+              if (isListingSoftDeleted(ad)) return false;
               if (myAdsFilter === 'active') {
                 if (ad.is_sold || ad.status === 'sold' || ad.is_ad_disabled || ad.status === 'disabled') return false;
               } else if (myAdsFilter === 'sold') {
@@ -7575,12 +7681,20 @@ export default function AdminSuperDashboard({
               return true;
             });
 
-            const totalInScope = baseList.length;
-            const activeInScope = baseList.filter((a) => !a.is_sold && a.status !== 'sold' && !a.is_ad_disabled && a.status !== 'disabled').length;
-            const soldInScope = baseList.filter((a) => a.is_sold || a.status === 'sold').length;
-            const pendingInScope = baseList.filter((a) => a.status === 'pending').length;
-            const featuredInScope = baseList.filter((a) => a.is_featured || a.featured).length;
-            const disabledInScope = baseList.filter((a) => a.is_ad_disabled || a.status === 'disabled').length;
+            const liveScope =
+              currentScope === 'all'
+                ? listingsList.filter((a) => !isListingSoftDeleted(a))
+                : myAds;
+            const deletedInScope =
+              currentScope === 'all'
+                ? listingsList.filter((a) => isListingSoftDeleted(a)).length
+                : myDeletedAds.length;
+            const totalInScope = liveScope.length;
+            const activeInScope = liveScope.filter((a) => !a.is_sold && a.status !== 'sold' && !a.is_ad_disabled && a.status !== 'disabled').length;
+            const soldInScope = liveScope.filter((a) => a.is_sold || a.status === 'sold').length;
+            const pendingInScope = liveScope.filter((a) => a.status === 'pending').length;
+            const featuredInScope = liveScope.filter((a) => a.is_featured || a.featured).length;
+            const disabledInScope = liveScope.filter((a) => a.is_ad_disabled || a.status === 'disabled').length;
 
             return (
               <div className="space-y-6">
@@ -7735,6 +7849,17 @@ export default function AdminSuperDashboard({
                         Featured ({featuredInScope})
                       </button>
                     )}
+                    <button
+                      type="button"
+                      onClick={() => setMyAdsFilter('deleted')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer shrink-0 ${
+                        myAdsFilter === 'deleted'
+                          ? 'bg-rose-600 text-white shadow-xs'
+                          : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
+                      }`}
+                    >
+                      Deleted Ads ({deletedInScope})
+                    </button>
                     {disabledInScope > 0 && (
                       <button
                         type="button"
@@ -7979,16 +8104,27 @@ export default function AdminSuperDashboard({
                                 <span>View Ad</span>
                               </button>
 
-                              {/* Delete Ad Button */}
-                              <button
-                                type="button"
-                                onClick={() => (effectiveIsAdmin ? handleDeleteListing(ad.id) : handleDeleteMyAd(ad.id))}
-                                className="flex-1 p-1.5 rounded-lg border border-rose-200 dark:border-rose-900 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors cursor-pointer text-xs font-bold flex items-center justify-center gap-1.5"
-                                title="Delete Ad Permanently"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                                <span>Delete Ad</span>
-                              </button>
+                              {isListingSoftDeleted(ad) || myAdsFilter === 'deleted' ? (
+                                <button
+                                  type="button"
+                                  onClick={() => handleRestoreMyAd(ad.id)}
+                                  className="flex-1 p-1.5 rounded-lg border border-emerald-200 dark:border-emerald-900 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 transition-colors cursor-pointer text-xs font-bold flex items-center justify-center gap-1.5"
+                                  title="Restore Ad to Marketplace"
+                                >
+                                  <RotateCcw className="w-3.5 h-3.5" />
+                                  <span>Restore Ad</span>
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => (effectiveIsAdmin ? handleDeleteListing(ad.id) : handleDeleteMyAd(ad.id))}
+                                  className="flex-1 p-1.5 rounded-lg border border-rose-200 dark:border-rose-900 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors cursor-pointer text-xs font-bold flex items-center justify-center gap-1.5"
+                                  title="Move to Deleted Ads (hidden from buyers, stays in DB)"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                  <span>Delete Ad</span>
+                                </button>
+                              )}
                             </div>
 
                             {/* Admin Quick Badges Row */}

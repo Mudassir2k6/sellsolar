@@ -6515,7 +6515,7 @@ function yx({
                     jsx(Eye,{
                       className:"h-3.5 w-3.5 text-amber-400 shrink-0"
                     }),
-                    jsx("span",{className:"tabular-nums font-extrabold text-white"},(viewCount || getRealisticAdViews(r) || 0).toLocaleString()),
+                    jsx("span",{className:"tabular-nums font-extrabold text-white",children:(viewCount || getRealisticAdViews(r) || 0).toLocaleString()}),
                     " views"
                   ]
                 })]
@@ -6572,7 +6572,7 @@ function yx({
                     children:[
                       jsx("span",{className:"inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse shrink-0"}),
                       jsx(Eye,{className:"h-3.5 w-3.5 text-amber-500 shrink-0"}),
-                      jsx("span",{className:"tabular-nums font-black text-gray-900 dark:text-white"},(viewCount || getRealisticAdViews(r) || 0).toLocaleString()),
+                      jsx("span",{className:"tabular-nums font-black text-gray-900 dark:text-white",children:(viewCount || getRealisticAdViews(r) || 0).toLocaleString()}),
                       " views"
                     ]
                   })]

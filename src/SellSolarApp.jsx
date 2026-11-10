@@ -333,10 +333,10 @@ function Xy({
             className:
               'hidden lg:block bg-gray-950 text-gray-300 text-xs py-1.5 border-b border-gray-800',
             children: jsxs('div', {
-              className: 'w-full max-w-[1440px] mx-auto px-2 sm:px-4 lg:px-6 flex items-center justify-between',
+              className: 'w-full max-w-[1440px] mx-auto px-2 sm:px-4 lg:px-6 flex items-center gap-3 overflow-hidden',
               children: [
                 jsxs('div', {
-                  className: 'flex items-center overflow-hidden whitespace-nowrap text-xs max-w-[68%] group select-none',
+                  className: 'flex items-center overflow-hidden whitespace-nowrap text-xs flex-1 min-w-0 group select-none',
                   children: [
                     jsx('style', {
                       dangerouslySetInnerHTML: { __html: `
@@ -402,7 +402,7 @@ function Xy({
                   ]
                 }),
                 jsxs('div', {
-                  className: 'flex items-center gap-5 text-gray-400 font-medium',
+                  className: 'flex items-center gap-2 xl:gap-3 2xl:gap-4 text-gray-400 font-medium shrink-0 whitespace-nowrap',
                   children: [
                     jsx('button', {
                       onClick: () => h('prices'),
@@ -412,23 +412,33 @@ function Xy({
                     }),
                     jsx('button', {
                       onClick: () => h('calculator'),
-                      className: 'hover:text-white transition-colors cursor-pointer',
+                      className: 'hover:text-white transition-colors cursor-pointer hidden xl:inline',
                       children: 'Load Calculator',
                     }),
                     jsx('button', {
                       onClick: () => h('install'),
-                      className: 'hover:text-white transition-colors cursor-pointer',
+                      className: 'hover:text-white transition-colors cursor-pointer hidden 2xl:inline',
                       children: 'Turnkey Installation',
                     }),
                     jsx('button', {
                       onClick: () => h('dealers'),
                       className: 'hover:text-white transition-colors cursor-pointer',
-                      children: 'Verified Dealers',
+                      children: jsxs(Fragment, {
+                        children: [
+                          jsx('span', { className: 'hidden 2xl:inline', children: 'Verified Dealers' }),
+                          jsx('span', { className: '2xl:hidden', children: 'Dealers' }),
+                        ],
+                      }),
                     }),
                     jsx('button', {
                       onClick: () => h('verification'),
                       className: 'hover:text-emerald-400 text-emerald-400/90 font-semibold transition-colors cursor-pointer flex items-center gap-1',
-                      children: 'Verify Solar Plates',
+                      children: jsxs(Fragment, {
+                        children: [
+                          jsx('span', { className: 'hidden 2xl:inline', children: 'Verify Solar Plates' }),
+                          jsx('span', { className: '2xl:hidden', children: 'Verify Plates' }),
+                        ],
+                      }),
                     }),
                     jsx('button', {
                       onClick: () => h('blog'),
@@ -505,54 +515,62 @@ function Xy({
               mobileOpen: isMobileSearchOpen,
               onCloseMobile: () => setIsMobileSearchOpen(!1),
               className:
-                'flex-1 min-w-[90px] max-w-[180px] lg:max-w-[220px] xl:max-w-xs mx-1 sm:mx-2 lg:mx-2.5',
+                'flex-1 min-w-[72px] max-w-[140px] lg:max-w-[180px] xl:max-w-[220px] 2xl:max-w-xs mx-1 sm:mx-1.5 lg:mx-2',
             }),
 
             // Desktop Navigation Buttons (hidden on mobile, md:flex)
             jsxs('div', {
-              className: 'hidden md:flex items-center gap-1 sm:gap-1.5 lg:gap-2 shrink-0',
+              className: 'hidden md:flex items-center gap-1 lg:gap-1.5 shrink-0',
               children: [
-                jsx('button', {
+                jsxs('button', {
                   onClick: () => h('prices'),
-                  className: `flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all shadow-xs cursor-pointer shrink-0 ${
+                  id: 'header-today-rates-btn',
+                  className: `relative isolate overflow-visible flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all shadow-xs cursor-pointer shrink-0 ${
                     e === 'prices'
                       ? 'bg-amber-500 text-white shadow-amber-500/25'
                       : 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/60 hover:bg-amber-100 dark:hover:bg-amber-900/60'
                   }`,
-                  children: jsxs(Fragment, {
-                    children: [
-                      jsxs('span', {
-                        className: 'relative flex h-2 w-2 shrink-0',
-                        children: [
-                          jsx('span', {
-                            className:
-                              'absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75',
-                          }),
-                          jsx('span', {
-                            className:
-                              'relative inline-flex h-2 w-2 rounded-full bg-amber-500',
-                          }),
-                        ],
-                      }),
-                      jsx('span', {
-                        className: 'whitespace-nowrap',
-                        children: "Today's Rates",
-                      }),
-                      jsx('span', {
-                        className: `hidden xl:inline rounded px-1.5 py-0.5 text-[10px] font-extrabold uppercase ${
-                          e === 'prices'
-                            ? 'bg-white/20 text-white'
-                            : 'bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-200'
-                        }`,
-                        children: 'LIVE',
-                      }),
-                    ],
-                  }),
+                  children: [
+                    // WhatsApp-style pulse rings around the whole button
+                    jsx('span', {
+                      'aria-hidden': true,
+                      className: 'pointer-events-none absolute inset-0 -z-10 rounded-lg bg-amber-400/50 animate-ping opacity-40',
+                    }),
+                    jsx('span', {
+                      'aria-hidden': true,
+                      className: 'pointer-events-none absolute -inset-1 -z-10 rounded-xl bg-amber-400/25 animate-pulse',
+                    }),
+                    jsxs('span', {
+                      className: 'relative flex h-2 w-2 shrink-0',
+                      children: [
+                        jsx('span', {
+                          className:
+                            'absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75',
+                        }),
+                        jsx('span', {
+                          className:
+                            'relative inline-flex h-2 w-2 rounded-full bg-amber-500',
+                        }),
+                      ],
+                    }),
+                    jsx('span', {
+                      className: 'relative z-10 whitespace-nowrap',
+                      children: "Today's Rates",
+                    }),
+                    jsx('span', {
+                      className: `relative z-10 hidden xl:inline rounded px-1.5 py-0.5 text-[10px] font-extrabold uppercase ${
+                        e === 'prices'
+                          ? 'bg-white/20 text-white'
+                          : 'bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-200'
+                      }`,
+                      children: 'LIVE',
+                    }),
+                  ],
                 }),
                 jsx('button', {
                   onClick: () => h('blog'),
                   id: 'header-blog-btn',
-                  className: `flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all shadow-xs cursor-pointer shrink-0 ${
+                  className: `hidden xl:flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all shadow-xs cursor-pointer shrink-0 ${
                     e === 'blog'
                       ? 'bg-amber-500 text-white shadow-amber-500/25'
                       : 'bg-amber-50/80 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/60 hover:bg-amber-100 dark:hover:bg-amber-900/60'
@@ -575,7 +593,7 @@ function Xy({
                 }),
                 jsx('button', {
                   onClick: () => h('calculator'),
-                  className: `flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 ${
+                  className: `hidden lg:flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 ${
                     e === 'calculator'
                       ? 'bg-primary-500 text-white shadow-xs shadow-primary-500/20'
                       : 'bg-primary-50 dark:bg-primary-950/40 text-primary-800 dark:text-primary-300 border border-primary-200/70 dark:border-primary-800/60 hover:bg-primary-100 dark:hover:bg-primary-900/60'
@@ -590,19 +608,19 @@ function Xy({
                         }`,
                       }),
                       jsx('span', {
-                        className: 'whitespace-nowrap hidden xl:inline',
+                        className: 'whitespace-nowrap hidden 2xl:inline',
                         children: 'Load Calculator',
                       }),
                       jsx('span', {
-                        className: 'whitespace-nowrap xl:hidden',
-                        children: 'Calculator',
+                        className: 'whitespace-nowrap 2xl:hidden',
+                        children: 'Calc',
                       }),
                     ],
                   }),
                 }),
                 jsx('button', {
                   onClick: () => h('dealers'),
-                  className: `flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 ${
+                  className: `hidden lg:flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 ${
                     e === 'dealers'
                       ? 'bg-sky-600 text-white shadow-xs shadow-sky-600/20'
                       : 'bg-sky-50 dark:bg-sky-950/40 text-sky-800 dark:text-sky-300 border border-sky-200/70 dark:border-sky-800/60 hover:bg-sky-100 dark:hover:bg-sky-900/60'
@@ -617,11 +635,11 @@ function Xy({
                         }`,
                       }),
                       jsx('span', {
-                        className: 'whitespace-nowrap hidden xl:inline',
+                        className: 'whitespace-nowrap hidden 2xl:inline',
                         children: 'Verified Dealers',
                       }),
                       jsx('span', {
-                        className: 'whitespace-nowrap xl:hidden',
+                        className: 'whitespace-nowrap 2xl:hidden',
                         children: 'Dealers',
                       }),
                     ],
@@ -629,7 +647,7 @@ function Xy({
                 }),
                 jsx('button', {
                   onClick: () => h('verification'),
-                  className: `flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 ${
+                  className: `hidden xl:flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 ${
                     e === 'verification' || e === 'tier-1-verification' || e === 'panel-verification'
                       ? 'bg-emerald-600 text-white shadow-xs shadow-emerald-600/20'
                       : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60'
@@ -644,19 +662,15 @@ function Xy({
                         }`,
                       }),
                       jsx('span', {
-                        className: 'whitespace-nowrap hidden xl:inline',
+                        className: 'whitespace-nowrap',
                         children: 'Verify Plates',
-                      }),
-                      jsx('span', {
-                        className: 'whitespace-nowrap xl:hidden',
-                        children: 'Verify',
                       }),
                     ],
                   }),
                 }),
                 jsx('button', {
                   onClick: () => h('install'),
-                  className: `flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 ${
+                  className: `hidden 2xl:flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 ${
                     e === 'install'
                       ? 'bg-secondary-600 text-white shadow-xs shadow-secondary-600/20'
                       : 'bg-secondary-50 dark:bg-secondary-950/40 text-secondary-800 dark:text-secondary-300 border border-secondary-200/70 dark:border-secondary-800/60 hover:bg-secondary-100 dark:hover:bg-secondary-900/60'
@@ -708,7 +722,7 @@ function Xy({
                                   children: userInitial,
                                 }),
                                 jsx('span', {
-                                  className: 'max-w-[120px] sm:max-w-[140px] md:max-w-[160px] lg:max-w-[200px] truncate hidden sm:inline',
+                                  className: 'hidden sm:inline whitespace-nowrap text-xs sm:text-sm font-semibold max-w-[9rem] md:max-w-[11rem] lg:max-w-[14rem] overflow-hidden text-ellipsis',
                                   title: displayUserName,
                                   children: displayUserName,
                                 }),

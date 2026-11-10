@@ -174,18 +174,20 @@ function MarqueeStyles() {
       }
       .ad-marquee-track {
         width: max-content;
-        animation: adMarquee 38s linear infinite;
+        /* Match top LIVE RATES ticker pace (280s for -50% seamless loop) */
+        animation: adMarquee 280s linear infinite;
+        will-change: transform;
       }
       .ad-marquee-track--reverse {
         animation-direction: reverse;
-        animation-duration: 42s;
+        animation-duration: 300s;
       }
       .ad-marquee-track:hover {
         animation-play-state: paused;
       }
       @media (prefers-reduced-motion: reduce) {
         .ad-marquee-track {
-          animation-duration: 120s;
+          animation-duration: 420s;
         }
       }
     `}</style>

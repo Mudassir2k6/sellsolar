@@ -708,12 +708,9 @@ function Xy({
                                   children: userInitial,
                                 }),
                                 jsx('span', {
-                                  className: 'max-w-[70px] xl:max-w-[90px] truncate hidden sm:inline',
-                                  children:
-                                    ((w = u == null ? void 0 : u.full_name) ==
-                                    null
-                                      ? void 0
-                                      : w.split(' ')[0]) || 'User',
+                                  className: 'max-w-[120px] sm:max-w-[140px] md:max-w-[160px] lg:max-w-[200px] truncate hidden sm:inline',
+                                  title: displayUserName,
+                                  children: displayUserName,
                                 }),
                                 jsx(ChevronDown, {
                                   className: 'h-4 w-4 text-gray-400 shrink-0',
@@ -1047,11 +1044,9 @@ function Xy({
                                 children: [
                                   jsx('h3', {
                                     className:
-                                      'text-sm font-extrabold text-gray-900 dark:text-white truncate',
-                                    children:
-                                      ((u?.full_name) && !String(u.full_name).toLowerCase().includes('mudassir'))
-                                        ? u.full_name
-                                        : (isUserAdmin ? 'SellSolar Administrator' : 'Solar User'),
+                                      'text-sm font-extrabold text-gray-900 dark:text-white break-words leading-snug',
+                                    title: displayUserName,
+                                    children: displayUserName === 'Admin' ? 'SellSolar Administrator' : displayUserName,
                                   }),
                                   jsx('p', {
                                     className:

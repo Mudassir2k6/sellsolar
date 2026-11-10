@@ -17,7 +17,6 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { CITIES } from '../lib/constants';
-import { supabase } from '../lib/supabase';
 import {
   VERIFIED_DEALERS,
   REGISTRATION_SOURCES,
@@ -33,64 +32,32 @@ export default function DealersPage({ onNavigate, onBack, hasOuterNavbar = false
   const [searchQuery, setSearchQuery] = useState('');
   const [verifiedOnly, setVerifiedOnly] = useState(false);
 
-  // Fetch any live dealers from Supabase profiles and merge with verified seed dealers
+  // Fetch DB dealers + registered dealer profiles + admin-saved dealers, merge with seed directory
   useEffect(() => {
     let isMounted = true;
 
     async function loadRemoteDealers() {
       try {
-        let query = supabase
-          .from('profiles')
-          .select('*')
-          .eq('account_type', 'dealer');
-
-        if (selectedSource && selectedSource !== 'all') {
-          query = query.eq('registration_source', selectedSource);
-        }
-
-        const { data, error } = await query.limit(100);
-
-        if (!error && Array.isArray(data) && data.length > 0 && isMounted) {
-          // Normalize remote dealer records
-          const remoteNormalized = data.map((d) => ({
-            id: d.id,
-            business_name: d.business_name || d.full_name || 'Solar Dealer',
-            full_name: d.full_name || 'Authorized Representative',
-            city: d.city || 'Pakistan',
-            phone: d.phone || '',
-            business_address: d.business_address || 'Verified Commercial Location',
-            cnic: d.cnic || null,
-            is_verified_dealer: !!d.is_verified_dealer,
-            registration_source: d.registration_source || 'self_registered',
-            brands: d.brands || ['Longi', 'Inverex', 'Growatt'],
-            specialties: d.specialties || 'Turnkey Solar Installation & Wholesale',
-            rating: d.rating || 4.8,
-            reviews_count: d.reviews_count || 15,
-            established_year: d.established_year || 2020,
-            tier: d.is_verified_dealer ? 'Verified Dealer' : 'Registered Dealer'
-          }));
-
-          // Merge: remote first, then seed items that don't match existing phone or business name
-          const phoneSet = new Set(remoteNormalized.map((r) => r.phone).filter(Boolean));
-          const nameSet = new Set(remoteNormalized.map((r) => r.business_name?.toLowerCase().trim()));
-
-          const remainingSeeds = VERIFIED_DEALERS.filter(
-            (seed) => !phoneSet.has(seed.phone) && !nameSet.has(seed.business_name?.toLowerCase().trim())
-          );
-
-          setDealersList([...remoteNormalized, ...remainingSeeds]);
-        }
+        const { fetchAllDealersMerged } = await import('../data/seedDealers');
+        const merged = await fetchAllDealersMerged(VERIFIED_DEALERS);
+        if (!isMounted) return;
+        setDealersList(Array.isArray(merged) && merged.length > 0 ? merged : VERIFIED_DEALERS);
       } catch (err) {
         console.warn('[DealersPage] Supabase load note:', err?.message);
       }
     }
 
     loadRemoteDealers();
+    const onDealersUpdated = () => loadRemoteDealers();
+    window.addEventListener('sellsolar_dealers_updated', onDealersUpdated);
+    window.addEventListener('sellsolar_users_updated', onDealersUpdated);
 
     return () => {
       isMounted = false;
+      window.removeEventListener('sellsolar_dealers_updated', onDealersUpdated);
+      window.removeEventListener('sellsolar_users_updated', onDealersUpdated);
     };
-  }, [selectedSource]);
+  }, []);
 
   // Filtered dataset
   const filteredDealers = useMemo(() => {

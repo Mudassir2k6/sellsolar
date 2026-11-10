@@ -19,13 +19,18 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { VERIFIED_DEALERS, getCityDealerCounts } from '../data/dealersData';
-import { CUSTOM_DEALERS_STORAGE_KEY, saveCustomDealer } from '../data/seedDealers';
+import {
+  fetchAllDealersMerged,
+  upsertDealerToDatabase,
+  deleteDealerFromDatabase,
+} from '../data/seedDealers';
 import { useToast } from '../context/ToastContext';
 import { CITIES } from '../lib/constants';
 
 export default function AdminDealersModule() {
   const { showToast } = useToast();
   const [dealers, setDealers] = useState([]);
+  const [loadingDealers, setLoadingDealers] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCity, setSelectedCity] = useState('all');
   const [selectedSource, setSelectedSource] = useState('all');
@@ -45,27 +50,28 @@ export default function AdminDealersModule() {
     is_verified_dealer: true,
   });
 
-  const loadAllDealers = () => {
-    let custom = [];
-    if (typeof window !== 'undefined') {
-      try {
-        const raw = localStorage.getItem(CUSTOM_DEALERS_STORAGE_KEY);
-        if (raw) custom = JSON.parse(raw);
-      } catch (err) {
-        console.warn('Failed loading custom dealers:', err);
-      }
+  const loadAllDealers = async () => {
+    setLoadingDealers(true);
+    try {
+      const merged = await fetchAllDealersMerged(VERIFIED_DEALERS);
+      setDealers(merged);
+    } catch (err) {
+      console.warn('Failed loading dealers:', err);
+      setDealers(VERIFIED_DEALERS);
+    } finally {
+      setLoadingDealers(false);
     }
-
-    const customPhones = new Set(custom.map((c) => c.phone).filter(Boolean));
-    const combined = [
-      ...custom,
-      ...VERIFIED_DEALERS.filter((d) => !customPhones.has(d.phone)),
-    ];
-    setDealers(combined);
   };
 
   useEffect(() => {
     loadAllDealers();
+    const onDealersUpdated = () => loadAllDealers();
+    window.addEventListener('sellsolar_dealers_updated', onDealersUpdated);
+    window.addEventListener('sellsolar_users_updated', onDealersUpdated);
+    return () => {
+      window.removeEventListener('sellsolar_dealers_updated', onDealersUpdated);
+      window.removeEventListener('sellsolar_users_updated', onDealersUpdated);
+    };
   }, []);
 
   const filteredDealers = useMemo(() => {
@@ -89,18 +95,24 @@ export default function AdminDealersModule() {
     });
   }, [dealers, selectedCity, selectedSource, searchQuery]);
 
-  const handleToggleVerification = (dealer) => {
-    const updated = { ...dealer, is_verified_dealer: !dealer.is_verified_dealer };
-    saveCustomDealer(updated);
-    setDealers((prev) => prev.map((d) => (d.id === dealer.id ? updated : d)));
+  const handleToggleVerification = async (dealer) => {
+    const updated = {
+      ...dealer,
+      is_verified_dealer: !dealer.is_verified_dealer,
+      tier: !dealer.is_verified_dealer ? 'Verified Dealer' : 'Registered Dealer',
+      updated_at: new Date().toISOString(),
+    };
+    const res = await upsertDealerToDatabase(updated);
+    setDealers((prev) => prev.map((d) => (d.id === dealer.id ? res.dealer : d)));
+    window.dispatchEvent(new Event('sellsolar_dealers_updated'));
     showToast({
       title: updated.is_verified_dealer ? 'Dealer Verified' : 'Verification Revoked',
-      message: `${dealer.business_name} status updated live.`,
+      message: `${dealer.business_name} ${res.synced ? 'synced to database' : 'saved locally'}.`,
       type: 'success',
     });
   };
 
-  const handleSaveDealer = (e) => {
+  const handleSaveDealer = async (e) => {
     e?.preventDefault();
     if (!dealerForm.business_name.trim() || !dealerForm.phone.trim()) {
       showToast({ title: 'Validation Error', message: 'Business name and phone are required.', type: 'error' });
@@ -129,10 +141,13 @@ export default function AdminDealersModule() {
       rating: 4.9,
       reviews_count: 12,
       created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      source_table: 'dealers',
     };
 
-    saveCustomDealer(newDealer);
-    loadAllDealers();
+    const res = await upsertDealerToDatabase(newDealer);
+    await loadAllDealers();
+    window.dispatchEvent(new Event('sellsolar_dealers_updated'));
     setIsAddingDealer(false);
     setEditingDealerId(null);
     setDealerForm({
@@ -150,7 +165,7 @@ export default function AdminDealersModule() {
 
     showToast({
       title: editingDealerId ? 'Dealer Updated' : 'Dealer Added',
-      message: `${newDealer.business_name} is live in the Verified Dealers Directory.`,
+      message: `${newDealer.business_name} is live in Admin + Dealers directory${res.synced ? ' (DB synced)' : ''}.`,
       type: 'success',
     });
   };
@@ -172,14 +187,12 @@ export default function AdminDealersModule() {
     setIsAddingDealer(true);
   };
 
-  const handleDeleteDealer = (dealerId) => {
+  const handleDeleteDealer = async (dealerId) => {
     if (!confirm('Are you sure you want to delete this dealer?')) return;
     try {
-      const raw = localStorage.getItem(CUSTOM_DEALERS_STORAGE_KEY);
-      let list = raw ? JSON.parse(raw) : [];
-      list = list.filter((d) => d.id !== dealerId);
-      localStorage.setItem(CUSTOM_DEALERS_STORAGE_KEY, JSON.stringify(list));
-      loadAllDealers();
+      await deleteDealerFromDatabase(dealerId);
+      await loadAllDealers();
+      window.dispatchEvent(new Event('sellsolar_dealers_updated'));
       showToast({ title: 'Dealer Removed', message: 'Dealer deleted from directory.', type: 'info' });
     } catch (err) {
       showToast({ title: 'Error', message: err.message, type: 'error' });
@@ -197,7 +210,7 @@ export default function AdminDealersModule() {
               Verified Solar Dealers Directory
             </h1>
             <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary-100 dark:bg-primary-950/60 text-primary-700 dark:text-primary-300">
-              {dealers.length} Dealers Active
+              {loadingDealers ? 'Syncing…' : `${dealers.length} Dealers Active`}
             </span>
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">

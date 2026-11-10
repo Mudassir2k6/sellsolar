@@ -1092,10 +1092,39 @@ export default function AdminSuperDashboard({
       if (updateUserRole) {
         await updateUserRole(userIdOrEmail, newRole);
       }
+      if (newRole === 'dealer') {
+        try {
+          const { upsertDealerToDatabase } = await import('../data/seedDealers');
+          const target = usersList.find(
+            (u) =>
+              u.id === userIdOrEmail ||
+              (u.email && u.email.toLowerCase() === (userIdOrEmail || '').toLowerCase())
+          );
+          if (target) {
+            await upsertDealerToDatabase({
+              id: target.id || userIdOrEmail,
+              business_name: target.business_name || target.full_name || target.name || 'Solar Dealer',
+              full_name: target.full_name || target.name || 'Authorized Representative',
+              phone: target.phone || '',
+              email: target.email || '',
+              city: target.city || 'Pakistan',
+              business_address: target.business_address || '',
+              is_verified_dealer: true,
+              registration_source: 'manual_admin',
+              registered_by_display: 'Admin Role Assignment',
+              tier: 'Verified Dealer',
+              created_at: target.created_at || new Date().toISOString(),
+            });
+            window.dispatchEvent(new Event('sellsolar_dealers_updated'));
+          }
+        } catch (dealerSyncErr) {
+          console.warn('Dealer directory sync notice:', dealerSyncErr);
+        }
+      }
       await loadData();
       showToast({
         title: 'Role Updated',
-        message: `Assigned role updated to ${newRole.toUpperCase()}.`,
+        message: `Assigned role updated to ${newRole.toUpperCase()}${newRole === 'dealer' ? ' — also listed in Dealers directory' : ''}.`,
         type: 'success',
       });
     } catch (err) {
@@ -1269,6 +1298,27 @@ export default function AdminSuperDashboard({
         } catch (sbErr) { console.warn('[AdminDashboard] Supabase insert error:', sbErr); }
       }
       if (updateUserRole) await updateUserRole(cleanMail, role).catch(() => {});
+      if (role === 'dealer') {
+        try {
+          const { upsertDealerToDatabase } = await import('../data/seedDealers');
+          await upsertDealerToDatabase({
+            id: newUserId,
+            business_name: name,
+            full_name: name,
+            phone: phone || '',
+            email: cleanMail,
+            city: city || 'Pakistan',
+            is_verified_dealer: true,
+            registration_source: 'manual_admin',
+            registered_by_display: 'Admin Created Dealer',
+            tier: 'Verified Dealer',
+            created_at: optimisticUser.created_at,
+          });
+          window.dispatchEvent(new Event('sellsolar_dealers_updated'));
+        } catch (dealerSyncErr) {
+          console.warn('New dealer directory sync notice:', dealerSyncErr);
+        }
+      }
       const localUsers = getStoredUsers();
       const ek = Object.keys(localUsers).find(
         (k) => k.toLowerCase() === cleanMail || localUsers[k]?.profile?.email?.toLowerCase() === cleanMail

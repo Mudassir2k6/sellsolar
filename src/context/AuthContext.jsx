@@ -951,6 +951,34 @@ export function AuthProvider({ children }) {
       }
       saveStoredUsers(localUsers);
 
+      const syncDealerDirectory = async () => {
+        if (accountType !== 'dealer') return;
+        try {
+          const { upsertDealerToDatabase } = await import('../data/seedDealers');
+          await upsertDealerToDatabase({
+            id: newId,
+            business_name: cleanBusinessName || cleanFullName || 'Solar Dealer',
+            full_name: cleanFullName || 'Authorized Representative',
+            phone: cleanPhone || '',
+            email: cleanEmail,
+            city: cleanCity || 'Pakistan',
+            business_address: cleanBusinessAddress || '',
+            cnic: cnic || null,
+            is_verified_dealer: false,
+            registration_source: 'self_registered',
+            registered_by_display: 'Self Registered Online',
+            tier: 'Registered Dealer',
+            created_at: newProfile.created_at,
+          });
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new Event('sellsolar_dealers_updated'));
+            window.dispatchEvent(new Event('sellsolar_users_updated'));
+          }
+        } catch (dealerErr) {
+          console.warn('Dealer directory signup sync notice:', dealerErr);
+        }
+      };
+
       // If email confirmation is required, do NOT create an active session yet
       if (needsEmailConfirmation) {
         try {
@@ -958,6 +986,7 @@ export function AuthProvider({ children }) {
         } catch (dbErr) {
           console.warn('Profile sync fallback:', dbErr);
         }
+        await syncDealerDirectory();
         return {
           success: true,
           needsEmailConfirmation: true,
@@ -979,6 +1008,8 @@ export function AuthProvider({ children }) {
           console.warn('Profile sync fallback:', dbErr);
         }
       }
+
+      await syncDealerDirectory();
 
       return {
         success: true,

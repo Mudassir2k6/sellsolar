@@ -132,6 +132,7 @@ import {
   listingBelongsToUser,
   mergeListingsPreferRemote,
   dedupeSellerAds,
+  listingDuplicateKey,
   isListingSoftDeleted,
 } from '../lib/listingsOwnership';
 
@@ -2315,23 +2316,38 @@ export default function AdminSuperDashboard({
   // Soft-delete Personal Ad — owner can still see it under Deleted Ads
   const handleDeleteMyAd = async (listingId) => {
     if (!confirm('Delete this solar ad? It will move to Deleted Ads and hide from all other users. It stays in the database.')) return;
-    softDeleteListingInState(listingId);
-    markAdAsDeleted(listingId);
 
-    if (isValidUuid(listingId) && isSupabaseConfigured()) {
-      try {
-        const { error } = await supabase
-          .from('solar_listings')
-          .update({
-            is_deleted: true,
-            deleted_at: new Date().toISOString(),
-            deleted_by: user?.id || null,
-            status: 'deleted',
-          })
-          .eq('id', listingId);
-        if (error) console.warn('Supabase soft-delete my ad error:', error.message);
-      } catch (sbErr) {
-        console.warn('Supabase soft-delete my ad error:', sbErr);
+    // Delete the ad AND any duplicate copies of it (same seller, title, price, city)
+    const target = listingsList.find((item) => String(item.id) === String(listingId));
+    const targetKey = listingDuplicateKey(target);
+    const idsToDelete = new Set([listingId]);
+    if (targetKey) {
+      listingsList.forEach((item) => {
+        if (listingBelongsToUser(item, user, profile) && listingDuplicateKey(item) === targetKey) {
+          idsToDelete.add(item.id);
+        }
+      });
+    }
+
+    for (const id of idsToDelete) {
+      softDeleteListingInState(id);
+      markAdAsDeleted(id);
+
+      if (isValidUuid(id) && isSupabaseConfigured()) {
+        try {
+          const { error } = await supabase
+            .from('solar_listings')
+            .update({
+              is_deleted: true,
+              deleted_at: new Date().toISOString(),
+              deleted_by: user?.id || null,
+              status: 'deleted',
+            })
+            .eq('id', id);
+          if (error) console.warn('Supabase soft-delete my ad error:', error.message);
+        } catch (sbErr) {
+          console.warn('Supabase soft-delete my ad error:', sbErr);
+        }
       }
     }
 

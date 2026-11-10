@@ -82,17 +82,44 @@ export function mergeListingsPreferRemote(remote = [], local = []) {
   return Array.from(byId.values());
 }
 
+/**
+ * Owner-scoped duplicate key. Ignores contact fields on purpose: the same ad is often
+ * saved twice (cloud row + local copy / double submit) with different phone/email values.
+ */
+export function listingDuplicateKey(listing) {
+  if (!listing) return '';
+  const norm = (v) => String(v || '').toLowerCase().replace(/\s+/g, ' ').trim();
+  return [
+    norm(listing.title),
+    String(Number(listing.price) || 0),
+    norm(listing.city),
+    norm(listing.category),
+    norm(listing.brand),
+  ].join('|');
+}
+
+/** Dedupe ads that belong to ONE seller. Prefers active over soft-deleted, then first seen. */
 export function dedupeSellerAds(listings = []) {
   const byId = new Map();
-  const byFp = new Map();
+  const byKey = new Map();
   for (const item of listings || []) {
     if (!item?.id) continue;
     const id = String(item.id);
     if (byId.has(id)) continue;
-    const fp = listingFingerprint(item);
-    if (fp && byFp.has(fp)) continue;
+    const key = listingDuplicateKey(item);
+    if (key && byKey.has(key)) {
+      const keptId = byKey.get(key);
+      const kept = byId.get(keptId);
+      // Replace a soft-deleted entry with an active duplicate so the ad still shows.
+      if (isListingSoftDeleted(kept) && !isListingSoftDeleted(item)) {
+        byId.delete(keptId);
+        byId.set(id, item);
+        byKey.set(key, id);
+      }
+      continue;
+    }
     byId.set(id, item);
-    if (fp) byFp.set(fp, id);
+    if (key) byKey.set(key, id);
   }
   return Array.from(byId.values());
 }

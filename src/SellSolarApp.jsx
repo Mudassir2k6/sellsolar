@@ -22,7 +22,11 @@ import CustomPageView from './views/CustomPageView';
 import KeywordLandingPage, { KEYWORD_LANDING_KEYS } from './views/KeywordLandingPage';
 import EmailContactModal from './components/EmailContactModal';
 import { applyPageSeo, parseLocation, pageToPath } from './lib/seo';
-import { getInboxMessages } from './services/inboxService';
+import {
+  countUnreadInboxMessages,
+  fetchSharedInboxMessages,
+  getInboxMessages,
+} from './services/inboxService';
 import { getStoredInstallationRequests } from './lib/installation';
 import { MARKET_SUMMARY } from './data/todayPricesData';
 import {
@@ -97,7 +101,14 @@ import {
   X,
   Youtube,
   Zap,
+  CalendarDays,
 } from 'lucide-react';
+import {
+  formatListingDate,
+  formatListingDateRelative,
+  filterListingsByDateRange,
+  LISTING_DATE_RANGES,
+} from './lib/dateUtils';
 import { useAuth, DEFAULT_ADMIN_ID, DEFAULT_ADMIN_EMAIL, getStoredUsers, saveStoredUsers, getUserPhonesMap, saveUserPhonesMap, getDeletedAds, markAdAsDeleted, isAdDeleted } from './context/AuthContext';
 import { useToast } from './context/ToastContext';
 import { supabase, isSupabaseConfigured } from './lib/supabase';
@@ -233,11 +244,11 @@ function Xy({
   useEffect(() => {
     const updateCount = () => {
       try {
-        const msgs = getInboxMessages();
-        setUnreadInboxCount(msgs.filter((m) => !m.is_read).length);
+        setUnreadInboxCount(countUnreadInboxMessages(getInboxMessages()));
       } catch {}
     };
     updateCount();
+    fetchSharedInboxMessages().then(updateCount).catch(() => {});
     window.addEventListener('sellsolar_inbox_updated', updateCount);
     return () =>
       window.removeEventListener('sellsolar_inbox_updated', updateCount);
@@ -2228,7 +2239,18 @@ function ax({
                     children: t.brand || "Solar"
                   })
                 ]
-              })
+              }),
+              t.created_at ? jsxs("div", {
+                className: "mt-1 flex items-center gap-1.5 text-[10px] text-gray-500 dark:text-gray-400",
+                title: `Posted on ${formatListingDate(t.created_at)}`,
+                children: [
+                  jsx(CalendarDays, { className: "h-3 w-3 shrink-0 text-gray-400" }),
+                  jsx("span", {
+                    className: "truncate",
+                    children: `Posted ${formatListingDateRelative(t.created_at)}`
+                  })
+                ]
+              }) : null
             ]
           })
         ]
@@ -2283,13 +2305,16 @@ function ax({
 }
 
 function lx({
-  listings:t,loading:e,error:r,totalCount:n,onSelectListing:s,onResetFilters:rf,onNavigate:nav,currentCondition,onConditionChange,currentCategory,onCategoryChange,isCarousel
+  listings:allListings,loading:e,error:r,totalCount:totalN,onSelectListing:s,onResetFilters:rf,onNavigate:nav,currentCondition,onConditionChange,currentCategory,onCategoryChange,isCarousel
 }){
   const [visibleCount, setVisibleCount] = useState(8);
+  const [dateRange, setDateRange] = useState("all");
+  const t = useMemo(() => filterListingsByDateRange(allListings || [], dateRange), [allListings, dateRange]);
+  const n = dateRange === "all" ? totalN : t.length;
 
   useEffect(() => {
     setVisibleCount(8);
-  }, [t.length, currentCondition, currentCategory]);
+  }, [t.length, currentCondition, currentCategory, dateRange]);
 
   return jsx("section",{
     id:"listings",className:"bg-white dark:bg-gray-950 py-5 sm:py-6 border-b border-gray-200/60 dark:border-gray-800 transition-colors",children:jsxs("div",{
@@ -2353,8 +2378,21 @@ function lx({
                     })
                   ]
                 }),
+                jsxs("label",{
+                  className:"inline-flex items-center gap-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2 py-1 text-xs font-bold text-gray-700 dark:text-gray-300 shadow-2xs",
+                  children:[
+                    jsx(CalendarDays,{ className:"h-3.5 w-3.5 text-primary-500" }),
+                    jsx("span",{ className:"sr-only", children:"Filter by post date" }),
+                    jsx("select",{
+                      value:dateRange,
+                      onChange:(ev)=>setDateRange(ev.target.value),
+                      className:"bg-transparent outline-none cursor-pointer text-xs font-bold",
+                      children:LISTING_DATE_RANGES.map(opt=>jsx("option",{ value:opt.id, children:opt.label }, opt.id))
+                    })
+                  ]
+                }),
                 rf&&jsxs("button",{
-                  onClick:rf,className:"btn-ghost text-xs px-2.5 py-1.5 flex items-center gap-1.5",children:[
+                  onClick:()=>{ setDateRange("all"); rf(); },className:"btn-ghost text-xs px-2.5 py-1.5 flex items-center gap-1.5",children:[
                     jsx(RefreshCw,{ className:"h-3.5 w-3.5" }),
                     "Clear"
                   ]
@@ -6448,42 +6486,6 @@ function yx({
                       " views"
                     ]
                   })]
-                }),jsxs("div",{
-                  className:"mt-3.5 flex items-center justify-between rounded-xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent p-3.5 border border-amber-200/80 dark:border-amber-800/60 shadow-xs",
-                  children:[
-                    jsxs("div",{
-                      className:"flex items-center gap-2.5",
-                      children:[
-                        jsx("div",{
-                          className:"flex h-9 w-9 items-center justify-center rounded-lg bg-amber-500 text-white shadow-xs shrink-0",
-                          children:jsx(Eye,{className:"h-5 w-5"})
-                        }),
-                        jsxs("div",{
-                          children:[
-                            jsxs("div",{
-                              className:"flex items-center gap-2 text-sm font-extrabold text-gray-900 dark:text-white leading-tight",
-                              children:[
-                                jsx("span",{className:"text-base font-black tabular-nums text-amber-600 dark:text-amber-400"},(viewCount || getRealisticAdViews(r) || 0).toLocaleString()),
-                                " Total Views",
-                                jsx("span",{className:"inline-flex items-center gap-1 rounded bg-emerald-100 dark:bg-emerald-950/80 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300",children:[
-                                  jsx("span",{className:"h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"}),
-                                  "Live Now"
-                                ]})
-                              ]
-                            }),
-                            jsx("div",{
-                              className:"text-[11px] text-gray-500 dark:text-gray-400 font-medium",
-                              children:"Updated 4x daily (+10-25 views) • Real-time visitor tracking"
-                            })
-                          ]
-                        })
-                      ]
-                    }),
-                    jsx("span",{
-                      className:"text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/60 px-2 py-1 rounded-md border border-amber-200 dark:border-amber-800 shrink-0",
-                      children:"Active Ad"
-                    })
-                  ]
                 }),jsxs("div",{
                   className:"mt-5 space-y-3",children:[
                     jsxs("button",{

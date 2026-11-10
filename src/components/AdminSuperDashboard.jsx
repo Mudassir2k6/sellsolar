@@ -66,6 +66,7 @@ import {
   Ban,
   AlertTriangle,
   RotateCcw,
+  CalendarDays,
 } from 'lucide-react';
 import {
   useAuth,
@@ -90,7 +91,17 @@ import { isValidUuid } from '../lib/auth';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { useToast } from '../context/ToastContext';
 import { useSiteSettings, DEFAULT_SITE_SETTINGS } from '../context/SiteSettingsContext';
-import { getInboxMessages, clearInboxMessagesToZero, fetchSharedInboxMessages, createDirectMessage, replyToInboxMessage, markMessageAsRead, deleteInboxMessage } from '../services/inboxService';
+import {
+  getInboxMessages,
+  clearInboxMessagesToZero,
+  fetchSharedInboxMessages,
+  createDirectMessage,
+  replyToInboxMessage,
+  markMessageAsRead,
+  deleteInboxMessage,
+  countUnreadInboxMessages,
+  isInboxMessageUnread,
+} from '../services/inboxService';
 import { getAnalyticsSummary, resetAllAnalyticsToZero } from '../services/analyticsService';
 import { formatPrice } from '../lib/constants';
 import AdminDailyRatesModule from './AdminDailyRatesModule';
@@ -112,6 +123,7 @@ import {
   TURNKEY_INSTALL_PROMO_IMAGE
 } from '../utils/solarImages';
 import { getRealisticAdViews } from '../lib/adViews';
+import { formatListingDate, formatListingDateRelative } from '../lib/dateUtils';
 
 const SOLAR_PRESET_IMAGES = [
   { label: 'Solar Field (SVG)', url: SELL_SOLAR_PROMO_IMAGE },
@@ -2434,7 +2446,7 @@ export default function AdminSuperDashboard({
 
   // Filtered Inbox Messages
   const filteredInbox = inboxMessages.filter((msg) => {
-    if (inboxFilter === 'unread') return !msg.is_read;
+    if (inboxFilter === 'unread') return isInboxMessageUnread(msg);
     if (inboxFilter === 'replied') return msg.status === 'replied';
   }).filter((msg) => {
     if (!inboxSearchQuery) return true;
@@ -2506,7 +2518,7 @@ export default function AdminSuperDashboard({
     });
   }, [allPagesList, pageFilter, pageSearchQuery]);
 
-  const unreadInboxCount = inboxMessages.filter((m) => !m.is_read).length;
+  const unreadInboxCount = countUnreadInboxMessages(inboxMessages);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex flex-col">
@@ -4018,7 +4030,7 @@ export default function AdminSuperDashboard({
                           className={`p-4 rounded-2xl border transition-all cursor-pointer ${
                             isSelected
                               ? 'border-amber-500 bg-amber-50/40 dark:bg-amber-950/20 shadow-xs'
-                              : !msg.is_read
+                              : isInboxMessageUnread(msg)
                               ? 'border-rose-200 dark:border-rose-900/60 bg-white dark:bg-gray-900 font-bold'
                               : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 opacity-80 hover:opacity-100'
                           }`}
@@ -7765,6 +7777,15 @@ export default function AdminSuperDashboard({
                                 {getRealisticAdViews(ad).toLocaleString()} views
                               </span>
                             </div>
+                            {ad.created_at && (
+                              <div
+                                className="mt-1 flex items-center gap-1 text-[11px] text-gray-500 dark:text-gray-400"
+                                title={new Date(ad.created_at).toLocaleString('en-PK', { timeZone: 'Asia/Karachi' })}
+                              >
+                                <CalendarDays className="w-3.5 h-3.5 text-gray-400" />
+                                Posted {formatListingDate(ad.created_at)} ({formatListingDateRelative(ad.created_at)})
+                              </div>
+                            )}
 
                             {/* Seller Contact Info Card */}
                             <div className="mt-2.5 pt-2 border-t border-gray-100 dark:border-gray-800 text-xs bg-gray-50/70 dark:bg-gray-800/40 p-2 rounded-xl">

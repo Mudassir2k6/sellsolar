@@ -1,27 +1,27 @@
-// Realistic Ad Views Engine for SellSolar Listings
-// Specifications:
-// 1. Updates 4 times per 24 hours (every 6 hours: 00:00, 06:00, 12:00, 18:00)
-// 2. Each update cycle adds a deterministic random increment between 10 and 25 views (average ~17.5 views/quarter, ~70 views/day)
-// 3. Real-time ad clicks and views are immediately added on top
-// 4. Strict guarantee: Views NEVER decrease under any condition (persisted in cache & DB)
-// 5. Robust Supabase DB synchronization with proper timeouts and error boundaries
+// Ad views engine for SellSolar listings
+// - Deterministic: same number on every device, card and detail page
+// - Grows by exactly 1 view per elapsed hour since the ad was created
+// - Page refreshes and ad opens never add views
 
-import { supabase, isSupabaseConfigured } from './supabase';
-import { isValidUuid } from './auth';
+const LEGACY_STORAGE_KEYS = [
+  'sellsolar_ad_views_cache',
+  'sellsolar_ad_views_clicks',
+  'sellsolar_ad_views_first_seen',
+];
 
-const STORAGE_CACHE_KEY = 'sellsolar_ad_views_cache';
-const STORAGE_CLICKS_KEY = 'sellsolar_ad_views_clicks';
-const STORAGE_FIRST_SEEN_KEY = 'sellsolar_ad_views_first_seen';
+const HOUR_MS = 60 * 60 * 1000;
+const LISTINGS_WITHOUT_DATE_ANCHOR = Date.UTC(2026, 9, 1);
 
-// In-memory sync trackers to prevent redundant network calls and avoid flooding Supabase
-const activeSyncs = new Set();
-const lastSyncTimestamp = new Map();
-const SYNC_THROTTLE_MS = 8000; // Throttle sync to Supabase per ad to max once every 8s
-const SUPABASE_TIMEOUT_MS = 4000; // 4 second hard timeout for DB operations
+let legacyCleared = false;
 
-/**
- * 32-bit Murmur/FNV-style hash to produce high-entropy, well-distributed deterministic random numbers
- */
+function clearLegacyViewCaches() {
+  if (legacyCleared || typeof window === 'undefined') return;
+  legacyCleared = true;
+  try {
+    LEGACY_STORAGE_KEYS.forEach((k) => localStorage.removeItem(k));
+  } catch {}
+}
+
 function hash32(str) {
   let h = 0x811c9dc5;
   const s = String(str || 'sellsolar_default_seed');
@@ -37,263 +37,39 @@ function hash32(str) {
   return h >>> 0;
 }
 
-/**
- * Deterministic random increment between 10 and 25 views for an ad for a specific 6-hour quarter
- * (4 quarters in a 24-hour day)
- * @param {string} adId
- * @param {number} quarterIndex
- * @returns {number} integer in [10, 25]
- */
-export function getQuarterRandomIncrement(adId, quarterIndex) {
-  const h = hash32(`${adId}_quarter_${quarterIndex}`);
-  return 10 + (h % 16); // strictly 10 to 25 inclusive
+function getListingCreatedAt(listing, id) {
+  const ts = listing.created_at ? new Date(listing.created_at).getTime() : NaN;
+  if (Number.isFinite(ts) && ts > 0) return ts;
+  // Seed/legacy listings without a date get a stable pseudo-date (0–10 days after anchor)
+  return LISTINGS_WITHOUT_DATE_ANCHOR + (hash32(`${id}_seed_age`) % (10 * 24)) * HOUR_MS;
 }
 
 /**
- * Convert an epoch millisecond timestamp to an epoch 6-hour quarter index
- * 6 hours = 21,600,000 ms. 4 quarters = 1 day (24 hours)
- */
-export function getEpochQuarter(timestamp) {
-  const msInQuarter = 6 * 60 * 60 * 1000;
-  return Math.floor(timestamp / msInQuarter);
-}
-
-/**
- * Safely read cached views map from localStorage
- */
-function getViewsCache() {
-  if (typeof window === 'undefined') return {};
-  try {
-    const raw = localStorage.getItem(STORAGE_CACHE_KEY);
-    return raw ? JSON.parse(raw) : {};
-  } catch {
-    return {};
-  }
-}
-
-/**
- * Safely save cached views map to localStorage
- */
-function saveViewsCache(cache) {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.setItem(STORAGE_CACHE_KEY, JSON.stringify(cache));
-  } catch {}
-}
-
-/**
- * Safely read user clicks map from localStorage
- */
-function getClicksMap() {
-  if (typeof window === 'undefined') return {};
-  try {
-    const raw = localStorage.getItem(STORAGE_CLICKS_KEY);
-    return raw ? JSON.parse(raw) : {};
-  } catch {
-    return {};
-  }
-}
-
-/**
- * Safely save user clicks map to localStorage
- */
-function saveClicksMap(map) {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.setItem(STORAGE_CLICKS_KEY, JSON.stringify(map));
-  } catch {}
-}
-
-/**
- * Safely read first seen timestamps
- */
-function getFirstSeenMap() {
-  if (typeof window === 'undefined') return {};
-  try {
-    const raw = localStorage.getItem(STORAGE_FIRST_SEEN_KEY);
-    return raw ? JSON.parse(raw) : {};
-  } catch {
-    return {};
-  }
-}
-
-function saveFirstSeenMap(map) {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.setItem(STORAGE_FIRST_SEEN_KEY, JSON.stringify(map));
-  } catch {}
-}
-
-/**
- * Calculate realistic, strictly non-decreasing views for a listing
- * Updates 4 times per 24 hours (10-25 random views added each time) + real-time views added on top
- * @param {object} listing - { id, views, created_at, featured, sponsored, ... }
- * @returns {number} strictly non-decreasing view count
+ * Views = small per-ad launch base + 1 per full hour since creation.
+ * @param {object} listing - { id, created_at, ... }
+ * @returns {number}
  */
 export function getRealisticAdViews(listing) {
   if (!listing || !listing.id) return 0;
+  clearLegacyViewCaches();
 
   const id = String(listing.id);
-  const cache = getViewsCache();
-  const cachedMax = Number(cache[id]) || 0;
-  const clicksMap = getClicksMap();
-  const directClicks = Number(clicksMap[id]) || 0;
-  const existingViews = Number(listing.views) || 0;
+  const launchBase = 20 + (hash32(`${id}_launch_base`) % 31);
+  const createdAt = getListingCreatedAt(listing, id);
+  const hoursElapsed = Math.max(0, Math.floor((Date.now() - createdAt) / HOUR_MS));
 
-  // 1. Initial launch base (25 to 45 views)
-  const launchBase = 25 + (hash32(`${id}_launch_base`) % 21);
-
-  // 2. Determine created timestamp
-  let createdAt = listing.created_at ? new Date(listing.created_at).getTime() : 0;
-  if (!createdAt || isNaN(createdAt)) {
-    const firstSeen = getFirstSeenMap();
-    if (firstSeen[id]) {
-      createdAt = Number(firstSeen[id]);
-    } else {
-      // Deterministic age between 2 to 5 days
-      const simulatedAgeDays = 2 + (hash32(`${id}_seed_age`) % 4);
-      createdAt = Date.now() - simulatedAgeDays * 24 * 60 * 60 * 1000;
-      if (typeof window !== 'undefined') {
-        firstSeen[id] = createdAt;
-        saveFirstSeenMap(firstSeen);
-      }
-    }
-  }
-
-  // 3. Compute elapsed quarters (4 times per 24 hours = 1 quarter every 6 hours)
-  const nowTs = Date.now();
-  const createdQuarter = getEpochQuarter(createdAt);
-  const currentQuarter = getEpochQuarter(nowTs);
-  const totalElapsedQuarters = Math.max(0, currentQuarter - createdQuarter);
-
-  // 4. Sum up 10-25 views for each elapsed quarter cycle (4 times a day)
-  let quarterGrowthTotal = 0;
-  const isBoosted = Boolean(listing.featured || listing.sponsored);
-
-  // For older listings, compute average for quarters older than 30 days (120 quarters)
-  const detailedQuarterLimit = 120;
-  if (totalElapsedQuarters > detailedQuarterLimit) {
-    const excessQuarters = totalElapsedQuarters - detailedQuarterLimit;
-    const stableAvg = 17 + (hash32(`${id}_quarter_avg`) % 3); // ~17 to 19 views per cycle
-    quarterGrowthTotal += excessQuarters * stableAvg;
-    const startQ = currentQuarter - detailedQuarterLimit;
-    for (let q = startQ; q <= currentQuarter; q++) {
-      quarterGrowthTotal += getQuarterRandomIncrement(id, q);
-    }
-  } else {
-    for (let q = createdQuarter; q <= currentQuarter; q++) {
-      quarterGrowthTotal += getQuarterRandomIncrement(id, q);
-    }
-  }
-
-  if (isBoosted) {
-    quarterGrowthTotal = Math.round(quarterGrowthTotal * 1.25);
-  }
-
-  // 5. Total organic quarters growth + direct real-time visitor clicks
-  const candidateViews = launchBase + quarterGrowthTotal + directClicks;
-
-  // 6. ABSOLUTE GUARANTEE: Never decrease under any circumstance!
-  const finalViews = Math.max(cachedMax, existingViews, candidateViews);
-
-  if (finalViews > cachedMax) {
-    cache[id] = finalViews;
-    saveViewsCache(cache);
-  }
-
-  return finalViews;
+  return launchBase + hoursElapsed;
 }
 
 /**
- * Asynchronously synchronizes ad views to Supabase with strict timeout, throttling, and error boundary
- * @param {string} id - Ad Listing ID
- * @param {number} views - New view count
- */
-export async function syncViewsToDatabase(id, views) {
-  if (!id || typeof window === 'undefined') return;
-  if (!isValidUuid(id) || !isSupabaseConfigured() || !supabase) return;
-
-  const now = Date.now();
-  const lastSync = lastSyncTimestamp.get(id) || 0;
-  if (now - lastSync < SYNC_THROTTLE_MS) {
-    return; // Throttled to avoid network spam
-  }
-
-  if (activeSyncs.has(id)) {
-    return; // Sync already in-flight for this ad
-  }
-
-  activeSyncs.add(id);
-  lastSyncTimestamp.set(id, now);
-
-  try {
-    // Timeout promise to ensure DB call never hangs or delays app
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Supabase sync timeout')), SUPABASE_TIMEOUT_MS)
-    );
-
-    const updatePromise = supabase
-      .from('solar_listings')
-      .update({ views })
-      .eq('id', id);
-
-    await Promise.race([updatePromise, timeoutPromise]);
-  } catch (err) {
-    // Non-blocking: Silently handle DB timeouts, network drops, or RLS rejections
-    // Local storage and browser cache already ensure pristine UI experience
-  } finally {
-    activeSyncs.delete(id);
-  }
-}
-
-/**
- * Increment view count for an ad when viewed, and sync to DB/local storage in real-time
+ * Kept for existing callers. Opening or refreshing an ad does not add views.
  * @param {object|string} listingOrId
- * @returns {number} updated view count
+ * @returns {number}
  */
 export function recordAndIncrementAdView(listingOrId) {
   if (!listingOrId) return 0;
-  const id = typeof listingOrId === 'object' ? String(listingOrId.id) : String(listingOrId);
-  if (!id) return 0;
-
-  // 1. Increment real-time visitor clicks count
-  const clicksMap = getClicksMap();
-  clicksMap[id] = (Number(clicksMap[id]) || 0) + 1;
-  saveClicksMap(clicksMap);
-
-  // 2. Re-calculate views
-  const listingObj = typeof listingOrId === 'object' ? listingOrId : { id };
-  const updatedViews = getRealisticAdViews(listingObj);
-
-  // 3. Ensure cache stores the latest incremented number
-  const cache = getViewsCache();
-  const finalViews = Math.max(Number(cache[id]) || 0, updatedViews);
-  cache[id] = finalViews;
-  saveViewsCache(cache);
-
-  // 4. Update custom listings in localStorage if present
-  try {
-    const rawListings = localStorage.getItem('sellsolar_custom_listings');
-    if (rawListings) {
-      const parsed = JSON.parse(rawListings);
-      if (Array.isArray(parsed)) {
-        let changed = false;
-        const nextList = parsed.map((item) => {
-          if (String(item.id) === id) {
-            changed = true;
-            return { ...item, views: Math.max(Number(item.views) || 0, finalViews) };
-          }
-          return item;
-        });
-        if (changed) {
-          localStorage.setItem('sellsolar_custom_listings', JSON.stringify(nextList));
-        }
-      }
-    }
-  } catch {}
-
-  // 5. Update Supabase DB safely with proper error boundary and timeout
-  syncViewsToDatabase(id, finalViews).catch(() => {});
-
-  return finalViews;
+  const listing = typeof listingOrId === 'object' ? listingOrId : { id: listingOrId };
+  return getRealisticAdViews(listing);
 }
+
+export async function syncViewsToDatabase() {}

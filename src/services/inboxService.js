@@ -2,67 +2,100 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 const INBOX_STORAGE_KEY = 'sellsolar_inbox_messages';
 
-const SEED_INBOX_MESSAGES = [
-  {
-    id: 'msg-001',
-    ticketNumber: 'SLR-482910',
-    senderName: 'Muhammad Hamza',
-    senderEmail: 'hamza.solar@gmail.com',
-    senderPhone: '03214567890',
-    subject: 'Quotation inquiry for 10kW On-Grid System (Islamabad)',
-    message: 'Assalam-o-Alaikum, I am looking to install a 10kW Longi Hi-MO 6 on-grid solar system with a Solis inverter in Sector F-10, Islamabad. Please let me know the estimated net-metering timeline and total turnkey cost.',
-    category: 'General Inquiry',
-    recipientEmail: 'info@sellsolar.pk',
-    status: 'unread', // 'unread' | 'read' | 'replied'
-    is_read: false,
-    replies: [],
-    createdAt: new Date(Date.now() - 3 * 3600 * 1000).toISOString(),
-  },
-  {
-    id: 'msg-002',
-    ticketNumber: 'SLR-319082',
-    senderName: 'Zubair Energy Solutions',
-    senderEmail: 'sales@zubairenergy.pk',
-    senderPhone: '03009876543',
-    subject: 'Verified Dealer Partnership Application',
-    message: 'We are certified tier-1 distributors of Growatt and Huawei inverters based in Lahore. We want to be listed in your Verified Solar Dealers directory.',
-    category: 'Dealer Verification',
-    recipientEmail: 'info@sellsolar.pk',
-    status: 'read',
-    is_read: true,
-    replies: [
-      {
-        id: 'rep-001',
-        sender: 'Super Admin',
-        text: 'Thank you for reaching out, Zubair. Our onboarding team has received your registration request. Please send your NTN certificate and distributor authorization letter.',
-        createdAt: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
-      }
-    ],
-    createdAt: new Date(Date.now() - 48 * 3600 * 1000).toISOString(),
-  },
-  {
-    id: 'msg-003',
-    ticketNumber: 'SLR-194823',
-    senderName: 'Ahmed Raza',
-    senderEmail: 'ahmed.raza99@yahoo.com',
-    senderPhone: '03335551234',
-    subject: 'Inquiry about Longi 585W Bifacial Panel Listing',
-    message: 'Hi, I want to purchase 24 pieces of the Longi 585W bifacial solar panels. Is warranty claimable directly in Rawalpindi?',
-    category: 'Product Inquiry',
-    recipientEmail: 'info@sellsolar.pk',
-    status: 'replied',
-    is_read: true,
-    replies: [
-      {
-        id: 'rep-002',
-        sender: 'Support Desk',
-        text: 'Yes Ahmed, official company warranty is valid across Pakistan through authorized service centers.',
-        createdAt: new Date(Date.now() - 12 * 3600 * 1000).toISOString(),
-      }
-    ],
-    createdAt: new Date(Date.now() - 18 * 3600 * 1000).toISOString(),
+/** Legacy demo tickets — removed so admin alerts are not stuck at 3 forever */
+export const DEMO_INBOX_IDS = new Set(['msg-001', 'msg-002', 'msg-003']);
+
+export function isInboxMessageRead(msg) {
+  if (!msg) return true;
+  if (msg.is_read === true) return true;
+  const status = (msg.status || '').toLowerCase();
+  return status === 'read' || status === 'replied';
+}
+
+export function isInboxMessageUnread(msg) {
+  return !isInboxMessageRead(msg);
+}
+
+export function countUnreadInboxMessages(messages) {
+  const list = Array.isArray(messages) ? messages : getInboxMessages();
+  return list.filter((m) => isInboxMessageUnread(m)).length;
+}
+
+function stripDemoInboxMessages(messages) {
+  if (!Array.isArray(messages)) return [];
+  return messages.filter((m) => m && !DEMO_INBOX_IDS.has(m.id));
+}
+
+async function syncEnquiryReadStateToSupabase(messageId) {
+  if (!isSupabaseConfigured() || typeof window === 'undefined') return;
+  const id = String(messageId || '');
+  let uuid = id.startsWith('sb-') ? id.slice(3) : id;
+  if (!uuid || DEMO_INBOX_IDS.has(id) || id.startsWith('msg-')) return;
+  try {
+    await supabase.from('enquiries').update({ is_read: true, status: 'read' }).eq('id', uuid);
+  } catch {
+    /* non-blocking */
   }
-];
+}
+
+function mapEnquiryRow(row) {
+  const ticketFromSubject =
+    row.subject && String(row.subject).includes('SLR-')
+      ? row.subject.match(/SLR-\d+/)?.[0]
+      : null;
+  return {
+    id: `sb-${row.id}`,
+    ticketNumber:
+      ticketFromSubject || `SLR-${String(row.id || '').slice(0, 6).toUpperCase() || '786012'}`,
+    senderName: row.name || 'Website Visitor',
+    senderEmail: row.email || 'inquiry@sellsolar.pk',
+    senderPhone: row.contact_phone || '',
+    subject:
+      row.subject ||
+      (row.message ? `${String(row.message).slice(0, 48)}…` : 'Customer Inquiry'),
+    message: row.message || '',
+    category: row.category || 'General Inquiry',
+    recipientEmail: row.recipient_email || 'info@sellsolar.pk',
+    status: row.status || (row.is_read ? 'read' : 'unread'),
+    is_read: !!row.is_read,
+    replies: Array.isArray(row.replies) ? row.replies : [],
+    createdAt: row.created_at || new Date().toISOString(),
+  };
+}
+
+function mergeInboxWithSupabase(local, dbRows) {
+  const map = new Map();
+
+  stripDemoInboxMessages(local).forEach((m) => {
+    map.set(m.id, m);
+  });
+
+  for (const row of dbRows) {
+    const id = `sb-${row.id}`;
+    const fromDb = mapEnquiryRow(row);
+    const localMatch = map.get(id);
+    if (localMatch) {
+      const read = isInboxMessageRead(localMatch) || isInboxMessageRead(fromDb);
+      map.set(id, {
+        ...fromDb,
+        ...localMatch,
+        is_read: read,
+        status: localMatch.status === 'replied'
+          ? 'replied'
+          : read
+            ? 'read'
+            : fromDb.status || 'unread',
+        replies: (localMatch.replies?.length ? localMatch.replies : fromDb.replies) || [],
+      });
+    } else {
+      map.set(id, fromDb);
+    }
+  }
+
+  return Array.from(map.values()).sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  );
+}
 
 export function getInboxMessages() {
   if (typeof window === 'undefined') return [];
@@ -70,9 +103,14 @@ export function getInboxMessages() {
     const raw = localStorage.getItem(INBOX_STORAGE_KEY);
     if (raw !== null) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) return parsed;
+      if (Array.isArray(parsed)) {
+        const cleaned = stripDemoInboxMessages(parsed);
+        if (cleaned.length !== parsed.length) {
+          saveInboxMessages(cleaned);
+        }
+        return cleaned;
+      }
     }
-    // Clean zero baseline (no fake messages)
     localStorage.setItem(INBOX_STORAGE_KEY, JSON.stringify([]));
     return [];
   } catch {
@@ -238,9 +276,17 @@ export async function sendContactMessage({
 export function markMessageAsRead(messageId) {
   const current = getInboxMessages();
   const updated = current.map((msg) =>
-    msg.id === messageId ? { ...msg, is_read: true, status: msg.status === 'unread' ? 'read' : msg.status } : msg
+    msg.id === messageId
+      ? {
+          ...msg,
+          is_read: true,
+          status:
+            msg.status === 'replied' ? 'replied' : msg.status === 'unread' ? 'read' : msg.status || 'read',
+        }
+      : msg
   );
   saveInboxMessages(updated);
+  void syncEnquiryReadStateToSupabase(messageId);
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new Event('sellsolar_inbox_updated'));
   }
@@ -264,59 +310,7 @@ export async function fetchSharedInboxMessages() {
     }
     if (!Array.isArray(data)) return local;
 
-    const localIds = new Set(local.map((m) => m.id));
-    const sbIds = new Set(
-      local.filter((m) => String(m.id).startsWith('sb-')).map((m) => String(m.id).slice(3))
-    );
-
-    const converted = data
-      .filter((row) => {
-        const rid = String(row.id);
-        return !localIds.has(rid) && !localIds.has(`sb-${rid}`) && !sbIds.has(rid);
-      })
-      .map((row) => ({
-        id: `sb-${row.id}`,
-        ticketNumber: `SLR-${(row.id || '').slice(0, 6).toUpperCase() || '786012'}`,
-        senderName: row.name || 'Website Visitor',
-        senderEmail: row.email || (row.contact_phone ? `${row.contact_phone}@customer.pk` : 'inquiry@sellsolar.pk'),
-        senderPhone: row.contact_phone || '',
-        subject: row.subject || (row.message ? row.message.slice(0, 40) + '...' : 'Customer Inquiry'),
-        message: row.message || 'No message content provided.',
-        category: row.category || 'General Inquiry',
-        recipientEmail: row.recipient_email || 'info@sellsolar.pk',
-        status: row.status || (row.is_read ? 'read' : 'unread'),
-        is_read: !!row.is_read,
-        replies: Array.isArray(row.replies) ? row.replies : [],
-        createdAt: row.created_at || new Date().toISOString(),
-      }));
-
-    const dbAsInbox = data.map((row) => ({
-      id: `sb-${row.id}`,
-      ticketNumber: row.subject && row.subject.includes('SLR-')
-        ? row.subject.match(/SLR-\d+/)?.[0] || `SLR-${String(row.id).slice(0, 6).toUpperCase()}`
-        : `SLR-${String(row.id).slice(0, 6).toUpperCase()}`,
-      senderName: row.name || 'Website Visitor',
-      senderEmail: row.email || 'inquiry@sellsolar.pk',
-      senderPhone: row.contact_phone || '',
-      subject: row.subject || (row.message ? `${String(row.message).slice(0, 48)}…` : 'Customer Inquiry'),
-      message: row.message || '',
-      category: row.category || 'General Inquiry',
-      recipientEmail: row.recipient_email || 'info@sellsolar.pk',
-      status: row.status || (row.is_read ? 'read' : 'unread'),
-      is_read: !!row.is_read,
-      replies: Array.isArray(row.replies) ? row.replies : [],
-      createdAt: row.created_at || new Date().toISOString(),
-    }));
-
-    const mergedById = new Map();
-    [...dbAsInbox, ...local.filter((m) => !String(m.id).startsWith('sb-'))].forEach((m) => {
-      mergedById.set(m.id, m);
-    });
-    converted.forEach((m) => mergedById.set(m.id, m));
-
-    const merged = Array.from(mergedById.values()).sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-    );
+    const merged = mergeInboxWithSupabase(local, data);
     saveInboxMessages(merged);
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new Event('sellsolar_inbox_updated'));
@@ -402,6 +396,7 @@ export function replyToInboxMessage(messageId, replyText, adminName = 'Super Adm
   });
 
   saveInboxMessages(updated);
+  void syncEnquiryReadStateToSupabase(messageId);
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new Event('sellsolar_inbox_updated'));
   }

@@ -37,7 +37,7 @@ function MarqueeRow({ ads, onNavigate, adSenseClientId, reverse }) {
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-gray-200/80 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xs">
-      <motionCSS />
+      <MarqueeStyles />
       <div
         className={`ad-marquee-track flex items-stretch gap-3 py-2.5 pl-3 ${
           reverse ? 'ad-marquee-track--reverse' : ''
@@ -165,7 +165,7 @@ export default function HomeAdvertisementBoard({ onNavigate, configOverride }) {
   );
 }
 
-function motionCSS() {
+function MarqueeStyles() {
   return (
     <style>{`
       @keyframes adMarquee {

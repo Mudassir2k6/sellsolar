@@ -439,7 +439,14 @@ function hasRecoveryParams() {
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(() => typeof window !== 'undefined');
+  const [loading, setLoading] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      return Boolean(localStorage.getItem(LOCAL_SESSION_KEY));
+    } catch {
+      return false;
+    }
+  });
   const [passwordRecovery, setPasswordRecovery] = useState(() => hasRecoveryParams());
 
   const loadProfile = useCallback(async (userId, userEmail) => {
@@ -580,7 +587,7 @@ export function AuthProvider({ children }) {
     let mounted = true;
     const timeout = window.setTimeout(() => {
       if (mounted) setLoading(false);
-    }, 1500);
+    }, 650);
 
     if (hasRecoveryParams()) {
       setPasswordRecovery(true);
@@ -1869,14 +1876,19 @@ export function AuthProvider({ children }) {
           await supabase.rpc('admin_verify_dealer', { target_user_id: targetUserIdOrEmail }).catch(() => {});
         }
 
-        await supabase
+        const roleQuery = supabase
           .from('profiles')
           .update({
+            role: newRole,
+            is_super_admin: isTargetSuperAdmin,
             is_admin: isTargetAdmin,
             is_verified_dealer: isTargetDealer,
             account_type: isTargetDealer ? 'dealer' : isTargetAdmin ? 'admin' : 'individual',
-          })
-          .or(`id.eq.${targetUserIdOrEmail},email.eq.${cleanId}`);
+          });
+        const { error: roleErr } = isValidUuid(targetUserIdOrEmail)
+          ? await roleQuery.eq('id', targetUserIdOrEmail)
+          : await roleQuery.eq('email', cleanId);
+        if (roleErr) console.warn('Supabase role sync failed:', roleErr.message);
       } catch (sbErr) {
         console.warn('Supabase role sync warning:', sbErr);
       }

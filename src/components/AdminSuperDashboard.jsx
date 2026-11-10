@@ -67,6 +67,7 @@ import {
   AlertTriangle,
   RotateCcw,
   CalendarDays,
+  BookOpen,
 } from 'lucide-react';
 import {
   useAuth,
@@ -110,6 +111,7 @@ import AdminInstallationsModule from './AdminInstallationsModule';
 import AdminDrillDownModal from './AdminDrillDownModal';
 import EditSolarAdModal from './EditSolarAdModal';
 import AdminAdvertisementSettings from './AdminAdvertisementSettings';
+import AdminBlogModule from './AdminBlogModule';
 import { getStoredInstallationRequests, fetchInstallationRequests } from '../lib/installation';
 import { VERIFIED_DEALERS } from '../data/dealersData';
 import { SEED_LISTINGS } from '../data/seedListings';
@@ -2919,6 +2921,19 @@ export default function AdminSuperDashboard({
 
             <button
               type="button"
+              onClick={() => selectTab('blog')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 transition-colors flex items-center gap-1.5 ${
+                activeTab === 'blog'
+                  ? 'bg-amber-500 text-white shadow-xs'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+              }`}
+            >
+              <BookOpen className="h-3.5 w-3.5" />
+              <span>Blog</span>
+            </button>
+
+            <button
+              type="button"
               onClick={() => selectTab('pages')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 transition-colors ${
                 activeTab === 'pages'
@@ -3113,6 +3128,27 @@ export default function AdminSuperDashboard({
                   <ChartColumn className="h-4 w-4" />
                   <span>Analytics & Traffic</span>
                 </div>
+              </button>
+            )}
+
+            {/* TAB: BLOG & GUIDES (SUPER ADMIN & ADMIN) */}
+            {effectiveIsAdmin && (
+              <button
+                type="button"
+                onClick={() => selectTab('blog')}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+                  activeTab === 'blog'
+                    ? 'bg-amber-500 text-white shadow-sm font-black'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <BookOpen className="h-4 w-4 text-amber-500" />
+                  <span>Blog & Guides</span>
+                </div>
+                <span className="px-1.5 py-0.5 rounded-full text-[9px] bg-amber-100 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 font-bold">
+                  Add
+                </span>
               </button>
             )}
 
@@ -4840,6 +4876,9 @@ export default function AdminSuperDashboard({
               </div>
             </div>
           )}
+
+          {/* TAB: BLOG & GUIDES */}
+          {activeTab === 'blog' && effectiveIsAdmin && <AdminBlogModule />}
 
           {/* TAB: PAGES & CONTENT CMS */}
           {activeTab === 'pages' && effectiveIsAdmin && (

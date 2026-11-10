@@ -997,55 +997,51 @@ function PressContent({ onNavigate }) {
 function BlogContent({ onNavigate }) {
   const [selectedArticle, setSelectedArticle] = useState(null);
   const [activeCategory, setActiveCategory] = useState('All');
+  const [posts, setPosts] = useState([]);
+  const [loadingPosts, setLoadingPosts] = useState(true);
 
-  const categories = ['All', 'Buying Guides', 'Technical', 'Net Metering', 'Market Rates'];
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const { fetchBlogPosts, BLOG_CATEGORIES, DEFAULT_BLOG_POSTS, normalizeBlogPost } = await import(
+          '../services/blogService'
+        );
+        const list = await fetchBlogPosts({ publishedOnly: true, includeSeeds: true });
+        if (!mounted) return;
+        setPosts(Array.isArray(list) && list.length > 0 ? list : DEFAULT_BLOG_POSTS.map(normalizeBlogPost));
+        // Keep category pills in sync with available posts + defaults
+        window.__sellsolarBlogCategories = ['All', ...BLOG_CATEGORIES];
+      } catch {
+        if (mounted) setPosts([]);
+      } finally {
+        if (mounted) setLoadingPosts(false);
+      }
+    })();
+    const onUpdate = () => {
+      import('../services/blogService').then(({ fetchBlogPosts }) =>
+        fetchBlogPosts({ publishedOnly: true, includeSeeds: true }).then((list) => {
+          if (mounted) setPosts(list || []);
+        })
+      );
+    };
+    window.addEventListener('sellsolar_blog_updated', onUpdate);
+    return () => {
+      mounted = false;
+      window.removeEventListener('sellsolar_blog_updated', onUpdate);
+    };
+  }, []);
 
-  const posts = [
-    {
-      id: 1,
-      title: 'Tier-1 Solar Panels in Pakistan: Longi vs Jinko vs Canadian Solar',
-      category: 'Buying Guides',
-      readTime: '6 min read',
-      date: 'May 2026',
-      author: 'Engr. Haris Tariq',
-      summary: 'A detailed breakdown of efficiency ratings, temperature coefficients, and degradation curves for Pakistan’s hottest summer climates.',
-      content: `### Comparing the Top 3 Tier-1 Modules in Pakistan\n\nWhen purchasing solar panels in Pakistan, choosing a Tier-1 BloombergNEF manufacturer ensures genuine cell quality, verified warranty backing, and superior performance during scorching 45°C+ summer days.\n\n#### 1. Longi Hi-MO 6 & Hi-MO 7\n- **Cell Type:** HPBC / N-Type TopCon\n- **Efficiency:** Up to 22.8%\n- **Best For:** Residential rooftops where aesthetic appearance and maximum per-square-foot yield are required.\n\n#### 2. Jinko Tiger Neo N-Type\n- **Cell Type:** N-Type TOPCon\n- **Efficiency:** 22.5% - 23.2%\n- **Temperature Coefficient:** -0.30%/°C (exceptional in Multan, Bahawalpur, and interior Sindh).\n\n#### 3. Canadian Solar HiKu7\n- **Cell Type:** Bifacial PERC / TopCon\n- **Durability:** Robust 35mm frame designed to withstand heavy wind loads on elevated mounting structures.\n\n**Buyer Caution:** Always scan the serial barcode located beneath the top tempered glass. If the barcode is printed on an external adhesive sticker, it is likely a re-labeled counterfeit!`
-    },
-    {
-      id: 2,
-      title: 'Net Metering in Pakistan: Complete Step-by-Step Guide (2026)',
-      category: 'Net Metering',
-      readTime: '8 min read',
-      date: 'April 2026',
-      author: 'SellSolar Policy Desk',
-      summary: 'Everything you need to apply for a green bidirectional meter with LESCO, IESCO, K-Electric, and FESCO.',
-      content: `### How to Successfully Get a Net-Metering Connection in Pakistan\n\nNet metering allows you to export excess solar electricity generated during midday back to the national grid, earning units that offset your nighttime consumption.\n\n#### Key Prerequisites:\n1. **Three-Phase Connection:** Net-metering is only permitted on sanctioned three-phase domestic or commercial meters.\n2. **Inverter Certification:** Your inverter must be on the AEDB (Alternative Energy Development Board) approved list.\n3. **Earthing & Lightning Arrestor:** Proper dual-pit earthing with earth resistance under 5 Ohms.\n\n#### The 5 Steps:\n1. **Site Assessment & Application Preparation:** Fill Form-A with single-line diagrams.\n2. **Submission to DISCO Division:** Submit through an AEDB-certified Tier-1 installer.\n3. **NOC & Inspection:** SDO/XEN site inspection to verify inverter safety disconnection.\n4. **Signing Connection Agreement:** Bilateral agreement with DISCO.\n5. **Bidirectional Green Meter Installation:** Meter testing in laboratory and final commissioning.`
-    },
-    {
-      id: 3,
-      title: 'Hybrid vs On-Grid Inverters: Which Saves More Money During Load Shedding?',
-      category: 'Technical',
-      readTime: '5 min read',
-      date: 'April 2026',
-      author: 'Team SellSolar',
-      summary: 'Understanding battery backup, EPS transfer times, and ROI when grid outages occur during peak tariff hours.',
-      content: `### On-Grid vs Hybrid: The Reality of Pakistan's Grid\n\n- **On-Grid Inverters:** Require the grid voltage and frequency reference to operate. When grid power drops, on-grid inverters immediately shut down for anti-islanding safety.\n- **Hybrid Inverters:** Seamlessly switch to battery storage (often within 10 milliseconds), running critical home loads like inverter ACs, refrigerators, and lights uninterrupted.\n\n**Recommendation:** For areas with more than 2 hours of daily load-shedding, hybrid inverters paired with lithium LiFePO4 batteries provide far superior comfort and peak-tariff savings.`
-    },
-    {
-      id: 4,
-      title: '5 Warning Signs of Fake or Re-labeled Solar Panels in Local Markets',
-      category: 'Buying Guides',
-      readTime: '4 min read',
-      date: 'March 2026',
-      author: 'SellSolar Verification Team',
-      summary: 'Learn how to detect B-grade cells, duplicated serial numbers, and altered wattage stickers before paying.',
-      content: `### How to Spot Fake Solar Equipment in Pakistan\n\n1. **Sticker vs Under-Glass Barcode:** Genuine Tier-1 modules laminate the barcode *underneath* the glass layer during factory vacuum seal. If you can peel off the barcode, reject it.\n2. **Mismatched Busbars:** Low-cost counterfeit panels use older 5BB (busbar) cells while claiming to be 9BB or 16BB half-cell modules.\n3. **Suspicious Price-Per-Watt:** If current market rate is Rs. 38/W and a seller is offering 'Tier-1 brand new' at Rs. 26/W, it is almost certainly B-grade, factory reject, or refurbished.\n4. **Uneven Soldering & Snail Trails:** Look closely under bright daylight for cracked wafers, discoloration, or inconsistent cell spacing.\n5. **Check Seller Credentials:** Always buy from verified dealers with a physical shop address and positive feedback on SellSolar.pk.`
-    }
-  ];
+  const categories = useMemo(() => {
+    const set = new Set(['All']);
+    posts.forEach((p) => {
+      if (p.category) set.add(p.category);
+    });
+    return Array.from(set);
+  }, [posts]);
 
-  const filteredPosts = activeCategory === 'All'
-    ? posts
-    : posts.filter((p) => p.category === activeCategory);
+  const filteredPosts =
+    activeCategory === 'All' ? posts : posts.filter((p) => p.category === activeCategory);
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -1081,6 +1077,14 @@ function BlogContent({ onNavigate }) {
       </div>
 
       {/* Articles Grid */}
+      {loadingPosts ? (
+        <div className="py-12 text-center text-xs text-gray-400">Loading solar guides…</div>
+      ) : filteredPosts.length === 0 ? (
+        <div className="py-12 text-center rounded-3xl border border-dashed border-gray-200 dark:border-gray-800">
+          <p className="text-sm font-bold text-gray-700 dark:text-gray-300">No published guides in this category yet</p>
+          <p className="text-xs text-gray-400 mt-1">Check back soon — new posts are added from the Admin Blog panel.</p>
+        </div>
+      ) : null}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {filteredPosts.map((post) => (
           <div
@@ -1092,7 +1096,7 @@ function BlogContent({ onNavigate }) {
                 <span className="text-primary-600 dark:text-primary-400 uppercase tracking-wider">
                   {post.category}
                 </span>
-                <span>{post.readTime}</span>
+                <span>{post.readTime || post.read_time}</span>
               </div>
               <h3 className="font-extrabold text-base sm:text-lg text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                 {post.title}
@@ -1126,7 +1130,7 @@ function BlogContent({ onNavigate }) {
               <div className="flex items-center gap-2 text-xs text-primary-600 dark:text-primary-400 font-bold">
                 <span>{selectedArticle.category}</span>
                 <span>•</span>
-                <span className="text-gray-400 font-normal">{selectedArticle.readTime}</span>
+                <span className="text-gray-400 font-normal">{selectedArticle.readTime || selectedArticle.read_time}</span>
               </div>
               <button
                 type="button"

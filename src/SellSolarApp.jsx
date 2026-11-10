@@ -2161,11 +2161,32 @@ function ax({
     window.open(`https://wa.me/${clean}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
   };
 
+  const listingHref = `/listing/${encodeURIComponent(t.id)}`;
+  const handleCardLinkClick = (ev) => {
+    // Let the browser handle ctrl/cmd/shift/middle clicks (open in new tab/window, copy link).
+    if (ev.defaultPrevented || ev.button !== 0 || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) {
+      ev.stopPropagation();
+      return;
+    }
+    ev.preventDefault();
+    ev.stopPropagation();
+    if (typeof e === 'function') e();
+  };
+
   return jsxs("div",{
     id: `listing-card-${t.id}`,
     onClick: e,
     className: "group cursor-pointer rounded-2xl bg-white dark:bg-gray-900 border border-gray-200/90 dark:border-gray-800/90 shadow-xs hover:shadow-xl hover:border-amber-500/50 dark:hover:border-amber-500/40 hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between overflow-hidden relative",
     children: [
+      // Real link covering the card: right-click → copy link / open in new tab gives the direct ad URL
+      jsx("a", {
+        href: listingHref,
+        onClick: handleCardLinkClick,
+        "aria-label": t.title,
+        title: t.title,
+        className: "absolute inset-0 z-[5] rounded-2xl",
+        draggable: false
+      }),
       jsxs("div", {
         children: [
           jsxs("div", {
@@ -2323,7 +2344,7 @@ function ax({
               onClick: handleWhatsApp,
               id: `listing-card-chat-btn-${t.id}`,
               title: "Chat with seller on WhatsApp",
-              className: "inline-flex items-center gap-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/80 border border-emerald-200 dark:border-emerald-800/80 text-emerald-700 dark:text-emerald-300 px-3 py-1.5 text-xs font-bold transition-all shadow-2xs hover:scale-105 active:scale-95 shrink-0 cursor-pointer",
+              className: "relative z-10 inline-flex items-center gap-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/80 border border-emerald-200 dark:border-emerald-800/80 text-emerald-700 dark:text-emerald-300 px-3 py-1.5 text-xs font-bold transition-all shadow-2xs hover:scale-105 active:scale-95 shrink-0 cursor-pointer",
               children: jsxs(Fragment, {
                 children: [
                   jsx(MessageCircle, {
@@ -6627,10 +6648,11 @@ function yx({
                     }),
                     jsxs("button",{
                       type:"button",onClick:()=>{
+                        const directUrl = `${(typeof window !== 'undefined' && window.location.origin) || 'https://sellsolar.pk'}/listing/${encodeURIComponent(r.id || t)}`;
                         if(typeof navigator !== 'undefined' && navigator.share){
-                          navigator.share({title:r.title,text:`Check out ${r.title} on SellSolar.pk:`,url:window.location.href}).catch(()=>{});
+                          navigator.share({title:r.title,text:`Check out ${r.title} on SellSolar.pk:`,url:directUrl}).catch(()=>{});
                         }else if(typeof navigator !== 'undefined' && navigator.clipboard){
-                          navigator.clipboard.writeText(window.location.href);
+                          navigator.clipboard.writeText(directUrl);
                           if(toastCtx && toastCtx.showToast){
                             toastCtx.showToast({title:"Link Copied",message:"Listing link copied to clipboard",type:"success"});
                           }

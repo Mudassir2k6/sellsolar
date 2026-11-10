@@ -17,7 +17,7 @@ function WhatsAppIcon({ className = 'h-7 w-7' }) {
   );
 }
 
-export default function FloatingWhatsAppWidget() {
+export default function FloatingWhatsAppWidget({ hideOnMobile = false }) {
   const { settings } = useSiteSettings();
 
   if (settings?.whatsAppEnabled === false) {
@@ -39,7 +39,7 @@ export default function FloatingWhatsAppWidget() {
         isBottomLeft
           ? 'left-4 sm:left-6 bottom-18 md:bottom-6'
           : 'right-4 sm:right-6 bottom-18 md:bottom-24'
-      } flex items-center group`}
+      } ${hideOnMobile ? 'hidden lg:flex' : 'flex'} items-center group`}
     >
       <a
         href={waUrl}

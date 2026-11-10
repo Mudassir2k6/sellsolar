@@ -105,8 +105,12 @@ import {
   Youtube,
   Zap,
   CalendarDays,
+  Flag,
+  Maximize2,
 } from 'lucide-react';
-import {
+import ListingLightbox from './components/ListingLightbox';
+import ReportAdModal from './components/ReportAdModal';
+import { dedupeSellerAds } from './lib/listingsOwnership';import {
   formatListingDate,
   formatListingDateRelative,
   filterListingsByDateRange,
@@ -2148,17 +2152,25 @@ function ax({
   const allImages = listingImages(t);
   const imgUrl = allImages[0] || t.image_url || getEquipmentFallbackImage(t.category, t.title);
 
+  const { settings: cardSettings } = useSiteSettings();
   const handleWhatsApp = (ev) => {
     ev.stopPropagation();
-    const phone = t.seller_phone || t.phone || "03345453761";
-    let clean = phone.replace(/[^0-9]/g, '');
-    if (clean.startsWith('0')) {
-      clean = '92' + clean.slice(1);
-    } else if (!clean.startsWith('92')) {
-      clean = '92' + clean;
-    }
+    const phone = t.seller_phone || t.phone || "";
     const msg = `Salam! I am interested in your solar listing on SellSolar: "${t.title}" (${formatPrice(t.price)}). Is it still available?`;
-    window.open(`https://wa.me/${clean}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
+    let waUrl;
+    if (phone) {
+      let clean = phone.replace(/[^0-9]/g, '');
+      if (clean.startsWith('0')) {
+        clean = '92' + clean.slice(1);
+      } else if (!clean.startsWith('92')) {
+        clean = '92' + clean;
+      }
+      waUrl = `https://wa.me/${clean}?text=${encodeURIComponent(msg)}`;
+    } else {
+      // Seller has no phone on file: route to SellSolar support desk (never a random number)
+      waUrl = buildWhatsAppUrl(cardSettings, `${msg}\nListing: ${(typeof window !== 'undefined' && window.location.origin) || 'https://sellsolar.pk'}/listing/${encodeURIComponent(t.id)}`);
+    }
+    window.open(waUrl, '_blank', 'noopener,noreferrer');
   };
 
   const listingHref = `/listing/${encodeURIComponent(t.id)}`;
@@ -6194,8 +6206,13 @@ function yx({
     })
   })
 }function jx({
-  listingId:t,onBack:e,hasOuterNavbar=false
+  listingId:t,onBack:e,hasOuterNavbar=false,onOpenListing
 }){
+  const { settings: siteSettings } = useSiteSettings();
+  const [lightboxOpen, setLightboxOpen] = useState(!1);
+  const [reportOpen, setReportOpen] = useState(!1);
+  const [similarAds, setSimilarAds] = useState([]);
+  const [sellerAds, setSellerAds] = useState([]);
   const[r,n]=useState(null),[s,a]=useState(null),[l,o]=useState(!0),[c,u]=useState(null),[d,h]=useState(!1),[activePhotoIdx,setActivePhotoIdx]=useState(0),[inquiryModalOpen,setInquiryModalOpen]=useState(!1);
   const { user: currentUser, profile: currentProfile, isAdmin, isSuperAdmin } = useAuth();
   const toastCtx = useToast();
@@ -6208,6 +6225,7 @@ function yx({
   useEffect(()=>{
     (async()=>{
       o(!0),u(null);
+      setActivePhotoIdx(0),setLightboxOpen(!1),h(!1),setSimilarAds([]),setSellerAds([]),a(null);
       try{
         if (isAdDeleted(t)) {
           u("Listing has been removed or is no longer available");
@@ -6296,10 +6314,10 @@ function yx({
       resolvedPhone = (currentProfile == null ? void 0 : currentProfile.phone) || (currentUser == null ? void 0 : currentUser.user_metadata?.phone) || (currentUser?.email && pMap[currentUser.email]) || null;
     }
   }
-  if (!resolvedPhone) {
-    resolvedPhone = '03345453761';
-  }
-  const w = resolvedPhone;
+  // No fallback number: if the seller has no phone on file we never show someone else's number.
+  const w = resolvedPhone || null;
+  const hasSellerPhone = Boolean(w);
+  const supportWaUrl = (extra) => buildWhatsAppUrl(siteSettings, extra);
 
   useEffect(() => {
     if (r && !r.seller_phone && resolvedPhone) {
@@ -6322,6 +6340,61 @@ function yx({
       }
     }
   }, [r == null ? void 0 : r.id, r == null ? void 0 : r.seller_phone, resolvedPhone]);
+
+  // Similar ads (same category/brand/city) + more ads from the same seller
+  useEffect(() => {
+    if (!r?.id) return;
+    let cancelled = false;
+    const selfId = String(r.id);
+    const sellerEmail = (r.seller_email || '').toLowerCase();
+    const isSameSeller = (x) =>
+      Boolean((r.user_id && x.user_id === r.user_id) || (sellerEmail && (x.seller_email || '').toLowerCase() === sellerEmail));
+    const isVisible = (x) =>
+      x && x.id && String(x.id) !== selfId && !x.is_sold && !x.is_deleted && x.status !== 'deleted' &&
+      x.status !== 'disabled' && !x.is_ad_disabled && !isAdDeleted(x.id);
+    const score = (x) => {
+      let s = 0;
+      if (x.category === r.category) s += 4;
+      if (x.brand && x.brand === r.brand) s += 3;
+      if (x.city && x.city === r.city) s += 2;
+      if (x.condition === r.condition) s += 1;
+      const pr = Number(r.price) || 0;
+      const px = Number(x.price) || 0;
+      if (pr && px && Math.abs(px - pr) / pr < 0.35) s += 1;
+      return s;
+    };
+    const apply = (pool) => {
+      if (cancelled) return;
+      const visible = dedupeSellerAds((pool || []).filter(isVisible));
+      setSellerAds(visible.filter(isSameSeller).slice(0, 4));
+      setSimilarAds(
+        visible
+          .filter((x) => !isSameSeller(x) && x.category === r.category)
+          .map((x) => ({ x, s: score(x) }))
+          .sort((a, b) => b.s - a.s)
+          .slice(0, 4)
+          .map((o) => o.x),
+      );
+    };
+    apply(getLocalOrSeedListings());
+    (async () => {
+      if (!isSupabaseConfigured() || !supabase) return;
+      try {
+        const res = await Promise.race([
+          supabase.from("solar_listings").select("*").eq("is_deleted", false).order("created_at", { ascending: false }).limit(60),
+          new Promise((resolve) => setTimeout(() => resolve({ data: null }), 4000)),
+        ]);
+        if (res?.data?.length) apply([...res.data, ...getLocalOrSeedListings()]);
+      } catch (err) {}
+    })();
+    return () => { cancelled = true; };
+  }, [r?.id, r?.category]);
+
+  // Open another listing from a card (SPA navigation when available, hard link otherwise)
+  const openListingFromCard = (id) => {
+    if (typeof onOpenListing === 'function') onOpenListing(id);
+    else if (typeof window !== 'undefined') window.location.href = `/listing/${encodeURIComponent(id)}`;
+  };
 
   const handleSaveListingPhone = async () => {
     setPhoneInputError("");
@@ -6403,14 +6476,18 @@ function yx({
     })
   });
   if(c||!r)return jsx("div",{
-    className:"min-h-screen bg-gray-50",children:jsx("div",{
+    className:`min-h-screen bg-gray-50 dark:bg-gray-950 ${hasOuterNavbar ? "pt-20 sm:pt-24 lg:pt-28" : ""}`,children:jsx("div",{
       className:"container-page flex flex-col items-center justify-center py-24",children:jsxs("div",{
-        className:"card max-w-md p-8 text-center",children:[jsx("p",{
-          className:"text-lg font-semibold text-gray-700",children:c||"Listing not found"
+        className:"card max-w-md p-8 text-center",children:[jsx("div",{
+          className:"mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-100 dark:bg-amber-950/60 text-amber-600",children:jsx(PackageOpen,{className:"h-7 w-7"})
+        }),jsx("p",{
+          className:"text-lg font-semibold text-gray-700 dark:text-gray-200",children:c||"Listing not found"
+        }),jsx("p",{
+          className:"mt-2 text-sm text-gray-500 dark:text-gray-400",children:"This ad may have been sold, removed or the link is incomplete. Browse thousands of other solar ads on SellSolar."
         }),jsxs("button",{
-          onClick:e,className:"btn-ghost mt-6",children:[jsx(ArrowLeft,{
+          onClick:e,className:"btn-primary mt-6 inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold",children:[jsx(Search,{
             className:"h-4 w-4"
-          }),"Back to Listings"]
+          }),"Browse all ads"]
         })]
       })
     })
@@ -6434,21 +6511,35 @@ function yx({
   });
   const photos = listingImages(r);
   const detailImg = photos[activePhotoIdx] || r.image_url || getEquipmentFallbackImage(r.category, r.title);
+  const capKw = Number(r.capacity_kw);
+  const priceNum = Number(r.price);
+  const perUnitPrice = capKw > 0 && priceNum > 0
+    ? (r.category === "panel"
+      ? `≈ PKR ${Math.round(priceNum / (capKw * 1000)).toLocaleString("en-PK")} / Watt`
+      : `≈ PKR ${Math.round(priceNum / capKw).toLocaleString("en-PK")} / kW`)
+    : null;
 
+  const adDirectUrl = `${(typeof window !== 'undefined' && window.location.origin) || 'https://sellsolar.pk'}/listing/${encodeURIComponent(r.id || t)}`;
   const handleWhatsApp = () => {
-    const targetPhone = w || '03345453761';
     if (r && r.id) {
       recordProductInquiry(r.id, 'whatsapp');
       const nextV = recordAndIncrementAdView(r);
       setViewCount(prev => Math.max(prev, nextV));
     }
+    if (!w) {
+      // Seller has no phone on file: ask SellSolar support to connect the buyer
+      const supportMsg = `Salam! I want to contact the seller of "${r.title}" (${formatPrice(r.price)}) on SellSolar.pk.\n${adDirectUrl}`;
+      if (typeof window !== 'undefined') window.open(supportWaUrl(supportMsg), '_blank', 'noopener,noreferrer');
+      return;
+    }
+    const targetPhone = w;
     let clean = targetPhone.replace(/[^0-9]/g, '');
     if (clean.startsWith('0')) {
       clean = '92' + clean.slice(1);
     } else if (!clean.startsWith('92') && clean.length === 10) {
       clean = '92' + clean;
     }
-    const msg = `Salam! I am interested in your listing: "${r.title}" (PKR ${formatPrice(r.price)}) on SellSolar.pk. Is it still available?`;
+    const msg = `Salam! I am interested in your listing: "${r.title}" (${formatPrice(r.price)}) on SellSolar.pk. Is it still available?\n${adDirectUrl}`;
     const waUrl = `https://wa.me/${clean}?text=${encodeURIComponent(msg)}`;
     if (typeof window !== 'undefined') {
       window.open(waUrl, '_blank', 'noopener,noreferrer');
@@ -6458,7 +6549,7 @@ function yx({
   return jsxs(Fragment, {
     children: [
       jsxs("div",{
-    className:`min-h-screen bg-gray-50 dark:bg-gray-950 ${hasOuterNavbar ? "pt-20 sm:pt-24 lg:pt-28" : ""}`,children:[
+    className:`min-h-screen bg-gray-50 dark:bg-gray-950 pb-36 lg:pb-0 ${hasOuterNavbar ? "pt-20 sm:pt-24 lg:pt-28" : ""}`,children:[
     !hasOuterNavbar ? jsx("div",{
       className:"sticky top-0 z-40 border-b border-gray-100 dark:border-gray-800 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md",children:jsxs("div",{
         className:"container-page flex h-16 items-center justify-between",children:[jsxs("button",{
@@ -6481,12 +6572,12 @@ function yx({
     jsx("div",{
       className:"container-page py-8 lg:py-12",children:jsxs("div",{
         className:"mx-auto max-w-5xl",children:[jsxs("div",{
-          className:"mb-6 flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400",children:[jsx("button",{
-            onClick:e,className:"hover:text-gray-700 dark:hover:text-gray-200",children:"Home"
+          "aria-label":"Breadcrumb",className:"mb-6 flex flex-wrap items-center gap-2 text-sm text-gray-500 dark:text-gray-400",children:[jsx("a",{
+            href:"/",onClick:ev=>{ if(ev.button===0&&!ev.metaKey&&!ev.ctrlKey&&!ev.shiftKey){ ev.preventDefault(); e(); } },className:"hover:text-gray-700 dark:hover:text-gray-200 hover:underline",children:"Home"
           }),jsx("span",{
             children:"/"
-          }),jsx("span",{
-            className:"font-semibold text-primary-600 dark:text-primary-400",children:CATEGORIES[r.category]||r.category
+          }),jsx("a",{
+            href:"/",onClick:ev=>{ if(ev.button===0&&!ev.metaKey&&!ev.ctrlKey&&!ev.shiftKey){ ev.preventDefault(); e(); } },title:`Browse ${CATEGORIES[r.category]||r.category}`,className:"font-semibold text-primary-600 dark:text-primary-400 hover:underline",children:CATEGORIES[r.category]||r.category
           }),jsx("span",{
             children:"/"
           }),jsx("span",{
@@ -6497,10 +6588,17 @@ function yx({
             className:"lg:col-span-3",children:[jsxs("div",{
               className:"card overflow-hidden",children:[jsxs("div",{
                 className:"relative aspect-[4/3] bg-gray-100 dark:bg-gray-800",children:[jsx("img",{
-                  src:detailImg,alt:r.title,referrerPolicy:"no-referrer",className:"h-full w-full object-cover",onError:s=>{
+                  src:detailImg,alt:r.title,fetchPriority:"high",decoding:"async",referrerPolicy:"no-referrer",className:`h-full w-full object-cover cursor-zoom-in ${r.is_sold?"grayscale opacity-70":""}`,onClick:()=>setLightboxOpen(!0),onError:s=>{
                     s.currentTarget.onerror = null;
                     s.currentTarget.src = getEquipmentFallbackImage(r.category, r.title);
                   }
+                }),r.is_sold&&jsx("div",{
+                  className:"pointer-events-none absolute inset-0 flex items-center justify-center",children:jsx("span",{
+                    className:"-rotate-12 rounded-xl border-4 border-rose-500 bg-white/90 px-6 py-2 text-3xl font-black uppercase tracking-widest text-rose-600 shadow-xl",children:"Sold"
+                  })
+                }),jsxs("button",{
+                  type:"button",onClick:()=>setLightboxOpen(!0),"aria-label":"View photos fullscreen",
+                  className:"absolute bottom-3 right-3 z-10 flex items-center gap-1.5 rounded-full bg-black/70 px-3 py-1.5 text-xs font-bold text-white backdrop-blur-md hover:bg-black/85 cursor-pointer",children:[jsx(Maximize2,{className:"h-3.5 w-3.5"}),photos.length>1?`${photos.length} photos`:"View"]
                 }),jsxs("div",{
                   className:"absolute left-4 top-4 flex gap-2",children:[jsx("span",{
                     className:`rounded-full px-3 py-1 text-xs font-bold shadow-sm ${p?"bg-warning-500 text-white":"bg-secondary-500 text-white"}`,children:p?"Used":"New"
@@ -6522,7 +6620,7 @@ function yx({
               }),photos.length > 1 && jsx("div",{
                 className:"p-3 flex gap-2 overflow-x-auto bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800",children:photos.map((ph, idx)=>jsx("button",{
                   onClick:()=>setActivePhotoIdx(idx),className:`relative h-16 w-16 shrink-0 rounded-lg overflow-hidden border-2 transition-all ${activePhotoIdx===idx?"border-primary-500 ring-2 ring-primary-500/30 scale-105":"border-transparent opacity-70 hover:opacity-100"}`,children:jsx("img",{
-                    src:ph,alt:`${r.title} photo ${idx + 1}`,referrerPolicy:"no-referrer",className:"h-full w-full object-cover",onError:s=>{
+                    src:ph,alt:`${r.title} photo ${idx + 1}`,loading:"lazy",decoding:"async",referrerPolicy:"no-referrer",className:"h-full w-full object-cover",onError:s=>{
                       s.currentTarget.onerror = null;
                       s.currentTarget.src = getEquipmentFallbackImage(r.category, r.title);
                     }
@@ -6554,9 +6652,17 @@ function yx({
                 className:"card p-6",children:[jsx("h1",{
                   className:"text-xl font-extrabold leading-tight text-gray-900 dark:text-white",children:r.title
                 }),jsx("div",{
-                  className:"mt-3 flex items-center gap-2",children:jsx("span",{
+                  className:"mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1",children:[jsx("span",{
                     className:"text-3xl font-extrabold text-primary-600 dark:text-primary-400",children:formatPrice(r.price)
-                  })
+                  }),perUnitPrice&&jsx("span",{
+                    className:"text-xs font-semibold text-gray-500 dark:text-gray-400",title:"Approximate unit price",children:perUnitPrice
+                  }),r.negotiable===true&&jsx("span",{
+                    className:"rounded-full bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800",children:"Negotiable"
+                  }),r.negotiable===false&&jsx("span",{
+                    className:"rounded-full bg-gray-100 dark:bg-gray-800 px-2 py-0.5 text-[11px] font-bold text-gray-600 dark:text-gray-300",children:"Fixed price"
+                  })]
+                }),r.is_sold&&jsx("div",{
+                  className:"mt-3 rounded-xl border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/40 px-3 py-2 text-xs font-bold text-rose-700 dark:text-rose-300",children:"This item has been marked as sold. See similar ads below."
                 }),jsxs("div",{
                   className:"mt-3 flex flex-wrap items-center gap-2 sm:gap-3 text-sm text-gray-500 dark:text-gray-400",children:[jsxs("span",{
                     className:"flex items-center gap-1",children:[jsx(MapPin,{
@@ -6583,10 +6689,10 @@ function yx({
                       onClick:handleWhatsApp,
                       className:"flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] hover:bg-[#20ba59] px-4 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-emerald-500/25 transition-all hover:scale-[1.01] active:scale-98 cursor-pointer",children:[jsx(MessageCircle,{
                         className:"h-5 w-5 fill-white"
-                      }),"Contact Seller via WhatsApp"]
+                      }),hasSellerPhone?"Contact Seller via WhatsApp":"Ask SellSolar to Connect You (WhatsApp)"]
                     }),
-                    jsxs("a",{
-                      href:`tel:${(w||'03345453761').replace(/[^0-9+]/g,'')}`,
+                    hasSellerPhone&&jsxs("a",{
+                      href:`tel:${w.replace(/[^0-9+]/g,'')}`,
                       onClick:()=>{
                         if(r && r.id) {
                           recordProductInquiry(r.id, 'phone');
@@ -6598,7 +6704,13 @@ function yx({
                         className:"h-5 w-5"
                       }),"Call Seller"]
                     }),
-                    !d?jsxs("button",{
+                    !hasSellerPhone?jsxs("div",{
+                      className:"rounded-xl border border-amber-200 dark:border-amber-800/80 bg-amber-50 dark:bg-amber-950/40 p-3 text-xs font-medium text-amber-800 dark:text-amber-200 space-y-2",children:[jsx("p",{
+                        children:"The seller has not added a phone number to this ad yet. Use the online message, or WhatsApp SellSolar and we will connect you."
+                      }),canEditPhone&&jsx("button",{
+                        type:"button",onClick:()=>{setPhoneInputVal("");setPhoneInputError("");setEditPhoneModalOpen(!0);},className:"inline-flex items-center gap-1.5 rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-700 cursor-pointer",children:"Add phone number to this ad"
+                      })]
+                    }):!d?jsxs("button",{
                       type:"button",
                       onClick:()=>{
                         h(!0);
@@ -6610,21 +6722,21 @@ function yx({
                       },
                       className:"btn-ghost w-full flex items-center justify-center gap-2 border border-gray-200 dark:border-gray-700 py-3 rounded-xl text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer",children:[jsx(Eye,{
                         className:"h-4 w-4 text-primary-500"
-                      }),`Show Phone Number (${(w || '03345453761').slice(0, 4)} •••••••)`]
+                      }),`Show Phone Number (${w.slice(0, 4)} •••••••)`]
                     }):jsxs("div",{
                       className:"rounded-xl bg-primary-50 dark:bg-primary-950/60 p-4 text-center border border-primary-200 dark:border-primary-800 shadow-xs space-y-2",children:[jsx("div",{
                         className:"text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400",children:"Seller Mobile Number"
                       }),jsxs("div",{
                         className:"flex items-center justify-center gap-2",children:[jsxs("a",{
-                          href:`tel:${(w||'03345453761').replace(/[^0-9+]/g,'')}`,
+                          href:`tel:${w.replace(/[^0-9+]/g,'')}`,
                           onClick:()=>{ if(r && r.id) recordProductInquiry(r.id, 'phone'); },
                           className:"text-xl font-black text-primary-600 dark:text-primary-400 tracking-wider hover:underline font-mono py-0.5",children:[jsx(Phone,{
                             className:"inline-block h-4 w-4 mr-1.5 align-middle text-primary-500"
-                          }),w || '03345453761']
+                          }),w]
                         }),jsx("button",{
                           type:"button",
                           onClick:()=>{
-                            const toCopy = w || '03345453761';
+                            const toCopy = w;
                             if(typeof navigator !== 'undefined' && navigator.clipboard){
                               navigator.clipboard.writeText(toCopy);
                               if(toastCtx && toastCtx.showToast){
@@ -6648,7 +6760,7 @@ function yx({
                     }),
                     jsxs("button",{
                       type:"button",onClick:()=>{
-                        const directUrl = `${(typeof window !== 'undefined' && window.location.origin) || 'https://sellsolar.pk'}/listing/${encodeURIComponent(r.id || t)}`;
+                        const directUrl = adDirectUrl;
                         if(typeof navigator !== 'undefined' && navigator.share){
                           navigator.share({title:r.title,text:`Check out ${r.title} on SellSolar.pk:`,url:directUrl}).catch(()=>{});
                         }else if(typeof navigator !== 'undefined' && navigator.clipboard){
@@ -6660,6 +6772,11 @@ function yx({
                       },className:"btn-ghost w-full flex items-center justify-center gap-2 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-colors text-gray-700 dark:text-gray-300",children:[jsx(Share2,{
                         className:"h-4 w-4 text-gray-500"
                       }),"Share Listing"]
+                    }),
+                    jsxs("button",{
+                      type:"button",onClick:()=>setReportOpen(!0),className:"w-full flex items-center justify-center gap-2 rounded-xl py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer",children:[jsx(Flag,{
+                        className:"h-3.5 w-3.5"
+                      }),"Report this ad"]
                     })
                   ]
                 })]
@@ -6676,7 +6793,7 @@ function yx({
                   }),jsxs("div",{
                     className:"min-w-0 flex-1",children:[jsxs("div",{
                       className:"flex items-center gap-2",children:[jsx("h4",{
-                        className:"truncate text-sm font-bold text-gray-900",children:y
+                        className:"truncate text-sm font-bold text-gray-900 dark:text-white",children:y
                       }),j&&(s==null?void 0:s.is_verified_dealer)&&jsx(BadgeCheck,{
                         className:"h-4 w-4 shrink-0 text-secondary-500"
                       })]
@@ -6690,7 +6807,7 @@ function yx({
                       jsxs("div",{
                         className:"flex items-center gap-2",children:[jsx(Phone,{
                           className:"h-4 w-4 text-primary-500 shrink-0"
-                        }),jsx("span",{className:"font-semibold text-emerald-600 dark:text-emerald-400",children:"Verified Seller Phone Active"})]
+                        }),jsx("span",{className:`font-semibold ${hasSellerPhone?"text-emerald-600 dark:text-emerald-400":"text-amber-600 dark:text-amber-400"}`,children:hasSellerPhone?"Phone number available":"Phone number not added"})]
                       })
                     ]
                   }),(s==null?void 0:s.city)&&jsxs("div",{
@@ -6728,6 +6845,18 @@ function yx({
               })]
             })
           })]
+        }),sellerAds.length>0&&jsxs("section",{
+          "aria-label":"More ads from this seller",className:"mt-12",children:[jsxs("h2",{
+            className:"mb-4 flex items-center gap-2 text-lg font-extrabold text-gray-900 dark:text-white",children:[jsx(Store,{className:"h-5 w-5 text-primary-500"}),`More ads from ${y}`]
+          }),jsx("div",{
+            className:"grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4",children:sellerAds.map(x=>jsx(ax,{listing:x,onClick:()=>openListingFromCard(x.id)},`seller-${x.id}`))
+          })]
+        }),similarAds.length>0&&jsxs("section",{
+          "aria-label":"Similar ads",className:"mt-12",children:[jsxs("h2",{
+            className:"mb-4 flex items-center gap-2 text-lg font-extrabold text-gray-900 dark:text-white",children:[jsx(Layers,{className:"h-5 w-5 text-amber-500"}),"Similar ads you may like"]
+          }),jsx("div",{
+            className:"grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4",children:similarAds.map(x=>jsx(ax,{listing:x,onClick:()=>openListingFromCard(x.id)},`similar-${x.id}`))
+          })]
         })]
       })
     })]
@@ -6737,6 +6866,58 @@ function yx({
     onClose: () => setInquiryModalOpen(!1),
     recipientEmail: r.seller_email || "info@sellsolar.pk",
     defaultSubject: `Inquiry: ${r.title} (${formatPrice(r.price)})`
+  }),
+  // Mobile sticky contact bar (sits above the mobile bottom nav)
+  jsxs("div", {
+    id: "listing-sticky-contact",
+    className: "fixed inset-x-0 bottom-14 md:bottom-0 z-40 flex items-center gap-2 border-t border-gray-200 dark:border-gray-800 bg-white/95 dark:bg-gray-900/95 px-3 py-2.5 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] backdrop-blur-md lg:hidden",
+    children: [
+      jsxs("div", {
+        className: "min-w-0 shrink-0",
+        children: [
+          jsx("div", { className: "text-[10px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400", children: "Price" }),
+          jsx("div", { className: "text-sm font-black text-primary-600 dark:text-primary-400 whitespace-nowrap", children: formatPrice(r.price) })
+        ]
+      }),
+      jsxs("button", {
+        type: "button",
+        onClick: handleWhatsApp,
+        className: "flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#25D366] px-3 py-3 text-sm font-extrabold text-white shadow-md cursor-pointer active:scale-95",
+        children: [jsx(MessageCircle, { className: "h-4 w-4 fill-white" }), "WhatsApp"]
+      }),
+      hasSellerPhone ? jsxs("a", {
+        href: `tel:${w.replace(/[^0-9+]/g, '')}`,
+        onClick: () => {
+          if (r && r.id) {
+            recordProductInquiry(r.id, 'phone');
+            const nv = recordAndIncrementAdView(r);
+            setViewCount(prev => Math.max(prev, nv));
+          }
+        },
+        className: "btn-primary flex flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-3 text-sm font-extrabold",
+        children: [jsx(Phone, { className: "h-4 w-4" }), "Call"]
+      }) : jsxs("button", {
+        type: "button",
+        onClick: () => setInquiryModalOpen(!0),
+        className: "flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-amber-500 px-3 py-3 text-sm font-extrabold text-white cursor-pointer active:scale-95",
+        children: [jsx(Mail, { className: "h-4 w-4" }), "Message"]
+      })
+    ]
+  }),
+  lightboxOpen && jsx(ListingLightbox, {
+    images: photos.length ? photos : [detailImg],
+    index: Math.min(activePhotoIdx, Math.max(0, (photos.length || 1) - 1)),
+    onIndexChange: setActivePhotoIdx,
+    onClose: () => setLightboxOpen(!1),
+    alt: r.title,
+    getFallback: () => getEquipmentFallbackImage(r.category, r.title)
+  }),
+  jsx(ReportAdModal, {
+    isOpen: reportOpen,
+    onClose: () => setReportOpen(!1),
+    listing: r,
+    defaultName: currentProfile?.full_name || "",
+    defaultEmail: currentUser?.email || ""
   }),
   editPhoneModalOpen && jsx("div", {
     className: "fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200",
@@ -7503,6 +7684,7 @@ export default function App({ initialPathname, initialSlug }){
         children: jsx(jx, {
           listingId: a,
           onBack: () => o("home"),
+          onOpenListing: u,
           hasOuterNavbar: true
         })
       }),
@@ -7720,7 +7902,7 @@ export default function App({ initialPathname, initialSlug }){
         children: pageContent
       }),
       showFloatingPostBtn ? jsx(FloatingPostAdButton, { onPostAd: c }) : null,
-      jsx(FloatingWhatsAppWidget, {}),
+      jsx(FloatingWhatsAppWidget, { hideOnMobile: n === "listing-detail" }),
       showMobileBottomNav ? jsx(MobileBottomNav, {
         currentPage: n,
         onNavigate: handleNavigate,

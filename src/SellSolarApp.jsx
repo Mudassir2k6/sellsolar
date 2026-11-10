@@ -544,7 +544,7 @@ function Xy({
                 jsx('button', {
                   onClick: () => h('blog'),
                   id: 'header-blog-btn',
-                  className: `hidden xl:flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all shadow-xs cursor-pointer shrink-0 ${
+                  className: `flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all shadow-xs cursor-pointer shrink-0 ${
                     e === 'blog'
                       ? 'bg-amber-500 text-white shadow-amber-500/25'
                       : 'bg-amber-50/80 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/60 hover:bg-amber-100 dark:hover:bg-amber-900/60'
@@ -567,7 +567,7 @@ function Xy({
                 }),
                 jsx('button', {
                   onClick: () => h('calculator'),
-                  className: `hidden lg:flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 ${
+                  className: `flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 ${
                     e === 'calculator'
                       ? 'bg-primary-500 text-white shadow-xs shadow-primary-500/20'
                       : 'bg-primary-50 dark:bg-primary-950/40 text-primary-800 dark:text-primary-300 border border-primary-200/70 dark:border-primary-800/60 hover:bg-primary-100 dark:hover:bg-primary-900/60'
@@ -582,15 +582,46 @@ function Xy({
                         }`,
                       }),
                       jsx('span', {
-                        className: 'whitespace-nowrap',
+                        className: 'whitespace-nowrap hidden xl:inline',
                         children: 'Load Calculator',
+                      }),
+                      jsx('span', {
+                        className: 'whitespace-nowrap xl:hidden',
+                        children: 'Calculator',
+                      }),
+                    ],
+                  }),
+                }),
+                jsx('button', {
+                  onClick: () => h('dealers'),
+                  className: `flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 ${
+                    e === 'dealers'
+                      ? 'bg-sky-600 text-white shadow-xs shadow-sky-600/20'
+                      : 'bg-sky-50 dark:bg-sky-950/40 text-sky-800 dark:text-sky-300 border border-sky-200/70 dark:border-sky-800/60 hover:bg-sky-100 dark:hover:bg-sky-900/60'
+                  }`,
+                  children: jsxs(Fragment, {
+                    children: [
+                      jsx(Store, {
+                        className: `h-4 w-4 shrink-0 ${
+                          e === 'dealers'
+                            ? 'text-white'
+                            : 'text-sky-600 dark:text-sky-400'
+                        }`,
+                      }),
+                      jsx('span', {
+                        className: 'whitespace-nowrap hidden xl:inline',
+                        children: 'Verified Dealers',
+                      }),
+                      jsx('span', {
+                        className: 'whitespace-nowrap xl:hidden',
+                        children: 'Dealers',
                       }),
                     ],
                   }),
                 }),
                 jsx('button', {
                   onClick: () => h('verification'),
-                  className: `hidden xl:flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 ${
+                  className: `flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 ${
                     e === 'verification' || e === 'tier-1-verification' || e === 'panel-verification'
                       ? 'bg-emerald-600 text-white shadow-xs shadow-emerald-600/20'
                       : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60'
@@ -605,15 +636,19 @@ function Xy({
                         }`,
                       }),
                       jsx('span', {
-                        className: 'whitespace-nowrap',
+                        className: 'whitespace-nowrap hidden xl:inline',
                         children: 'Verify Plates',
+                      }),
+                      jsx('span', {
+                        className: 'whitespace-nowrap xl:hidden',
+                        children: 'Verify',
                       }),
                     ],
                   }),
                 }),
                 jsx('button', {
                   onClick: () => h('install'),
-                  className: `hidden 2xl:flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 ${
+                  className: `flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 ${
                     e === 'install'
                       ? 'bg-secondary-600 text-white shadow-xs shadow-secondary-600/20'
                       : 'bg-secondary-50 dark:bg-secondary-950/40 text-secondary-800 dark:text-secondary-300 border border-secondary-200/70 dark:border-secondary-800/60 hover:bg-secondary-100 dark:hover:bg-secondary-900/60'
@@ -6132,7 +6167,7 @@ function yx({
     })
   })
 }function jx({
-  listingId:t,onBack:e
+  listingId:t,onBack:e,hasOuterNavbar=false
 }){
   const[r,n]=useState(null),[s,a]=useState(null),[l,o]=useState(!0),[c,u]=useState(null),[d,h]=useState(!1),[activePhotoIdx,setActivePhotoIdx]=useState(0),[inquiryModalOpen,setInquiryModalOpen]=useState(!1);
   const { user: currentUser, profile: currentProfile, isAdmin, isSuperAdmin } = useAuth();
@@ -6396,7 +6431,8 @@ function yx({
   return jsxs(Fragment, {
     children: [
       jsxs("div",{
-    className:"min-h-screen bg-gray-50 dark:bg-gray-950",children:[jsx("div",{
+    className:`min-h-screen bg-gray-50 dark:bg-gray-950 ${hasOuterNavbar ? "pt-20 sm:pt-24 lg:pt-28" : ""}`,children:[
+    !hasOuterNavbar ? jsx("div",{
       className:"sticky top-0 z-40 border-b border-gray-100 dark:border-gray-800 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md",children:jsxs("div",{
         className:"container-page flex h-16 items-center justify-between",children:[jsxs("button",{
           onClick:e,className:"flex items-center gap-2",children:[jsx("div",{
@@ -6414,7 +6450,8 @@ function yx({
           }),"Back to Listings"]
         })]
       })
-    }),jsx("div",{
+    }) : null,
+    jsx("div",{
       className:"container-page py-8 lg:py-12",children:jsxs("div",{
         className:"mx-auto max-w-5xl",children:[jsxs("div",{
           className:"mb-6 flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400",children:[jsx("button",{
@@ -7366,21 +7403,55 @@ export default function App({ initialPathname, initialSlug }){
     }), jsx(hx, {
       onPostAd: c, onNavigate: handleNavigate
     })]
-  }) : jsx(AdminSuperDashboard, {
-    onBack: () => {
-    try {
-      if (typeof window !== 'undefined') {
-        window.history.pushState({}, '', '/');
-      }
-    } catch (err) {}
-    o("home");
-  },
-    onNavigateToListing: u,
-    onPostAd: c,
-    onChangePassword: () => o("password"),
-    initialTab: n === "inbox" ? "inbox" : "dashboard"
-  }) : n === "listing-detail" && a ? jsx(jx, {
-    listingId: a, onBack: () => o("home")
+  }) : jsxs("div", {
+    className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200",
+    children: [
+      jsx(Xy, {
+        onNavigate: handleNavigate,
+        currentPage: n === "inbox" ? "inbox" : "dashboard",
+        onSelectListing: u,
+        onSearchSubmit: handleGlobalSearchSubmit
+      }),
+      jsx("main", {
+        id: "main",
+        children: jsx(AdminSuperDashboard, {
+          onBack: () => {
+            try {
+              if (typeof window !== 'undefined') {
+                window.history.pushState({}, '', '/');
+              }
+            } catch (err) {}
+            o("home");
+          },
+          onNavigateToListing: u,
+          onPostAd: c,
+          onChangePassword: () => o("password"),
+          initialTab: n === "inbox" ? "inbox" : "dashboard",
+          hasOuterNavbar: true
+        })
+      })
+    ]
+  }) : n === "listing-detail" && a ? jsxs("div", {
+    className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200",
+    children: [
+      jsx(Xy, {
+        onNavigate: handleNavigate,
+        currentPage: "listing-detail",
+        onSelectListing: u,
+        onSearchSubmit: handleGlobalSearchSubmit
+      }),
+      jsx("main", {
+        id: "main",
+        children: jsx(jx, {
+          listingId: a,
+          onBack: () => o("home"),
+          hasOuterNavbar: true
+        })
+      }),
+      jsx(hx, {
+        onPostAd: c, onNavigate: handleNavigate
+      })
+    ]
   }) : n === "not-found" ? jsxs("div", {
     className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100",
     children: [

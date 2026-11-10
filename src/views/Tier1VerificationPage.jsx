@@ -71,7 +71,7 @@ export default function Tier1VerificationPage({ onNavigate }) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors pt-20 sm:pt-24 lg:pt-28">
       {/* Header Banner */}
       <section className="relative overflow-hidden bg-gradient-to-b from-primary-950 via-gray-900 to-gray-950 text-white pt-10 pb-12 sm:pt-14 sm:pb-16 border-b border-gray-800">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />

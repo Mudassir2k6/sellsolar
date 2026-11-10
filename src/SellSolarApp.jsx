@@ -7161,10 +7161,19 @@ export default function App({ initialPathname, initialSlug }){
   };
 
   const isAuthProtectedPage = n === "dashboard" || n === "admin-dashboard" || n === "post-ad";
-  const pageContent = (r && isAuthProtectedPage) ? jsx("div", {
-    className: "flex min-h-screen items-center justify-center bg-white dark:bg-gray-950", children: jsx("div", {
-      className: "flex h-12 w-12 animate-spin rounded-full border-4 border-primary-200 dark:border-primary-800 border-t-primary-500"
-    })
+  const pageContent = (r && isAuthProtectedPage) ? jsxs("div", {
+    className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100",
+    children: [
+      jsx(Xy, {
+        onNavigate: handleNavigate, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
+      }),
+      jsx("div", {
+        className: "flex min-h-[70vh] items-center justify-center pt-24",
+        children: jsx("div", {
+          className: "flex h-12 w-12 animate-spin rounded-full border-4 border-primary-200 dark:border-primary-800 border-t-primary-500"
+        })
+      })
+    ]
   }) : pr ? jsxs("div", {
     className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
       onNavigate: handleNavigate, currentPage: "reset-password", onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit

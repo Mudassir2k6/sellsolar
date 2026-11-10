@@ -1489,7 +1489,66 @@ export const ISLAMABAD_DAILY_SHEETS = {
   }
 };
 
+// 10-Nov-2026 rates
+ISLAMABAD_DAILY_SHEETS["10-Nov-2026"] = {
+  "date": "10-November-2026",
+  "label": "10-Nov-2026 (Ready Stock)",
+  "rates": [
+    {"brand": "LONGi", "model": "645W BF", "rate": 41.25, "prevRate": 41.25, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Astronergy", "model": "625W BF", "rate": 36.90, "prevRate": 36.90, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Astronergy", "model": "720W", "rate": 39.25, "prevRate": 39.25, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "JA Solar", "model": "590W", "rate": 37.00, "prevRate": 37.00, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "JA Solar", "model": "625W", "rate": 37.25, "prevRate": 37.25, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "JA Solar", "model": "630W", "rate": 36.90, "prevRate": 36.90, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Canadian Solar", "model": "585W", "rate": 40.25, "prevRate": 40.25, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Canadian Solar", "model": "625W", "rate": 40.00, "prevRate": 40.00, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Jinko Solar", "model": "585W", "rate": 38.75, "prevRate": 38.75, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Jinko Solar", "model": "645W BF", "rate": 39.75, "prevRate": 39.75, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Korean", "model": "585W", "rate": 37.00, "prevRate": 37.00, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Korean", "model": "715W", "rate": 38.50, "prevRate": 38.50, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "TCL", "model": "720W", "rate": 37.50, "prevRate": 37.50, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "OSDA", "model": "590W / 615W", "rate": 35.00, "prevRate": 35.00, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Trox", "model": "590W", "rate": 35.00, "prevRate": 35.00, "change": 0, "status": "stable", "badge": "Ready Stock"}
+  ],
+  "inverterRates": [
+    {"brand": "SAJ", "model": "06 kW Single Phase", "capacity": "6.0 kW", "rate": 168000, "prevRate": 168000, "change": 0, "status": "new", "badge": "Single Phase"},
+    {"brand": "SAJ", "model": "08 kW Single Phase", "capacity": "8.0 kW", "rate": 255000, "prevRate": 255000, "change": 0, "status": "new", "badge": "Single Phase"},
+    {"brand": "SAJ", "model": "10 kW Single Phase", "capacity": "10.0 kW", "rate": 310000, "prevRate": 310000, "change": 0, "status": "new", "badge": "Single Phase"},
+    {"brand": "SAJ", "model": "12 kW Single Phase", "capacity": "12.0 kW", "rate": 340000, "prevRate": 340000, "change": 0, "status": "new", "badge": "Single Phase"},
+    {"brand": "SAJ", "model": "12 kW Three Phase", "capacity": "12.0 kW", "rate": 410000, "prevRate": 410000, "change": 0, "status": "new", "badge": "Three Phase"},
+    {"brand": "SAJ", "model": "16 kW Three Phase", "capacity": "16.0 kW", "rate": 530000, "prevRate": 530000, "change": 0, "status": "new", "badge": "Three Phase"},
+    {"brand": "SAJ", "model": "20 kW Three Phase", "capacity": "20.0 kW", "rate": 650000, "prevRate": 650000, "change": 0, "status": "new", "badge": "Three Phase"},
+    {"brand": "Itel", "model": "1.6kw PV-3200", "capacity": "1.6 kW", "rate": 42500, "prevRate": 44000, "change": -1500, "status": "down", "badge": "IP-54"},
+    {"brand": "Itel", "model": "3KW Pro PV-4500", "capacity": "3.0 kW", "rate": 71000, "prevRate": 78000, "change": -7000, "status": "down", "badge": "IP-54"},
+    {"brand": "Itel", "model": "4KW Pro PV-6000", "capacity": "4.0 kW", "rate": 111000, "prevRate": 112000, "change": -1000, "status": "down", "badge": "IP-54"},
+    {"brand": "Itel", "model": "6KW Pro PV-8000", "capacity": "6.0 kW", "rate": 135000, "prevRate": 137000, "change": -2000, "status": "down", "badge": "IP-54"},
+    {"brand": "Itel", "model": "8KW PV-16000", "capacity": "8.0 kW", "rate": 190000, "prevRate": 194000, "change": -4000, "status": "down", "badge": "IP-54"},
+    {"brand": "Itel", "model": "12KW PV-16000", "capacity": "12.0 kW", "rate": 265000, "prevRate": 264000, "change": 1000, "status": "up", "badge": "IP-54"},
+    {"brand": "Itel", "model": "6.6KW PV-13000 SP", "capacity": "6.6 kW", "rate": 190000, "prevRate": 194000, "change": -4000, "status": "down", "badge": "IP-66"},
+    {"brand": "Itel", "model": "8KW PV-16000 3P", "capacity": "8.0 kW", "rate": 380000, "prevRate": 380000, "change": 0, "status": "stable", "badge": "IP-66"}
+  ],
+  "batteryRates": [
+    {"brand": "Daewoo", "model": "25V 100Ah LiFePO4", "capacity": "2.56 kWh", "rate": 120000, "prevRate": 120000, "change": 0, "status": "stable"},
+    {"brand": "Daewoo", "model": "51.2V 100Ah LiFePO4", "capacity": "5.12 kWh", "rate": 213000, "prevRate": 213000, "change": 0, "status": "stable"},
+    {"brand": "Daewoo", "model": "51V 200Ah LiFePO4", "capacity": "10.24 kWh", "rate": 418000, "prevRate": 420000, "change": -2000, "status": "down"},
+    {"brand": "Daewoo", "model": "51V 314Ah LiFePO4", "capacity": "16.08 kWh", "rate": 660000, "prevRate": null, "change": 0, "status": "new", "badge": "CATL"},
+    {"brand": "Lithium", "model": "51V 314Ah IP-20", "capacity": "16.0 kWh", "rate": 545000, "prevRate": 575000, "change": -30000, "status": "down"},
+    {"brand": "Lithium", "model": "51V 314Ah IP-65", "capacity": "16.0 kWh", "rate": 565000, "prevRate": null, "change": 0, "status": "new"},
+    {"brand": "Itel", "model": "12V 100Ah", "capacity": "1.28 kWh", "rate": 54000, "prevRate": 56500, "change": -2500, "status": "down"},
+    {"brand": "Itel", "model": "25V 100Ah", "capacity": "2.56 kWh", "rate": 116000, "prevRate": 123000, "change": -7000, "status": "down"},
+    {"brand": "Itel", "model": "25V 200Ah", "capacity": "5.12 kWh", "rate": 215000, "prevRate": null, "change": 0, "status": "new"},
+    {"brand": "Itel", "model": "51V 100Ah", "capacity": "5.12 kWh", "rate": 210000, "prevRate": null, "change": 0, "status": "new"},
+    {"brand": "Itel", "model": "51V 200Ah", "capacity": "10.24 kWh", "rate": 422000, "prevRate": null, "change": 0, "status": "new"},
+    {"brand": "Itel", "model": "51V 314Ah", "capacity": "16.08 kWh", "rate": 559000, "prevRate": null, "change": 0, "status": "new"}
+  ],
+  "essRates": [
+    {"brand": "Itel", "model": "Power Tank 500W/1KWh", "rate": 66000, "prevRate": 65000, "change": 1000, "status": "up"},
+    {"brand": "Itel", "model": "3.6KW + 8KWh ESS", "rate": 325000, "prevRate": null, "change": 0, "status": "new"}
+  ]
+};
+
 // 05-Oct-2026 active sheet aliases
+ISLAMABAD_DAILY_SHEETS["today"] = ISLAMABAD_DAILY_SHEETS["10-Nov-2026"];
 ISLAMABAD_DAILY_SHEETS["24-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
 ISLAMABAD_DAILY_SHEETS["06-Oct-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
 ISLAMABAD_DAILY_SHEETS["16-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];

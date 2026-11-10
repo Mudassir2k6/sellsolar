@@ -112,6 +112,8 @@ import AdminDrillDownModal from './AdminDrillDownModal';
 import EditSolarAdModal from './EditSolarAdModal';
 import AdminAdvertisementSettings from './AdminAdvertisementSettings';
 import AdminBlogModule from './AdminBlogModule';
+import ThemeRadioToggle from './ThemeRadioToggle';
+import GlobalNavbarSearch from './GlobalNavbarSearch';
 import { getStoredInstallationRequests, fetchInstallationRequests } from '../lib/installation';
 import { VERIFIED_DEALERS } from '../data/dealersData';
 import { SEED_LISTINGS } from '../data/seedListings';
@@ -2713,33 +2715,96 @@ export default function AdminSuperDashboard({
           </a>
         </div>
 
-        <div className="flex items-center gap-1.5 sm:gap-2.5">
-          <div className="hidden lg:flex items-center gap-1 mr-2">
+        <div className="flex items-center gap-1 sm:gap-1.5 lg:gap-2 min-w-0">
+          <GlobalNavbarSearch
+            onSelectListing={(id) => {
+              if (typeof onNavigateToListing === 'function') onNavigateToListing(id);
+              else if (typeof window !== 'undefined') window.location.href = `/listing/${id}`;
+            }}
+            onSearchSubmit={(filterObj) => {
+              try {
+                const q = typeof filterObj === 'string'
+                  ? filterObj
+                  : (filterObj?.query || filterObj?.q || '');
+                const params = new URLSearchParams();
+                if (q) params.set('q', String(q));
+                if (filterObj?.category) params.set('category', String(filterObj.category));
+                const qs = params.toString();
+                if (typeof window !== 'undefined') {
+                  window.location.href = qs ? `/?${qs}` : '/';
+                }
+              } catch (_) {
+                if (typeof window !== 'undefined') window.location.href = '/';
+              }
+            }}
+            className="hidden md:flex flex-1 min-w-[90px] max-w-[160px] lg:max-w-[200px] xl:max-w-[240px] mx-0.5 sm:mx-1"
+          />
+
+          <div className="hidden md:flex items-center gap-1 sm:gap-1.5 shrink-0">
             <button
+              type="button"
               onClick={() => { if (typeof window !== 'undefined') window.location.href = '/prices'; }}
-              className="text-xs font-bold text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 px-3 py-1.5 cursor-pointer transition-colors"
+              className="flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 py-1.5 text-xs font-bold transition-all shadow-xs cursor-pointer shrink-0 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/60 hover:bg-amber-100 dark:hover:bg-amber-900/60"
             >
-              Today's Rates
+              <span className="relative flex h-2 w-2 shrink-0">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500" />
+              </span>
+              <span className="whitespace-nowrap">Today's Rates</span>
+              <span className="hidden xl:inline rounded px-1.5 py-0.5 text-[10px] font-extrabold uppercase bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-200">
+                LIVE
+              </span>
             </button>
+
             <button
+              type="button"
+              onClick={() => { if (typeof window !== 'undefined') window.location.href = '/blog'; }}
+              className="hidden lg:flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 py-1.5 text-xs font-bold transition-all shadow-xs cursor-pointer shrink-0 bg-amber-50/80 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/60 hover:bg-amber-100 dark:hover:bg-amber-900/60"
+            >
+              <BookOpen className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+              <span className="whitespace-nowrap">Blog</span>
+            </button>
+
+            <button
+              type="button"
               onClick={() => { if (typeof window !== 'undefined') window.location.href = '/calculator'; }}
-              className="text-xs font-bold text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 px-3 py-1.5 cursor-pointer transition-colors"
+              className="flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 py-1.5 text-xs font-bold transition-all cursor-pointer shrink-0 bg-primary-50 dark:bg-primary-950/40 text-primary-800 dark:text-primary-300 border border-primary-200/70 dark:border-primary-800/60 hover:bg-primary-100 dark:hover:bg-primary-900/60"
             >
-              Load Calculator
+              <Calculator className="h-3.5 w-3.5 text-primary-600 dark:text-primary-400 shrink-0" />
+              <span className="whitespace-nowrap hidden xl:inline">Load Calculator</span>
+              <span className="whitespace-nowrap xl:hidden">Calculator</span>
             </button>
+
             <button
+              type="button"
               onClick={() => { if (typeof window !== 'undefined') window.location.href = '/dealers'; }}
-              className="text-xs font-bold text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 px-3 py-1.5 cursor-pointer transition-colors"
+              className="hidden lg:flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 py-1.5 text-xs font-bold transition-all cursor-pointer shrink-0 bg-sky-50 dark:bg-sky-950/40 text-sky-800 dark:text-sky-300 border border-sky-200/70 dark:border-sky-800/60 hover:bg-sky-100 dark:hover:bg-sky-900/60"
             >
-              Verify Plates
+              <Store className="h-3.5 w-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
+              <span className="whitespace-nowrap">Verified Dealers</span>
             </button>
+
             <button
-              onClick={() => { if (typeof window !== 'undefined') window.location.href = '/install'; }}
-              className="text-xs font-bold text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 px-3 py-1.5 cursor-pointer transition-colors"
+              type="button"
+              onClick={() => { if (typeof window !== 'undefined') window.location.href = '/verification'; }}
+              className="flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 py-1.5 text-xs font-bold transition-all cursor-pointer shrink-0 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60"
             >
-              Installation
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <span className="whitespace-nowrap hidden xl:inline">Verify Plates</span>
+              <span className="whitespace-nowrap xl:hidden">Verify</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => { if (typeof window !== 'undefined') window.location.href = '/install'; }}
+              className="hidden xl:flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 py-1.5 text-xs font-bold transition-all cursor-pointer shrink-0 bg-secondary-50 dark:bg-secondary-950/40 text-secondary-800 dark:text-secondary-300 border border-secondary-200/70 dark:border-secondary-800/60 hover:bg-secondary-100 dark:hover:bg-secondary-900/60"
+            >
+              <Wrench className="h-3.5 w-3.5 text-secondary-600 dark:text-secondary-400 shrink-0" />
+              <span className="whitespace-nowrap">Installation</span>
             </button>
           </div>
+
+          <ThemeRadioToggle className="shrink-0" />
 
           {onPostAd && (
             <button
@@ -2748,7 +2813,7 @@ export default function AdminSuperDashboard({
               className="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-xs transition-colors shrink-0 cursor-pointer"
             >
               <PlusCircle className="h-3.5 w-3.5" />
-              <span>Post Ad</span>
+              <span className="hidden sm:inline">Post Ad</span>
             </button>
           )}
 
@@ -3385,6 +3450,38 @@ export default function AdminSuperDashboard({
 
           {/* Sidebar Footer */}
           <div className="pt-4 mt-4 border-t border-gray-100 dark:border-gray-800 space-y-2">
+            <div className="px-1 pb-1">
+              <p className="px-2 pb-1.5 text-[10px] font-black uppercase tracking-wider text-gray-400">
+                Marketplace
+              </p>
+              <div className="grid grid-cols-2 gap-1.5">
+                {[
+                  { href: '/prices', label: "Today's Rates", icon: Zap },
+                  { href: '/blog', label: 'Blog', icon: BookOpen },
+                  { href: '/calculator', label: 'Load Calculator', icon: Calculator },
+                  { href: '/dealers', label: 'Verified Dealers', icon: Store },
+                  { href: '/verification', label: 'Verify Plates', icon: ShieldCheck },
+                  { href: '/install', label: 'Installation', icon: Wrench },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <a
+                      key={item.href}
+                      href={item.href}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setMobileMenuOpen(false);
+                        if (typeof window !== 'undefined') window.location.href = item.href;
+                      }}
+                      className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-800 text-[11px] font-bold text-gray-700 dark:text-gray-300 hover:bg-amber-50 dark:hover:bg-amber-950/30 hover:border-amber-300 dark:hover:border-amber-700 transition-colors"
+                    >
+                      <Icon className="h-3 w-3 text-amber-500 shrink-0" />
+                      <span className="truncate">{item.label}</span>
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
             <a
               href="/"
               onClick={handleGoHome}

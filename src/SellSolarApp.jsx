@@ -3353,6 +3353,7 @@ function yx({
           featured: !1,
           seller_name: (isSignedIn ? (resolvedName || ye.trim()) : ye.trim()) || (r == null ? void 0 : r.full_name) || null,
           seller_phone: enteredPhone,
+          seller_email: targetEmail || (r == null ? void 0 : r.email) || null,
           views: 0,
           status: "approved",
           is_sold: !1
@@ -5175,18 +5176,13 @@ function yx({
         if (Array.isArray(parsed)) {
           localListings = isPlatformAdmin
             ? parsed
-            : parsed.filter(
-                (item) =>
-                  item.user_id === effectiveUserId ||
-                  item.user_id === e.id ||
-                  (e?.email &&
-                    (item.seller_email?.toLowerCase() === e.email.toLowerCase() ||
-                      item.email?.toLowerCase() === e.email.toLowerCase())) ||
-                  (r?.phone &&
-                    String(item.seller_phone || '').replace(/\D/g, '') ===
-                      String(r.phone || '').replace(/\D/g, '') &&
-                    (!item.user_id || item.user_id === effectiveUserId || item.user_id === e.id))
-              );
+            : parsed.filter((item) => {
+                if (item.user_id && (item.user_id === effectiveUserId || item.user_id === e.id)) return true;
+                const email = (e?.email || '').toLowerCase().trim();
+                if (!email) return false;
+                const listingEmail = (item.seller_email || item.email || '').toLowerCase().trim();
+                return Boolean(listingEmail && listingEmail === email);
+              });
         }
       }
     } catch (err) {}
@@ -5414,7 +5410,7 @@ function yx({
       submitUserId = e.email?.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() ? DEFAULT_ADMIN_ID : null;
     }
     const newProductData = {
-      title:_.title,brand:_.brand,category:_.category,condition:_.condition,price:parseFloat(_.price),city:_.city,capacity_kw:_.capacity_kw?parseFloat(_.capacity_kw):null,warranty_years:_.warranty_years !== null && _.warranty_years !== "" && !isNaN(Number(_.warranty_years)) ? parseFloat(Number(_.warranty_years).toFixed(4)) : null,image_url:_.image_url||null,description:_.description||null,seller_name:_.seller_name||r.full_name,seller_phone:_.seller_phone||r.phone,user_id:isValidUuid(submitUserId)?submitUserId:null,status:D,featured:!1,sponsored:!1,is_sold:!1,views:0
+      title:_.title,brand:_.brand,category:_.category,condition:_.condition,price:parseFloat(_.price),city:_.city,capacity_kw:_.capacity_kw?parseFloat(_.capacity_kw):null,warranty_years:_.warranty_years !== null && _.warranty_years !== "" && !isNaN(Number(_.warranty_years)) ? parseFloat(Number(_.warranty_years).toFixed(4)) : null,image_url:_.image_url||null,description:_.description||null,seller_name:_.seller_name||r.full_name,seller_phone:_.seller_phone||r.phone,seller_email:(e?.email||r?.email||'').toLowerCase().trim()||null,user_id:isValidUuid(submitUserId)?submitUserId:null,status:D,featured:!1,sponsored:!1,is_sold:!1,views:0
     };
     try {
       await supabase.from("solar_listings").insert(newProductData);

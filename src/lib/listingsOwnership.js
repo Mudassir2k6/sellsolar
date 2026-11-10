@@ -4,6 +4,10 @@ export function digitsOnly(value) {
   return String(value || '').replace(/\D/g, '');
 }
 
+export function normalizeEmail(value) {
+  return String(value || '').toLowerCase().trim();
+}
+
 export function listingFingerprint(listing) {
   if (!listing) return '';
   const title = String(listing.title || '')
@@ -11,8 +15,9 @@ export function listingFingerprint(listing) {
     .replace(/\s+/g, ' ')
     .trim();
   const price = String(Number(listing.price) || 0);
+  const email = normalizeEmail(listing.seller_email || listing.email);
   const phone = digitsOnly(listing.seller_phone || listing.phone);
-  return `${title}|${price}|${phone}`;
+  return `${title}|${price}|${email || phone}`;
 }
 
 export function isListingSoftDeleted(listing) {
@@ -23,9 +28,9 @@ export function isListingSoftDeleted(listing) {
 }
 
 /**
- * Does this listing belong to the logged-in seller?
- * Prefer user_id / email / phone. Do NOT match by seller_name alone
- * (that caused fake extra ads from similarly named seed/local rows).
+ * Strict ownership: only account user_id OR seller email.
+ * Never match by phone/name — that leaked other users' ads into dashboards
+ * when emails changed or phones overlapped.
  */
 export function listingBelongsToUser(listing, user, profile) {
   if (!listing || !user) return false;
@@ -34,18 +39,11 @@ export function listingBelongsToUser(listing, user, profile) {
     return true;
   }
 
-  const uEmail = (user.email || profile?.email || '').toLowerCase().trim();
-  const listingEmail = (listing.seller_email || listing.email || '').toLowerCase().trim();
-  if (uEmail && listingEmail && uEmail === listingEmail) return true;
+  const uEmail = normalizeEmail(user.email || profile?.email);
+  if (!uEmail) return false;
 
-  const uPhone = digitsOnly(profile?.phone || user?.user_metadata?.phone);
-  const listingPhone = digitsOnly(listing.seller_phone || listing.phone);
-  if (uPhone && listingPhone && uPhone === listingPhone) {
-    // Only claim orphan phone-matched ads (no other owner), or same user_id
-    if (!listing.user_id || String(listing.user_id) === String(user.id)) return true;
-  }
-
-  return false;
+  const listingEmail = normalizeEmail(listing.seller_email || listing.email);
+  return Boolean(listingEmail && listingEmail === uEmail);
 }
 
 /**
@@ -66,7 +64,6 @@ export function mergeListingsPreferRemote(remote = [], local = []) {
       return;
     }
     if (fp && byFp.has(fp)) {
-      // Skip local duplicate of an already-loaded listing
       if (!prefer) return;
       const existingId = byFp.get(fp);
       byId.delete(existingId);

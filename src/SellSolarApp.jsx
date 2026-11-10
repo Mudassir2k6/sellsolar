@@ -124,6 +124,7 @@ import ListingPhotoUploader from './components/ListingPhotoUploader';
 import { listingImages, uploadListingPhotos } from './lib/images';
 import GlobalNavbarSearch from './components/GlobalNavbarSearch';
 import { useSiteSettings } from './context/SiteSettingsContext';
+import { DEFAULT_SUPPORT_PHONE, buildWhatsAppUrl } from './lib/whatsapp';
 import FloatingWhatsAppWidget from './components/FloatingWhatsAppWidget';
 import MobileBottomNav from './components/MobileBottomNav';
 import AdminSuperDashboard from './components/AdminSuperDashboard';
@@ -2605,14 +2606,16 @@ function hx({
   const { settings } = useSiteSettings();
 
   const supportEmail = settings?.supportEmail || "info@sellsolar.pk";
-  const supportPhone = settings?.supportPhone || "+92 300 1234567";
+  const supportPhone = settings?.supportPhone || DEFAULT_SUPPORT_PHONE;
   const supportPhoneStr = String(supportPhone);
   const officeAddress = settings?.headOfficeAddress || "Sector G-7, Blue Area, Islamabad, Pakistan";
   const copyrightText = settings?.copyrightText || "© 2026 SellSolar Pakistan. All rights reserved.";
   const aboutText = settings?.footerAboutText || "Pakistan's #1 Used Solar Marketplace. Buy and sell used and new solar plates, on-grid & hybrid inverters, and lithium batteries with total confidence.";
 
-  const rawWa = String(settings?.whatsAppNumber || "923001234567").replace(/\D/g, "");
-  const waUrl = `https://wa.me/${rawWa}?text=${encodeURIComponent("Assalam-o-Alaikum, I am inquiring about solar equipment on SellSolar.pk")}`;
+  const waUrl = buildWhatsAppUrl(
+    settings,
+    settings?.whatsAppDefaultMessage || "Assalam-o-Alaikum, I am inquiring about solar equipment on SellSolar.pk"
+  );
 
   const socialLinksList = [
     { label: "WhatsApp Support", href: waUrl, Icon: MessageCircle, isExternal: true },

@@ -5,6 +5,7 @@ import { Mail, Copy, Check, ExternalLink, MessageSquare, Phone, X, Send, CheckCi
 import { useSiteSettings } from '../context/SiteSettingsContext';
 import { sendContactMessage } from '../services/inboxService';
 import FloatingLabelInput from './FloatingLabelInput';
+import { DEFAULT_SUPPORT_PHONE, resolveWhatsAppNumber, buildWhatsAppUrl } from '../lib/whatsapp';
 
 export default function EmailContactModal({
   isOpen,
@@ -17,8 +18,8 @@ export default function EmailContactModal({
 }) {
   const { settings } = useSiteSettings();
   const recipientEmail = propRecipientEmail || settings?.supportEmail || 'info@sellsolar.pk';
-  const supportPhone = settings?.supportPhone || '+92 300 1234567';
-  const rawWhatsApp = String(settings?.whatsAppNumber || '923001234567').replace(/\D/g, '');
+  const supportPhone = settings?.supportPhone || DEFAULT_SUPPORT_PHONE;
+  const rawWhatsApp = resolveWhatsAppNumber(settings);
 
   const [activeTab, setActiveTab] = useState('direct'); // 'direct' | 'external'
   const [copied, setCopied] = useState(false);
@@ -49,9 +50,10 @@ export default function EmailContactModal({
   const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(
     recipientEmail
   )}&su=${mailSubject}&body=${mailBody}`;
-  const whatsappUrl = `https://wa.me/${rawWhatsApp}?text=${encodeURIComponent(
+  const whatsappUrl = buildWhatsAppUrl(
+    rawWhatsApp,
     `Assalam-o-Alaikum, I am inquiring about solar equipment on SellSolar.pk (${recipientEmail})\nSubject: ${formSubject || defaultSubject}`
-  )}`;
+  );
 
   const handleCopy = async () => {
     try {

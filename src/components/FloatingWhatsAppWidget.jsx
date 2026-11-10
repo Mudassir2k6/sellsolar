@@ -1,6 +1,7 @@
 'use client';
 
 import { useSiteSettings } from '../context/SiteSettingsContext';
+import { buildWhatsAppUrl, resolveWhatsAppNumber } from '../lib/whatsapp';
 
 // Official crisp WhatsApp vector icon
 function WhatsAppIcon({ className = 'h-7 w-7' }) {
@@ -19,15 +20,18 @@ function WhatsAppIcon({ className = 'h-7 w-7' }) {
 export default function FloatingWhatsAppWidget() {
   const { settings } = useSiteSettings();
 
-  if (!settings.whatsAppEnabled || !settings.whatsAppNumber) {
+  if (settings?.whatsAppEnabled === false) {
     return null;
   }
 
-  const cleanNumber = String(settings.whatsAppNumber || '').replace(/\D/g, '');
-  const encodedText = encodeURIComponent(settings.whatsAppDefaultMessage || 'Assalam-o-Alaikum SellSolar');
-  const waUrl = `https://wa.me/${cleanNumber}?text=${encodedText}`;
+  const cleanNumber = resolveWhatsAppNumber(settings);
+  const message =
+    settings?.whatsAppDefaultMessage ||
+    'Assalam-o-Alaikum, I am inquiring about solar equipment on SellSolar.pk';
+  const waUrl = buildWhatsAppUrl(cleanNumber, message);
 
-  const isBottomLeft = settings.whatsAppPosition !== 'bottom-right';
+  const isBottomLeft = settings?.whatsAppPosition === 'bottom-left';
+  const showPulse = settings?.whatsAppPulse !== false;
 
   return (
     <div
@@ -42,10 +46,14 @@ export default function FloatingWhatsAppWidget() {
         target="_blank"
         rel="noopener noreferrer"
         id="floating-whatsapp-btn"
+        data-wa-number={cleanNumber}
         className="relative flex items-center justify-center w-13 h-13 sm:w-14 sm:h-14 rounded-full bg-[#25D366] hover:bg-[#20ba5a] text-white shadow-xl shadow-[#25D366]/35 hover:shadow-[#25D366]/50 hover:scale-110 active:scale-95 transition-all duration-300 border-2 border-white/30 dark:border-gray-800/40"
         aria-label="Chat with SellSolar on WhatsApp"
       >
-        <WhatsAppIcon className="h-7 w-7 text-white drop-shadow-xs" />
+        {showPulse ? (
+          <span className="absolute inset-0 rounded-full bg-[#25D366] animate-ping opacity-30 pointer-events-none" />
+        ) : null}
+        <WhatsAppIcon className="h-7 w-7 text-white drop-shadow-xs relative z-10" />
 
         {/* Hover label tooltip */}
         <span
@@ -55,10 +63,9 @@ export default function FloatingWhatsAppWidget() {
               : 'right-full mr-3 group-hover:translate-x-0 translate-x-1'
           } whitespace-nowrap rounded-xl bg-gray-900/90 dark:bg-gray-800/95 backdrop-blur-xs px-3 py-1.5 text-xs font-bold text-white opacity-0 shadow-lg transition-all duration-200 group-hover:opacity-100`}
         >
-          {settings.whatsAppLabel || 'Chat on WhatsApp'}
+          {settings?.whatsAppLabel || 'Chat on WhatsApp'}
         </span>
       </a>
     </div>
   );
 }
-

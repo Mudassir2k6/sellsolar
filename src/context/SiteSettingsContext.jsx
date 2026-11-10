@@ -3,6 +3,13 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { SELL_SOLAR_PROMO_IMAGE, TURNKEY_INSTALL_PROMO_IMAGE } from '../utils/solarImages';
 import { DEFAULT_ADVERTISEMENT_SETTINGS, normalizeAdvertisementSettings } from '../lib/advertisementDefaults';
+import {
+  DEFAULT_WHATSAPP_NUMBER,
+  DEFAULT_WHATSAPP_DISPLAY,
+  DEFAULT_SUPPORT_PHONE,
+  isPlaceholderWhatsAppNumber,
+  resolveWhatsAppNumber,
+} from '../lib/whatsapp';
 
 const SITE_SETTINGS_KEY = 'sellsolar_site_settings';
 
@@ -30,13 +37,13 @@ export const DEFAULT_SITE_SETTINGS = {
   // Contact Info
   supportEmail: 'info@sellsolar.pk',
   salesEmail: 'sales@sellsolar.pk',
-  supportPhone: '+92 300 1234567',
+  supportPhone: DEFAULT_SUPPORT_PHONE,
   headOfficeAddress: 'Sector G-7, Blue Area, Islamabad, Pakistan',
 
   // WhatsApp Configuration
   whatsAppEnabled: true,
-  whatsAppNumber: '923001234567',
-  whatsAppDisplayNumber: '+92 300 1234567',
+  whatsAppNumber: DEFAULT_WHATSAPP_NUMBER,
+  whatsAppDisplayNumber: DEFAULT_WHATSAPP_DISPLAY,
   whatsAppDefaultMessage: 'Assalam-o-Alaikum, I am inquiring about solar equipment on SellSolar.pk',
   whatsAppPosition: 'bottom-right', // 'bottom-right' | 'bottom-left'
   whatsAppLabel: 'WhatsApp Us',
@@ -158,9 +165,20 @@ export function SiteSettingsProvider({ children }) {
               });
             }
           }
+          const mergedWhatsAppNumber = resolveWhatsAppNumber(parsed.whatsAppNumber);
+          const mergedSupportPhone = isPlaceholderWhatsAppNumber(parsed.supportPhone)
+            ? DEFAULT_SUPPORT_PHONE
+            : (parsed.supportPhone || DEFAULT_SUPPORT_PHONE);
+          const mergedDisplay = isPlaceholderWhatsAppNumber(parsed.whatsAppDisplayNumber)
+            ? DEFAULT_WHATSAPP_DISPLAY
+            : (parsed.whatsAppDisplayNumber || DEFAULT_WHATSAPP_DISPLAY);
+
           setSettings((prev) => ({
             ...prev,
             ...parsed,
+            supportPhone: mergedSupportPhone,
+            whatsAppNumber: mergedWhatsAppNumber,
+            whatsAppDisplayNumber: mergedDisplay,
             socialLinks: {
               ...prev.socialLinks,
               ...(parsed.socialLinks || {}),
@@ -211,39 +229,55 @@ export function SiteSettingsProvider({ children }) {
 
   const updateSiteSettings = useCallback((newPartialSettings) => {
     setSettings((prev) => {
+      const nextPartial = { ...newPartialSettings };
+      if (Object.prototype.hasOwnProperty.call(nextPartial, 'whatsAppNumber')) {
+        nextPartial.whatsAppNumber = resolveWhatsAppNumber(nextPartial.whatsAppNumber);
+      }
+      if (Object.prototype.hasOwnProperty.call(nextPartial, 'supportPhone') && isPlaceholderWhatsAppNumber(nextPartial.supportPhone)) {
+        nextPartial.supportPhone = DEFAULT_SUPPORT_PHONE;
+      }
+      if (Object.prototype.hasOwnProperty.call(nextPartial, 'whatsAppDisplayNumber') && isPlaceholderWhatsAppNumber(nextPartial.whatsAppDisplayNumber)) {
+        nextPartial.whatsAppDisplayNumber = DEFAULT_WHATSAPP_DISPLAY;
+      }
+
       const updated = {
         ...prev,
-        ...newPartialSettings,
+        ...nextPartial,
+        whatsAppNumber: resolveWhatsAppNumber(
+          Object.prototype.hasOwnProperty.call(nextPartial, 'whatsAppNumber')
+            ? nextPartial.whatsAppNumber
+            : prev.whatsAppNumber
+        ),
         socialLinks: {
           ...prev.socialLinks,
-          ...(newPartialSettings.socialLinks || {}),
+          ...(nextPartial.socialLinks || {}),
         },
-        homePageCms: newPartialSettings.homePageCms ? {
+        homePageCms: nextPartial.homePageCms ? {
           ...prev.homePageCms,
-          ...newPartialSettings.homePageCms,
+          ...nextPartial.homePageCms,
           hero: {
             ...prev.homePageCms.hero,
-            ...(newPartialSettings.homePageCms?.hero || {}),
+            ...(nextPartial.homePageCms?.hero || {}),
           },
-          cards: Array.isArray(newPartialSettings.homePageCms?.cards)
-            ? newPartialSettings.homePageCms.cards
+          cards: Array.isArray(nextPartial.homePageCms?.cards)
+            ? nextPartial.homePageCms.cards
             : prev.homePageCms.cards,
           calculatorBanner: {
             ...prev.homePageCms.calculatorBanner,
-            ...(newPartialSettings.homePageCms?.calculatorBanner || {}),
+            ...(nextPartial.homePageCms?.calculatorBanner || {}),
           },
-          trustMetrics: Array.isArray(newPartialSettings.homePageCms?.trustMetrics)
-            ? newPartialSettings.homePageCms.trustMetrics
+          trustMetrics: Array.isArray(nextPartial.homePageCms?.trustMetrics)
+            ? nextPartial.homePageCms.trustMetrics
             : prev.homePageCms.trustMetrics,
         } : prev.homePageCms,
-        pagesCmsMap: newPartialSettings.pagesCmsMap ? {
+        pagesCmsMap: nextPartial.pagesCmsMap ? {
           ...prev.pagesCmsMap,
-          ...newPartialSettings.pagesCmsMap,
+          ...nextPartial.pagesCmsMap,
         } : prev.pagesCmsMap,
-        advertisementSettings: newPartialSettings.advertisementSettings
+        advertisementSettings: nextPartial.advertisementSettings
           ? normalizeAdvertisementSettings({
               ...prev.advertisementSettings,
-              ...newPartialSettings.advertisementSettings,
+              ...nextPartial.advertisementSettings,
             })
           : prev.advertisementSettings,
       };
@@ -251,6 +285,8 @@ export function SiteSettingsProvider({ children }) {
       if (typeof window !== 'undefined') {
         try {
           localStorage.setItem(SITE_SETTINGS_KEY, JSON.stringify(updated));
+          // Keep legacy key in sync for older listeners
+          localStorage.setItem('sellsolar_settings', JSON.stringify(updated));
           window.dispatchEvent(new CustomEvent('sellsolar_settings_updated', { detail: updated }));
         } catch (err) {
           console.error('Error saving site settings:', err);

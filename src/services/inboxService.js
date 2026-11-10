@@ -156,7 +156,7 @@ export function generateEmailLinks({
 
   const cleanPhone = (senderPhone || '').replace(/^0/, '92').replace(/[^0-9]/g, '');
   const waText = `*SellSolar Inquiry ${ticketNumber ? `[#${ticketNumber}]` : ''}*\n*Name:* ${senderName}\n*Email:* ${senderEmail}\n*Phone:* ${senderPhone || 'N/A'}\n*Subject:* ${subject}\n\n*Message:*\n${message}`;
-  const whatsappUrl = `https://wa.me/923001234567?text=${encodeURIComponent(waText)}`;
+  const whatsappUrl = `https://wa.me/923083888043?text=${encodeURIComponent(waText)}`;
 
   return {
     mailtoUrl,

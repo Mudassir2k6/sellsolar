@@ -925,7 +925,7 @@ export default function AdminSuperDashboard({
       if (e.key === 'sellsolar_inbox_messages' || !e.key) {
         setInboxMessages(getInboxMessages());
       }
-      if (e.key === 'sellsolar_custom_pages' || e.key === 'sellsolar_settings' || e.key === 'sellsolar_users_roles') {
+      if (e.key === 'sellsolar_custom_pages' || e.key === 'sellsolar_settings' || e.key === 'sellsolar_site_settings' || e.key === 'sellsolar_users_roles') {
         loadData();
       }
     };
@@ -1871,7 +1871,19 @@ export default function AdminSuperDashboard({
   // Save CMS Settings
   const handleSaveCmsSettings = (e) => {
     e?.preventDefault();
-    updateSiteSettings(cmsForm);
+    const cleanedNumber = String(cmsForm.whatsAppNumber || '')
+      .replace(/\D/g, '')
+      .replace(/^0/, '92');
+    const payload = {
+      ...cmsForm,
+      whatsAppNumber: cleanedNumber || '923083888043',
+      whatsAppDisplayNumber:
+        cmsForm.whatsAppDisplayNumber ||
+        (cleanedNumber ? `+${cleanedNumber}` : '+92 308 3888043'),
+      supportPhone: cmsForm.supportPhone || '+92 308 3888043',
+    };
+    updateSiteSettings(payload);
+    setCmsForm(payload);
     setCmsSaved(true);
     setTimeout(() => setCmsSaved(false), 3000);
     showToast({
@@ -7352,7 +7364,7 @@ export default function AdminSuperDashboard({
                         type="text"
                         value={cmsForm.whatsAppNumber}
                         onChange={(e) => setCmsForm({ ...cmsForm, whatsAppNumber: e.target.value })}
-                        placeholder="e.g. 923001234567"
+                        placeholder="e.g. 923083888043"
                         className="input-field text-xs font-mono"
                       />
                     </div>
@@ -7364,7 +7376,7 @@ export default function AdminSuperDashboard({
                         type="text"
                         value={cmsForm.whatsAppDisplayNumber}
                         onChange={(e) => setCmsForm({ ...cmsForm, whatsAppDisplayNumber: e.target.value })}
-                        placeholder="e.g. +92 300 1234567"
+                        placeholder="e.g. +92 308 3888043"
                         className="input-field text-xs"
                       />
                     </div>

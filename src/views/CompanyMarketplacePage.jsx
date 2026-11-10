@@ -49,6 +49,7 @@ import { sendContactMessage } from '../services/inboxService';
 import EmailContactModal from '../components/EmailContactModal';
 import { useSiteSettings } from '../context/SiteSettingsContext';
 import { normalizeAdvertisementSettings } from '../lib/advertisementDefaults';
+import { DEFAULT_SUPPORT_PHONE, resolveWhatsAppNumber, buildWhatsAppUrl } from '../lib/whatsapp';
 import { useAuth } from '../context/AuthContext';
 
 // Navigation groups definition
@@ -1841,8 +1842,8 @@ function ContactUsContent() {
 
   const supportEmail = settings?.supportEmail || 'info@sellsolar.pk';
   const salesEmail = settings?.salesEmail || 'support@sellsolar.pk';
-  const supportPhone = settings?.supportPhone || '+92 300 1234567';
-  const rawWhatsApp = String(settings?.whatsAppNumber || '923001234567').replace(/\D/g, '');
+  const supportPhone = settings?.supportPhone || DEFAULT_SUPPORT_PHONE;
+  const rawWhatsApp = resolveWhatsAppNumber(settings);
   const headOfficeAddress = settings?.headOfficeAddress || 'Blue Area, Sector G-7, Islamabad, Pakistan';
 
   const [submitted, setSubmitted] = useState(false);
@@ -2174,9 +2175,10 @@ function ContactUsContent() {
                 <a
                   href={
                     submissionLinks?.whatsappUrl ||
-                    `https://wa.me/923001234567?text=${encodeURIComponent(
+                    buildWhatsAppUrl(
+                      rawWhatsApp,
                       `*SellSolar Inquiry Ticket #${ticketNo}*\n*Name:* ${form.name}\n*Email:* ${form.email}\n*Phone:* ${form.phone}\n*Subject:* ${form.subject}\n*Message:* ${form.message}`
-                    )}`
+                    )
                   }
                   target="_blank"
                   rel="noopener noreferrer"

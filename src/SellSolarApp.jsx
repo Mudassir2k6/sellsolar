@@ -16,6 +16,7 @@ import DailyMarketRates from './components/DailyMarketRates';
 import LoadCalculatorPage from './views/LoadCalculatorPage';
 import SolarLoadCalculator from './components/SolarLoadCalculator';
 import FloatingPostAdButton from './components/FloatingPostAdButton';
+import HomeAdvertisementBoard from './components/HomeAdvertisementBoard';
 import CompanyMarketplacePage from './views/CompanyMarketplacePage';
 import CustomPageView from './views/CustomPageView';
 import KeywordLandingPage, { KEYWORD_LANDING_KEYS } from './views/KeywordLandingPage';
@@ -111,7 +112,7 @@ import DealersPage from './views/DealersPage';
 import ListingPhotoUploader from './components/ListingPhotoUploader';
 import { listingImages, uploadListingPhotos } from './lib/images';
 import GlobalNavbarSearch from './components/GlobalNavbarSearch';
-import { SiteSettingsProvider, useSiteSettings } from './context/SiteSettingsContext';
+import { useSiteSettings } from './context/SiteSettingsContext';
 import FloatingWhatsAppWidget from './components/FloatingWhatsAppWidget';
 import MobileBottomNav from './components/MobileBottomNav';
 import AdminSuperDashboard from './components/AdminSuperDashboard';
@@ -1536,7 +1537,7 @@ function Xy({
   value:"used",label:"Used"
 }];
 function nx({
-  filters:t,onFilterChange:e,onSearch:r,onReset:n,onNavigatePrices:np,onNavigateCalculator:nc,onNavigateDealers:nd,onNavigateInstallation:ni
+  filters:t,onFilterChange:e,onSearch:r,onReset:n,onNavigatePrices:np,onNavigateCalculator:nc,onNavigateDealers:nd,onNavigateInstallation:ni,onNavigatePricing:npr
 }){
   const { settings } = useSiteSettings();
   const heroCms = settings?.homePageCms?.hero;
@@ -1582,7 +1583,7 @@ function nx({
   };
 
   return jsxs("section",{
-    className:"relative overflow-hidden pt-14 sm:pt-18 lg:pt-20 pb-4 sm:pb-5 border-b border-gray-200/60 dark:border-gray-800 transition-colors",children:[
+    className:"relative overflow-x-hidden overflow-y-visible pt-24 sm:pt-28 lg:pt-32 pb-4 sm:pb-5 border-b border-gray-200/60 dark:border-gray-800 transition-colors",children:[
       jsxs("div",{
         className:"absolute inset-0 -z-10",children:[
           heroCms?.heroImageUrl ? jsx("div", {
@@ -1614,13 +1615,19 @@ function nx({
                 ]
               }),
               jsx("h1",{
-                className:"text-balance text-xl xs:text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white leading-tight",
+                className:"text-balance text-xl xs:text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white leading-snug",
                 children: heroCms?.heading || "Buy & Sell Used Solar Plates, Inverters & Batteries in Pakistan"
               }),
               jsx("p",{
                 className:"mx-auto mt-1 sm:mt-1.5 max-w-xl text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed",
                 children: heroCms?.subheading || "Pakistan's dedicated marketplace to buy and sell used solar plates, second-hand inverters, and solar batteries at live market prices. Post free ads or find verified deals across Pakistan."
               }),
+              npr?jsxs("button",{
+                type:"button",
+                onClick:npr,
+                className:"mt-2 inline-flex items-center gap-1.5 rounded-full border border-violet-200 dark:border-violet-800 bg-violet-50/80 dark:bg-violet-950/40 px-3 py-1 text-[10px] sm:text-[11px] font-bold text-violet-800 dark:text-violet-300 hover:bg-violet-100 dark:hover:bg-violet-900/50 transition-colors",
+                children:[jsx(Megaphone,{ className:"h-3 w-3"}),"Advertise here — view packages"]
+              }):null,
               (nc||np||nd)&&jsxs("div",{
                 className:"mt-2.5 flex flex-wrap items-center justify-center gap-2",children:[
                   np?jsxs("button",{
@@ -6884,8 +6891,8 @@ function _x({
 
   return jsxs(Fragment,{
     children:[jsx(nx,{
-      filters:e,onFilterChange:y,onSearch:w,onReset:j,onNavigatePrices:nav?()=>nav("prices"):void 0,onNavigateCalculator:nav?()=>nav("calculator"):void 0,onNavigateDealers:nav?()=>nav("dealers"):void 0,onNavigateInstallation:nav?()=>nav("install"):void 0
-    }),jsx(PakWheelsSellCards,{
+      filters:e,onFilterChange:y,onSearch:w,onReset:j,onNavigatePrices:nav?()=>nav("prices"):void 0,onNavigateCalculator:nav?()=>nav("calculator"):void 0,onNavigateDealers:nav?()=>nav("dealers"):void 0,onNavigateInstallation:nav?()=>nav("install"):void 0,onNavigatePricing:nav?()=>nav("pricing"):void 0
+    }),jsx(HomeAdvertisementBoard,{ onNavigate:nav }),jsx(PakWheelsSellCards,{
       onPostAd:()=>nav?nav("post-ad"):void 0,
       onInstall:()=>nav?nav("install"):void 0,
       onNavigate:nav
@@ -7541,19 +7548,17 @@ export default function App({ initialPathname, initialSlug }){
 
   const showMobileBottomNav = !r && !pr && n !== "post-ad" && n !== "login" && n !== "password" && n !== "forgot-password" && n !== "reset-password";
 
-  return jsx(SiteSettingsProvider, {
-    children: jsxs(Fragment, {
-      children: [
-        pageContent,
-        showFloatingPostBtn ? jsx(FloatingPostAdButton, { onPostAd: c }) : null,
-        jsx(FloatingWhatsAppWidget, {}),
-        showMobileBottomNav ? jsx(MobileBottomNav, {
-          currentPage: n,
-          onNavigate: handleNavigate,
-          onPostAd: c
-        }) : null
-      ]
-    })
+  return jsxs(Fragment, {
+    children: [
+      pageContent,
+      showFloatingPostBtn ? jsx(FloatingPostAdButton, { onPostAd: c }) : null,
+      jsx(FloatingWhatsAppWidget, {}),
+      showMobileBottomNav ? jsx(MobileBottomNav, {
+        currentPage: n,
+        onNavigate: handleNavigate,
+        onPostAd: c
+      }) : null
+    ]
   });
 }
 

@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { SELL_SOLAR_PROMO_IMAGE, TURNKEY_INSTALL_PROMO_IMAGE } from '../utils/solarImages';
+import { DEFAULT_ADVERTISEMENT_SETTINGS, normalizeAdvertisementSettings } from '../lib/advertisementDefaults';
 
 const SITE_SETTINGS_KEY = 'sellsolar_site_settings';
 
@@ -121,7 +122,10 @@ export const DEFAULT_SITE_SETTINGS = {
   },
 
   // Per-page visual custom content overrides
-  pagesCmsMap: {}
+  pagesCmsMap: {},
+
+  // Homepage scroll + static ads & packages (admin-editable)
+  advertisementSettings: DEFAULT_ADVERTISEMENT_SETTINGS,
 };
 
 export const SiteSettingsContext = createContext(null);
@@ -135,6 +139,25 @@ export function SiteSettingsProvider({ children }) {
         const raw = localStorage.getItem(SITE_SETTINGS_KEY);
         if (raw) {
           const parsed = JSON.parse(raw);
+          let adSettings = normalizeAdvertisementSettings(
+            parsed.advertisementSettings || undefined
+          );
+          // Local dev: restore marquee if an old localStorage snapshot turned ads off
+          if (process.env.NODE_ENV === 'development') {
+            const saved = parsed.advertisementSettings || {};
+            const marqueeOff =
+              adSettings.enabled === false ||
+              saved.scrollEnabled === false ||
+              saved.staticEnabled === false;
+            if (marqueeOff) {
+              adSettings = normalizeAdvertisementSettings({
+                ...saved,
+                enabled: true,
+                scrollEnabled: true,
+                staticEnabled: true,
+              });
+            }
+          }
           setSettings((prev) => ({
             ...prev,
             ...parsed,
@@ -176,7 +199,8 @@ export function SiteSettingsProvider({ children }) {
             pagesCmsMap: {
               ...prev.pagesCmsMap,
               ...(parsed.pagesCmsMap || {}),
-            }
+            },
+            advertisementSettings: adSettings,
           }));
         }
       } catch (e) {
@@ -216,6 +240,12 @@ export function SiteSettingsProvider({ children }) {
           ...prev.pagesCmsMap,
           ...newPartialSettings.pagesCmsMap,
         } : prev.pagesCmsMap,
+        advertisementSettings: newPartialSettings.advertisementSettings
+          ? normalizeAdvertisementSettings({
+              ...prev.advertisementSettings,
+              ...newPartialSettings.advertisementSettings,
+            })
+          : prev.advertisementSettings,
       };
 
       if (typeof window !== 'undefined') {

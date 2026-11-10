@@ -98,6 +98,7 @@ import AdminDealersModule from './AdminDealersModule';
 import AdminInstallationsModule from './AdminInstallationsModule';
 import AdminDrillDownModal from './AdminDrillDownModal';
 import EditSolarAdModal from './EditSolarAdModal';
+import AdminAdvertisementSettings from './AdminAdvertisementSettings';
 import { getStoredInstallationRequests, fetchInstallationRequests } from '../lib/installation';
 import { VERIFIED_DEALERS } from '../data/dealersData';
 import { SEED_LISTINGS } from '../data/seedListings';
@@ -928,7 +929,10 @@ export default function AdminSuperDashboard({
   }, [activeTab]);
 
   useEffect(() => {
-    setCmsForm({ ...settings });
+    setCmsForm({
+      ...settings,
+      advertisementSettings: settings?.advertisementSettings,
+    });
   }, [settings]);
 
   // Analytics summary with live event listener
@@ -7252,6 +7256,13 @@ export default function AdminSuperDashboard({
                     </div>
                   </div>
                 </div>
+
+                <AdminAdvertisementSettings
+                  value={cmsForm.advertisementSettings}
+                  onChange={(advertisementSettings) =>
+                    setCmsForm({ ...cmsForm, advertisementSettings })
+                  }
+                />
 
                 {/* Section 5: Contact Info & Support Email */}
                 <div className="p-6 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 space-y-4 shadow-xs">

@@ -196,12 +196,13 @@ export async function sendContactMessage({
 
       if (insErr) {
         // Fallback for database schemas with restricted columns or structure
-        await supabase.from('enquiries').insert({
+        const { error: fbErr } = await supabase.from('enquiries').insert({
           contact_phone: phone || null,
           message: `[Ticket: ${ticketNumber}] Sender: ${cleanName} (${cleanEmail}) | Subject: ${subject}\n\n${cleanMessage}`,
           is_read: false,
           created_at: new Date().toISOString(),
-        }).catch(() => {});
+        });
+        if (fbErr) console.warn('Supabase enquiry fallback insert:', fbErr.message);
       }
     } catch (err) {
       console.warn('Supabase enquiry insert notice:', err?.message);
@@ -257,13 +258,22 @@ export async function fetchSharedInboxMessages() {
       .order('created_at', { ascending: false })
       .limit(50);
 
-    if (error || !Array.isArray(data) || data.length === 0) {
+    if (error) {
+      console.warn('Supabase enquiries fetch:', error.message);
       return local;
     }
+    if (!Array.isArray(data)) return local;
 
     const localIds = new Set(local.map((m) => m.id));
+    const sbIds = new Set(
+      local.filter((m) => String(m.id).startsWith('sb-')).map((m) => String(m.id).slice(3))
+    );
+
     const converted = data
-      .filter((row) => !localIds.has(row.id) && !localIds.has(`sb-${row.id}`))
+      .filter((row) => {
+        const rid = String(row.id);
+        return !localIds.has(rid) && !localIds.has(`sb-${rid}`) && !sbIds.has(rid);
+      })
       .map((row) => ({
         id: `sb-${row.id}`,
         ticketNumber: `SLR-${(row.id || '').slice(0, 6).toUpperCase() || '786012'}`,
@@ -280,15 +290,38 @@ export async function fetchSharedInboxMessages() {
         createdAt: row.created_at || new Date().toISOString(),
       }));
 
-    if (converted.length > 0) {
-      const merged = [...converted, ...local];
-      saveInboxMessages(merged);
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new Event('sellsolar_inbox_updated'));
-      }
-      return merged;
+    const dbAsInbox = data.map((row) => ({
+      id: `sb-${row.id}`,
+      ticketNumber: row.subject && row.subject.includes('SLR-')
+        ? row.subject.match(/SLR-\d+/)?.[0] || `SLR-${String(row.id).slice(0, 6).toUpperCase()}`
+        : `SLR-${String(row.id).slice(0, 6).toUpperCase()}`,
+      senderName: row.name || 'Website Visitor',
+      senderEmail: row.email || 'inquiry@sellsolar.pk',
+      senderPhone: row.contact_phone || '',
+      subject: row.subject || (row.message ? `${String(row.message).slice(0, 48)}…` : 'Customer Inquiry'),
+      message: row.message || '',
+      category: row.category || 'General Inquiry',
+      recipientEmail: row.recipient_email || 'info@sellsolar.pk',
+      status: row.status || (row.is_read ? 'read' : 'unread'),
+      is_read: !!row.is_read,
+      replies: Array.isArray(row.replies) ? row.replies : [],
+      createdAt: row.created_at || new Date().toISOString(),
+    }));
+
+    const mergedById = new Map();
+    [...dbAsInbox, ...local.filter((m) => !String(m.id).startsWith('sb-'))].forEach((m) => {
+      mergedById.set(m.id, m);
+    });
+    converted.forEach((m) => mergedById.set(m.id, m));
+
+    const merged = Array.from(mergedById.values()).sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+    saveInboxMessages(merged);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('sellsolar_inbox_updated'));
     }
-    return local;
+    return merged.length > 0 ? merged : local;
   } catch (err) {
     console.warn('Supabase fetchSharedInboxMessages notice:', err);
     return local;

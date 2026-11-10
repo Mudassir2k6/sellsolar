@@ -48,6 +48,7 @@ import {
 import { sendContactMessage } from '../services/inboxService';
 import EmailContactModal from '../components/EmailContactModal';
 import { useSiteSettings } from '../context/SiteSettingsContext';
+import { normalizeAdvertisementSettings } from '../lib/advertisementDefaults';
 import { useAuth } from '../context/AuthContext';
 
 // Navigation groups definition
@@ -1480,6 +1481,15 @@ function HowItWorksContent({ onNavigate, onPostAd }) {
 }
 
 function PricingContent({ onNavigate, onPostAd }) {
+  const { settings } = useSiteSettings();
+  const adCfg = normalizeAdvertisementSettings(settings?.advertisementSettings);
+  const adPackages = (adCfg.packages || []).filter((p) => p.isActive !== false);
+
+  const runCta = (pkg) => {
+    const link = pkg.ctaLink || 'contact';
+    if (onNavigate) onNavigate(link.replace(/^\//, ''));
+  };
+
   return (
     <div className="space-y-8 animate-fade-in">
       <div className="rounded-3xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 sm:p-10 shadow-sm text-center max-w-3xl mx-auto">
@@ -1491,8 +1501,70 @@ function PricingContent({ onNavigate, onPostAd }) {
           Simple, Fair Pricing for Everyone
         </h1>
         <p className="mt-3 text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-          Posting individual ads is 100% free forever. If you are an active solar merchant or want maximum exposure, upgrade to our premium dealer tools.
+          Posting individual ads is 100% free forever. Homepage banner slots start on the free launch run — scroll strip and static cards are managed from Admin.
         </p>
+      </div>
+
+      {adPackages.length > 0 && (
+        <div className="space-y-4">
+          <div className="text-center">
+            <h2 className="text-xl font-black text-gray-900 dark:text-white">Homepage advertisement packages</h2>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Scroll banner + static spotlight • Free launch slots available now
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-stretch">
+            {adPackages.map((pkg) => (
+              <div
+                key={pkg.id}
+                className={`rounded-3xl border p-6 flex flex-col justify-between shadow-sm ${
+                  pkg.highlighted
+                    ? 'border-2 border-violet-500 bg-white dark:bg-gray-900 shadow-lg relative'
+                    : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900'
+                }`}
+              >
+                {pkg.highlighted && (
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-violet-600 text-white text-[10px] font-extrabold uppercase px-3 py-0.5">
+                    Best value
+                  </span>
+                )}
+                <div>
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">
+                    {pkg.id === 'free' ? 'Launch offer' : 'Banner slot'}
+                  </span>
+                  <h3 className="text-lg font-black text-gray-900 dark:text-white mt-1">{pkg.name}</h3>
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">{pkg.description}</p>
+                  <div className="mt-4 text-2xl font-black text-gray-900 dark:text-white">
+                    {pkg.priceLabel || `Rs. ${pkg.price}`}{' '}
+                    <span className="text-xs font-medium text-gray-400">/ {pkg.period}</span>
+                  </div>
+                  <ul className="mt-4 space-y-2 text-[11px] text-gray-600 dark:text-gray-300">
+                    {(pkg.features || []).map((f) => (
+                      <li key={f} className="flex items-start gap-2">
+                        <Check className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => runCta(pkg)}
+                  className={`mt-6 w-full text-xs py-2.5 rounded-xl font-bold ${
+                    pkg.highlighted ? 'btn-primary' : pkg.id === 'free' ? 'btn-secondary' : 'btn-secondary'
+                  }`}
+                >
+                  {pkg.ctaText || 'Contact sales'}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="text-center pt-2">
+        <h2 className="text-xl font-black text-gray-900 dark:text-white">Marketplace listing plans</h2>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">For sellers posting solar equipment ads</p>
       </div>
 
       {/* Pricing Tiers */}

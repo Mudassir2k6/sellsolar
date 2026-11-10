@@ -6,14 +6,18 @@ export default function SellSolarBootShell() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <div className="border-b border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm">
         <div className="container-page flex h-14 items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-amber-500/20 animate-pulse" />
-            <SkeletonBlock className="h-4 w-28" />
-          </div>
-          <div className="hidden sm:flex gap-2">
-            <SkeletonBlock className="h-8 w-20" />
-            <SkeletonBlock className="h-8 w-24" />
-          </div>
+          <a href="/" className="flex items-center gap-2 font-black text-lg tracking-tight text-slate-900 dark:text-white">
+            <span className="h-8 w-8 rounded-lg bg-amber-400 flex items-center justify-center text-white text-sm">☀</span>
+            <span>Sell<span className="text-amber-500">Solar</span></span>
+          </a>
+          <nav className="hidden md:flex items-center gap-1 text-xs font-bold text-slate-700 dark:text-slate-300">
+            <a href="/prices" className="px-2.5 py-1.5 rounded-lg hover:text-amber-600">Today&apos;s Rates</a>
+            <a href="/blog" className="px-2.5 py-1.5 rounded-lg hover:text-amber-600">Blog</a>
+            <a href="/calculator" className="px-2.5 py-1.5 rounded-lg hover:text-amber-600">Load Calculator</a>
+            <a href="/dealers" className="px-2.5 py-1.5 rounded-lg hover:text-amber-600">Verified Dealers</a>
+            <a href="/verification" className="px-2.5 py-1.5 rounded-lg hover:text-amber-600">Verify Plates</a>
+            <a href="/install" className="px-2.5 py-1.5 rounded-lg hover:text-amber-600">Installation</a>
+          </nav>
         </div>
       </div>
 

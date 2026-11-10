@@ -1,6 +1,8 @@
 'use client';
 
 import {
+  Suspense,
+  lazy,
   useCallback,
   useEffect,
   useMemo,
@@ -10,14 +12,15 @@ import {
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
 import AuthPage from './views/AuthPage';
 import PasswordPage from './views/PasswordPage';
-import TodayPricesPage from './views/TodayPricesPage';
-import Tier1VerificationPage from './views/Tier1VerificationPage';
+// Heavy pages are code-split so the home page bundle stays small & fast.
+const TodayPricesPage = lazy(() => import('./views/TodayPricesPage'));
+const Tier1VerificationPage = lazy(() => import('./views/Tier1VerificationPage'));
 import DailyMarketRates from './components/DailyMarketRates';
-import LoadCalculatorPage from './views/LoadCalculatorPage';
+const LoadCalculatorPage = lazy(() => import('./views/LoadCalculatorPage'));
 import SolarLoadCalculator from './components/SolarLoadCalculator';
 import FloatingPostAdButton from './components/FloatingPostAdButton';
 import HomeAdvertisementBoard from './components/HomeAdvertisementBoard';
-import CompanyMarketplacePage from './views/CompanyMarketplacePage';
+const CompanyMarketplacePage = lazy(() => import('./views/CompanyMarketplacePage'));
 import CustomPageView from './views/CustomPageView';
 import KeywordLandingPage, { KEYWORD_LANDING_KEYS } from './views/KeywordLandingPage';
 import EmailContactModal from './components/EmailContactModal';
@@ -127,7 +130,7 @@ import { useSiteSettings } from './context/SiteSettingsContext';
 import { DEFAULT_SUPPORT_PHONE, buildWhatsAppUrl } from './lib/whatsapp';
 import FloatingWhatsAppWidget from './components/FloatingWhatsAppWidget';
 import MobileBottomNav from './components/MobileBottomNav';
-import AdminSuperDashboard from './components/AdminSuperDashboard';
+const AdminSuperDashboard = lazy(() => import('./components/AdminSuperDashboard'));
 import { recordPageView, recordProductView, recordProductInquiry } from './services/analyticsService';
 import { getRealisticAdViews, recordAndIncrementAdView } from './lib/adViews';
 
@@ -6866,7 +6869,21 @@ function _x({
 }){
   const { settings } = useSiteSettings();
   const calcBanner = settings?.homePageCms?.calculatorBanner;
-  const[e,r]=useState(()=>initialFilters?{...Vu,...initialFilters}:Vu),[n,s]=useState([]),[a,l]=useState(!0),[o,c]=useState(null),[u,d]=useState(0),[h,p]=useState(0),y=useCallback((g,m)=>{
+  const initialListingsRef = useRef(null);
+  if (initialListingsRef.current === null) {
+    // Paint local/seed listings instantly; Supabase refreshes them in the background.
+    try {
+      const startFilters = initialFilters ? { ...Vu, ...initialFilters } : Vu;
+      const deletedMap = getDeletedAds();
+      initialListingsRef.current = (getLocalOrSeedListings(startFilters) || []).filter(
+        (item) => !deletedMap[String(item.id)] && item?.is_deleted !== true && item?.status !== 'deleted'
+      );
+    } catch {
+      initialListingsRef.current = [];
+    }
+  }
+  const hasInstantListingsRef = useRef(initialListingsRef.current.length > 0);
+  const[e,r]=useState(()=>initialFilters?{...Vu,...initialFilters}:Vu),[n,s]=useState(()=>initialListingsRef.current),[a,l]=useState(()=>initialListingsRef.current.length===0),[o,c]=useState(null),[u,d]=useState(()=>initialListingsRef.current.length),[h,p]=useState(0),y=useCallback((g,m)=>{
     r(v=>({
       ...v,[g]:m
     }))
@@ -6907,19 +6924,26 @@ function _x({
   useEffect(()=>{
     let active = true;
     (async()=>{
-      l(!0),c(null);
+      // Only show the skeleton when there is nothing to display yet.
+      if(!hasInstantListingsRef.current) l(!0);
+      c(null);
       try{
         let f=supabase.from("solar_listings").select("*",{
-          count:"exact"
+          count:"estimated"
         }).eq("is_deleted", false).order("featured",{
           ascending:!1
         }).order("created_at",{
           ascending:!1
         });
         e.category&&(f=f.eq("category",e.category)),e.brand&&(f=f.eq("brand",e.brand)),e.condition&&(f=f.eq("condition",e.condition)),e.city&&(f=f.eq("city",e.city)),e.minPrice&&(f=f.gte("price",parseFloat(e.minPrice))),e.maxPrice&&(f=f.lte("price",parseFloat(e.maxPrice))),e.query&&(f=f.or(`title.ilike.%${e.query}%,brand.ilike.%${e.query}%,description.ilike.%${e.query}%`));
+        // Hard 5s cap so a slow network never leaves the page stuck on skeletons.
+        const queryResult = await Promise.race([
+          f.limit(60),
+          new Promise((resolve) => setTimeout(() => resolve({ data: null, error: new Error('timeout'), count: null }), 5000))
+        ]);
         const{
           data:m,error:v,count:k
-        }=await f.limit(100);
+        }=queryResult;
         if(!active) return;
         if(!v && m && m.length > 0){
           let combined = [...m];
@@ -7653,7 +7677,17 @@ export default function App({ initialPathname, initialSlug }){
 
   return jsxs(Fragment, {
     children: [
-      pageContent,
+      jsx(Suspense, {
+        fallback: jsx("div", {
+          className: "flex min-h-screen items-center justify-center bg-white dark:bg-gray-950",
+          role: "status",
+          "aria-label": "Loading page",
+          children: jsx("div", {
+            className: "h-10 w-10 animate-spin rounded-full border-4 border-amber-200 dark:border-amber-900 border-t-amber-500"
+          })
+        }),
+        children: pageContent
+      }),
       showFloatingPostBtn ? jsx(FloatingPostAdButton, { onPostAd: c }) : null,
       jsx(FloatingWhatsAppWidget, {}),
       showMobileBottomNav ? jsx(MobileBottomNav, {

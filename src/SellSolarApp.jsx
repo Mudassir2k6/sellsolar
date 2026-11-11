@@ -133,6 +133,7 @@ import GlobalNavbarSearch from './components/GlobalNavbarSearch';
 import { useSiteSettings } from './context/SiteSettingsContext';
 import { DEFAULT_SUPPORT_PHONE, buildWhatsAppUrl } from './lib/whatsapp';
 import FloatingWhatsAppWidget from './components/FloatingWhatsAppWidget';
+import RequirePhoneModal from './components/RequirePhoneModal';
 import MobileBottomNav from './components/MobileBottomNav';
 const AdminSuperDashboard = lazy(() => import('./components/AdminSuperDashboard'));
 import { recordPageView, recordProductView, recordProductInquiry } from './services/analyticsService';
@@ -7914,6 +7915,7 @@ export default function App({ initialPathname, initialSlug }){
       }),
       showFloatingPostBtn ? jsx(FloatingPostAdButton, { onPostAd: c }) : null,
       jsx(FloatingWhatsAppWidget, { hideOnMobile: n === "listing-detail" }),
+      jsx(RequirePhoneModal, { currentPage: n }),
       showMobileBottomNav ? jsx(MobileBottomNav, {
         currentPage: n,
         onNavigate: handleNavigate,

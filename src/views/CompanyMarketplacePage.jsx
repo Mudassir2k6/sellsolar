@@ -50,7 +50,6 @@ import EmailContactModal from '../components/EmailContactModal';
 import { useSiteSettings } from '../context/SiteSettingsContext';
 import { normalizeAdvertisementSettings } from '../lib/advertisementDefaults';
 import { DEFAULT_SUPPORT_PHONE, resolveWhatsAppNumber, buildWhatsAppUrl } from '../lib/whatsapp';
-import { useAuth } from '../context/AuthContext';
 
 // Navigation groups definition
 export const FOOTER_PAGES = {
@@ -1838,7 +1837,6 @@ function HelpCenterContent({ onNavigate }) {
 
 function ContactUsContent() {
   const { settings } = useSiteSettings();
-  const { user, profile } = useAuth();
 
   const supportEmail = settings?.supportEmail || 'info@sellsolar.pk';
   const salesEmail = settings?.salesEmail || 'support@sellsolar.pk';
@@ -1854,63 +1852,14 @@ function ContactUsContent() {
   const [copiedSummary, setCopiedSummary] = useState(false);
   const [emailModalOpen, setEmailModalOpen] = useState(false);
 
-  // Auto-fill from authenticated user, profile, or localStorage so it is never empty
-  const getInitialName = () => {
-    return (
-      profile?.full_name ||
-      user?.user_metadata?.full_name ||
-      user?.name ||
-      (typeof window !== 'undefined' ? localStorage.getItem('sellsolar_last_contact_name') || '' : '')
-    );
-  };
-
-  const getInitialEmail = () => {
-    return (
-      user?.email ||
-      profile?.email ||
-      (typeof window !== 'undefined' ? localStorage.getItem('sellsolar_last_contact_email') || '' : '')
-    );
-  };
-
-  const getInitialPhone = () => {
-    return (
-      profile?.phone ||
-      (typeof window !== 'undefined' ? localStorage.getItem('sellsolar_last_contact_phone') || '' : '')
-    );
-  };
-
+  // Contact fields stay blank — visitor fills them manually (no profile/localStorage autofill)
   const [form, setForm] = useState({
-    name: getInitialName(),
-    email: getInitialEmail(),
-    phone: getInitialPhone(),
+    name: '',
+    email: '',
+    phone: '',
     subject: 'General Inquiry',
     message: ''
   });
-
-  // When user or profile loads asynchronously, ensure fields get auto-filled if still empty
-  useEffect(() => {
-    const loadedName = profile?.full_name || user?.user_metadata?.full_name || user?.name || '';
-    const loadedEmail = user?.email || profile?.email || '';
-    const loadedPhone = profile?.phone || '';
-
-    setForm((prev) => {
-      let changed = false;
-      const updated = { ...prev };
-      if (!updated.name && loadedName) {
-        updated.name = loadedName;
-        changed = true;
-      }
-      if (!updated.email && loadedEmail) {
-        updated.email = loadedEmail;
-        changed = true;
-      }
-      if (!updated.phone && loadedPhone) {
-        updated.phone = loadedPhone;
-        changed = true;
-      }
-      return changed ? updated : prev;
-    });
-  }, [user, profile]);
 
   const handleCopyEmail = async (emailText = supportEmail) => {
     try {
@@ -1943,14 +1892,6 @@ function ContactUsContent() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      if (typeof window !== 'undefined') {
-        try {
-          if (form.name) localStorage.setItem('sellsolar_last_contact_name', form.name);
-          if (form.email) localStorage.setItem('sellsolar_last_contact_email', form.email);
-          if (form.phone) localStorage.setItem('sellsolar_last_contact_phone', form.phone);
-        } catch {}
-      }
-
       const res = await sendContactMessage({
         name: form.name,
         email: form.email,

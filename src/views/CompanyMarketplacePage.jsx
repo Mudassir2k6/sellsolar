@@ -50,6 +50,9 @@ import EmailContactModal from '../components/EmailContactModal';
 import { useSiteSettings } from '../context/SiteSettingsContext';
 import { normalizeAdvertisementSettings } from '../lib/advertisementDefaults';
 import { DEFAULT_SUPPORT_PHONE, resolveWhatsAppNumber, buildWhatsAppUrl } from '../lib/whatsapp';
+import { useAuth } from '../context/AuthContext';
+import { isValidPhone, normalizePhone } from '../lib/auth';
+import { persistUserPhoneAndAttachToAds, isGoogleAuthUser } from '../lib/userPhone';
 
 // Navigation groups definition
 export const FOOTER_PAGES = {
@@ -1837,6 +1840,7 @@ function HelpCenterContent({ onNavigate }) {
 
 function ContactUsContent() {
   const { settings } = useSiteSettings();
+  const { user, profile, refreshProfile } = useAuth();
 
   const supportEmail = settings?.supportEmail || 'info@sellsolar.pk';
   const salesEmail = settings?.salesEmail || 'support@sellsolar.pk';
@@ -1851,15 +1855,69 @@ function ContactUsContent() {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedSummary, setCopiedSummary] = useState(false);
   const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [formError, setFormError] = useState('');
 
-  // Contact fields stay blank — visitor fills them manually (no profile/localStorage autofill)
+  const isGoogleUser = isGoogleAuthUser(user);
+  const profilePhoneMissing = Boolean(user) && !normalizePhone(profile?.phone || user?.user_metadata?.phone || '');
+
+  // Auto-fill from authenticated user, profile, or localStorage
+  const getInitialName = () => {
+    return (
+      profile?.full_name ||
+      user?.user_metadata?.full_name ||
+      user?.name ||
+      (typeof window !== 'undefined' ? localStorage.getItem('sellsolar_last_contact_name') || '' : '')
+    );
+  };
+
+  const getInitialEmail = () => {
+    return (
+      user?.email ||
+      profile?.email ||
+      (typeof window !== 'undefined' ? localStorage.getItem('sellsolar_last_contact_email') || '' : '')
+    );
+  };
+
+  const getInitialPhone = () => {
+    return (
+      profile?.phone ||
+      user?.user_metadata?.phone ||
+      (typeof window !== 'undefined' ? localStorage.getItem('sellsolar_last_contact_phone') || '' : '')
+    );
+  };
+
   const [form, setForm] = useState({
-    name: '',
-    email: '',
-    phone: '',
+    name: getInitialName(),
+    email: getInitialEmail(),
+    phone: getInitialPhone(),
     subject: 'General Inquiry',
     message: ''
   });
+
+  // When user or profile loads asynchronously, auto-fill empty fields
+  useEffect(() => {
+    const loadedName = profile?.full_name || user?.user_metadata?.full_name || user?.name || '';
+    const loadedEmail = user?.email || profile?.email || '';
+    const loadedPhone = profile?.phone || user?.user_metadata?.phone || '';
+
+    setForm((prev) => {
+      let changed = false;
+      const updated = { ...prev };
+      if (!updated.name && loadedName) {
+        updated.name = loadedName;
+        changed = true;
+      }
+      if (!updated.email && loadedEmail) {
+        updated.email = loadedEmail;
+        changed = true;
+      }
+      if (!updated.phone && loadedPhone) {
+        updated.phone = loadedPhone;
+        changed = true;
+      }
+      return changed ? updated : prev;
+    });
+  }, [user, profile]);
 
   const handleCopyEmail = async (emailText = supportEmail) => {
     try {
@@ -1890,12 +1948,51 @@ function ContactUsContent() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setFormError('');
+    const cleanPhone = normalizePhone(form.phone);
+
+    // Phone is always mandatory — especially for Google login users with no saved number
+    if (!cleanPhone) {
+      setFormError(
+        isGoogleUser || profilePhoneMissing
+          ? 'Mobile number is mandatory for Google login accounts. Enter your WhatsApp/mobile number (11 digits).'
+          : 'Mobile number is required (11 digits, e.g. 03001234567).'
+      );
+      return;
+    }
+    if (!isValidPhone(cleanPhone)) {
+      setFormError('Phone number must be exactly 11 digits (e.g. 03001234567).');
+      return;
+    }
+
     setSubmitting(true);
     try {
+      if (typeof window !== 'undefined') {
+        try {
+          if (form.name) localStorage.setItem('sellsolar_last_contact_name', form.name);
+          if (form.email) localStorage.setItem('sellsolar_last_contact_email', form.email);
+          if (cleanPhone) localStorage.setItem('sellsolar_last_contact_phone', cleanPhone);
+        } catch {}
+      }
+
+      // Logged-in user: save phone on profile + attach to all their ads
+      if (user) {
+        try {
+          await persistUserPhoneAndAttachToAds({ phone: cleanPhone, user, profile });
+          if (typeof refreshProfile === 'function') {
+            await refreshProfile(user.id).catch(() => {});
+          }
+        } catch (persistErr) {
+          setFormError(persistErr instanceof Error ? persistErr.message : 'Could not save mobile number.');
+          setSubmitting(false);
+          return;
+        }
+      }
+
       const res = await sendContactMessage({
         name: form.name,
         email: form.email,
-        phone: form.phone,
+        phone: cleanPhone,
         subject: form.subject,
         message: form.message,
         category: form.subject || 'General Inquiry',
@@ -2205,15 +2302,27 @@ function ContactUsContent() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">WhatsApp / Phone *</label>
+                <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                  WhatsApp / Phone *{(isGoogleUser || profilePhoneMissing) ? ' (Mandatory)' : ''}
+                </label>
                 <input
                   type="tel"
                   required
-                  placeholder="0300 1234567"
+                  inputMode="numeric"
+                  maxLength={15}
+                  placeholder="03001234567"
                   value={form.phone}
-                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  className="input-field"
+                  onChange={(e) => {
+                    setFormError('');
+                    setForm({ ...form, phone: e.target.value });
+                  }}
+                  className={`input-field ${(isGoogleUser || profilePhoneMissing) && !normalizePhone(form.phone) ? 'border-amber-400 ring-1 ring-amber-300' : ''}`}
                 />
+                {(isGoogleUser || profilePhoneMissing) && (
+                  <p className="mt-1 text-[11px] font-medium text-amber-700 dark:text-amber-300">
+                    Google login accounts must add an 11-digit mobile number. It is saved to your profile and attached to your ads.
+                  </p>
+                )}
               </div>
               <div>
                 <label className="font-bold text-gray-700 dark:text-gray-300 block mb-1">Subject</label>
@@ -2242,6 +2351,10 @@ function ContactUsContent() {
                 className="input-field py-2"
               />
             </div>
+
+            {formError ? (
+              <p className="text-xs font-semibold text-rose-600 dark:text-rose-400">{formError}</p>
+            ) : null}
 
             <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <p className="text-[11px] text-gray-500 dark:text-gray-400">

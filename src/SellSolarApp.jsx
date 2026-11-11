@@ -319,7 +319,9 @@ function Xy({
   const displayUserName = ((u?.full_name && !String(u.full_name).toLowerCase().includes('mudassir'))
     ? u.full_name
     : (isUserAdmin ? 'Admin' : (c?.email || 'User')));
-  const userInitial = displayUserName.charAt(0).toUpperCase();
+  // Navbar chip shows first name only so the right cluster never overflows the viewport.
+  const shortUserName = String(displayUserName).trim().split(/\s+/)[0] || 'User';
+  const userInitial = shortUserName.charAt(0).toUpperCase();
 
   return jsxs('header', {
     className: `fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -412,7 +414,7 @@ function Xy({
                     }),
                     jsx('button', {
                       onClick: () => h('calculator'),
-                      className: 'hover:text-white transition-colors cursor-pointer hidden xl:inline',
+                      className: 'hover:text-white transition-colors cursor-pointer hidden lg:inline',
                       children: 'Load Calculator',
                     }),
                     jsx('button', {
@@ -453,10 +455,10 @@ function Xy({
         : null,
 
       jsx('div', {
-        className: 'w-full max-w-[1440px] mx-auto px-2 sm:px-4 lg:px-6',
+        className: 'w-full max-w-[1440px] mx-auto px-2 sm:px-4 lg:px-6 overflow-x-clip',
         children: jsxs('div', {
           className:
-            'flex h-16 items-center justify-between gap-1 sm:gap-2 lg:gap-2.5',
+            'flex h-16 min-w-0 items-center gap-1 sm:gap-2 lg:gap-2.5',
           children: [
             // Brand Logo
             jsxs('button', {
@@ -479,7 +481,7 @@ function Xy({
                       }),
                 }),
                 jsxs('div', {
-                  className: 'flex flex-col justify-center leading-tight',
+                  className: 'flex flex-col justify-center leading-tight min-w-0',
                   children: [
                     jsxs('span', {
                       className:
@@ -494,7 +496,7 @@ function Xy({
                     }),
                     jsx('span', {
                       className:
-                        'block text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 tracking-tight leading-none mt-1 whitespace-nowrap',
+                        'hidden xl:block text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 tracking-tight leading-none mt-1 whitespace-nowrap',
                       children: settings?.headerTagline || "Pakistan's #1 Used Solar Marketplace",
                     }),
                   ],
@@ -515,12 +517,12 @@ function Xy({
               mobileOpen: isMobileSearchOpen,
               onCloseMobile: () => setIsMobileSearchOpen(!1),
               className:
-                'flex-1 min-w-[72px] max-w-[140px] lg:max-w-[180px] xl:max-w-[220px] 2xl:max-w-xs mx-1 sm:mx-1.5 lg:mx-2',
+                'hidden md:block flex-1 min-w-0 max-w-[120px] lg:max-w-[160px] xl:max-w-[200px] 2xl:max-w-[240px] mx-1 sm:mx-1.5 lg:mx-2',
             }),
 
-            // Desktop Navigation Buttons (hidden on mobile, md:flex)
+            // Mid nav links — hide extras at smaller breakpoints; never clip labels
             jsxs('div', {
-              className: 'hidden md:flex items-center gap-1 lg:gap-1.5 shrink-0',
+              className: 'hidden md:flex min-w-0 flex-1 items-center justify-end gap-1 lg:gap-1.5',
               children: [
                 jsxs('button', {
                   onClick: () => h('prices'),
@@ -593,6 +595,7 @@ function Xy({
                 }),
                 jsx('button', {
                   onClick: () => h('calculator'),
+                  title: 'Load Calculator',
                   className: `hidden lg:flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 ${
                     e === 'calculator'
                       ? 'bg-primary-500 text-white shadow-xs shadow-primary-500/20'
@@ -608,19 +611,15 @@ function Xy({
                         }`,
                       }),
                       jsx('span', {
-                        className: 'whitespace-nowrap hidden 2xl:inline',
+                        className: 'whitespace-nowrap',
                         children: 'Load Calculator',
-                      }),
-                      jsx('span', {
-                        className: 'whitespace-nowrap 2xl:hidden',
-                        children: 'Calc',
                       }),
                     ],
                   }),
                 }),
                 jsx('button', {
                   onClick: () => h('dealers'),
-                  className: `hidden lg:flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 ${
+                  className: `hidden xl:flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 ${
                     e === 'dealers'
                       ? 'bg-sky-600 text-white shadow-xs shadow-sky-600/20'
                       : 'bg-sky-50 dark:bg-sky-950/40 text-sky-800 dark:text-sky-300 border border-sky-200/70 dark:border-sky-800/60 hover:bg-sky-100 dark:hover:bg-sky-900/60'
@@ -635,11 +634,7 @@ function Xy({
                         }`,
                       }),
                       jsx('span', {
-                        className: 'whitespace-nowrap hidden 2xl:inline',
-                        children: 'Verified Dealers',
-                      }),
-                      jsx('span', {
-                        className: 'whitespace-nowrap 2xl:hidden',
+                        className: 'whitespace-nowrap',
                         children: 'Dealers',
                       }),
                     ],
@@ -647,7 +642,7 @@ function Xy({
                 }),
                 jsx('button', {
                   onClick: () => h('verification'),
-                  className: `hidden xl:flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 ${
+                  className: `hidden 2xl:flex items-center gap-1.5 rounded-lg px-2 sm:px-2.5 xl:px-3 py-1.5 text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 ${
                     e === 'verification' || e === 'tier-1-verification' || e === 'panel-verification'
                       ? 'bg-emerald-600 text-white shadow-xs shadow-emerald-600/20'
                       : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60'
@@ -691,6 +686,13 @@ function Xy({
                     ],
                   }),
                 }),
+              ],
+            }),
+
+            // Right account cluster — always fully visible, never pushed off-screen by mid-nav
+            jsxs('div', {
+              className: 'hidden md:flex items-center gap-1.5 lg:gap-2 shrink-0 ml-auto',
+              children: [
                 jsx(ThemeRadioToggle, {
                   className: 'shrink-0',
                 }),
@@ -722,9 +724,9 @@ function Xy({
                                   children: userInitial,
                                 }),
                                 jsx('span', {
-                                  className: 'hidden sm:inline whitespace-nowrap text-xs sm:text-sm font-semibold max-w-[9rem] md:max-w-[11rem] lg:max-w-[14rem] overflow-hidden text-ellipsis',
+                                  className: 'hidden sm:inline whitespace-nowrap text-xs sm:text-sm font-semibold',
                                   title: displayUserName,
-                                  children: displayUserName,
+                                  children: shortUserName,
                                 }),
                                 jsx(ChevronDown, {
                                   className: 'h-4 w-4 text-gray-400 shrink-0',

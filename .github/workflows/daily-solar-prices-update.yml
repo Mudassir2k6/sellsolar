@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: write   # needed to trigger the Cloudflare deploy workflow below
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -28,8 +29,25 @@ jobs:
         run: node scripts/update-today-prices.js
 
       - name: Commit and push if prices updated
+        id: commit
         run: |
           git config --global user.name "SellSolar Price Bot"
           git config --global user.email "bot@sellsolar.pk"
           git add src/data/todayPricesData.js public/daily_price_update_log.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: auto-update today's solar market benchmark prices (12:00 AM)" && git push)
+          if git diff --staged --quiet; then
+            echo "No price changes to commit."
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git commit -m "chore: auto-update today's solar market benchmark prices (12:00 AM)"
+          git pull --rebase origin main
+          git push origin main
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+      # Pushes made with the default GITHUB_TOKEN do NOT start the push-triggered deploy,
+      # so start the Cloudflare deploy explicitly (workflow_dispatch is allowed for GITHUB_TOKEN).
+      - name: Deploy updated prices to sellsolar.pk
+        if: steps.commit.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy-cloudflare.yml --ref main

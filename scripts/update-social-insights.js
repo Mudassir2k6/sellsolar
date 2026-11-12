@@ -11,6 +11,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
 const OUT_FILE = path.join(rootDir, 'public', 'social-insights.json');
+const TAGS_HTML_FILE = path.join(rootDir, 'public', 'trending-solar-hashtags.html');
+const TAGS_TXT_FILE = path.join(rootDir, 'public', 'trending-solar-hashtags.txt');
+const SITEMAP_FILE = path.join(rootDir, 'public', 'sitemap.xml');
+const LLMS_FILE = path.join(rootDir, 'public', 'llms.txt');
+const LLMS_START = '<!-- SOCIAL_INSIGHTS_TAGS_START -->';
+const LLMS_END = '<!-- SOCIAL_INSIGHTS_TAGS_END -->';
 
 const SOLAR_FILTER =
   /\b(solar|photovoltaic|pv\b|inverter|net[\s-]?meter|renewable|photovoltaics?|lifepo4|topcon|panel|plates?)\b/i;
@@ -286,7 +292,138 @@ async function main() {
   fs.mkdirSync(path.dirname(OUT_FILE), { recursive: true });
   fs.writeFileSync(OUT_FILE, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
   console.log(`Wrote ${OUT_FILE}`);
+
+  // Plain-text tags file — easy for crawlers / AEO tools to index
+  const tagLines = [
+    `SellSolar.pk trending solar hashtags — updated ${stamp.label}`,
+    `Source: https://sellsolar.pk/social-insights`,
+    '',
+    ...hashtags.map((h) => {
+      const posts = (h.platforms || []).map((p) => `${p.name} ${p.posts}`).join(', ');
+      return `${h.tag} (${posts})`;
+    }),
+    '',
+    `SEO keywords: ${seoKeywords}`,
+    '',
+  ];
+  fs.writeFileSync(TAGS_TXT_FILE, `${tagLines.join('\n')}\n`, 'utf8');
+  console.log(`Wrote ${TAGS_TXT_FILE}`);
+
+  // Static HTML snapshot so Google/Bing see fresh tags without waiting for JS
+  const newsHtml = trendingNews
+    .map(
+      (n) =>
+        `<li><strong>${escapeHtml(n.title)}</strong> — ${escapeHtml(n.summary || '')} <em>${escapeHtml(
+          (n.tags || []).join(' ')
+        )}</em></li>`
+    )
+    .join('\n');
+  const tagsHtml = hashtags
+    .map((h) => {
+      const posts = (h.platforms || []).map((p) => `${p.name}: ${p.posts}`).join(' · ');
+      const href = h.searchUrl || `https://sellsolar.pk/social-insights`;
+      return `<li><a href="${escapeHtml(href)}">${escapeHtml(h.tag)}</a> — ${escapeHtml(posts)} — find solar plates &amp; inverters on <a href="https://sellsolar.pk/">SellSolar.pk</a></li>`;
+    })
+    .join('\n');
+
+  const htmlDoc = `<!DOCTYPE html>
+<html lang="en-PK">
+<head>
+  <meta charset="utf-8" />
+  <title>Trending Solar Hashtags Pakistan ${stamp.label} | SellSolar</title>
+  <meta name="description" content="Daily updated trending solar hashtags for Pakistan: ${escapeHtml(
+    seoKeywords
+  )}. Discover SellSolar.pk marketplace for solar plates, inverters and batteries." />
+  <meta name="keywords" content="${escapeHtml(seoKeywords)}, solar hashtags Pakistan, SellSolar" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://sellsolar.pk/trending-solar-hashtags.html" />
+  <meta http-equiv="refresh" content="0;url=https://sellsolar.pk/social-insights" />
+</head>
+<body>
+  <h1>Trending Solar Hashtags in Pakistan — SellSolar.pk</h1>
+  <p>Updated ${escapeHtml(stamp.label)}. These tags help people searching solar topics find <a href="https://sellsolar.pk/">SellSolar.pk</a>.</p>
+  <p><a href="https://sellsolar.pk/social-insights">Open live Social Insights</a> · <a href="https://sellsolar.pk/prices">Today solar rates</a></p>
+  <h2>Hashtags</h2>
+  <ul>
+${tagsHtml}
+  </ul>
+  <h2>Trending topics</h2>
+  <ul>
+${newsHtml}
+  </ul>
+  <p>Keywords: ${escapeHtml(seoKeywords)}</p>
+</body>
+</html>
+`;
+  fs.writeFileSync(TAGS_HTML_FILE, htmlDoc, 'utf8');
+  console.log(`Wrote ${TAGS_HTML_FILE}`);
+
+  // Bump sitemap lastmod so search engines re-crawl social insights daily
+  if (fs.existsSync(SITEMAP_FILE)) {
+    const today = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Karachi',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(new Date());
+    let sitemap = fs.readFileSync(SITEMAP_FILE, 'utf8');
+    sitemap = sitemap.replace(
+      /(<loc>https:\/\/sellsolar\.pk\/social-insights<\/loc>\s*<lastmod>)[^<]+(<\/lastmod>)/,
+      `$1${today}$2`
+    );
+    sitemap = sitemap.replace(
+      /(<loc>https:\/\/sellsolar\.pk\/trends<\/loc>\s*<lastmod>)[^<]+(<\/lastmod>)/,
+      `$1${today}$2`
+    );
+    if (!sitemap.includes('trending-solar-hashtags.html')) {
+      const extraUrl = `  <url>
+    <loc>https://sellsolar.pk/trending-solar-hashtags.html</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.82</priority>
+  </url>
+`;
+      sitemap = sitemap.replace('</urlset>', `${extraUrl}</urlset>`);
+    } else {
+      sitemap = sitemap.replace(
+        /(<loc>https:\/\/sellsolar\.pk\/trending-solar-hashtags\.html<\/loc>\s*<lastmod>)[^<]+(<\/lastmod>)/,
+        `$1${today}$2`
+      );
+    }
+    fs.writeFileSync(SITEMAP_FILE, sitemap, 'utf8');
+    console.log(`Updated sitemap lastmod → ${today}`);
+  }
+
+  // Refresh llms.txt tag block for AEO / AI engines
+  if (fs.existsSync(LLMS_FILE)) {
+    let llms = fs.readFileSync(LLMS_FILE, 'utf8');
+    const block = [
+      LLMS_START,
+      `## Trending Solar Hashtags (auto-updated ${stamp.label})`,
+      hashtags.map((h) => `- ${h.tag}`).join('\n'),
+      `- Keywords: ${seoKeywords}`,
+      `- Page: https://sellsolar.pk/social-insights`,
+      `- Snapshot: https://sellsolar.pk/trending-solar-hashtags.html`,
+      LLMS_END,
+    ].join('\n');
+    if (llms.includes(LLMS_START) && llms.includes(LLMS_END)) {
+      llms = llms.replace(new RegExp(`${LLMS_START}[\\s\\S]*?${LLMS_END}`), block);
+    } else {
+      llms = `${llms.trim()}\n\n${block}\n`;
+    }
+    fs.writeFileSync(LLMS_FILE, llms, 'utf8');
+    console.log(`Updated ${LLMS_FILE}`);
+  }
+
   console.log(`Hashtags: ${hashtags.length} | News topics: ${trendingNews.length}`);
+}
+
+function escapeHtml(value = '') {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 main().catch((err) => {

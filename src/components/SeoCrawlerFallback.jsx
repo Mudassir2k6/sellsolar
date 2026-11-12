@@ -1,8 +1,17 @@
 import React from 'react';
+import socialInsights from '../../public/social-insights.json';
 
 export default function SeoCrawlerFallback({ slug = [], meta = {} }) {
   const pageKey = slug && slug.length > 0 ? slug[0] : 'home';
   const heading = meta?.title?.split('|')[0]?.trim() || "Buy & Sell Used Solar Plates, Inverters & Batteries in Pakistan";
+  const isSocialInsights =
+    pageKey === 'social-insights' ||
+    pageKey === 'trends' ||
+    pageKey === 'discover-trends' ||
+    pageKey === 'insights';
+  const liveHashtags = Array.isArray(socialInsights?.hashtags) ? socialInsights.hashtags : [];
+  const liveKeywords = socialInsights?.seoKeywords || '';
+  const liveUpdated = socialInsights?.lastUpdatedLabel || '';
 
   return (
     <div id="seo-static-crawler-snapshot" className="sr-only" aria-hidden="false">
@@ -13,6 +22,30 @@ export default function SeoCrawlerFallback({ slug = [], meta = {} }) {
           Buy and sell used solar plates, second-hand hybrid inverters, solar batteries, and complete solar systems across Lahore, Karachi, Islamabad, Rawalpindi, Faisalabad, Multan, and throughout Pakistan.
         </p>
       </header>
+
+      {(isSocialInsights || liveHashtags.length > 0) && (
+        <section aria-labelledby="seo-trending-hashtags-heading">
+          <h2 id="seo-trending-hashtags-heading">
+            Trending Solar Hashtags Pakistan {liveUpdated ? `(Updated ${liveUpdated})` : ''}
+          </h2>
+          <p>
+            Search these solar social tags to find SellSolar.pk — solar plates, hybrid inverters, lithium batteries and daily rates:
+            {liveKeywords ? ` ${liveKeywords}.` : ''}
+          </p>
+          <ul>
+            {liveHashtags.map((item) => (
+              <li key={item.tag}>
+                <a href={item.searchUrl || '/social-insights'}>{item.tag}</a>
+                {' — '}
+                {(item.platforms || []).map((p) => `${p.name} ${p.posts}`).join(', ')}
+                {' — '}
+                <a href="/social-insights">SellSolar Social Insights</a>
+              </li>
+            ))}
+            <li><a href="/trending-solar-hashtags.html">Daily trending solar hashtags HTML snapshot</a></li>
+          </ul>
+        </section>
+      )}
 
       {/* Main Keywords and Navigation Hub */}
       <nav aria-label="Solar Marketplace Categories">

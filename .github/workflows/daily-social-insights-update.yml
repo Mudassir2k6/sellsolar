@@ -5,12 +5,24 @@ on:
     # 1:00 AM Pakistan Standard Time (UTC+5) = 20:00 UTC previous calendar day
     - cron: '0 20 * * *'
   workflow_dispatch:
+    # Triggered from Admin -> Social Insights -> "Run cron now" (via /api/social-insights-refresh)
+    inputs:
+      country:
+        description: 'Country code (PK, IN, AE, US ...) or ALL'
+        required: false
+        default: 'ALL'
+
+# Never run two updates at once (avoids push races)
+concurrency:
+  group: social-insights-update
+  cancel-in-progress: false
 
 jobs:
   update-social-insights:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: write   # needed to trigger the Cloudflare deploy workflow below
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -24,12 +36,33 @@ jobs:
       - name: Install dependencies
         run: npm ci || npm install
 
-      - name: Refresh trending solar hashtags & social insights file
+      - name: Refresh trending solar hashtags & social insights files
+        env:
+          COUNTRY: ${{ github.event.inputs.country || 'ALL' }}
         run: node scripts/update-social-insights.js
 
       - name: Commit and push if insights updated
+        id: commit
         run: |
           git config --global user.name "SellSolar Social Insights Bot"
           git config --global user.email "bot@sellsolar.pk"
-          git add public/social-insights.json public/trending-solar-hashtags.html public/trending-solar-hashtags.txt public/sitemap.xml public/llms.txt
-          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: auto-update social insights hashtags for SEO (1:00 AM PKT)" && git push)
+          git add public/social-insights.json public/insights-data public/trending-solar-hashtags.html public/trending-solar-hashtags.txt public/sitemap.xml public/llms.txt
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git commit -m "chore: auto-update social insights hashtags for SEO (${COUNTRY_LABEL})"
+          git pull --rebase origin main
+          git push origin main
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+        env:
+          COUNTRY_LABEL: ${{ github.event.inputs.country || 'ALL countries, 1:00 AM PKT' }}
+
+      # Pushes made with the default GITHUB_TOKEN do NOT start the push-triggered deploy,
+      # so start the Cloudflare deploy explicitly (workflow_dispatch is allowed for GITHUB_TOKEN).
+      - name: Deploy updated files to sellsolar.pk
+        if: steps.commit.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy-cloudflare.yml --ref main

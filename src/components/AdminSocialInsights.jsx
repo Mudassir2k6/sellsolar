@@ -1,14 +1,15 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft,
   Bookmark,
   Copy,
   ExternalLink,
+  Globe,
   Hash,
   Lightbulb,
-  MapPin,
+  Play,
   RefreshCw,
   Share2,
   Sparkles,
@@ -16,8 +17,30 @@ import {
   FileText,
   LayoutDashboard,
 } from 'lucide-react';
+import COUNTRY_DATA from '../data/socialInsightCountries.json';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 const STORAGE_KEY = 'sellsolar_social_insights_tracked';
+const COUNTRY_KEY = 'sellsolar_social_insights_country';
+const COUNTRIES = COUNTRY_DATA.countries;
+const DEFAULT_COUNTRY = COUNTRY_DATA.default || 'PK';
+const ACTIONS_URL =
+  'https://github.com/Mudassir2k6/sellsolar/actions/workflows/daily-social-insights-update.yml';
+const POLL_EVERY_MS = 30_000;
+const POLL_MAX_MS = 12 * 60_000;
+
+function getStoredCountry() {
+  if (typeof window === 'undefined') return DEFAULT_COUNTRY;
+  try {
+    const saved = localStorage.getItem(COUNTRY_KEY);
+    if (saved && COUNTRIES.some((c) => c.code === saved)) return saved;
+  } catch {}
+  return DEFAULT_COUNTRY;
+}
+
+function dataUrlFor(code) {
+  return code === DEFAULT_COUNTRY ? '/social-insights.json' : `/insights-data/${code.toLowerCase()}.json`;
+}
 
 const NAV = [
   { id: 'discover', label: 'Discover Trends', icon: TrendingUp },
@@ -65,26 +88,151 @@ export default function AdminSocialInsights({ onBackToSite }) {
   const [error, setError] = useState('');
   const [tracked, setTracked] = useState({ pages: [], posts: [], savedTags: [] });
   const [copiedTag, setCopiedTag] = useState('');
+  const [country, setCountry] = useState(getStoredCountry);
+  const [runState, setRunState] = useState({ status: 'idle', message: '', actionsUrl: '' });
+  const pollRef = useRef(null);
+
+  const countryInfo = useMemo(
+    () => COUNTRIES.find((c) => c.code === country) || COUNTRIES[0],
+    [country]
+  );
+
+  const stopPolling = useCallback(() => {
+    if (pollRef.current) {
+      clearInterval(pollRef.current);
+      pollRef.current = null;
+    }
+  }, []);
+
+  // Loads the data file of a country. A missing file makes the host return the HTML app shell,
+  // so we check the content-type instead of trusting res.ok.
+  const loadCountryFile = useCallback(async (code) => {
+    const res = await fetch(`${dataUrlFor(code)}?t=${Date.now()}`, { cache: 'no-store' });
+    const type = res.headers.get('content-type') || '';
+    if (!res.ok || !type.includes('json')) return null;
+    return res.json();
+  }, []);
 
   const fetchInsights = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch(`/social-insights.json?t=${Date.now()}`, { cache: 'no-store' });
-      if (!res.ok) throw new Error(`Failed to load insights (${res.status})`);
-      const json = await res.json();
-      setData(json);
+      const json = await loadCountryFile(country);
+      if (json) {
+        setData(json);
+      } else {
+        setData(null);
+        setError(
+          `No data file for ${countryInfo.name} yet. Press "Run cron now" to generate it (takes a few minutes).`
+        );
+      }
     } catch (err) {
+      setData(null);
       setError(err?.message || 'Could not load social insights');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [country, countryInfo.name, loadCountryFile]);
 
   useEffect(() => {
     setTracked(loadTracked());
+  }, []);
+
+  useEffect(() => {
     fetchInsights();
   }, [fetchInsights]);
+
+  useEffect(() => stopPolling, [stopPolling]);
+
+  const changeCountry = (code) => {
+    stopPolling();
+    setRunState({ status: 'idle', message: '', actionsUrl: '' });
+    setCountry(code);
+    try {
+      localStorage.setItem(COUNTRY_KEY, code);
+    } catch {}
+  };
+
+  // Starts the same GitHub Actions workflow the 1:00 AM PKT cron uses, then watches for the new file.
+  const runCron = async (target) => {
+    stopPolling();
+    const targetLabel = target === 'ALL' ? 'all countries' : countryInfo.name;
+    setRunState({ status: 'starting', message: `Starting cron job for ${targetLabel}…`, actionsUrl: '' });
+    try {
+      let token = null;
+      if (isSupabaseConfigured()) {
+        const { data: sessionData } = await supabase.auth.getSession();
+        token = sessionData?.session?.access_token || null;
+      }
+      if (!token) {
+        setRunState({
+          status: 'error',
+          message: 'Admin session not found. Sign out and sign in again with your admin account, or run it from GitHub Actions.',
+          actionsUrl: ACTIONS_URL,
+        });
+        return;
+      }
+
+      const res = await fetch('/api/social-insights-refresh', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ country: target }),
+      });
+      const body = await res.json().catch(() => null);
+
+      if (!body || !body.ok) {
+        setRunState({
+          status: 'error',
+          message:
+            body?.message ||
+            'Refresh endpoint is not available yet (site may still be deploying). You can run it from GitHub Actions.',
+          actionsUrl: ACTIONS_URL,
+        });
+        return;
+      }
+
+      const baseline = data?.lastUpdated || null;
+      const startedAt = Date.now();
+      setRunState({
+        status: 'running',
+        message: `${body.message} This panel refreshes automatically.`,
+        actionsUrl: body.actionsUrl || ACTIONS_URL,
+      });
+
+      pollRef.current = setInterval(async () => {
+        try {
+          const json = await loadCountryFile(country);
+          if (json && json.lastUpdated && json.lastUpdated !== baseline) {
+            stopPolling();
+            setData(json);
+            setError('');
+            setRunState({
+              status: 'done',
+              message: `Updated: ${json.lastUpdatedLabel || json.lastUpdated}`,
+              actionsUrl: '',
+            });
+            return;
+          }
+        } catch {}
+        if (Date.now() - startedAt > POLL_MAX_MS) {
+          stopPolling();
+          setRunState({
+            status: 'error',
+            message: 'Still not live after 12 minutes. Check the workflow run on GitHub Actions.',
+            actionsUrl: ACTIONS_URL,
+          });
+        }
+      }, POLL_EVERY_MS);
+    } catch (err) {
+      setRunState({
+        status: 'error',
+        message: err?.message || 'Could not start the cron job.',
+        actionsUrl: ACTIONS_URL,
+      });
+    }
+  };
+
+  const cronBusy = runState.status === 'starting' || runState.status === 'running';
 
   const updateTracked = useCallback((updater) => {
     setTracked((prev) => {
@@ -232,10 +380,22 @@ export default function AdminSocialInsights({ onBackToSite }) {
               </p>
             </div>
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-xs font-bold text-gray-700 dark:text-gray-200">
-                <MapPin className="h-3.5 w-3.5 text-amber-500" />
-                {data?.location || 'Pakistan'}
-              </span>
+              <label className="inline-flex items-center gap-1.5 pl-3 pr-1 py-1 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-xs font-bold text-gray-700 dark:text-gray-200">
+                <Globe className="h-3.5 w-3.5 text-amber-500" />
+                <span className="sr-only">Country</span>
+                <select
+                  value={country}
+                  onChange={(e) => changeCountry(e.target.value)}
+                  aria-label="Select country"
+                  className="bg-transparent py-1.5 pr-2 text-xs font-bold text-gray-800 dark:text-gray-100 focus:outline-none cursor-pointer"
+                >
+                  {COUNTRIES.map((c) => (
+                    <option key={c.code} value={c.code} className="text-gray-900">
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
               <button
                 type="button"
                 onClick={fetchInsights}
@@ -244,6 +404,25 @@ export default function AdminSocialInsights({ onBackToSite }) {
               >
                 <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
                 Refresh
+              </button>
+              <button
+                type="button"
+                onClick={() => runCron(country)}
+                disabled={cronBusy}
+                title={`Run the nightly cron now for ${countryInfo.name}`}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gray-900 hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-100 text-white dark:text-gray-900 text-xs font-black shadow-sm disabled:opacity-60"
+              >
+                <Play className={`h-3.5 w-3.5 ${cronBusy ? 'animate-pulse' : ''}`} />
+                {cronBusy ? 'Cron running…' : 'Run cron now'}
+              </button>
+              <button
+                type="button"
+                onClick={() => runCron('ALL')}
+                disabled={cronBusy}
+                title="Run the nightly cron now for every country"
+                className="px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-xs font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-60"
+              >
+                All countries
               </button>
               <a
                 href="https://sellsolar.pk/social-insights"
@@ -259,8 +438,43 @@ export default function AdminSocialInsights({ onBackToSite }) {
 
           {data?.lastUpdatedLabel && (
             <p className="text-[11px] text-gray-400 font-mono">
-              File last updated: {data.lastUpdatedLabel} · Cron: every night 1:00 AM PKT
+              {countryInfo.name} file last updated: {data.lastUpdatedLabel} · Cron: every night 1:00 AM PKT (all countries)
             </p>
+          )}
+
+          {country !== DEFAULT_COUNTRY && (
+            <p className="text-[11px] text-gray-500 dark:text-gray-400">
+              Research view for {countryInfo.name}. The public SEO page, sitemap and llms.txt on sellsolar.pk are always
+              built from {COUNTRIES.find((c) => c.code === DEFAULT_COUNTRY)?.name} data.
+            </p>
+          )}
+
+          {runState.status !== 'idle' && (
+            <div
+              role="status"
+              className={`rounded-xl border px-4 py-3 text-sm flex flex-wrap items-center justify-between gap-2 ${
+                runState.status === 'error'
+                  ? 'border-rose-200 bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:border-rose-900 dark:text-rose-300'
+                  : runState.status === 'done'
+                    ? 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/30 dark:border-emerald-900 dark:text-emerald-300'
+                    : 'border-amber-200 bg-amber-50 text-amber-900 dark:bg-amber-950/30 dark:border-amber-900 dark:text-amber-200'
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                {cronBusy && <RefreshCw className="h-3.5 w-3.5 animate-spin shrink-0" />}
+                {runState.message}
+              </span>
+              {runState.actionsUrl && (
+                <a
+                  href={runState.actionsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs font-bold underline"
+                >
+                  GitHub Actions <ExternalLink className="h-3 w-3" />
+                </a>
+              )}
+            </div>
           )}
 
           {error && (
@@ -336,8 +550,9 @@ export default function AdminSocialInsights({ onBackToSite }) {
                     Trending Solar Hashtags
                   </h2>
                   <p className="text-xs text-gray-500 mt-1">
-                    These tags update nightly into <code className="font-mono text-[11px]">/social-insights.json</code> so
-                    search / AEO / GEO can find SellSolar.pk.
+                    These tags update nightly into{' '}
+                    <code className="font-mono text-[11px]">{dataUrlFor(country)}</code>
+                    {country === DEFAULT_COUNTRY ? ' so search / AEO / GEO can find SellSolar.pk.' : '.'}
                   </p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">

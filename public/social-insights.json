@@ -1,79 +1,80 @@
 {
-  "version": 1,
+  "version": 2,
+  "countryCode": "PK",
   "location": "Pakistan",
-  "lastUpdated": "2026-11-12T11:21:56+05:00",
-  "lastUpdatedLabel": "12 Nov 2026, 11:21 am PKT",
+  "lastUpdated": "2026-11-12T11:31:28+05:00",
+  "lastUpdatedLabel": "12 Nov 2026, 11:31 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarpakistan, solarplates, hybridinverter, lifepo4, renewableenergysecurity, solarpowerin, solarboomis, solarrevolutionthe, solarboomto, solarpowerboom, solarsurgeshocks, solarpanelinstallation, solarsuccessafrican, solarpowerwill",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarpakistan, solarboom, solarrevolution, solarsurge, solarpanel, solarsuccess",
   "trendingNews": [
     {
       "id": "tn-1",
-      "title": "Powering Pakistan’s Future – Is There A Path To Renewable Energy Security By 2031 - The Friday Times",
-      "summary": "Powering Pakistan’s Future – Is There A Path To Renewable Energy Security By 2031 &nbsp;&nbsp; The Friday Times",
+      "title": "Powering Pakistan’s Future – Is There A Path To Renewable Energy Security By 2031",
+      "summary": "Trending solar coverage from The Friday Times — use this Pakistan topic for your own posts and SEO content.",
       "source": "The Friday Times",
       "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxOelcyMGJVRUV0NmZjNkYxcWJDT2dBNTdHa0JxTGxpWl95R01pTnRYX2F6MDV5N1BlTGk1anRrbHVOMU4wd3JkLXVHNS15aXdVZVJqaVZLYnhfNUcycFoxRjFjbVczT3RuYTVXc3RDQW5iNzVHSkdENU9MeElTWHRTREJVOWxqQS1KTG5XQ3laeVJud3hKQ01rb3EzVXRhMVZ3Y245SFZjSUs?oc=5",
       "tags": [
-        "#renewableenergysecurity",
+        "#renewableenergy",
         "#solarPakistan",
         "#solarenergy"
       ]
     },
     {
       "id": "tn-2",
-      "title": "Solar power in Pakistan: Assisting Low-Income Families - The Borgen Project",
-      "summary": "Solar power in Pakistan: Assisting Low-Income Families &nbsp;&nbsp; The Borgen Project",
+      "title": "Solar power in Pakistan: Assisting Low-Income Families",
+      "summary": "Trending solar coverage from The Borgen Project — use this Pakistan topic for your own posts and SEO content.",
       "source": "The Borgen Project",
       "url": "https://news.google.com/rss/articles/CBMiX0FVX3lxTE1MNFhhSDN3MFJRYTJqellObWFkSXV1QnA1NXhyV050eDVma216MXk5ZU9JNngzQ1daNDlDa3pWQUtwclNaZElvcDhtTG1IV2FQSTIzYjJfZXNreHphQ1NN?oc=5",
       "tags": [
-        "#solarpowerin",
+        "#solarpower",
         "#solarPakistan",
         "#solarenergy"
       ]
     },
     {
       "id": "tn-3",
-      "title": "How Pakistan’s solar boom is shielding it from worst of Iran war crisis - Al Jazeera",
-      "summary": "How Pakistan’s solar boom is shielding it from worst of Iran war crisis &nbsp;&nbsp; Al Jazeera",
+      "title": "How Pakistan’s solar boom is shielding it from worst of Iran war crisis",
+      "summary": "Trending solar coverage from Al Jazeera — use this Pakistan topic for your own posts and SEO content.",
       "source": "Al Jazeera",
       "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxQbGJ0eE1ueU9tZXpKZUUyUDFOV3dGTzFZQlMxbmFvTUNuSFAzN0ZLRUJJdXBBVnZMTFNBOVhHbk9iWXBsWEc1VDluMGcwbW1NVURmS3ZzLXFiMXQ3aXZIcG8ybVYxd3hTVnBuaUYzamFLQzgyMENpeGZaMTZSUkFCUTQ5S0NfbDhvLVNQOXVVd0tJd0djTWtqQW12d3FvUVRONFZLM01QcmZCQklabnFoOEtPaE7SAboBQVVfeXFMTUd3S2VrTWs5QzdBWUZnR0Nnak5FODVNWF9rczdwQmVJV3dYcjhxN0E4cXBJSV9CVkxTTEVfMEdZYS1lenhnbGFPaHBXZkZFOGRNZmlleDBxWE5NeWRPNlVndHZyNmUyLXFaanNJWFM5QWlTTGYzSmlpZVUwd2lRR2xaNlctTThOZW5qNXBpVXpaNy1MaUFMX3RmOE9pcXJvTENidkkzbl9GbFUyX2xDUVF6V19CaEt0REdn?oc=5",
       "tags": [
-        "#solarboomis",
+        "#solarboom",
         "#solarPakistan",
         "#solarenergy"
       ]
     },
     {
       "id": "tn-4",
-      "title": "Pakistan’s solar revolution - The World from PRX",
-      "summary": "Pakistan’s solar revolution &nbsp;&nbsp; The World from PRX",
+      "title": "Pakistan’s solar revolution",
+      "summary": "Trending solar coverage from The World from PRX — use this Pakistan topic for your own posts and SEO content.",
       "source": "The World from PRX",
       "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTE5kZlc4UWo5anlRWXVWWEprOVZLeWNJdlp3TUZJYnd6M09DS05aNzNfb1E0TTJCZ3JxQ0Rud1JRamFBSS01YVNmbkltRm9nUzlnTEZ0V1VHT2drUmNnSm83eVVJeWNHZUJ1d1JHbkktaWlFdkQ4?oc=5",
       "tags": [
-        "#solarrevolutionthe",
+        "#solarrevolution",
         "#solarPakistan",
         "#solarenergy"
       ]
     },
     {
       "id": "tn-5",
-      "title": "How Pakistan’s people-led solar boom is easing impact of Middle East energy crisis - The Guardian",
-      "summary": "How Pakistan’s people-led solar boom is easing impact of Middle East energy crisis &nbsp;&nbsp; The Guardian",
+      "title": "How Pakistan’s people-led solar boom is easing impact of Middle East energy crisis",
+      "summary": "Trending solar coverage from The Guardian — use this Pakistan topic for your own posts and SEO content.",
       "source": "The Guardian",
       "url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxORU8tbUQyaTFlWmVELUpsb3JmLW9pZkViZG4xQ09wSGtQT2FSRGVSQnNTVjJqSHF3dUxyUkJsOV83NUM0eHNobWc0OTZKdVpkMWN1czI0WUdWREtqcXJsZWZraVJ6dWhrNGtneXJ3X0VTYktfSnB2X2hLQll6UXl2Q0R3enQxZUxCN0UwQ014dUxOYTB1RGZqZkYya21FczdCWDEwRzNuVndmRWFE?oc=5",
       "tags": [
-        "#solarboomis",
+        "#solarboom",
         "#solarPakistan",
         "#solarenergy"
       ]
     },
     {
       "id": "tn-6",
-      "title": "Running on sunshine: Pakistan’s solar boom to tide over Middle East energy crisis - Dawn",
-      "summary": "Running on sunshine: Pakistan’s solar boom to tide over Middle East energy crisis &nbsp;&nbsp; Dawn",
+      "title": "Running on sunshine: Pakistan’s solar boom to tide over Middle East energy crisis",
+      "summary": "Trending solar coverage from Dawn — use this Pakistan topic for your own posts and SEO content.",
       "source": "Dawn",
       "url": "https://news.google.com/rss/articles/CBMiSEFVX3lxTE5CUlFpbXlyS05uNW5VX196eWo1RHRKMXM5REo3eHM0Umd5eW9saWEyVFFJem5zVTlQUkhCdWZsWEJCc2ZOMnNKSg?oc=5",
       "tags": [
-        "#solarboomto",
+        "#solarboom",
         "#solarPakistan",
         "#solarenergy"
       ]
@@ -181,16 +182,6 @@
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
     },
     {
-      "tag": "#solarPakistan",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "96K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarpakistan/"
-    },
-    {
       "tag": "#solarplates",
       "platforms": [
         {
@@ -205,7 +196,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "122K+"
+          "posts": "123K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -221,104 +212,64 @@
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
     },
     {
-      "tag": "#renewableenergysecurity",
+      "tag": "#solarPakistan",
+      "platforms": [
+        {
+          "name": "Instagram",
+          "posts": "97K+"
+        }
+      ],
+      "searchUrl": "https://www.instagram.com/explore/tags/solarpakistan/"
+    },
+    {
+      "tag": "#solarboom",
+      "platforms": [
+        {
+          "name": "Instagram",
+          "posts": "44K+"
+        }
+      ],
+      "searchUrl": "https://www.instagram.com/explore/tags/solarboom/"
+    },
+    {
+      "tag": "#solarrevolution",
       "platforms": [
         {
           "name": "Instagram",
           "posts": "19K+"
         }
       ],
-      "searchUrl": "https://www.instagram.com/explore/tags/renewableenergysecurity/"
+      "searchUrl": "https://www.instagram.com/explore/tags/solarrevolution/"
     },
     {
-      "tag": "#solarpowerin",
+      "tag": "#solarsurge",
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "26K+"
+          "posts": "47K+"
         }
       ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarpowerin/"
+      "searchUrl": "https://www.instagram.com/explore/tags/solarsurge/"
     },
     {
-      "tag": "#solarboomis",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "50K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarboomis/"
-    },
-    {
-      "tag": "#solarrevolutionthe",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "20K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarrevolutionthe/"
-    },
-    {
-      "tag": "#solarboomto",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "51K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarboomto/"
-    },
-    {
-      "tag": "#solarpowerboom",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "49K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarpowerboom/"
-    },
-    {
-      "tag": "#solarsurgeshocks",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "35K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarsurgeshocks/"
-    },
-    {
-      "tag": "#solarpanelinstallation",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "48K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarpanelinstallation/"
-    },
-    {
-      "tag": "#solarsuccessafrican",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "28K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarsuccessafrican/"
-    },
-    {
-      "tag": "#solarpowerwill",
+      "tag": "#solarpanel",
       "platforms": [
         {
           "name": "Instagram",
           "posts": "36K+"
         }
       ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarpowerwill/"
+      "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
+    },
+    {
+      "tag": "#solarsuccess",
+      "platforms": [
+        {
+          "name": "Instagram",
+          "posts": "17K+"
+        }
+      ],
+      "searchUrl": "https://www.instagram.com/explore/tags/solarsuccess/"
     }
   ],
   "contentIdeas": [

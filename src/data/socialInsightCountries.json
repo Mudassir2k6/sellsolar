@@ -1,0 +1,21 @@
+{
+  "default": "PK",
+  "countries": [
+    { "code": "PK", "name": "Pakistan", "tagName": "Pakistan", "hl": "en-PK", "gl": "PK", "ceid": "PK:en" },
+    { "code": "IN", "name": "India", "tagName": "India", "hl": "en-IN", "gl": "IN", "ceid": "IN:en" },
+    { "code": "BD", "name": "Bangladesh", "tagName": "Bangladesh", "hl": "en-BD", "gl": "BD", "ceid": "BD:en" },
+    { "code": "AE", "name": "United Arab Emirates", "tagName": "UAE", "hl": "en-AE", "gl": "AE", "ceid": "AE:en" },
+    { "code": "SA", "name": "Saudi Arabia", "tagName": "SaudiArabia", "hl": "en-SA", "gl": "SA", "ceid": "SA:en" },
+    { "code": "EG", "name": "Egypt", "tagName": "Egypt", "hl": "en-EG", "gl": "EG", "ceid": "EG:en" },
+    { "code": "US", "name": "United States", "tagName": "USA", "hl": "en-US", "gl": "US", "ceid": "US:en" },
+    { "code": "GB", "name": "United Kingdom", "tagName": "UK", "hl": "en-GB", "gl": "GB", "ceid": "GB:en" },
+    { "code": "CA", "name": "Canada", "tagName": "Canada", "hl": "en-CA", "gl": "CA", "ceid": "CA:en" },
+    { "code": "AU", "name": "Australia", "tagName": "Australia", "hl": "en-AU", "gl": "AU", "ceid": "AU:en" },
+    { "code": "ZA", "name": "South Africa", "tagName": "SouthAfrica", "hl": "en-ZA", "gl": "ZA", "ceid": "ZA:en" },
+    { "code": "NG", "name": "Nigeria", "tagName": "Nigeria", "hl": "en-NG", "gl": "NG", "ceid": "NG:en" },
+    { "code": "KE", "name": "Kenya", "tagName": "Kenya", "hl": "en-KE", "gl": "KE", "ceid": "KE:en" },
+    { "code": "PH", "name": "Philippines", "tagName": "Philippines", "hl": "en-PH", "gl": "PH", "ceid": "PH:en" },
+    { "code": "MY", "name": "Malaysia", "tagName": "Malaysia", "hl": "en-MY", "gl": "MY", "ceid": "MY:en" },
+    { "code": "SG", "name": "Singapore", "tagName": "Singapore", "hl": "en-SG", "gl": "SG", "ceid": "SG:en" }
+  ]
+}

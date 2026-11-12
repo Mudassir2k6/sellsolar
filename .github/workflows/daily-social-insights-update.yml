@@ -1,0 +1,35 @@
+name: Daily Social Insights Hashtag Update at 1:00 AM PKT
+
+on:
+  schedule:
+    # 1:00 AM Pakistan Standard Time (UTC+5) = 20:00 UTC previous calendar day
+    - cron: '0 20 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-social-insights:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Refresh trending solar hashtags & social insights file
+        run: node scripts/update-social-insights.js
+
+      - name: Commit and push if insights updated
+        run: |
+          git config --global user.name "SellSolar Social Insights Bot"
+          git config --global user.email "bot@sellsolar.pk"
+          git add public/social-insights.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: auto-update social insights hashtags (1:00 AM PKT)" && git push)

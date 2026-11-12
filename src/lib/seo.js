@@ -272,6 +272,24 @@ export const PAGE_SEO = {
     path: '/blog',
     robots: INDEXABLE,
   },
+  'social-insights': {
+    title: 'Trending Solar Hashtags & Social Insights Pakistan | SellSolar',
+    description:
+      'Discover trending solar hashtags, renewable energy topics, and content ideas in Pakistan. Use #solarenergy #solarPakistan #netmetering and more — find solar plates, inverters and batteries on SellSolar.pk.',
+    path: '/social-insights',
+    robots: INDEXABLE,
+    keywords:
+      'solar hashtags Pakistan, #solarenergy, #solarpower, #solarpanels, #netmetering, #solarPakistan, #solarplates, #hybridinverter, #lifepo4, #solartok, #renewableenergy, #cleanenergy, solar social media trends Pakistan, SellSolar social insights',
+  },
+  trends: {
+    title: 'Trending Solar Hashtags & Social Insights Pakistan | SellSolar',
+    description:
+      'Discover trending solar hashtags, renewable energy topics, and content ideas in Pakistan. Use #solarenergy #solarPakistan #netmetering and more — find solar plates, inverters and batteries on SellSolar.pk.',
+    path: '/trends',
+    robots: INDEXABLE,
+    keywords:
+      'solar hashtags Pakistan, #solarenergy, #solarpower, #solarpanels, #netmetering, #solarPakistan, solar social media trends Pakistan',
+  },
   'buy-solar': {
     title: 'Buy Solar Plates & Inverters in Pakistan | SellSolar',
     description:
@@ -376,6 +394,8 @@ const PAGE_ALIASES = {
   'cookie-policy': 'cookies',
   'installation': 'install',
   'request-installation': 'install',
+  trends: 'social-insights',
+  'discover-trends': 'social-insights',
 };
 
 export function canonicalPage(page) {
@@ -465,6 +485,11 @@ export function parseLocation(pathname = '/', hash = '') {
     '/cookies': 'cookies',
     '/cookie-policy': 'cookies',
     '/disclaimer': 'disclaimer',
+    '/social-insights': 'social-insights',
+    '/trends': 'social-insights',
+    '/discover-trends': 'social-insights',
+    '/news': 'news',
+    '/solar-news': 'solar-news',
   };
 
   if (map[path]) {

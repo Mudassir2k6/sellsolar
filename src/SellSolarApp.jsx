@@ -23,6 +23,7 @@ import HomeAdvertisementBoard from './components/HomeAdvertisementBoard';
 const CompanyMarketplacePage = lazy(() => import('./views/CompanyMarketplacePage'));
 import CustomPageView from './views/CustomPageView';
 import KeywordLandingPage, { KEYWORD_LANDING_KEYS } from './views/KeywordLandingPage';
+const SocialInsightsPublicPage = lazy(() => import('./views/SocialInsightsPublicPage'));
 import EmailContactModal from './components/EmailContactModal';
 import { applyPageSeo, parseLocation, pageToPath } from './lib/seo';
 import {
@@ -2631,6 +2632,7 @@ const ux={
     { label: "Help Center", page: "help" },
     { label: "Careers", page: "careers" },
     { label: "Blog & Guides", page: "blog" },
+    { label: "Social Insights", page: "social-insights" },
     { label: "Report an Issue", page: "report-issue" }
   ],
   "Legal & Privacy":[
@@ -7558,6 +7560,20 @@ export default function App({ initialPathname, initialSlug }){
       id: "main",
       children: jsx(Tier1VerificationPage, {
         onNavigate: handleNavigate
+      })
+    }), jsx(hx, {
+      onPostAd: c, onNavigate: handleNavigate
+    })]
+  }) : n === "social-insights" || n === "trends" || n === "discover-trends" ? jsxs("div", {
+    className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
+      onNavigate: handleNavigate, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
+    }), jsx("main", {
+      id: "main",
+      children: jsx(Suspense, {
+        fallback: jsx("div", { className: "container-page py-20 text-center text-sm text-gray-500", children: "Loading social insights…" }),
+        children: jsx(SocialInsightsPublicPage, {
+          onNavigate: handleNavigate
+        })
       })
     }), jsx(hx, {
       onPostAd: c, onNavigate: handleNavigate

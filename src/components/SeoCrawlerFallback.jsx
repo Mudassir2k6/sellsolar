@@ -34,6 +34,8 @@ export default function SeoCrawlerFallback({ slug = [], meta = {} }) {
           <li><a href="/buy-solar">Buy Solar Panels, Inverters &amp; Batteries</a></li>
           <li><a href="/sell-solar">Sell Used Solar - Post Free Ad</a></li>
           <li><a href="/install">Professional Solar Installation Request</a></li>
+          <li><a href="/social-insights">Trending Solar Hashtags &amp; Social Insights Pakistan</a></li>
+          <li><a href="/trends">Solar Social Media Trends #solarenergy #netmetering</a></li>
         </ul>
       </nav>
 

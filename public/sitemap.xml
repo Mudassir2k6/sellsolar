@@ -143,6 +143,22 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://sellsolar.pk/blog" />
   </url>
   <url>
+    <loc>https://sellsolar.pk/social-insights</loc>
+    <lastmod>2026-11-12</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.88</priority>
+    <xhtml:link rel="alternate" hreflang="en-PK" href="https://sellsolar.pk/social-insights" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://sellsolar.pk/social-insights" />
+  </url>
+  <url>
+    <loc>https://sellsolar.pk/trends</loc>
+    <lastmod>2026-11-12</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.80</priority>
+    <xhtml:link rel="alternate" hreflang="en-PK" href="https://sellsolar.pk/trends" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://sellsolar.pk/trends" />
+  </url>
+  <url>
     <loc>https://sellsolar.pk/how-it-works</loc>
     <lastmod>2026-10-05</lastmod>
     <changefreq>monthly</changefreq>

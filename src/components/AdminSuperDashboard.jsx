@@ -68,6 +68,7 @@ import {
   RotateCcw,
   CalendarDays,
   BookOpen,
+  TrendingUp,
 } from 'lucide-react';
 import {
   useAuth,
@@ -112,6 +113,7 @@ import AdminDrillDownModal from './AdminDrillDownModal';
 import EditSolarAdModal from './EditSolarAdModal';
 import AdminAdvertisementSettings from './AdminAdvertisementSettings';
 import AdminBlogModule from './AdminBlogModule';
+import AdminSocialInsights from './AdminSocialInsights';
 import ThemeRadioToggle from './ThemeRadioToggle';
 import GlobalNavbarSearch from './GlobalNavbarSearch';
 import { getStoredInstallationRequests, fetchInstallationRequests } from '../lib/installation';
@@ -3129,6 +3131,19 @@ export default function AdminSuperDashboard({
 
             <button
               type="button"
+              onClick={() => selectTab('social-insights')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 transition-colors flex items-center gap-1.5 ${
+                activeTab === 'social-insights'
+                  ? 'bg-amber-500 text-white shadow-xs'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+              }`}
+            >
+              <TrendingUp className="h-3.5 w-3.5" />
+              <span>Social</span>
+            </button>
+
+            <button
+              type="button"
               onClick={() => selectTab('pages')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 transition-colors ${
                 activeTab === 'pages'
@@ -3343,6 +3358,27 @@ export default function AdminSuperDashboard({
                 </div>
                 <span className="px-1.5 py-0.5 rounded-full text-[9px] bg-amber-100 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 font-bold">
                   Add
+                </span>
+              </button>
+            )}
+
+            {/* TAB: SOCIAL INSIGHTS (SUPER ADMIN & ADMIN) */}
+            {effectiveIsAdmin && (
+              <button
+                type="button"
+                onClick={() => selectTab('social-insights')}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+                  activeTab === 'social-insights'
+                    ? 'bg-amber-500 text-white shadow-sm font-black'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <TrendingUp className={`h-4 w-4 ${activeTab === 'social-insights' ? 'text-white' : 'text-amber-500'}`} />
+                  <span>Social Insights</span>
+                </div>
+                <span className="px-1.5 py-0.5 rounded-full text-[9px] bg-amber-100 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 font-bold">
+                  Live
                 </span>
               </button>
             )}
@@ -5119,6 +5155,11 @@ export default function AdminSuperDashboard({
 
           {/* TAB: BLOG & GUIDES */}
           {activeTab === 'blog' && effectiveIsAdmin && <AdminBlogModule />}
+
+          {/* TAB: SOCIAL INSIGHTS */}
+          {activeTab === 'social-insights' && effectiveIsAdmin && (
+            <AdminSocialInsights onBackToSite={handleGoHome} />
+          )}
 
           {/* TAB: PAGES & CONTENT CMS */}
           {activeTab === 'pages' && effectiveIsAdmin && (

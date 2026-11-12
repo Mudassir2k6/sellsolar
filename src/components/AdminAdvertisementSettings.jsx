@@ -1,9 +1,15 @@
 'use client';
 
-import React from 'react';
-import { Megaphone, Plus, Trash2, GripVertical } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Megaphone, Plus, Trash2, GripVertical, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { DEFAULT_ADVERTISEMENT_SETTINGS } from '../lib/advertisementDefaults';
 import HomeAdvertisementBoard from './HomeAdvertisementBoard';
+import {
+  deletePartnerAdSubmission,
+  getPartnerAdSubmissions,
+  PARTNER_AD_EVENT,
+  setPartnerAdStatus,
+} from '../lib/partnerAdSubmissions';
 
 function FieldGrid({ fields, onField }) {
   return (
@@ -25,6 +31,19 @@ function FieldGrid({ fields, onField }) {
 
 export default function AdminAdvertisementSettings({ value, onChange }) {
   const ad = { ...DEFAULT_ADVERTISEMENT_SETTINGS, ...(value || {}) };
+  const [submissions, setSubmissions] = useState([]);
+
+  const refreshSubs = () => setSubmissions(getPartnerAdSubmissions());
+  useEffect(() => {
+    refreshSubs();
+    const onUpd = () => refreshSubs();
+    window.addEventListener(PARTNER_AD_EVENT, onUpd);
+    window.addEventListener('storage', onUpd);
+    return () => {
+      window.removeEventListener(PARTNER_AD_EVENT, onUpd);
+      window.removeEventListener('storage', onUpd);
+    };
+  }, []);
 
   const patch = (partial) => onChange({ ...ad, ...partial });
 
@@ -258,24 +277,139 @@ export default function AdminAdvertisementSettings({ value, onChange }) {
         ))}
       </div>
 
+      <div className="space-y-3 pt-2 border-t border-violet-200/60 dark:border-violet-900/40">
+        <div className="flex items-center justify-between gap-2">
+          <div>
+            <p className="text-xs font-black text-gray-900 dark:text-white">Advertise-here submissions</p>
+            <p className="text-[10px] text-gray-400">
+              Approve to show on the homepage scroll. Hide anytime to remove from display.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={refreshSubs}
+            className="rounded-lg bg-gray-100 px-2 py-1 text-[10px] font-bold dark:bg-gray-800"
+          >
+            Refresh
+          </button>
+        </div>
+
+        {submissions.length === 0 ? (
+          <p className="rounded-xl border border-dashed border-gray-200 px-3 py-6 text-center text-xs text-gray-400 dark:border-gray-700">
+            No partner banner submissions yet.
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {submissions.map((item) => (
+              <div
+                key={item.id}
+                className="flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-gray-900 sm:flex-row sm:items-center"
+              >
+                {item.imageUrl ? (
+                  <img src={item.imageUrl} alt="" className="h-14 w-20 rounded-lg object-cover shrink-0" />
+                ) : (
+                  <div className="flex h-14 w-20 items-center justify-center rounded-lg bg-amber-50 dark:bg-amber-950/40 shrink-0">
+                    <Megaphone className="h-5 w-5 text-amber-500" />
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-xs font-bold text-gray-900 dark:text-white">{item.title}</p>
+                  <p className="truncate text-[10px] text-gray-500">
+                    {item.subtitle || item.advertiser || '—'}
+                    {item.contactPhone ? ` · ${item.contactPhone}` : ''}
+                    {item.contactEmail ? ` · ${item.contactEmail}` : ''}
+                  </p>
+                  <span
+                    className={`mt-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                      item.status === 'approved'
+                        ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300'
+                        : item.status === 'hidden'
+                          ? 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
+                          : 'bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300'
+                    }`}
+                  >
+                    {item.status || 'pending'}
+                  </span>
+                </div>
+                <div className="flex flex-wrap items-center gap-1.5 shrink-0">
+                  {item.status !== 'approved' && (
+                    <button
+                      type="button"
+                      title="Show on homepage"
+                      onClick={() => {
+                        setPartnerAdStatus(item.id, 'approved');
+                        refreshSubs();
+                      }}
+                      className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-2 py-1.5 text-[10px] font-bold text-white hover:bg-emerald-700"
+                    >
+                      <CheckCircle2 className="h-3 w-3" /> Approve / Show
+                    </button>
+                  )}
+                  {item.status === 'approved' && (
+                    <button
+                      type="button"
+                      title="Hide from homepage"
+                      onClick={() => {
+                        setPartnerAdStatus(item.id, 'hidden');
+                        refreshSubs();
+                      }}
+                      className="inline-flex items-center gap-1 rounded-lg bg-amber-600 px-2 py-1.5 text-[10px] font-bold text-white hover:bg-amber-700"
+                    >
+                      <EyeOff className="h-3 w-3" /> Hide from display
+                    </button>
+                  )}
+                  {item.status === 'hidden' && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPartnerAdStatus(item.id, 'approved');
+                        refreshSubs();
+                      }}
+                      className="inline-flex items-center gap-1 rounded-lg bg-sky-600 px-2 py-1.5 text-[10px] font-bold text-white hover:bg-sky-700"
+                    >
+                      <Eye className="h-3 w-3" /> Show again
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (window.confirm('Delete this submission permanently?')) {
+                        deletePartnerAdSubmission(item.id);
+                        refreshSubs();
+                      }
+                    }}
+                    className="rounded-lg p-1.5 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                    title="Delete"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {renderAdEditor(
         'scrollAds',
-        'Scroll strip ads (moving banner)',
-        'Rotating strip on homepage. Use packageId free for launch promos.'
+        'Legacy scroll strip ads (optional / packages CMS)',
+        'Homepage now prefers Advertise-here + approved submissions. These remain for package CMS editing.'
       )}
 
       {renderAdEditor(
         'staticAds',
         'Static spotlight ads',
-        'Large cards under the scroll strip.'
+        'Large cards under the scroll strip (legacy CMS).'
       )}
 
       <div className="pt-4 border-t border-violet-200/60 dark:border-violet-900/40 space-y-2">
         <p className="text-xs font-black text-gray-900 dark:text-white">Live preview (homepage)</p>
-        <div className="rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden pointer-events-none opacity-95">
+        <div className="rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden opacity-95">
           <HomeAdvertisementBoard configOverride={ad} onNavigate={() => {}} />
         </div>
-        <p className="text-[10px] text-gray-400">Save settings to publish changes on the live homepage.</p>
+        <p className="text-[10px] text-gray-400">
+          Homepage scroll shows approved submissions + Advertise here slots. Hide any live ad above anytime.
+        </p>
       </div>
     </div>
   );

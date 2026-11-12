@@ -23,7 +23,8 @@ import HomeAdvertisementBoard from './components/HomeAdvertisementBoard';
 const CompanyMarketplacePage = lazy(() => import('./views/CompanyMarketplacePage'));
 import CustomPageView from './views/CustomPageView';
 import KeywordLandingPage, { KEYWORD_LANDING_KEYS } from './views/KeywordLandingPage';
-const SocialInsightsPublicPage = lazy(() => import('./views/SocialInsightsPublicPage'));
+import SocialInsightsPublicPage from './views/SocialInsightsPublicPage';
+import DailySolarNews from './components/DailySolarNews';
 import EmailContactModal from './components/EmailContactModal';
 import { applyPageSeo, parseLocation, pageToPath } from './lib/seo';
 import {
@@ -7564,16 +7565,25 @@ export default function App({ initialPathname, initialSlug }){
     }), jsx(hx, {
       onPostAd: c, onNavigate: handleNavigate
     })]
-  }) : n === "social-insights" || n === "trends" || n === "discover-trends" ? jsxs("div", {
+  }) : n === "social-insights" || n === "trends" || n === "discover-trends" || n === "social-insight" || n === "insights" ? jsxs("div", {
+    className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
+      onNavigate: handleNavigate, currentPage: "social-insights", onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
+    }), jsx("main", {
+      id: "main",
+      children: jsx(SocialInsightsPublicPage, {
+        onNavigate: handleNavigate
+      })
+    }), jsx(hx, {
+      onPostAd: c, onNavigate: handleNavigate
+    })]
+  }) : n === "news" || n === "solar-news" ? jsxs("div", {
     className: "min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-200", children: [jsx(Xy, {
       onNavigate: handleNavigate, currentPage: n, onSelectListing: u, onSearchSubmit: handleGlobalSearchSubmit
     }), jsx("main", {
       id: "main",
-      children: jsx(Suspense, {
-        fallback: jsx("div", { className: "container-page py-20 text-center text-sm text-gray-500", children: "Loading social insights…" }),
-        children: jsx(SocialInsightsPublicPage, {
-          onNavigate: handleNavigate
-        })
+      className: "container-page pt-20 sm:pt-24 pb-10",
+      children: jsx(DailySolarNews, {
+        onNavigate: handleNavigate, isStandalonePage: true
       })
     }), jsx(hx, {
       onPostAd: c, onNavigate: handleNavigate

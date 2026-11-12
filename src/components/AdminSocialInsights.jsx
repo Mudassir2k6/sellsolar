@@ -246,12 +246,12 @@ export default function AdminSocialInsights({ onBackToSite }) {
                 Refresh
               </button>
               <a
-                href="/social-insights"
+                href="https://sellsolar.pk/social-insights"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-200 text-xs font-bold bg-amber-50 dark:bg-amber-950/40"
               >
-                Public SEO page
+                Open /social-insights
                 <ExternalLink className="h-3.5 w-3.5" />
               </a>
             </div>

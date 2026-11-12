@@ -66,6 +66,30 @@ if (fs.existsSync(authCallbackHtml)) {
   fs.copyFileSync(authCallbackHtml, path.join(authCallbackDir, 'index.html'));
 }
 
+// 4b. Cloudflare Pages: also publish directory/index.html for key SPA routes
+// (avoids 404 when edge resolves /path/ as a folder instead of /path.html)
+const directoryIndexRoutes = [
+  'social-insights',
+  'trends',
+  'discover-trends',
+  'news',
+  'solar-news',
+  'prices',
+  'calculator',
+  'dealers',
+  'verification',
+  'install',
+  'blog',
+];
+for (const route of directoryIndexRoutes) {
+  const flatHtml = path.join(distDir, `${route}.html`);
+  const dirIndex = path.join(distDir, route, 'index.html');
+  if (fs.existsSync(flatHtml)) {
+    fs.mkdirSync(path.dirname(dirIndex), { recursive: true });
+    fs.copyFileSync(flatHtml, dirIndex);
+  }
+}
+
 // ============================================================================
 // PERFORMANCE & HTTP REQUEST REDUCTION OPTIMIZER (< 20 HTTP requests threshold)
 // & ELIMINATE RENDER-BLOCKING RESOURCES (Google PageSpeed / Lighthouse 100%)

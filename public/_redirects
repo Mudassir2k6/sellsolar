@@ -23,5 +23,12 @@ http://sellsolar.pk/*       https://sellsolar.pk/:splat  301!
 # Dynamic listing deep-links → app shell
 /listing/*  /index.html  200
 
+# Social Insights SEO aliases → canonical public page
+/social-insight          /social-insights   301
+/social-media-insights   /social-insights   301
+/insights                /social-insights   301
+/discover-trends         /social-insights   301
+/trends                  /social-insights   301
+
 # Fallback for unknown client routes
 /*    /index.html   200

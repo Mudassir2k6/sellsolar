@@ -396,6 +396,10 @@ const PAGE_ALIASES = {
   'request-installation': 'install',
   trends: 'social-insights',
   'discover-trends': 'social-insights',
+  'social-insight': 'social-insights',
+  insights: 'social-insights',
+  'social-media-insights': 'social-insights',
+  'solar-news': 'news',
 };
 
 export function canonicalPage(page) {
@@ -488,12 +492,26 @@ export function parseLocation(pathname = '/', hash = '') {
     '/social-insights': 'social-insights',
     '/trends': 'social-insights',
     '/discover-trends': 'social-insights',
+    '/social-insight': 'social-insights',
+    '/insights': 'social-insights',
+    '/social-media-insights': 'social-insights',
     '/news': 'news',
-    '/solar-news': 'solar-news',
+    '/solar-news': 'news',
   };
 
-  if (map[path]) {
-    return { page: map[path], listingId: null, hash };
+  const normalizedPath = path.toLowerCase();
+  if (map[path] || map[normalizedPath]) {
+    return { page: map[path] || map[normalizedPath], listingId: null, hash };
+  }
+
+  // Soft-match social insights / trends deep links (prevents SPA 404 after deploys)
+  if (
+    normalizedPath.includes('social-insight') ||
+    normalizedPath.includes('social-media') ||
+    normalizedPath === '/insights' ||
+    normalizedPath.endsWith('/trends')
+  ) {
+    return { page: 'social-insights', listingId: null, hash };
   }
 
   // Check if it matches a custom CMS page in localStorage

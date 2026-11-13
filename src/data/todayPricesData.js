@@ -1547,33 +1547,79 @@ ISLAMABAD_DAILY_SHEETS["10-Nov-2026"] = {
   ]
 };
 
-// 05-Oct-2026 active sheet aliases
-ISLAMABAD_DAILY_SHEETS["today"] = ISLAMABAD_DAILY_SHEETS["10-Nov-2026"];
+// Legacy date aliases (older days that were served from the 05-Oct-2026 sheet)
 ISLAMABAD_DAILY_SHEETS["24-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
 ISLAMABAD_DAILY_SHEETS["06-Oct-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
 ISLAMABAD_DAILY_SHEETS["16-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
 ISLAMABAD_DAILY_SHEETS["15-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
 ISLAMABAD_DAILY_SHEETS["14-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
 ISLAMABAD_DAILY_SHEETS["24-Sept-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
-ISLAMABAD_DAILY_SHEETS["today"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
-ISLAMABAD_DAILY_SHEETS["yesterday"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
+
+// ---------------------------------------------------------------------------
+// Date-wise sheets: EVERY day always has a sheet.
+// If no new rates were added for a day, the latest earlier sheet is carried forward
+// (same rates, change = 0, status "stable") so the website still shows that day's date-wise prices.
+// ---------------------------------------------------------------------------
+const SHEET_MONTHS = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11 };
+
+function sheetKeyToDay(key) {
+  const m = /^(\d{1,2})-([A-Za-z]{3,9})-(\d{4})$/.exec(key || '');
+  if (!m) return null;
+  const month = SHEET_MONTHS[m[2].slice(0, 3).toLowerCase()];
+  if (month === undefined) return null;
+  return Date.UTC(Number(m[3]), month, Number(m[1]));
+}
+
+/** Key of the newest real sheet dated on/before dateKey (falls back to the newest sheet overall) */
+function findLatestSheetKey(dateKey) {
+  const limit = sheetKeyToDay(dateKey);
+  const dated = Object.keys(ISLAMABAD_DAILY_SHEETS)
+    .map((key) => ({ key, day: sheetKeyToDay(key) }))
+    .filter((entry) => entry.day !== null && ISLAMABAD_DAILY_SHEETS[entry.key]?.rates)
+    .sort((a, b) => a.day - b.day);
+  if (!dated.length) return '05-Oct-2026';
+  const eligible = limit === null ? dated : dated.filter((entry) => entry.day <= limit);
+  return (eligible.length ? eligible[eligible.length - 1] : dated[dated.length - 1]).key;
+}
+
+function carryForwardSheet(sheet, dateKey, dateLabel, sourceKey) {
+  const hasRate = (row) => row && typeof row === 'object' && 'rate' in row;
+  const carried = {
+    ...sheet,
+    date: dateLabel,
+    label: `${dateKey} (Ready Stock)`,
+    carriedForward: true,
+    carriedForwardFrom: sourceKey
+  };
+  Object.keys(carried).forEach((field) => {
+    if (Array.isArray(carried[field]) && carried[field].some(hasRate)) {
+      carried[field] = carried[field].map((row) =>
+        hasRate(row) ? { ...row, prevRate: row.rate, change: 0, status: 'stable' } : row
+      );
+    }
+  });
+  return carried;
+}
 
 const todayKey = _currentPkt?.shortDate || "05-Oct-2026";
 const yesterdayKey = _currentPkt?.yesterdayShortDate || "04-Oct-2026";
 
+// Resolve sources BEFORE inserting anything so "yesterday" never picks up today's carried copy
+const todaySourceKey = findLatestSheetKey(todayKey);
+const yesterdaySourceKey = findLatestSheetKey(yesterdayKey);
+
+if (!ISLAMABAD_DAILY_SHEETS[yesterdayKey]) {
+  ISLAMABAD_DAILY_SHEETS[yesterdayKey] = carryForwardSheet(
+    ISLAMABAD_DAILY_SHEETS[yesterdaySourceKey], yesterdayKey, yesterdayKey, yesterdaySourceKey
+  );
+}
 if (!ISLAMABAD_DAILY_SHEETS[todayKey]) {
-  ISLAMABAD_DAILY_SHEETS[todayKey] = {
-    ...ISLAMABAD_DAILY_SHEETS["05-Oct-2026"],
-    date: _currentPkt?.todayStr || "05 October 2026",
-    label: `${todayKey} (Ready Stock)`
-  };
+  ISLAMABAD_DAILY_SHEETS[todayKey] = carryForwardSheet(
+    ISLAMABAD_DAILY_SHEETS[todaySourceKey], todayKey, _currentPkt?.todayStr || todayKey, todaySourceKey
+  );
 }
-if (_currentPkt?.shortDate) {
-  ISLAMABAD_DAILY_SHEETS[_currentPkt.shortDate] = ISLAMABAD_DAILY_SHEETS["today"];
-}
-if (_currentPkt?.yesterdayShortDate) {
-  ISLAMABAD_DAILY_SHEETS[_currentPkt.yesterdayShortDate] = ISLAMABAD_DAILY_SHEETS["yesterday"];
-}
+ISLAMABAD_DAILY_SHEETS["today"] = ISLAMABAD_DAILY_SHEETS[todayKey];
+ISLAMABAD_DAILY_SHEETS["yesterday"] = ISLAMABAD_DAILY_SHEETS[yesterdayKey];
 
 export const MARKET_SUMMARY = {
   "panelsPerWattAvg": "Rs 35.65 – 43.25 / W",

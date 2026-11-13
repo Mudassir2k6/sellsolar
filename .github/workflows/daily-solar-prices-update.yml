@@ -12,6 +12,14 @@ jobs:
     permissions:
       contents: write
       actions: write   # needed to trigger the Cloudflare deploy workflow below
+    env:
+      # Optional email alert (repo Settings -> Secrets and variables -> Actions)
+      #   MAIL_USERNAME = Gmail address that sends the mail
+      #   MAIL_PASSWORD = Gmail App Password (not the normal password)
+      #   MAIL_TO       = who receives the alert (defaults to MAIL_USERNAME)
+      MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+      MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+      MAIL_TO: ${{ secrets.MAIL_TO || secrets.MAIL_USERNAME }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -26,6 +34,7 @@ jobs:
         run: npm ci || npm install
 
       - name: Run Midnight Solar Price Update (Preserving Customer & Dealer Ads)
+        id: prices
         run: node scripts/update-today-prices.js
 
       - name: Commit and push if prices updated
@@ -51,3 +60,33 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run deploy-cloudflare.yml --ref main
+
+      # Date-wise prices are ALWAYS shown on the website (latest sheet is carried forward),
+      # but tell the owner by email when no new rates were added for the day.
+      - name: Email alert - no price change
+        if: steps.prices.outputs.price_status == 'NO_CHANGE' && env.MAIL_USERNAME != '' && env.MAIL_PASSWORD != ''
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ env.MAIL_USERNAME }}
+          password: ${{ env.MAIL_PASSWORD }}
+          to: ${{ env.MAIL_TO }}
+          from: SellSolar Price Bot <${{ env.MAIL_USERNAME }}>
+          subject: "SellSolar: No price change for ${{ steps.prices.outputs.report_date }}"
+          body: |
+            Assalam o Alaikum,
+
+            No new solar prices were added for ${{ steps.prices.outputs.report_date }}.
+
+            The website still shows the date-wise price page for ${{ steps.prices.outputs.report_date }}
+            using the latest verified sheet (${{ steps.prices.outputs.latest_sheet }}), with all changes shown as "stable".
+
+            If rates did change in the market, add a new dated sheet to src/data/todayPricesData.js
+            and push it - the site will publish it automatically.
+
+            Site: https://sellsolar.pk/today-prices
+            Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            - SellSolar Price Bot

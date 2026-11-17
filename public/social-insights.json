@@ -2,25 +2,13 @@
   "version": 2,
   "countryCode": "PK",
   "location": "Pakistan",
-  "lastUpdated": "2026-11-12T11:31:28+05:00",
-  "lastUpdatedLabel": "12 Nov 2026, 11:31 am PKT",
+  "lastUpdated": "2026-11-17T14:34:44+05:00",
+  "lastUpdatedLabel": "17 Nov 2026, 2:34 pm PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarpakistan, solarboom, solarrevolution, solarsurge, solarpanel, solarsuccess",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarpakistan, solarboom, solarrevolution, solarpanel, solarsurge",
   "trendingNews": [
     {
       "id": "tn-1",
-      "title": "Powering Pakistan’s Future – Is There A Path To Renewable Energy Security By 2031",
-      "summary": "Trending solar coverage from The Friday Times — use this Pakistan topic for your own posts and SEO content.",
-      "source": "The Friday Times",
-      "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxOelcyMGJVRUV0NmZjNkYxcWJDT2dBNTdHa0JxTGxpWl95R01pTnRYX2F6MDV5N1BlTGk1anRrbHVOMU4wd3JkLXVHNS15aXdVZVJqaVZLYnhfNUcycFoxRjFjbVczT3RuYTVXc3RDQW5iNzVHSkdENU9MeElTWHRTREJVOWxqQS1KTG5XQ3laeVJud3hKQ01rb3EzVXRhMVZ3Y245SFZjSUs?oc=5",
-      "tags": [
-        "#renewableenergy",
-        "#solarPakistan",
-        "#solarenergy"
-      ]
-    },
-    {
-      "id": "tn-2",
       "title": "Solar power in Pakistan: Assisting Low-Income Families",
       "summary": "Trending solar coverage from The Borgen Project — use this Pakistan topic for your own posts and SEO content.",
       "source": "The Borgen Project",
@@ -32,7 +20,7 @@
       ]
     },
     {
-      "id": "tn-3",
+      "id": "tn-2",
       "title": "How Pakistan’s solar boom is shielding it from worst of Iran war crisis",
       "summary": "Trending solar coverage from Al Jazeera — use this Pakistan topic for your own posts and SEO content.",
       "source": "Al Jazeera",
@@ -44,7 +32,7 @@
       ]
     },
     {
-      "id": "tn-4",
+      "id": "tn-3",
       "title": "Pakistan’s solar revolution",
       "summary": "Trending solar coverage from The World from PRX — use this Pakistan topic for your own posts and SEO content.",
       "source": "The World from PRX",
@@ -56,7 +44,7 @@
       ]
     },
     {
-      "id": "tn-5",
+      "id": "tn-4",
       "title": "How Pakistan’s people-led solar boom is easing impact of Middle East energy crisis",
       "summary": "Trending solar coverage from The Guardian — use this Pakistan topic for your own posts and SEO content.",
       "source": "The Guardian",
@@ -65,6 +53,17 @@
         "#solarboom",
         "#solarPakistan",
         "#solarenergy"
+      ]
+    },
+    {
+      "id": "tn-5",
+      "title": "Is Pakistan at risk of fumbling its solar energy revolution? | BBC News",
+      "summary": "Trending solar coverage from Modern Ghana — use this Pakistan topic for your own posts and SEO content.",
+      "source": "Modern Ghana",
+      "url": "https://news.google.com/rss/articles/CBMiX0FVX3lxTE83LVkxTmN1V0xBSkxiZTA1MFR3LUlGLTZNbktadVJ1eDB6ZG5uc2VtTUhabDA3NXlxb3B2ODV2ajZOLVBOQi1GdFVpZ2hRaURBbTI1R0l1bHJUeWw5M0I40gFcQVVfeXFMTy1VNUFQQXRHZENkZkxsdlFYb0JlVG9iYXl1cjU2YkFLcnlZaUZ0eE45d284UTYtbEFPYTZGa3JHdU1neUJBcHJWeERpbmxOM0VtUlEteHJDWTNWcVU?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarPakistan"
       ]
     },
     {
@@ -146,7 +145,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "990K+"
+          "posts": "977K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -176,7 +175,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "177K+"
+          "posts": "176K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -186,7 +185,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "46K+"
+          "posts": "44K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -196,7 +195,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "123K+"
+          "posts": "120K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -206,7 +205,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "509K+"
+          "posts": "513K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -216,7 +215,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "97K+"
+          "posts": "94K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpakistan/"
@@ -226,7 +225,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "44K+"
+          "posts": "45K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarboom/"
@@ -242,34 +241,24 @@
       "searchUrl": "https://www.instagram.com/explore/tags/solarrevolution/"
     },
     {
-      "tag": "#solarsurge",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "47K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarsurge/"
-    },
-    {
       "tag": "#solarpanel",
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "36K+"
+          "posts": "37K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
     },
     {
-      "tag": "#solarsuccess",
+      "tag": "#solarsurge",
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "17K+"
+          "posts": "45K+"
         }
       ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarsuccess/"
+      "searchUrl": "https://www.instagram.com/explore/tags/solarsurge/"
     }
   ],
   "contentIdeas": [

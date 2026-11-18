@@ -1547,6 +1547,35 @@ ISLAMABAD_DAILY_SHEETS["10-Nov-2026"] = {
   ]
 };
 
+// 18-Nov-2026 rates (panel list updated; inverters / batteries / ESS carried forward from 10-Nov with change = 0)
+ISLAMABAD_DAILY_SHEETS["18-Nov-2026"] = {
+  ...carryForwardSheet(ISLAMABAD_DAILY_SHEETS["10-Nov-2026"], "18-Nov-2026", "18-November-2026", "10-Nov-2026"),
+  "carriedForward": false,
+  "date": "18-November-2026",
+  "label": "18-Nov-2026 (Ready Stock)",
+  "rates": [
+    {"brand": "LONGi", "model": "645W BF", "rate": 41.25, "prevRate": 41.25, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Astronergy", "model": "615W / 620W / 625W", "rate": 37.00, "prevRate": 36.90, "change": 0.10, "status": "up", "badge": "Ready Stock"},
+    {"brand": "Astronergy", "model": "625W", "rate": 36.50, "prevRate": null, "change": 0, "status": "new", "badge": "Expected Delivery 19/11/26"},
+    {"brand": "Astronergy", "model": "720W", "rate": 39.25, "prevRate": 39.25, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "JA Solar", "model": "590W", "rate": 36.50, "prevRate": 37.00, "change": -0.50, "status": "down", "badge": "Ready Stock"},
+    {"brand": "JA Solar", "model": "625W", "rate": 37.15, "prevRate": 37.25, "change": -0.10, "status": "down", "badge": "Ready Stock"},
+    {"brand": "JA Solar", "model": "630W", "rate": 37.00, "prevRate": 36.90, "change": 0.10, "status": "up", "badge": "Ready Stock"},
+    {"brand": "Canadian Solar", "model": "585W", "rate": 40.00, "prevRate": 40.25, "change": -0.25, "status": "down", "badge": "Ready Stock"},
+    {"brand": "Canadian Solar", "model": "625W", "rate": 40.00, "prevRate": 40.00, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Jinko Solar", "model": "585W", "rate": 38.50, "prevRate": 38.75, "change": -0.25, "status": "down", "badge": "Ready Stock"},
+    {"brand": "Jinko Solar", "model": "645W", "rate": 39.25, "prevRate": 39.75, "change": -0.50, "status": "down", "badge": "Expected Delivery 20/11/26"},
+    {"brand": "OSDA", "model": "585W", "rate": 34.25, "prevRate": null, "change": 0, "status": "new", "badge": "Ready Stock"},
+    {"brand": "OSDA", "model": "615W", "rate": 35.00, "prevRate": 35.00, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Trox", "model": "590W", "rate": 35.00, "prevRate": 35.00, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Korean", "model": "585W", "rate": 35.00, "prevRate": 37.00, "change": -2.00, "status": "down", "badge": "Ready Stock"},
+    {"brand": "Korean", "model": "615W", "rate": 35.50, "prevRate": null, "change": 0, "status": "new", "badge": "Ready Stock"},
+    {"brand": "Korean", "model": "670W", "rate": 40.50, "prevRate": null, "change": 0, "status": "new", "badge": "Ready Stock"},
+    {"brand": "Korean", "model": "715W", "rate": 38.50, "prevRate": 38.50, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "TCL", "model": "720W", "rate": 37.50, "prevRate": 37.50, "change": 0, "status": "stable", "badge": "Ready Stock"}
+  ]
+};
+
 // Legacy date aliases (older days that were served from the 05-Oct-2026 sheet)
 ISLAMABAD_DAILY_SHEETS["24-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
 ISLAMABAD_DAILY_SHEETS["06-Oct-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
@@ -1622,13 +1651,13 @@ ISLAMABAD_DAILY_SHEETS["today"] = ISLAMABAD_DAILY_SHEETS[todayKey];
 ISLAMABAD_DAILY_SHEETS["yesterday"] = ISLAMABAD_DAILY_SHEETS[yesterdayKey];
 
 export const MARKET_SUMMARY = {
-  "panelsPerWattAvg": "Rs 35.65 – 43.25 / W",
-  "panelsAvgRate": "Rs 38.90 / W",
+  "panelsPerWattAvg": "Rs 34.25 – 41.25 / W",
+  "panelsAvgRate": "Rs 37.56 / W",
   "invertersAvg": "Rs 44,000 – 1,335,000",
   "invertersAvgDetail": "LCD Series ~Rs 195k–745k • Solis Plus ~Rs 207k–364k • GoodWe 15kW HV Rs 625k",
   "batteriesAvg": "Rs 56,500 – 1,100,000",
   "batteriesAvgDetail": "Daewoo N-Tech (10-Yr Warranty) ~Rs 120k–420k • Zilo Nexa PK ~Rs 65k–580k • 5kW IP20 Rs 257k",
-  "panelsTrend": `Verified ready stock prices updated for ${todayKey}: LONGi 645W BF at Rs 43.25, Canadian 625W at Rs 41.00 (590W at Rs 40.50), Jinko 585W at Rs 39.25 (645W BF at Rs 40.15), JA Solar 625W at Rs 38.00 (585W at Rs 38.50), Astronergy 590W at Rs 38.00 (625W Booking available, 720W at Rs 39.00), AIKO 665W at Rs 42.50, Inverex 620W at Rs 42.50, Korean 585W at Rs 37.00 (715W at Rs 37.25, 645W at Rs 39.00), TCL 720W at Rs 38.00, OSDA 585W at Rs 35.65.`,
+  "panelsTrend": `Verified ready stock prices updated for ${todayKey}: LONGi 645W BF at Rs 41.25, Canadian 585W/625W at Rs 40.00, Jinko 585W at Rs 38.50 (645W Rs 39.25, expected 20/11/26), JA Solar 590W at Rs 36.50 (625W Rs 37.15, 630W Rs 37.00), Astronergy 615/620/625W at Rs 37.00 (625W Rs 36.50 expected 19/11/26, 720W Rs 39.25), Korean 585W at Rs 35.00 (615W Rs 35.50, 670W Rs 40.50, 715W Rs 38.50), TCL 720W at Rs 37.50, OSDA 585W at Rs 34.25 (615W Rs 35.00), Trox 590W at Rs 35.00.`,
   "invertersTrend": "LCD Series 6kW to 20kW from Rs 195k, Solis Plus Hybrid 6-10kW from Rs 207k, and GoodWe HV active",
   "batteriesTrend": "DAEWOO Lithium Battery by N-Tech (2.56kWh Rs 120k, 5.12kWh Rs 213k, 10.24kWh Trolley Rs 420k with 5-Yr Replacement + 5-Yr Service Warranty) live with Service Center at 26-Number Islamabad; Zilo Nexa series active.",
   "lastMidnightUpdate": `${todayKey} (Islamabad Ready Stock Verified)`,

@@ -335,7 +335,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
       const key = `sheet-inv-${item.brand}-${item.model}`.toLowerCase();
       if (!seen.has(key)) {
         seen.add(key);
-        const fRate = typeof item.rate === 'number' ? (item.rate >= 1000 ? `Rs ${item.rate.toLocaleString('en-PK')}` : `Rs ${item.rate}`) : item.rate;
+        const fRate = typeof item.rate === 'number' ? (item.rate >= 1000 ? `Rs ${item.rate.toLocaleString('en-PK')}` : `Rs ${item.rate}`) : (item.rate || item.priceDisplay || 'Rs. N/A');
         pool.push({
           id: `sheet-inv-${idx}`,
           brand: item.brand,
@@ -359,7 +359,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
       const key = `sheet-bat-${item.brand}-${item.model}`.toLowerCase();
       if (!seen.has(key)) {
         seen.add(key);
-        const fRate = typeof item.rate === 'number' ? (item.rate >= 1000 ? `Rs ${item.rate.toLocaleString('en-PK')}` : `Rs ${item.rate}`) : item.rate;
+        const fRate = typeof item.rate === 'number' ? (item.rate >= 1000 ? `Rs ${item.rate.toLocaleString('en-PK')}` : `Rs ${item.rate}`) : (item.rate || item.priceDisplay || 'Rs. N/A');
         pool.push({
           id: `sheet-bat-${idx}`,
           brand: item.brand,
@@ -383,7 +383,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
       const key = `sheet-ess-${item.brand}-${item.model}`.toLowerCase();
       if (!seen.has(key)) {
         seen.add(key);
-        const fRate = typeof item.rate === 'number' ? `Rs ${item.rate.toLocaleString('en-PK')}` : item.rate;
+        const fRate = typeof item.rate === 'number' ? `Rs ${item.rate.toLocaleString('en-PK')}` : (item.rate || item.priceDisplay || 'Rs. N/A');
         pool.push({
           id: `sheet-ess-${idx}`,
           brand: item.brand,
@@ -406,7 +406,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
       const key = `sheet-cable-${item.brand}-${item.model}`.toLowerCase();
       if (!seen.has(key)) {
         seen.add(key);
-        const fRate = typeof item.rate === 'number' ? `Rs ${item.rate}/M` : item.rate;
+        const fRate = typeof item.rate === 'number' ? `Rs ${item.rate}/M` : (item.rate || item.priceDisplay || 'Rs. N/A');
         pool.push({
           id: `sheet-cable-${idx}`,
           brand: item.brand,
@@ -428,7 +428,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
       const key = `sheet-acc-${item.brand}-${item.model}`.toLowerCase();
       if (!seen.has(key)) {
         seen.add(key);
-        const fRate = typeof item.rate === 'number' ? `Rs ${item.rate.toLocaleString('en-PK')}` : item.rate;
+        const fRate = typeof item.rate === 'number' ? `Rs ${item.rate.toLocaleString('en-PK')}` : (item.rate || item.priceDisplay || 'Rs. N/A');
         pool.push({
           id: `sheet-acc-${idx}`,
           brand: item.brand,
@@ -450,7 +450,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
       const key = `sheet-sys-${item.brand}-${item.model}`.toLowerCase();
       if (!seen.has(key)) {
         seen.add(key);
-        const fRate = typeof item.rate === 'number' ? `Rs ${item.rate.toLocaleString('en-PK')}` : item.rate;
+        const fRate = typeof item.rate === 'number' ? `Rs ${item.rate.toLocaleString('en-PK')}` : (item.rate || item.priceDisplay || 'Rs. N/A');
         pool.push({
           id: `sheet-sys-${idx}`,
           brand: item.brand,
@@ -472,7 +472,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
       const key = `sheet-struct-${item.brand}-${item.model}`.toLowerCase();
       if (!seen.has(key)) {
         seen.add(key);
-        const fRate = typeof item.rate === 'number' ? `Rs ${item.rate.toLocaleString('en-PK')}` : item.rate;
+        const fRate = typeof item.rate === 'number' ? `Rs ${item.rate.toLocaleString('en-PK')}` : (item.rate || item.priceDisplay || 'Rs. N/A');
         pool.push({
           id: `sheet-struct-${idx}`,
           brand: item.brand,
@@ -498,7 +498,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
           ? `Rs ${catItem.pricePerWatt}/W`
           : catItem.unitPriceMin
           ? `Rs ${formatPrice(catItem.unitPriceMin)}`
-          : 'Market Rate';
+          : (catItem.trendPercent === 'Rs. N/A' ? 'Rs. N/A' : 'Market Rate');
         pool.push({
           id: `catalog-${catItem.id}`,
           brand: catItem.brand,
@@ -742,20 +742,26 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         if (sheetFilterStatus === 'tcl' && !item.brand.toLowerCase().includes('tcl')) return false;
         if (sheetFilterStatus === 'lefn' && !item.brand.toLowerCase().includes('lefn')) return false;
       } else if (sheetCategory === 'inverter') {
+        if (sheetFilterStatus === 'knox' && !item.brand.toLowerCase().includes('knox') && !item.brand.toLowerCase().includes('zapher')) return false;
+        if (sheetFilterStatus === 'asw' && !item.brand.toLowerCase().includes('asw') && !item.model.toLowerCase().includes('asw')) return false;
+        if (sheetFilterStatus === 'xerox' && !item.brand.toLowerCase().includes('xerox') && !item.model.toLowerCase().includes('xerox')) return false;
+        if (sheetFilterStatus === 'saj' && !item.brand.toLowerCase().includes('saj') && !item.model.toLowerCase().includes('saj')) return false;
         if (sheetFilterStatus === 'lcd' && !item.brand.toLowerCase().includes('lcd') && !item.model.toLowerCase().includes('lcd')) return false;
         if (sheetFilterStatus === 'solis' && !item.brand.toLowerCase().includes('solis') && !item.model.toLowerCase().includes('solis')) return false;
         if (sheetFilterStatus === 'goodwe' && !item.brand.toLowerCase().includes('goodwe')) return false;
-        if (sheetFilterStatus === 'zapher' && !item.brand.toLowerCase().includes('zapher')) return false;
-        if (sheetFilterStatus === 'xenon' && !item.brand.toLowerCase().includes('xenon') && !item.brand.toLowerCase().includes('xynex')) return false;
-        if (sheetFilterStatus === 'krypton' && !item.brand.toLowerCase().includes('krypton')) return false;
+        if (sheetFilterStatus === 'zapher' && !item.brand.toLowerCase().includes('zapher') && !item.model.toLowerCase().includes('zapher')) return false;
+        if (sheetFilterStatus === 'xenon' && !item.brand.toLowerCase().includes('xenon') && !item.brand.toLowerCase().includes('xynex') && !item.model.toLowerCase().includes('xenon') && !item.model.toLowerCase().includes('zynex') && !item.model.toLowerCase().includes('xynex')) return false;
+        if (sheetFilterStatus === 'krypton' && !item.brand.toLowerCase().includes('krypton') && !item.model.toLowerCase().includes('krypton')) return false;
         if (sheetFilterStatus === 'itel' && !item.brand.toLowerCase().includes('itel')) return false;
         if (sheetFilterStatus === 'inverex' && !item.brand.toLowerCase().includes('inverex')) return false;
         if (sheetFilterStatus === 'hybrid' && !item.type?.toLowerCase().includes('hybrid')) return false;
         if (sheetFilterStatus === 'ongrid' && !item.type?.toLowerCase().includes('on-grid') && !item.type?.toLowerCase().includes('grid-tied') && !item.type?.toLowerCase().includes('string')) return false;
       } else if (sheetCategory === 'battery') {
+        if (sheetFilterStatus === 'knox' && !item.brand.toLowerCase().includes('knox')) return false;
+        if (sheetFilterStatus === 'hv_pack' && !item.model.toLowerCase().includes('hv') && !item.model.toLowerCase().includes('powerstack')) return false;
         if (sheetFilterStatus === 'zilo' && !item.brand.toLowerCase().includes('zilo')) return false;
         if (sheetFilterStatus === 'goodwe' && !item.brand.toLowerCase().includes('goodwe')) return false;
-        if (sheetFilterStatus === 'lithium' && !item.type?.toLowerCase().includes('lithium') && !item.type?.toLowerCase().includes('lifepo4') && !item.brand?.toLowerCase().includes('lithium')) return false;
+        if (sheetFilterStatus === 'lithium' && !item.type?.toLowerCase().includes('lithium') && !item.type?.toLowerCase().includes('lifepo4') && !item.type?.toLowerCase().includes('lfp') && !item.brand?.toLowerCase().includes('lithium') && !item.model?.toLowerCase().includes('powerwall') && !item.model?.toLowerCase().includes('powerbase') && !item.model?.toLowerCase().includes('powerstack')) return false;
         if (sheetFilterStatus === 'tubular' && !item.type?.toLowerCase().includes('tubular')) return false;
         if (sheetFilterStatus === 'itel' && !item.brand.toLowerCase().includes('itel')) return false;
         if (sheetFilterStatus === 'narada' && !item.brand.toLowerCase().includes('narada')) return false;
@@ -765,6 +771,10 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         if (sheetFilterStatus === 'mci' && !item.brand.toLowerCase().includes('mci')) return false;
         if (sheetFilterStatus === 'jukai' && !item.brand.toLowerCase().includes('jukai')) return false;
       } else if (sheetCategory === 'solar_accessories') {
+        if (sheetFilterStatus === 'knox' && !item.brand.toLowerCase().includes('knox') && !item.model.toLowerCase().includes('hv box') && !item.model.toLowerCase().includes('base wheel')) return false;
+        if (sheetFilterStatus === 'eastron' && !item.brand.toLowerCase().includes('eastron') && !item.model.toLowerCase().includes('eastron')) return false;
+        if (sheetFilterStatus === 'xerox' && !item.brand.toLowerCase().includes('xerox') && !item.model.toLowerCase().includes('xerox')) return false;
+        if (sheetFilterStatus === 'smart_meter' && !item.type?.toLowerCase().includes('meter') && !item.model?.toLowerCase().includes('meter')) return false;
         if (sheetFilterStatus === 'chint' && !item.brand.toLowerCase().includes('chint') && !item.model.toLowerCase().includes('chint')) return false;
         if (sheetFilterStatus === 'cnc' && !item.brand.toLowerCase().includes('cnc') && !item.model.toLowerCase().includes('cnc')) return false;
         if (sheetFilterStatus === 'tomzen' && !item.brand.toLowerCase().includes('tomzen') && !item.model.toLowerCase().includes('tomz')) return false;
@@ -775,8 +785,9 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         if (sheetFilterStatus === 'cabinet' && !item.model?.toLowerCase().includes('all-in-one') && !item.type?.toLowerCase().includes('all-in-one') && !item.model?.toLowerCase().includes('8kwh')) return false;
         if (sheetFilterStatus === 'itel' && !item.brand.toLowerCase().includes('itel')) return false;
       } else if (sheetCategory === 'complete_system') {
+        if (sheetFilterStatus === 'zapher' && !item.brand.toLowerCase().includes('zapher') && !item.model.toLowerCase().includes('zapher')) return false;
         if (sheetFilterStatus === 'residential' && !item.badge?.toLowerCase().includes('marla') && !item.badge?.toLowerCase().includes('kanal')) return false;
-        if (sheetFilterStatus === 'commercial' && !item.badge?.toLowerCase().includes('plaza') && !item.badge?.toLowerCase().includes('factory')) return false;
+        if (sheetFilterStatus === 'commercial' && !item.badge?.toLowerCase().includes('plaza') && !item.badge?.toLowerCase().includes('factory') && !item.brand.toLowerCase().includes('zapher')) return false;
       } else if (sheetCategory === 'structure_accessories') {
         if (sheetFilterStatus === 'structure' && !item.type?.toLowerCase().includes('structure') && !item.type?.toLowerCase().includes('frame')) return false;
         if (sheetFilterStatus === 'cable' && !item.type?.toLowerCase().includes('wire') && !item.type?.toLowerCase().includes('cable')) return false;
@@ -788,6 +799,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         if (sheetFilterStatus === 'cables_wiring' && item.itemCategory !== 'cables_wiring') return false;
         if (sheetFilterStatus === 'solar_accessories' && item.itemCategory !== 'solar_accessories') return false;
         if (sheetFilterStatus === 'ess' && item.itemCategory !== 'ess') return false;
+        if (sheetFilterStatus === 'knox' && !item.brand.toLowerCase().includes('knox') && !item.brand.toLowerCase().includes('zapher')) return false;
         if (sheetFilterStatus === 'goodwe' && !item.brand.toLowerCase().includes('goodwe')) return false;
         if (sheetFilterStatus === 'itel' && !item.brand.toLowerCase().includes('itel')) return false;
         if (sheetFilterStatus === 'system' && item.itemCategory !== 'complete_system') return false;
@@ -1694,17 +1706,21 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                   ) : sheetCategory === 'inverter' ? (
                     [
                       { id: 'all', label: 'All Inverters' },
+                      { id: 'knox', label: 'Knox' },
+                      { id: 'zapher', label: 'Zapher IP66' },
+                      { id: 'krypton', label: 'Krypton IP20' },
+                      { id: 'xenon', label: 'Xenon / Zynex' },
+                      { id: 'ongrid', label: 'On-Grid' },
+                      { id: 'asw', label: 'ASW' },
+                      { id: 'xerox', label: 'XEROX G4' },
+                      { id: 'saj', label: 'SAJ Hybrid' },
                       { id: 'changed', label: 'Rate Changed' },
                       { id: 'lcd', label: 'LCD Series' },
                       { id: 'solis', label: 'Solis Plus' },
                       { id: 'goodwe', label: 'GoodWe HV/LV' },
-                      { id: 'zapher', label: 'Zapher IP66' },
-                      { id: 'xenon', label: 'Xenon / Xynex' },
-                      { id: 'krypton', label: 'Krypton IP20' },
                       { id: 'itel', label: 'Itel Hybrid' },
                       { id: 'inverex', label: 'Inverex' },
                       { id: 'hybrid', label: 'Hybrid' },
-                      { id: 'ongrid', label: 'On-Grid' },
                     ].map((f) => (
                       <button
                         key={f.id}
@@ -1721,6 +1737,8 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                   ) : sheetCategory === 'battery' ? (
                     [
                       { id: 'all', label: 'All Batteries' },
+                      { id: 'knox', label: 'Knox LFP / HV' },
+                      { id: 'hv_pack', label: 'HV Packs / PowerStack' },
                       { id: 'changed', label: 'Rate Changed' },
                       { id: 'zilo', label: 'Zilo Energy (PK 🇵🇰)' },
                       { id: 'lithium', label: 'Lithium (IP20/IP65)' },
@@ -1764,7 +1782,11 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                     ))
                   ) : sheetCategory === 'solar_accessories' ? (
                     [
-                      { id: 'all', label: 'All Protection' },
+                      { id: 'all', label: 'All Accessories' },
+                      { id: 'knox', label: 'Knox HV Box' },
+                      { id: 'smart_meter', label: 'Smart Meters' },
+                      { id: 'eastron', label: 'Eastron' },
+                      { id: 'xerox', label: 'XEROX' },
                       { id: 'changed', label: 'Rate Changed' },
                       { id: 'chint', label: 'Chint' },
                       { id: 'cnc', label: 'CNC' },
@@ -1807,9 +1829,10 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                   ) : sheetCategory === 'complete_system' ? (
                     [
                       { id: 'all', label: 'All Systems' },
+                      { id: 'zapher', label: 'Zapher 1C HV' },
                       { id: 'changed', label: 'Rate Changed' },
                       { id: 'residential', label: 'Residential (5-10kW)' },
-                      { id: 'commercial', label: 'Commercial (15-20kW)' },
+                      { id: 'commercial', label: 'Commercial (15-50kW)' },
                     ].map((f) => (
                       <button
                         key={f.id}
@@ -1851,6 +1874,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                       { id: 'panel', label: 'Panels' },
                       { id: 'inverter', label: 'Inverters' },
                       { id: 'battery', label: 'Batteries' },
+                      { id: 'knox', label: 'Knox' },
                       { id: 'cables_wiring', label: 'Cables & Wiring' },
                       { id: 'solar_accessories', label: 'Accessories' },
                       { id: 'ess', label: 'ESS / Storage' },
@@ -1964,11 +1988,13 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                               </div>
                               <div className="text-right shrink-0">
                                 <div className="text-base font-extrabold text-amber-600 dark:text-amber-400">
-                                  Rs. {item.rate.toFixed(2)}/W
+                                  {item.rate != null ? `Rs. ${item.rate.toFixed(2)}/W` : (item.priceDisplay || 'Rs. N/A')}
                                 </div>
-                                <div className="text-[10px] text-gray-500 dark:text-gray-400">
-                                  Prev: Rs. {item.prevRate.toFixed(2)}/W
-                                </div>
+                                {item.prevRate != null && (
+                                  <div className="text-[10px] text-gray-500 dark:text-gray-400">
+                                    Prev: Rs. {item.prevRate.toFixed(2)}/W
+                                  </div>
+                                )}
                               </div>
                             </div>
 
@@ -2055,9 +2081,9 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                               </div>
                               <div className="text-right shrink-0">
                                 <div className="text-base font-extrabold text-blue-600 dark:text-blue-400">
-                                  Rs. {Math.round(item.rate).toLocaleString()}
+                                  {item.rate != null ? `Rs. ${Math.round(item.rate).toLocaleString()}` : (item.priceDisplay || 'Rs. N/A')}
                                 </div>
-                                {item.prevRate && (
+                                {item.prevRate != null && (
                                   <div className="text-[10px] text-gray-500 dark:text-gray-400">
                                     Prev: Rs. {Math.round(item.prevRate).toLocaleString()}
                                   </div>
@@ -2067,7 +2093,11 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
 
                             <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-800 text-xs">
                               <div>
-                                {item.change < 0 ? (
+                                {item.rate == null ? (
+                                  <span className="inline-flex items-center gap-1 text-gray-400 bg-gray-50 dark:bg-gray-800 px-2 py-0.5 rounded-md text-[11px]">
+                                    {item.priceDisplay || 'Rs. N/A'}
+                                  </span>
+                                ) : item.change < 0 ? (
                                   <span className="inline-flex items-center gap-0.5 text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md text-[11px]">
                                     <ArrowDownRight className="h-3 w-3" />
                                     -Rs. {Math.abs(item.change).toLocaleString()} Drop
@@ -2134,11 +2164,15 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                               </div>
                               <div className="text-right shrink-0">
                                 <div className="text-base font-extrabold text-emerald-600 dark:text-emerald-400">
-                                  Rs. {Math.round(item.rate).toLocaleString()}
+                                  {item.rate != null
+                                    ? typeof item.rate === 'number'
+                                      ? `Rs. ${Math.round(item.rate).toLocaleString()}`
+                                      : item.rate
+                                    : item.priceDisplay || 'Rs. N/A'}
                                 </div>
-                                {item.prevRate && (
+                                {item.prevRate != null && (
                                   <div className="text-[10px] text-gray-500 dark:text-gray-400">
-                                    Prev: Rs. {Math.round(item.prevRate).toLocaleString()}
+                                    Prev: {typeof item.prevRate === 'number' ? `Rs. ${Math.round(item.prevRate).toLocaleString()}` : item.prevRate}
                                   </div>
                                 )}
                               </div>
@@ -2146,7 +2180,11 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
 
                             <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-800 text-xs">
                               <div>
-                                {item.change < 0 ? (
+                                {item.rate == null ? (
+                                  <span className="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-md text-[11px] font-semibold">
+                                    {item.priceDisplay || 'Rs. N/A'}
+                                  </span>
+                                ) : item.change < 0 ? (
                                   <span className="inline-flex items-center gap-0.5 text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md text-[11px]">
                                     <ArrowDownRight className="h-3 w-3" />
                                     -Rs. {Math.abs(item.change).toLocaleString()} Drop
@@ -2212,9 +2250,9 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                             </div>
                             <div className="text-right shrink-0">
                               <div className="text-base font-extrabold text-primary-600 dark:text-primary-400">
-                                Rs. {Math.round(item.rate).toLocaleString()}{item.unit ? ` ${item.unit}` : ''}
+                                {item.rate != null ? `Rs. ${Math.round(item.rate).toLocaleString()}${item.unit ? ` ${item.unit}` : ''}` : (item.priceDisplay || 'Rs. N/A')}
                               </div>
-                              {item.prevRate && (
+                              {item.prevRate != null && (
                                 <div className="text-[10px] text-gray-500 dark:text-gray-400">
                                   Prev: Rs. {Math.round(item.prevRate).toLocaleString()}
                                 </div>
@@ -2850,10 +2888,10 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                                 </div>
                               </td>
                               <td className="px-3 py-2.5 font-bold text-indigo-600 dark:text-indigo-400">
-                                Rs. {item.rate.toLocaleString()}
+                                {item.rate != null ? `Rs. ${item.rate.toLocaleString()}` : (item.priceDisplay || 'Rs. N/A')}
                               </td>
                               <td className="px-3 py-2.5 text-gray-600 dark:text-gray-300">
-                                Rs. {item.prevRate.toLocaleString()}
+                                {item.prevRate != null ? `Rs. ${item.prevRate.toLocaleString()}` : '—'}
                               </td>
                               <td className="px-3 py-2.5">
                                 {item.change < 0 ? (
@@ -2874,7 +2912,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                               </td>
                               <td className="px-3 py-2.5">
                                 <div className="font-bold text-gray-900 dark:text-white">
-                                  Rs. {item.rate.toLocaleString()}
+                                  {item.rate != null ? `Rs. ${item.rate.toLocaleString()}` : (item.priceDisplay || 'Call for Quote')}
                                 </div>
                                 <div className="text-[10px] text-gray-500 dark:text-gray-400">
                                   {item.warranty || '25-Yr Panels, 5-Yr Inverter'}
@@ -2937,10 +2975,10 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                               <div className="text-[11px] text-gray-500 dark:text-gray-400">{item.capacity} • {item.type}</div>
                             </td>
                             <td className="px-3 py-2.5 font-bold text-slate-800 dark:text-slate-200">
-                              Rs. {item.rate.toLocaleString()} {item.itemCategory === 'cables_wiring' || item.unit === 'per_meter' ? '/ Meter' : ''}
+                              {item.rate != null ? `Rs. ${item.rate.toLocaleString()}` : (item.priceDisplay || 'Rs. N/A')} {item.rate != null && (item.itemCategory === 'cables_wiring' || item.unit === 'per_meter') ? '/ Meter' : ''}
                             </td>
                             <td className="px-3 py-2.5 text-gray-600 dark:text-gray-300">
-                              Rs. {item.prevRate.toLocaleString()} {item.itemCategory === 'cables_wiring' || item.unit === 'per_meter' ? '/ Meter' : ''}
+                              {item.prevRate != null ? `Rs. ${item.prevRate.toLocaleString()}` : '—'} {item.prevRate != null && (item.itemCategory === 'cables_wiring' || item.unit === 'per_meter') ? '/ Meter' : ''}
                             </td>
                             <td className="px-3 py-2.5">
                               {item.change < 0 ? (
@@ -2961,7 +2999,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                             </td>
                             <td className="px-3 py-2.5">
                               <div className="font-bold text-gray-900 dark:text-white">
-                                Rs. {item.rate.toLocaleString()} {item.itemCategory === 'cables_wiring' || item.unit === 'per_meter' ? '/ Meter' : ''}
+                                {item.rate != null ? `Rs. ${item.rate.toLocaleString()}` : (item.priceDisplay || 'Rs. N/A')} {item.rate != null && (item.itemCategory === 'cables_wiring' || item.unit === 'per_meter') ? '/ Meter' : ''}
                               </div>
                               <div className="text-[10px] text-gray-500 dark:text-gray-400">
                                 {item.warranty || (item.itemCategory === 'cables_wiring' ? '25-Yr Outdoor Rating' : '2-Yr Replacement')}
@@ -3242,13 +3280,13 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                         )}
                       </td>
                       <td className="px-4 py-4">
-                        {item.pricePerWattRange ? (
+                        {item.pricePerWattRange && item.pricePerWatt ? (
                           <span className="font-extrabold text-amber-600">
                             {item.pricePerWattRange}
                           </span>
-                        ) : item.unitPriceMin == null ? (
+                        ) : !item.unitPriceMin ? (
                           <span className="font-bold text-gray-500">
-                            Call for Rate
+                            {item.trendPercent === 'Rs. N/A' ? 'Rs. N/A' : 'Call for Rate'}
                           </span>
                         ) : (
                           <span className="font-bold text-primary-600">
@@ -3258,8 +3296,8 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                       </td>
                       <td className="px-4 py-4">
                         <div className="font-extrabold text-gray-900">
-                          {item.unitPriceMin == null
-                            ? 'Call for Rate'
+                          {!item.unitPriceMin
+                            ? (item.trendPercent === 'Rs. N/A' ? 'Rs. N/A' : 'Call for Rate')
                             : item.unitPriceMin === item.unitPriceMax
                             ? formatPrice(item.unitPriceMin)
                             : `${formatPrice(item.unitPriceMin)} – ${formatPrice(item.unitPriceMax)}`}
@@ -3662,8 +3700,8 @@ function PriceCard({ item, onExploreMarket }) {
                 Complete Turnkey Package Cost
               </div>
               <div className="text-xl font-extrabold text-indigo-600">
-                {item.unitPriceMin == null
-                  ? 'Call for Quote'
+                {!item.unitPriceMin
+                  ? (item.trendPercent === 'Rs. N/A' ? 'Rs. N/A' : 'Call for Quote')
                   : item.unitPriceMin === item.unitPriceMax
                   ? formatPrice(item.unitPriceMin)
                   : `${formatPrice(item.unitPriceMin)} – ${formatPrice(item.unitPriceMax)}`}
@@ -3678,8 +3716,8 @@ function PriceCard({ item, onExploreMarket }) {
                 Mounting & BOS Trade Rate
               </div>
               <div className="text-xl font-extrabold text-slate-800">
-                {item.unitPriceMin == null
-                  ? 'Call for Rate'
+                {!item.unitPriceMin
+                  ? (item.trendPercent === 'Rs. N/A' ? 'Rs. N/A' : 'Call for Rate')
                   : item.unitPriceMin === item.unitPriceMax
                   ? formatPrice(item.unitPriceMin)
                   : `${formatPrice(item.unitPriceMin)} – ${formatPrice(item.unitPriceMax)}`}
@@ -3694,8 +3732,8 @@ function PriceCard({ item, onExploreMarket }) {
                 Estimated Trade Price
               </div>
               <div className="text-xl font-extrabold text-primary-600">
-                {item.unitPriceMin == null
-                  ? 'Call for Rate'
+                {!item.unitPriceMin
+                  ? (item.trendPercent === 'Rs. N/A' ? 'Rs. N/A' : 'Call for Rate')
                   : item.unitPriceMin === item.unitPriceMax
                   ? formatPrice(item.unitPriceMin)
                   : `${formatPrice(item.unitPriceMin)} – ${formatPrice(item.unitPriceMax)}`}

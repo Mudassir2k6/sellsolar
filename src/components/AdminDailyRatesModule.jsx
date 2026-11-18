@@ -41,7 +41,7 @@ export default function AdminDailyRatesModule() {
   const [editingIndex, setEditingIndex] = useState(null);
   const [editingItem, setEditingItem] = useState(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
-  const [sheetData, setSheetData] = useState(() => getActiveDailyRates('16-Sep-2026'));
+  const [sheetData, setSheetData] = useState(() => getActiveDailyRates('today'));
 
   const [newItemForm, setNewItemForm] = useState({
     brand: '',

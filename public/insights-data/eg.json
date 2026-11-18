@@ -2,8 +2,8 @@
   "version": 2,
   "countryCode": "EG",
   "location": "Egypt",
-  "lastUpdated": "2026-11-17T14:34:44+05:00",
-  "lastUpdatedLabel": "17 Nov 2026, 2:34 pm PKT",
+  "lastUpdated": "2026-11-18T07:02:32+05:00",
+  "lastUpdatedLabel": "18 Nov 2026, 7:02 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
   "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solaregypt, solarpanel, solargoods",
   "trendingNews": [
@@ -54,22 +54,21 @@
     },
     {
       "id": "tn-5",
-      "title": "Egypt to construct new solar power plant in Aswan’s Benban Complex for US$127 million",
-      "summary": "Trending solar coverage from Egypt Independent — use this Egypt topic for your own posts and SEO content.",
-      "source": "Egypt Independent",
-      "url": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxNOEZaRkJQWFNvbTEtOExnME9NSktKM1BaejdRY0ZrbFpya3pDT2hFN2IzTWtMWVo3TGpRc1pSaWxRQ0dBNVNFY2lNRnlBMVhsOExpdFBpeDFlNDI4eGZtN2VnRFJ3cmZqMkRoWjByTDlESnNhZFBkQVR3WV9wT2tMVkE2WnBEcE5jcDczN1ZSa2luamk2ZlZGOS12OWtoV2JXLWttT2pGUHQ4QjNidEVPeTh5aDY1QUxU?oc=5",
-      "tags": [
-        "#solarpower",
-        "#solarEgypt",
-        "#solarenergy"
-      ]
-    },
-    {
-      "id": "tn-6",
       "title": "IDSC's report: Egypt ranks among top 3 African markets for new solar energy additions",
       "summary": "Trending solar coverage from Egypt Today — use this Egypt topic for your own posts and SEO content.",
       "source": "Egypt Today",
       "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxQek5QcS1RUEpNaFFUbFNESk1JbVB2TGZRSEg5WjNoNDhRVWxwOUpJNFVRWWl1REZYbHY2MmJaYXN6NnE4SHcyeERfZnoxdlVWTmJobS1NYWNRVzNkaG1aQldpMlJKemRldjdMck1xMXVtNWNiZkVmdGoyRDJ5dUNsNUQ4LWhhUlhfUk9hMWxkZ21tdGZ3MVFNaHhRUlRTdw?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarEgypt"
+      ]
+    },
+    {
+      "id": "tn-6",
+      "title": "Rooftop Revolution: Solar Energy Is Reshaping Egypt’s Oil and Gas Future",
+      "summary": "Trending solar coverage from Egypt Oil & Gas — use this Egypt topic for your own posts and SEO content.",
+      "source": "Egypt Oil & Gas",
+      "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxPMTREN1dRM3l6NG5DUzNJa2VDeXE5eUFzX2M4bjd0RWhTcXdhZl94YmVsSEcyWVd6NVlTR2FnY1dSSEVoeUJWZHlYck5NOEhpYmJXZlVLOTltX0NJU2J4WjlMSmhWTmMzNEJxakl5bWRkNTZXQ1JUaUZsUUF0dEEtNFN1QWNnODNid3NCWG1hUkVBZ3dta2ZKUTdJMzEtQUtqOXNRNE9mXzI?oc=5",
       "tags": [
         "#solarenergy",
         "#solarEgypt"
@@ -142,7 +141,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "977K+"
+          "posts": "1M+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -172,7 +171,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "176K+"
+          "posts": "175K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -182,7 +181,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "44K+"
+          "posts": "45K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -192,7 +191,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "120K+"
+          "posts": "122K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -202,7 +201,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "513K+"
+          "posts": "496K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -212,7 +211,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "94K+"
+          "posts": "93K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solaregypt/"

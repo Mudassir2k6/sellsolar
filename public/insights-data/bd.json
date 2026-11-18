@@ -2,13 +2,24 @@
   "version": 2,
   "countryCode": "BD",
   "location": "Bangladesh",
-  "lastUpdated": "2026-11-17T14:34:44+05:00",
-  "lastUpdatedLabel": "17 Nov 2026, 2:34 pm PKT",
+  "lastUpdated": "2026-11-18T07:02:32+05:00",
+  "lastUpdatedLabel": "18 Nov 2026, 7:02 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarbangladesh, solarpanel, photovoltaicenergy",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarbangladesh, solarpanel, solarincentives",
   "trendingNews": [
     {
       "id": "tn-1",
+      "title": "Powering Our Future through Community-Led Solar Energy in Bangladesh",
+      "summary": "Trending solar coverage from New Age BD — use this Bangladesh topic for your own posts and SEO content.",
+      "source": "New Age BD",
+      "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxQZGNsYWRrUlVnLXYzSHZCNmU4UjRseTFUSUVxaVk4NmdNTkJ3RS1iVWVTLWZfaUhuNzZoV0xUZkJFc0t2SUh6Q1hKSXpPQkJVbDVxeERNLWV6T0thekdjTW15SVROWk9UWUluRkx2Tzd6bmliOHpGUkt2a0tHOEp2VkgzYXF1eW1EWGltNjJHd29ROGxaUlgzb0g1Z2llX0JtUUNFR0JGb3Y1ZjFVWVhEdXA0bTJhTVA1YzBXc2NDWQ?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarBangladesh"
+      ]
+    },
+    {
+      "id": "tn-2",
       "title": "Somiron Mistry: A Pioneering Engineering Professional Advancing Rooftop Solar Energy in Bangladesh",
       "summary": "Trending solar coverage from https://www.thefinancetoday.net/ — use this Bangladesh topic for your own posts and SEO content.",
       "source": "https://www.thefinancetoday.net/",
@@ -19,7 +30,7 @@
       ]
     },
     {
-      "id": "tn-2",
+      "id": "tn-3",
       "title": "Bangladesh Market Sees Surge In Solar Panel Demand Amid Energy Crisis",
       "summary": "Trending solar coverage from NDTV — use this Bangladesh topic for your own posts and SEO content.",
       "source": "NDTV",
@@ -31,22 +42,11 @@
       ]
     },
     {
-      "id": "tn-3",
+      "id": "tn-4",
       "title": "Tandhan DPT showcases solar, energy storage products at Power Bangladesh Expo",
       "summary": "Trending solar coverage from The Business Standard — use this Bangladesh topic for your own posts and SEO content.",
       "source": "The Business Standard",
       "url": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxNdmVsODBmekFtNEQ0WG9MYnhxblFDem1ISHRKc0U1YzlUSlhodTl2TnlDcHpzelhicWNCWW5IYzB5NnlwWEp3elRjUjUyTTNtRVJ1MkVsRmc2TGxiTXVGOVoyaTE1TzAwLVo4cHR2cF9BVVVUMy1HQzVUa1ZpeHZHWURLUEVRNk9ORm1MWTlnMzhzZGhEOVJQakdna1NrMi1qeVlpVUZyQlZtQ0JCS1QtOUlxVGJjNGp3M2U3YkRwMkNydw?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarBangladesh"
-      ]
-    },
-    {
-      "id": "tn-4",
-      "title": "Potentials of Solar Energy in Bangladesh",
-      "summary": "Trending solar coverage from Daily Sun — use this Bangladesh topic for your own posts and SEO content.",
-      "source": "Daily Sun",
-      "url": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE1iYmdkZzVMR1pEdUprb2xVNEQ0Q2JIaHRqSURoR2ZwdndBQU9NM1l6WGtKX3ZLZm93bVVxamdXSXU2UTMwYV9QTWVXZGFCMURi?oc=5",
       "tags": [
         "#solarenergy",
         "#solarBangladesh"
@@ -65,14 +65,13 @@
     },
     {
       "id": "tn-6",
-      "title": "Rooftop solar panels can add 3,600MWp to national grid",
-      "summary": "Trending solar coverage from The Daily Star — use this Bangladesh topic for your own posts and SEO content.",
-      "source": "The Daily Star",
-      "url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxNZ3hsdkV1SE5MeGdiWHVRU01Ib0MxaWN6VkFpeFFNLXJZNW03WVg2VElOSUIzaU5LRGxIMWdlcG1Sa2tPc011T1ozU01vWWQwM1ZhR1liajQwa3AtSkt4eDVITFk4d1JQNE14UXBTd1hlRlY1YlpvX1o3OFMyNlVORnZIWkhhTEZfNW03c0REZmVRVzJoYlVFS2lLOE0zNmxOX21KX3hVS3NnRjUy?oc=5",
+      "title": "Potentials of Solar Energy in Bangladesh",
+      "summary": "Trending solar coverage from Daily Sun — use this Bangladesh topic for your own posts and SEO content.",
+      "source": "Daily Sun",
+      "url": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE1iYmdkZzVMR1pEdUprb2xVNEQ0Q2JIaHRqSURoR2ZwdndBQU9NM1l6WGtKX3ZLZm93bVVxamdXSXU2UTMwYV9QTWVXZGFCMURi?oc=5",
       "tags": [
-        "#solarpanels",
-        "#solarBangladesh",
-        "#solarenergy"
+        "#solarenergy",
+        "#solarBangladesh"
       ]
     }
   ],
@@ -142,7 +141,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "977K+"
+          "posts": "1M+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -172,7 +171,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "176K+"
+          "posts": "175K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -182,7 +181,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "44K+"
+          "posts": "45K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -192,7 +191,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "120K+"
+          "posts": "122K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -202,7 +201,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "513K+"
+          "posts": "496K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -212,7 +211,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "94K+"
+          "posts": "93K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarbangladesh/"
@@ -228,14 +227,14 @@
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
     },
     {
-      "tag": "#photovoltaicenergy",
+      "tag": "#solarincentives",
       "platforms": [
         {
           "name": "Instagram",
           "posts": "32K+"
         }
       ],
-      "searchUrl": "https://www.instagram.com/explore/tags/photovoltaicenergy/"
+      "searchUrl": "https://www.instagram.com/explore/tags/solarincentives/"
     }
   ],
   "contentIdeas": [

@@ -2,13 +2,37 @@
   "version": 2,
   "countryCode": "US",
   "location": "United States",
-  "lastUpdated": "2026-11-17T14:34:44+05:00",
-  "lastUpdatedLabel": "17 Nov 2026, 2:34 pm PKT",
+  "lastUpdated": "2026-11-18T07:02:32+05:00",
+  "lastUpdatedLabel": "18 Nov 2026, 7:02 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarusa, solarpanel, solarinstallations, solarrooftop, solargenerates",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarusa, solarpanel, solarrooftop, solarinstallations, solargenerates",
   "trendingNews": [
     {
       "id": "tn-1",
+      "title": "Korea Zinc Partners With US SolarCycle on Solar Panel Recycling",
+      "summary": "Trending solar coverage from THE ELEC, Korea Electronics Industry Media — use this United States topic for your own posts and SEO content.",
+      "source": "THE ELEC, Korea Electronics Industry Media",
+      "url": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE92ZFBoektZU09VMFBUSjRzb3dpSDNLeHg3NlRpd1RuMXB2Rm9HRWQ3OHRDMTJLOG9tcFVjQnZXSjRWTmxNSmgtQVdFSWVNNlV5MXFob1JjbEdmY0JSQUZGZE45WWd1Vm8?oc=5",
+      "tags": [
+        "#solarpanel",
+        "#solarUSA",
+        "#solarenergy"
+      ]
+    },
+    {
+      "id": "tn-2",
+      "title": "Solar panel recycler expands into ‘epicenter’ for solar installations in California",
+      "summary": "Trending solar coverage from Waste Dive — use this United States topic for your own posts and SEO content.",
+      "source": "Waste Dive",
+      "url": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxOTWVBNGcyNS1KbXdXUFo1OWd0QzZWem9SQXprdXpkc3lIZVI1X1BUUUdVdC1PT1ZOVVM4WTNKTHAyV0RMRmw4V094NlpmVGNaMS14cUpsSUF0TjFkU2ktVlFtUmIzUHJqeE1oQk5IaWFlRkQ4X1h1cE9mMHVnSWpYR3Q3dVdjd0p1aTJZ?oc=5",
+      "tags": [
+        "#solarpanel",
+        "#solarUSA",
+        "#solarenergy"
+      ]
+    },
+    {
+      "id": "tn-3",
       "title": "Solar Panel Recycling Expands to California with 42,000-Square-Foot Facility",
       "summary": "Trending solar coverage from citybiz — use this United States topic for your own posts and SEO content.",
       "source": "citybiz",
@@ -20,34 +44,11 @@
       ]
     },
     {
-      "id": "tn-2",
-      "title": "USDA & DOE Solar Energy and Farming Initiatives",
-      "summary": "Trending solar coverage from Department of Energy (.gov) — use this United States topic for your own posts and SEO content.",
-      "source": "Department of Energy (.gov)",
-      "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxNZ2RnTVVWdGpON1FLenZvOGVOTGtFdTk4V0ktMG9Ya0RpT3BOalJ4dFhvc0ROejA5NHJzYWNILXhFTk85djZKdmFtVkc3OTZzZDBzYlYybU54a2VNRndiRFR0SEE0THJZUG9xd3h0ZWFlWGhnT1pDUXU5c1ZmNV9kdVhBeUVNMmhP?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarUSA"
-      ]
-    },
-    {
-      "id": "tn-3",
+      "id": "tn-4",
       "title": "Solar Panel Recycling Acquires California Site for Fifth US Facility",
       "summary": "Trending solar coverage from Securities.io — use this United States topic for your own posts and SEO content.",
       "source": "Securities.io",
       "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxON2ZDa2pyd0pJd3dHNjNMRnBUYnJ3eFZPdWpycVc5T2huM0pUNnpyTGNVUnE0UzNDdjZVT29VU1NCbFpiYmVCMFB5eWdKblVmR1VyWEtzUmJUOXluTWhZT0tEWEp1a0tjZkR2amZDN1ZhNnpBcVBYQzAwdzZGX0pLUktpbHRyMVFxenlFRFZBakx1NHM2OGpIZFB4QQ?oc=5",
-      "tags": [
-        "#solarpanel",
-        "#solarUSA",
-        "#solarenergy"
-      ]
-    },
-    {
-      "id": "tn-4",
-      "title": "Korea Zinc Forms U.S. Solar Panel Recycling JV with Microsoft-Backed SolarCycle",
-      "summary": "Trending solar coverage from 아시아경제 — use this United States topic for your own posts and SEO content.",
-      "source": "아시아경제",
-      "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE1VWEdmd0JjMXNTTEhfMnJ0dHVldXJWUDZINVdlTXN3a2FBRzdxV0VjRmJvOERySUs4TTJwdG94R0VoSF9XcXd0NlozczNzYUdzQy1pM29PR2IxbklFODFtZU10RElsNnBn?oc=5",
       "tags": [
         "#solarpanel",
         "#solarUSA",
@@ -145,7 +146,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "977K+"
+          "posts": "1M+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -175,7 +176,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "176K+"
+          "posts": "175K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -185,7 +186,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "44K+"
+          "posts": "45K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -195,7 +196,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "120K+"
+          "posts": "122K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -205,7 +206,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "513K+"
+          "posts": "496K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -215,7 +216,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "94K+"
+          "posts": "93K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarusa/"
@@ -231,6 +232,16 @@
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
     },
     {
+      "tag": "#solarrooftop",
+      "platforms": [
+        {
+          "name": "Instagram",
+          "posts": "45K+"
+        }
+      ],
+      "searchUrl": "https://www.instagram.com/explore/tags/solarrooftop/"
+    },
+    {
       "tag": "#solarinstallations",
       "platforms": [
         {
@@ -241,21 +252,11 @@
       "searchUrl": "https://www.instagram.com/explore/tags/solarinstallations/"
     },
     {
-      "tag": "#solarrooftop",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "46K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarrooftop/"
-    },
-    {
       "tag": "#solargenerates",
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "33K+"
+          "posts": "34K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solargenerates/"

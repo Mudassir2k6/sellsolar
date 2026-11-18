@@ -2,31 +2,31 @@
   "version": 2,
   "countryCode": "SG",
   "location": "Singapore",
-  "lastUpdated": "2026-11-17T14:34:44+05:00",
-  "lastUpdatedLabel": "17 Nov 2026, 2:34 pm PKT",
+  "lastUpdated": "2026-11-18T07:02:32+05:00",
+  "lastUpdatedLabel": "18 Nov 2026, 7:02 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarsingapore, solarpush, solarpanel, solardeployment, solarsupply, solarindependence",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarsingapore, solarpush, solarpanel, solardeployment, solarsupply",
   "trendingNews": [
     {
       "id": "tn-1",
-      "title": "Singapore’s renewed solar push: Hanging panels, clay-like tiles for heritage buildings among plans",
-      "summary": "Trending solar coverage from The Straits Times — use this Singapore topic for your own posts and SEO content.",
-      "source": "The Straits Times",
-      "url": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxQWXFHTFFsSTFmVWRUSGxKX05hbWxwRUdFelZmd3YycDBqT1hYWWpobkx1ME1yQlMzMUlhTnhfR3JKSlhvbFJMdkNiakNreWZRNThyODl0bV8xWjFWaDR2aEZ0UVNaN3NnU0hlRzNiZ1lqR3hGWUtPXzdydVl2VGtCZk4wcmxWUmFqS24zR0w1VGFvR2ZrMWxhUFZreVdKUG5Sa1FCNUhTenFkLW1MU0RlOWpIUzNnUXdsTlhKT1h2Y0JVR0xpV05qTFZiaXlvcFVmaF9Wb2dUbFZCeDZKNmJN?oc=5",
-      "tags": [
-        "#solarpush",
-        "#solarSingapore",
-        "#solarenergy"
-      ]
-    },
-    {
-      "id": "tn-2",
       "title": "Cheaper, better solar panels are here. But maximising adoption in Singapore will take creativity",
       "summary": "Trending solar coverage from CNA — use this Singapore topic for your own posts and SEO content.",
       "source": "CNA",
       "url": "https://news.google.com/rss/articles/CBMixwFBVV95cUxNc043QWtOMVNVdms3STBRVXBYcGFLc3R2R1Z1MnY2bjFOUjl2aVNHMjVFZnFLVUFFNFR3UUxuenl4S210NndWVFA1SXJ2X1d3QlpPc2lMMlBKbkprcUhXUjZJNHZTRENtRkJkVmFTaWZaaTBZZFcxeHo2b2hRUXZlb3lzWFhRd2MzSXBJN3JoUkJYOXZ1aXM3ZnUzcWZSWkpTNEl6S2pVdDVGbnM4ajZfSGF4RU80RTQyZUFYRTktSzZRRnpweUtF?oc=5",
       "tags": [
         "#solarpanels",
+        "#solarSingapore",
+        "#solarenergy"
+      ]
+    },
+    {
+      "id": "tn-2",
+      "title": "Singapore’s renewed solar push: Hanging panels, clay-like tiles for heritage buildings among plans",
+      "summary": "Trending solar coverage from The Straits Times — use this Singapore topic for your own posts and SEO content.",
+      "source": "The Straits Times",
+      "url": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxQWXFHTFFsSTFmVWRUSGxKX05hbWxwRUdFelZmd3YycDBqT1hYWWpobkx1ME1yQlMzMUlhTnhfR3JKSlhvbFJMdkNiakNreWZRNThyODl0bV8xWjFWaDR2aEZ0UVNaN3NnU0hlRzNiZ1lqR3hGWUtPXzdydVl2VGtCZk4wcmxWUmFqS24zR0w1VGFvR2ZrMWxhUFZreVdKUG5Sa1FCNUhTenFkLW1MU0RlOWpIUzNnUXdsTlhKT1h2Y0JVR0xpV05qTFZiaXlvcFVmaF9Wb2dUbFZCeDZKNmJN?oc=5",
+      "tags": [
+        "#solarpush",
         "#solarSingapore",
         "#solarenergy"
       ]
@@ -146,7 +146,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "977K+"
+          "posts": "1M+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -176,7 +176,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "176K+"
+          "posts": "175K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -186,7 +186,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "44K+"
+          "posts": "45K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -196,7 +196,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "120K+"
+          "posts": "122K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -206,7 +206,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "513K+"
+          "posts": "496K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -216,7 +216,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "94K+"
+          "posts": "93K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarsingapore/"
@@ -226,7 +226,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "28K+"
+          "posts": "27K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpush/"
@@ -260,16 +260,6 @@
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarsupply/"
-    },
-    {
-      "tag": "#solarindependence",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "41K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarindependence/"
     }
   ],
   "contentIdeas": [

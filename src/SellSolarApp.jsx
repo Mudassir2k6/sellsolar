@@ -20,6 +20,8 @@ const LoadCalculatorPage = lazy(() => import('./views/LoadCalculatorPage'));
 import SolarLoadCalculator from './components/SolarLoadCalculator';
 import FloatingPostAdButton from './components/FloatingPostAdButton';
 import HomeAdvertisementBoard from './components/HomeAdvertisementBoard';
+import HeroSideRatesCard from './components/HeroSideRatesCard';
+import HeroSideAdCard from './components/HeroSideAdCard';
 const CompanyMarketplacePage = lazy(() => import('./views/CompanyMarketplacePage'));
 import CustomPageView from './views/CustomPageView';
 import KeywordLandingPage, { KEYWORD_LANDING_KEYS } from './views/KeywordLandingPage';
@@ -1605,7 +1607,7 @@ function Xy({
   value:"used",label:"Used"
 }];
 function nx({
-  filters:t,onFilterChange:e,onSearch:r,onReset:n,onNavigatePrices:np,onNavigateCalculator:nc,onNavigateDealers:nd,onNavigateInstallation:ni,onNavigatePricing:npr
+  filters:t,onFilterChange:e,onSearch:r,onReset:n,onNavigatePrices:np,onNavigateCalculator:nc,onNavigateDealers:nd,onNavigateInstallation:ni,onNavigatePricing:npr,onNavigateVerification:nvf
 }){
   const { settings } = useSiteSettings();
   const heroCms = settings?.homePageCms?.hero;
@@ -1675,6 +1677,8 @@ function nx({
       jsxs("div",{
         className:"container-page",children:[
           jsxs("div",{
+            className:"relative",children:[
+          jsxs("div",{
             className:"mx-auto max-w-3xl text-center px-1 sm:px-0",children:[
               jsxs("div",{
                 className:"mb-2 inline-flex items-center gap-1.5 rounded-full bg-primary-50 dark:bg-primary-950/60 border border-primary-200/80 dark:border-primary-800/60 px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold text-primary-700 dark:text-primary-300 shadow-2xs",children:[
@@ -1721,6 +1725,10 @@ function nx({
                   }):null
                 ]
               })
+            ]
+          }),
+          jsx(HeroSideRatesCard,{ onOpenRates:np }),
+          jsx(HeroSideAdCard,{ onAdvertise:npr, onVerifyPlates:nvf })
             ]
           }),
           jsx("div",{
@@ -7202,7 +7210,7 @@ function _x({
 
   return jsxs(Fragment,{
     children:[jsx(nx,{
-      filters:e,onFilterChange:y,onSearch:w,onReset:j,onNavigatePrices:nav?()=>nav("prices"):void 0,onNavigateCalculator:nav?()=>nav("calculator"):void 0,onNavigateDealers:nav?()=>nav("dealers"):void 0,onNavigateInstallation:nav?()=>nav("install"):void 0,onNavigatePricing:nav?()=>nav("pricing"):void 0
+      filters:e,onFilterChange:y,onSearch:w,onReset:j,onNavigatePrices:nav?()=>nav("prices"):void 0,onNavigateCalculator:nav?()=>nav("calculator"):void 0,onNavigateDealers:nav?()=>nav("dealers"):void 0,onNavigateInstallation:nav?()=>nav("install"):void 0,onNavigatePricing:nav?()=>nav("pricing"):void 0,onNavigateVerification:nav?()=>nav("verification"):void 0
     }),jsx(HomeAdvertisementBoard,{ onNavigate:nav }),jsx(PakWheelsSellCards,{
       onPostAd:()=>nav?nav("post-ad"):void 0,
       onInstall:()=>nav?nav("install"):void 0,

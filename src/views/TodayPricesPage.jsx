@@ -183,6 +183,37 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
     setSheetCurrentPage(1);
     setCatalogCurrentPage(1);
   };
+  // Coming from the home hero rate card ("Full ... sheet"): pre-select that category, scroll to the
+  // live rate sheet and flash a highlight around it. Key must match RATES_FOCUS_KEY in HeroSideRatesCard.jsx.
+  const [flashRateSheet, setFlashRateSheet] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    let focus = null;
+    try {
+      focus = window.sessionStorage.getItem('sellsolar_rates_focus');
+      window.sessionStorage.removeItem('sellsolar_rates_focus');
+    } catch {
+      /* storage unavailable */
+    }
+    if (!focus) return undefined;
+
+    handleSelectCategory(focus);
+    setPageTab('rates');
+    setShowDailySheetDetail(true);
+
+    const scrollTimer = window.setTimeout(() => {
+      const el = document.getElementById('live-rate-sheet');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setFlashRateSheet(true);
+    }, 450);
+    const stopTimer = window.setTimeout(() => setFlashRateSheet(false), 4200);
+    return () => {
+      window.clearTimeout(scrollTimer);
+      window.clearTimeout(stopTimer);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Global hero search: one box that filters BOTH the daily rate sheet and the equipment catalog
   const [globalSearch, setGlobalSearch] = useState('');
   const [selectedDirectRate, setSelectedDirectRate] = useState(null);
@@ -1251,7 +1282,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         {pageTab === 'rates' && (
         <>
         {/* Verified Live Daily Trade Sheet & Date Comparison */}
-        <div id="live-rate-sheet" className="rounded-2xl bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-5 sm:p-6 shadow-sm border border-gray-200/90 dark:border-gray-800 mb-8 transition-colors">
+        <div id="live-rate-sheet" className={`rounded-2xl bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-5 sm:p-6 shadow-sm border border-gray-200/90 dark:border-gray-800 mb-8 transition-all duration-500 scroll-mt-24 ${flashRateSheet ? 'ring-4 ring-amber-400 ring-offset-2 dark:ring-offset-gray-950 shadow-2xl shadow-amber-500/30' : ''}`}>
           <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 dark:bg-amber-400/10 px-3.5 py-1 text-xs font-bold text-amber-800 dark:text-amber-300 border border-amber-500/30 shadow-2xs">
               <MapPin className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400 shrink-0" />

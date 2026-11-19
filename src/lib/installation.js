@@ -46,13 +46,7 @@ export async function ensureAdminSupabaseAuth() {
   try {
     if (!isSupabaseConfigured()) return false;
     const sessionRes = await supabase.auth.getSession();
-    if (sessionRes?.data?.session?.user) return true;
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: 'mudassir2k6@gmail.com',
-      password: '12345678',
-    });
-    return !error && !!data?.session;
+    return !!sessionRes?.data?.session?.user;
   } catch (err) {
     console.warn('Admin Supabase auth check notice:', err);
     return false;

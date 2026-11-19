@@ -242,7 +242,7 @@ export default function PasswordPage({
             verified = true;
           } else if (
             (user.email.toLowerCase() === 'mudassir2k6@gmail.com' || user.email.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase()) &&
-            (currentPassword.trim() === '12345678' || (rec && rec.password === currentPassword.trim()))
+            (rec && rec.password === currentPassword.trim())
           ) {
             verified = true;
           }

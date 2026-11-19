@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { Zap, ArrowRight, TrendingDown, TrendingUp, Minus } from 'lucide-react';
 import { getActiveDailyRates } from '../data/todayPricesData';
 import { getPakistanDateDetails } from '../lib/dateUtils';
+import { useAutoScrollLoop } from '../lib/useAutoScrollLoop';
 
 /** sessionStorage key read by TodayPricesPage to pick the category and highlight the rate sheet */
 export const RATES_FOCUS_KEY = 'sellsolar_rates_focus';
@@ -129,40 +130,15 @@ export default function HeroSideRatesCard({ onOpenRates }) {
   const rows = current?.rows || [];
   const tab = current?.tab || TABS[0];
 
-  // Auto-scroll (seamless loop over a duplicated list). Pauses on hover / touch,
-  // never runs for users who prefer reduced motion, and the list stays manually scrollable.
+  // Auto-scroll (seamless loop over a duplicated list); a new tab restarts from the top.
   const scrollRef = useRef(null);
-  const pausedRef = useRef(false);
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (el) el.scrollTop = 0; // new tab -> start from the top
-    if (!el || rows.length <= VISIBLE_ROWS) return undefined;
-    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return undefined;
-
-    let raf = 0;
-    let last = performance.now();
-    let pos = 0;
-    const tick = (now) => {
-      const dt = now - last;
-      last = now;
-      if (pausedRef.current || document.hidden) {
-        pos = el.scrollTop;
-      } else {
-        pos += (dt * SCROLL_PX_PER_SECOND) / 1000;
-        const loopAt = el.scrollHeight / 2;
-        if (loopAt > 0 && pos >= loopAt) pos -= loopAt;
-        el.scrollTop = pos;
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [rows.length, tab.id]);
+  const { pause, resume } = useAutoScrollLoop(scrollRef, {
+    enabled: rows.length > VISIBLE_ROWS,
+    resetKey: tab.id,
+    pxPerSecond: SCROLL_PX_PER_SECOND,
+  });
 
   if (!tabsWithRows.length) return null;
-
-  const pause = () => { pausedRef.current = true; };
-  const resume = () => { pausedRef.current = false; };
 
   const openFullSheet = () => {
     try {

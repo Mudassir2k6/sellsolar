@@ -1604,14 +1604,6 @@ export default function AdminSuperDashboard({
       // 5. Update Supabase Cloud DB directly with authentication guarantee
       if (isSupabaseConfigured()) {
         try {
-          const curSess = await supabase.auth.getSession().catch(() => null);
-          if (!curSess?.data?.session?.user) {
-            await supabase.auth.signInWithPassword({
-              email: 'mudassir2k6@gmail.com',
-              password: '12345678',
-            }).catch(() => null);
-          }
-
           if (editingPhoneUser.id && isValidUuid(editingPhoneUser.id)) {
             await supabase
               .from('profiles')
@@ -2532,13 +2524,6 @@ export default function AdminSuperDashboard({
       // 2. Direct Supabase update with active auth guarantee
       if (isSupabaseConfigured()) {
         try {
-          const curSess = await supabase.auth.getSession().catch(() => null);
-          if (!curSess?.data?.session?.user) {
-            await supabase.auth.signInWithPassword({
-              email: 'mudassir2k6@gmail.com',
-              password: '12345678',
-            }).catch(() => null);
-          }
           const targetId = activeId || user?.id || profile?.id;
           if (targetId && isValidUuid(targetId)) {
             await supabase.from('profiles').update({

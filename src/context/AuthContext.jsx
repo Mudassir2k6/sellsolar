@@ -16,6 +16,21 @@ export const AuthContext = createContext(null);
 export const DEFAULT_ADMIN_EMAIL = 'admin@sellsolar.pk';
 export const LEGACY_ADMIN_EMAIL = 'mudassir2k6@gmail.com';
 export const DEFAULT_ADMIN_ID = '00000000-0000-4000-8000-000000000001';
+
+/**
+ * Random, never-shown secret for the built-in admin's LOCAL record.
+ * The admin has no usable local password - admin sign-in only works through Supabase,
+ * so no password is ever stored in (or guessable from) the JavaScript bundle.
+ */
+function makeUnusableLocalSecret() {
+  try {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) return `x-${crypto.randomUUID()}`;
+  } catch {
+    /* fall through */
+  }
+  return `x-${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`;
+}
+
 const LOCAL_USERS_KEY = 'sellsolar_custom_auth_users';
 const LOCAL_SESSION_KEY = 'sellsolar_active_auth_session';
 export const LOCAL_DISABLED_USERS_KEY = 'sellsolar_disabled_users';
@@ -292,6 +307,14 @@ export function getStoredUsers() {
     for (const key of Object.keys(parsed)) {
       const entry = parsed[key];
       const isAdmKey = key.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase();
+      // Retire the old well-known default admin password stored in existing browsers
+      if (
+        entry?.password === '12345678' &&
+        (isAdmKey || entry?.profile?.is_admin || entry?.profile?.role === 'super_admin')
+      ) {
+        entry.password = makeUnusableLocalSecret();
+        modified = true;
+      }
       if (!entry?.user?.id || !isValidUuid(entry.user.id) || entry.user.id === 'admin-user-mudassir') {
         const correctId = isAdmKey ? DEFAULT_ADMIN_ID : generateUuid();
         if (entry.user) entry.user.id = correctId;
@@ -311,7 +334,7 @@ export function getStoredUsers() {
     const adminKey = DEFAULT_ADMIN_EMAIL.toLowerCase();
     if (!parsed[adminKey]) {
       parsed[adminKey] = {
-        password: '12345678',
+        password: makeUnusableLocalSecret(),
         user: {
           id: DEFAULT_ADMIN_ID,
           email: DEFAULT_ADMIN_EMAIL,
@@ -342,7 +365,7 @@ export function getStoredUsers() {
   } catch {
     return {
       [DEFAULT_ADMIN_EMAIL.toLowerCase()]: {
-        password: '12345678',
+        password: makeUnusableLocalSecret(),
         user: {
           id: DEFAULT_ADMIN_ID,
           email: DEFAULT_ADMIN_EMAIL,
@@ -1278,7 +1301,7 @@ export function AuthProvider({ children }) {
 
       // 3. Admin credentials check (mudassir2k6@gmail.com / mudassir2k6 / 03001234567)
       if (isAdm) {
-        if (record && (record.password === cleanPass || cleanPass === '12345678')) {
+        if (record && record.password === cleanPass) {
           clearRateLimit('login', cleanIdentifier || 'global');
           const activeUser = { ...record.user, id: DEFAULT_ADMIN_ID };
           const activeProfile = { ...record.profile, id: DEFAULT_ADMIN_ID };
@@ -1287,7 +1310,8 @@ export function AuthProvider({ children }) {
           saveStoredSession({ user: activeUser, profile: activeProfile });
           return { success: true, user: activeUser, profile: activeProfile };
         }
-        if (!record && (cleanPass === '12345678' || record?.password === cleanPass)) {
+        // No built-in default password any more: with no local record the admin must sign in via Supabase.
+        if (!record && record?.password === cleanPass) {
           clearRateLimit('login', cleanIdentifier || 'global');
           const defaultUser = {
             id: DEFAULT_ADMIN_ID,
@@ -1895,14 +1919,7 @@ export function AuthProvider({ children }) {
 
     if (isSupabaseConfigured()) {
       try {
-        const curSess = await supabase.auth.getSession().catch(() => null);
-        if (!curSess?.data?.session?.user) {
-          await supabase.auth.signInWithPassword({
-            email: 'mudassir2k6@gmail.com',
-            password: '12345678',
-          }).catch(() => {});
-        }
-
+        // Uses the admin's own signed-in Supabase session (no stored credentials)
         if (isTargetDealer && targetUserIdOrEmail && isValidUuid(targetUserIdOrEmail)) {
           await supabase.rpc('admin_verify_dealer', { target_user_id: targetUserIdOrEmail }).then(() => {}, () => {});
         }
@@ -2333,15 +2350,7 @@ export function AuthProvider({ children }) {
       // 5. Supabase profiles delete via security definer RPC
       if (isSupabaseConfigured()) {
         try {
-          // Ensure client is authenticated as admin in Supabase cloud
-          const curSess = await supabase.auth.getSession().catch(() => null);
-          const curUserEmail = (curSess?.data?.session?.user?.email || '').toLowerCase();
-          if (!curSess?.data?.session?.user || curUserEmail !== 'mudassir2k6@gmail.com') {
-            await supabase.auth.signInWithPassword({
-              email: 'mudassir2k6@gmail.com',
-              password: '12345678',
-            }).catch(() => {});
-          }
+          // Runs with the admin's own signed-in Supabase session (no stored credentials)
 
           // Resolve target UUID safely (avoid Postgres 22P02 invalid UUID cast)
           let targetUuid = isValidUuid(targetId) ? targetId : (isValidUuid(cleanId) ? cleanId : null);

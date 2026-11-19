@@ -3371,10 +3371,10 @@ function yx({
 
           if (Object.keys(profileUpdatePayload).length > 0) {
             if (safeUserId && isValidUuid(safeUserId)) {
-              await supabase.from('profiles').update(profileUpdatePayload).eq('id', safeUserId).catch(() => {});
+              await supabase.from('profiles').update(profileUpdatePayload).eq('id', safeUserId).then(() => {}, () => {});
             }
             if (targetEmail) {
-              await supabase.from('profiles').update(profileUpdatePayload).ilike('email', targetEmail).catch(() => {});
+              await supabase.from('profiles').update(profileUpdatePayload).ilike('email', targetEmail).then(() => {}, () => {});
             }
           }
         }
@@ -6359,7 +6359,7 @@ function yx({
         }
       } catch (err) {}
       if (r.id) {
-        supabase.from("solar_listings").update({ seller_phone: resolvedPhone }).eq("id", r.id).catch(() => {});
+        supabase.from("solar_listings").update({ seller_phone: resolvedPhone }).eq("id", r.id).then(() => {}, () => {});
       }
     }
   }, [r == null ? void 0 : r.id, r == null ? void 0 : r.seller_phone, resolvedPhone]);

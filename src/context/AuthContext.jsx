@@ -489,13 +489,13 @@ export function AuthProvider({ children }) {
             const fallbackPhone = phoneMap[targetEmail] || (userId ? phoneMap[userId] : '') || '';
             if (fallbackPhone && !data.phone) {
               data.phone = fallbackPhone;
-              supabase.from('profiles').update({ phone: fallbackPhone }).eq('id', data.id).catch(() => {});
+              supabase.from('profiles').update({ phone: fallbackPhone }).eq('id', data.id).then(() => {}, () => {});
             }
           }
           // Ensure Super Admin has is_admin = true in remote database
           if (isDefaultAdmin && !data.is_admin) {
             data.is_admin = true;
-            supabase.from('profiles').update({ is_admin: true }).eq('id', data.id).catch(() => {});
+            supabase.from('profiles').update({ is_admin: true }).eq('id', data.id).then(() => {}, () => {});
           }
           setProfile(data);
           return;
@@ -1253,7 +1253,7 @@ export function AuthProvider({ children }) {
             saveStoredUsers(localUsers);
 
             if (isSupabaseConfigured() && metaPhone) {
-              supabase.from('profiles').update({ phone: metaPhone }).eq('id', authId).catch(() => {});
+              supabase.from('profiles').update({ phone: metaPhone }).eq('id', authId).then(() => {}, () => {});
             }
 
             return { success: true, user: authUser };
@@ -1904,7 +1904,7 @@ export function AuthProvider({ children }) {
         }
 
         if (isTargetDealer && targetUserIdOrEmail && isValidUuid(targetUserIdOrEmail)) {
-          await supabase.rpc('admin_verify_dealer', { target_user_id: targetUserIdOrEmail }).catch(() => {});
+          await supabase.rpc('admin_verify_dealer', { target_user_id: targetUserIdOrEmail }).then(() => {}, () => {});
         }
 
         const roleQuery = supabase
@@ -2351,7 +2351,7 @@ export function AuthProvider({ children }) {
               .select('id, email, phone')
               .ilike('email', targetEmail)
               .maybeSingle()
-              .catch(() => ({ data: null }));
+              .then((res) => res, () => ({ data: null }));
             if (foundByEmail?.id) {
               targetUuid = foundByEmail.id;
               deletedMap[foundByEmail.id.toLowerCase()] = { deletedAt: new Date().toISOString() };
@@ -2365,7 +2365,7 @@ export function AuthProvider({ children }) {
               .select('id, email, phone')
               .eq('phone', targetPhone)
               .maybeSingle()
-              .catch(() => ({ data: null }));
+              .then((res) => res, () => ({ data: null }));
             if (foundByPhone?.id) {
               targetUuid = foundByPhone.id;
               deletedMap[foundByPhone.id.toLowerCase()] = { deletedAt: new Date().toISOString() };
@@ -2383,10 +2383,10 @@ export function AuthProvider({ children }) {
                 .eq('user_id', targetUuid);
               if (Array.isArray(userAds)) {
                 for (const ad of userAds) {
-                  await supabase.rpc('admin_delete_listing', { listing_id: ad.id }).catch(() => {});
+                  await supabase.rpc('admin_delete_listing', { listing_id: ad.id }).then(() => {}, () => {});
                 }
               }
-              await supabase.from('solar_listings').delete().eq('user_id', targetUuid).catch(() => {});
+              await supabase.from('solar_listings').delete().eq('user_id', targetUuid).then(() => {}, () => {});
             } catch {}
 
             // Call admin_delete_profile RPC with postgres security definer
@@ -2406,10 +2406,10 @@ export function AuthProvider({ children }) {
                 .ilike('seller_email', targetEmail);
               if (Array.isArray(emailAds)) {
                 for (const ad of emailAds) {
-                  await supabase.rpc('admin_delete_listing', { listing_id: ad.id }).catch(() => {});
+                  await supabase.rpc('admin_delete_listing', { listing_id: ad.id }).then(() => {}, () => {});
                 }
               }
-              await supabase.from('solar_listings').delete().ilike('seller_email', targetEmail).catch(() => {});
+              await supabase.from('solar_listings').delete().ilike('seller_email', targetEmail).then(() => {}, () => {});
             } catch {}
           }
         } catch (sbErr) {

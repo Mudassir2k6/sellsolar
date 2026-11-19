@@ -2,8 +2,8 @@
   "version": 2,
   "countryCode": "MY",
   "location": "Malaysia",
-  "lastUpdated": "2026-11-18T07:02:32+05:00",
-  "lastUpdatedLabel": "18 Nov 2026, 7:02 am PKT",
+  "lastUpdated": "2026-11-19T06:39:47+05:00",
+  "lastUpdatedLabel": "19 Nov 2026, 6:39 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
   "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarmalaysia, solarpanel, solarsystem",
   "trendingNews": [
@@ -42,6 +42,17 @@
     },
     {
       "id": "tn-4",
+      "title": "Huawei brings new era of AI-powered, grid-stabilising solar energy to Malaysia with launch of FusionSolar9.0",
+      "summary": "Trending solar coverage from Huawei — use this Malaysia topic for your own posts and SEO content.",
+      "source": "Huawei",
+      "url": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxOUTVtcFlsQ1FHejFmQkx6QnRGWWdNT29yQ28ybjZ2MVd0SEdYRDFTXzdycVpIWUdDX0ktOVA0TGVrZFViZnR6SXZhMXZkTEwydUIwWWdGQkhTYW5YX3ozc3ByR1N0WjNuRVhwTm1JYXV3QnMtX3Q5YnNaMVJDVnFRNkRsRThERUl5QTFLeWVxb1NZbHhFcmdoa3FNbC15VTV4aHphaDE4UWw3aGtYQVJValVESG91YmJUSlo1WXkyMEVxekVCV1N5bkVLN3RyZ3lx?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarMalaysia"
+      ]
+    },
+    {
+      "id": "tn-5",
       "title": "Masdar starts construction on 200MW solar energy project in Malaysia",
       "summary": "Trending solar coverage from The National — use this Malaysia topic for your own posts and SEO content.",
       "source": "The National",
@@ -52,7 +63,7 @@
       ]
     },
     {
-      "id": "tn-5",
+      "id": "tn-6",
       "title": "MBSB to sponsor 61 underserved Muslim tradesmen for solar panel certification",
       "summary": "Trending solar coverage from The Edge Malaysia — use this Malaysia topic for your own posts and SEO content.",
       "source": "The Edge Malaysia",
@@ -61,17 +72,6 @@
         "#solarpanel",
         "#solarMalaysia",
         "#solarenergy"
-      ]
-    },
-    {
-      "id": "tn-6",
-      "title": "Malaysia Solar Energy Market Expected to Reach MYR 5.04B in 2026 as LSS6 Accelerates Solar and Battery Storage",
-      "summary": "Trending solar coverage from EIN Presswire — use this Malaysia topic for your own posts and SEO content.",
-      "source": "EIN Presswire",
-      "url": "https://news.google.com/rss/articles/CBMi7gFBVV95cUxQUUdRSEN0eEZ6Q2xCRFFzSEY5Q3VFbjFCOEdRX1ZZcDJnQmIyTUwtdlBTMWo2MXUxVXl4WUVQcFYxWVRhanY5UWZPanZfWlBabUkyRlBlcGIteGU4QURFYXdoeUVzYUpHeml5dlZiTkxILUV0YV9SSG44bjNfNllPdFIwUGhWM0UzNlp4LUJOTng5TDJJTTg1T0RPbUpQaW5vM09vX180cnpVZjdoOE9NVmhjVU5VRlk5bWVpcVZVZWcyWGxoOTFQc1czSUNKcDVlZ1JRa1kxazhjczF1TFNRT1BITEJlbTluVVA5ckVB?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarMalaysia"
       ]
     }
   ],
@@ -171,7 +171,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "175K+"
+          "posts": "185K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -181,7 +181,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "45K+"
+          "posts": "44K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -201,7 +201,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "496K+"
+          "posts": "505K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -211,7 +211,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "93K+"
+          "posts": "95K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarmalaysia/"
@@ -221,7 +221,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "36K+"
+          "posts": "35K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"

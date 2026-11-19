@@ -2,8 +2,8 @@
   "version": 2,
   "countryCode": "ZA",
   "location": "South Africa",
-  "lastUpdated": "2026-11-18T07:02:32+05:00",
-  "lastUpdatedLabel": "18 Nov 2026, 7:02 am PKT",
+  "lastUpdated": "2026-11-19T06:39:47+05:00",
+  "lastUpdatedLabel": "19 Nov 2026, 6:39 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
   "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarsouthafrica, solarpanel, solartechnology",
   "trendingNews": [
@@ -20,6 +20,17 @@
     },
     {
       "id": "tn-2",
+      "title": "Fresh global funding continues to accelerate the shift to solar energy",
+      "summary": "Trending solar coverage from Novus Press Bulletin — use this South Africa topic for your own posts and SEO content.",
+      "source": "Novus Press Bulletin",
+      "url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxQakRzWW9USE9ZekpJZkJDaldheWk1MElnd0hrV1JaVmhQbXlteW9HUjdoZ0k1eGNYM2tiUVllU1VZYmliSzVjUV9sQTRDUUVEOTZaQ0ZqN2NoQ1lVUnRCck5Cay04UzM3YnptckI2b0xCR3o1NW0xbzJZYXRuNGdQZGFSWWJFTUplSTYyRFktM3VJUFpabVRjOVF1LVo1d3dNUUs3S3pCa3FabHQy?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarSouthAfrica"
+      ]
+    },
+    {
+      "id": "tn-3",
       "title": "The 339-year-old town known for wine and the longest main street in South Africa now hosts one of the country’s only solar panel manufacturers",
       "summary": "Trending solar coverage from MyBroadband — use this South Africa topic for your own posts and SEO content.",
       "source": "MyBroadband",
@@ -31,7 +42,19 @@
       ]
     },
     {
-      "id": "tn-3",
+      "id": "tn-4",
+      "title": "A visit to a solar panel graveyard reveals new uses rising from waste",
+      "summary": "Trending solar coverage from Daily Maverick — use this South Africa topic for your own posts and SEO content.",
+      "source": "Daily Maverick",
+      "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQUU9PWW9jMVFCNE5Uc3NtM2RwejRqS3EtNEMwQzF1SjdZeFdLWmJyWGRyZ3dTaEJSeldvbElxSW1ydTJBYXFMUGRWcU9mcEJPZktEUWRiT0JpUmxtcTJJZ1lIdU02eDV1UnU1R29NM3ZzSjBTRnR0Q3lFNTFiaGJQQ3NRcGtaQk1PNGltLV9KU3BaZTVCVGxTV2pud1BGSWNaQWdJSmlyLWZ2NC05TnBPY0ZLNGVHdw?oc=5",
+      "tags": [
+        "#solarpanel",
+        "#solarSouthAfrica",
+        "#solarenergy"
+      ]
+    },
+    {
+      "id": "tn-5",
       "title": "South Africa is overlooking solar technology that can keep generating electricity after sunset",
       "summary": "Trending solar coverage from The Conversation — use this South Africa topic for your own posts and SEO content.",
       "source": "The Conversation",
@@ -43,7 +66,7 @@
       ]
     },
     {
-      "id": "tn-4",
+      "id": "tn-6",
       "title": "Ecoprogetti breathes new life into solar panel factory in South Africa",
       "summary": "Trending solar coverage from Green Building Africa — use this South Africa topic for your own posts and SEO content.",
       "source": "Green Building Africa",
@@ -52,29 +75,6 @@
         "#solarpanel",
         "#solarSouthAfrica",
         "#solarenergy"
-      ]
-    },
-    {
-      "id": "tn-5",
-      "title": "Warning to solar panel users in South Africa, and Facebook under siege",
-      "summary": "Trending solar coverage from BusinessTech — use this South Africa topic for your own posts and SEO content.",
-      "source": "BusinessTech",
-      "url": "https://news.google.com/rss/articles/CBMiugFBVV95cUxQU1k3R29XU3Q3ZU9fUUhYVjhVMGk5X01ENUhIUm00N00yV1FCZkNucm50Q3Uta1N4Z3ZmYkY0OTlyQjRENWp1ZmpmUTlYOVBjbERUNHZ4QlYwUk1hZWZKTEZPQXlIR3NnMjk2dkU5SUZ6V1Etc1UxU1ZQUlU4VTU1dURrVlVsQ1FHWnhpT2YyM2o2NjFJYmljcElIVTgtbHlaejIwS1p5eGlWMktCQ2c0cGZfUnJsSDJVbGc?oc=5",
-      "tags": [
-        "#solarpanel",
-        "#solarSouthAfrica",
-        "#solarenergy"
-      ]
-    },
-    {
-      "id": "tn-6",
-      "title": "How fixed charges impact solar energy users in South Africa",
-      "summary": "Trending solar coverage from IOL — use this South Africa topic for your own posts and SEO content.",
-      "source": "IOL",
-      "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxPX1lydU50X2Y2a3E1WnBfNW93b2pFb2pRVU5lRjMyZmFaYXZpaEkwbGFqT2M5YzFvemFGM1M3b2tqTWxXYWxnaGR1R19mRG1ub01OOHFaWS04MTNKQkhFWkhxYWNHSWZENVhVSkExR1ZYbXNBRmdkckxIT193M29MWDhvM2F1OU1LUUNLXzJobTBfa0hIREZ6ZXlmUW84UGdxVzhMUTFCcEZMdUJia1h0cmZn?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarSouthAfrica"
       ]
     }
   ],
@@ -174,7 +174,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "175K+"
+          "posts": "185K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -184,7 +184,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "45K+"
+          "posts": "44K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -204,7 +204,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "496K+"
+          "posts": "505K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -214,7 +214,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "93K+"
+          "posts": "95K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarsouthafrica/"
@@ -224,7 +224,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "36K+"
+          "posts": "35K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"

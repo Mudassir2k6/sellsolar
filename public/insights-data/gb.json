@@ -2,19 +2,19 @@
   "version": 2,
   "countryCode": "GB",
   "location": "United Kingdom",
-  "lastUpdated": "2026-11-18T07:02:32+05:00",
-  "lastUpdatedLabel": "18 Nov 2026, 7:02 am PKT",
+  "lastUpdated": "2026-11-19T06:39:47+05:00",
+  "lastUpdatedLabel": "19 Nov 2026, 6:39 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solaruk, solarpanel, plugsolar",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solaruk, solarpanel, plugsolar, solaravailable",
   "trendingNews": [
     {
       "id": "tn-1",
-      "title": "Solar panel grants and UK funding 2026, explained",
-      "summary": "Trending solar coverage from The Independent — use this United Kingdom topic for your own posts and SEO content.",
-      "source": "The Independent",
-      "url": "https://news.google.com/rss/articles/CBMipgFBVV95cUxQNXE0SHZsVnNXeVNod2dvUDN0R0M5UnBQa2FONXJFZGZBLXZZd1JMdjZLXzN5cTVaRTNqX0lmbThKNl9FZWw5UnJUTHdzc3MwYkJZZWp2cHV1V1RTX3h2ZTZGS3NHeXV0VEtUOVRZTmFXSjc0NHFQSTJZdi1GdWdyaWpONC0yblR5dE16QlA5eHotMDZCMGhXNTNlRXp5WHRZalZuQ25R?oc=5",
+      "title": "Which areas of the UK have the most solar panels in 2026?",
+      "summary": "Trending solar coverage from Energy Saving Trust — use this United Kingdom topic for your own posts and SEO content.",
+      "source": "Energy Saving Trust",
+      "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE1STlBEaUFuQ3hSMlBXbVVORlEteDdDSlRMT3lmREE3NklVMDU0STY3OWFyWVhTdDNaemRxcVAzWTB6Q1hYYWdib24zWkpTME93QVU5SUVNbHdzb2FuZXJiandSUFFOMWhZ?oc=5",
       "tags": [
-        "#solarpanel",
+        "#solarpanels",
         "#solarUK",
         "#solarenergy"
       ]
@@ -33,12 +33,12 @@
     },
     {
       "id": "tn-3",
-      "title": "Which areas of the UK have the most solar panels in 2026?",
-      "summary": "Trending solar coverage from Energy Saving Trust — use this United Kingdom topic for your own posts and SEO content.",
-      "source": "Energy Saving Trust",
-      "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE1STlBEaUFuQ3hSMlBXbVVORlEteDdDSlRMT3lmREE3NklVMDU0STY3OWFyWVhTdDNaemRxcVAzWTB6Q1hYYWdib24zWkpTME93QVU5SUVNbHdzb2FuZXJiandSUFFOMWhZ?oc=5",
+      "title": "Solar panel grants and UK funding 2026, explained",
+      "summary": "Trending solar coverage from The Independent — use this United Kingdom topic for your own posts and SEO content.",
+      "source": "The Independent",
+      "url": "https://news.google.com/rss/articles/CBMipgFBVV95cUxQNXE0SHZsVnNXeVNod2dvUDN0R0M5UnBQa2FONXJFZGZBLXZZd1JMdjZLXzN5cTVaRTNqX0lmbThKNl9FZWw5UnJUTHdzc3MwYkJZZWp2cHV1V1RTX3h2ZTZGS3NHeXV0VEtUOVRZTmFXSjc0NHFQSTJZdi1GdWdyaWpONC0yblR5dE16QlA5eHotMDZCMGhXNTNlRXp5WHRZalZuQ25R?oc=5",
       "tags": [
-        "#solarpanels",
+        "#solarpanel",
         "#solarUK",
         "#solarenergy"
       ]
@@ -57,24 +57,23 @@
     },
     {
       "id": "tn-5",
+      "title": "Britain breaks solar energy record twice as UK’s biggest solar farm gets approval",
+      "summary": "Trending solar coverage from The Guardian — use this United Kingdom topic for your own posts and SEO content.",
+      "source": "The Guardian",
+      "url": "https://news.google.com/rss/articles/CBMizwFBVV95cUxNUzN6WFYwbUVnY0VnOVUtd2lrdnFzcXppWGVBQ2QyeFVWdnVVTVZrNHZseFMycTZWYm1fbXNjM1dSVGhMeW9oWnMxelR6Nlp0MkE0UHlzRkp6UlR4cXhYeTdweEdFRUoxMGF3MHVLZWJBN2tKWU9iT25WYlZqUnJMY2c5WHlIUER1ZjdudThEei1pX1pNNmQyU1RaY3VWd29Qcko2WTh2LTgtNWdsaUZEZG90WjVmUG1zNHBFREl2dFZpbW5oNjB1M2tpX1B4dlE?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarUK"
+      ]
+    },
+    {
+      "id": "tn-6",
       "title": "Solar panel grants and funding in the UK 2026 | FMB",
       "summary": "Trending solar coverage from FMB, Federation of Master Builders — use this United Kingdom topic for your own posts and SEO content.",
       "source": "FMB, Federation of Master Builders",
       "url": "https://news.google.com/rss/articles/CBMic0FVX3lxTE13dExMbU1xbTZQcjRFbkhpb3VEREwwYzBTUGtjNWFVQjhtSEpEbC0zcUhnY2xmMmktRWVkSXBRMUlFTmR5WWcwWWduTG9wN2V4VHhCVThRaUpWa25xWDViaWhuTWdZMVc5REg1SGJOSXJaMGs?oc=5",
       "tags": [
         "#solarpanel",
-        "#solarUK",
-        "#solarenergy"
-      ]
-    },
-    {
-      "id": "tn-6",
-      "title": "Cut cost of loans for solar panels on UK homes, ministers urged",
-      "summary": "Trending solar coverage from The Guardian — use this United Kingdom topic for your own posts and SEO content.",
-      "source": "The Guardian",
-      "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPNHp0OEFKampEY1hXNHNrd0dtYjRLYk1LMGZGY0MxRm9oSFlPb0tsMVpLcWFrTWRtQ3BzS1Z3dzMzVURQN1U3bFVnUG4yNUdCaFlrd2JCUVp4azQ5dWl3a3pjR3UxdFUyMmo1N3AyM2QxUWY1cFpVcDdrVlFHcWV6RWUzVzhRbTd1UXhyallRRjlQc3NIYUhLUmROY3RNUkNmckdDWEQ5Q2tFQ1RPckZwWjhmZHM?oc=5",
-      "tags": [
-        "#solarpanels",
         "#solarUK",
         "#solarenergy"
       ]
@@ -176,7 +175,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "175K+"
+          "posts": "185K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -186,7 +185,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "45K+"
+          "posts": "44K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -206,7 +205,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "496K+"
+          "posts": "505K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -216,7 +215,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "93K+"
+          "posts": "95K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solaruk/"
@@ -226,7 +225,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "36K+"
+          "posts": "35K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
@@ -240,6 +239,16 @@
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/plugsolar/"
+    },
+    {
+      "tag": "#solaravailable",
+      "platforms": [
+        {
+          "name": "Instagram",
+          "posts": "15K+"
+        }
+      ],
+      "searchUrl": "https://www.instagram.com/explore/tags/solaravailable/"
     }
   ],
   "contentIdeas": [

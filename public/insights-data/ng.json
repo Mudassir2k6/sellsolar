@@ -2,24 +2,13 @@
   "version": 2,
   "countryCode": "NG",
   "location": "Nigeria",
-  "lastUpdated": "2026-11-18T07:02:32+05:00",
-  "lastUpdatedLabel": "18 Nov 2026, 7:02 am PKT",
+  "lastUpdated": "2026-11-19T06:39:47+05:00",
+  "lastUpdatedLabel": "19 Nov 2026, 6:39 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
   "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarnigeria, solarboom, solarpanel",
   "trendingNews": [
     {
       "id": "tn-1",
-      "title": "NGYouthSDGs launches national solar energy competition for young Nigerians",
-      "summary": "Trending solar coverage from Business News Nigeria — use this Nigeria topic for your own posts and SEO content.",
-      "source": "Business News Nigeria",
-      "url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxNSHRsNkc5MWFFOVMwWFNJMjFtY0UwYlRfeGp0c081TWVXZ0ppN3ZmNk50cUJtb3dpNV9zWWYyeFhpSzNoUW5rd2lZZGd2b3NXcjktSHR0ZktOMm9iWnFDcm9ObWhKbm5WTy1EakVKRkxkMkVuSXl1ejFuNTFRQUFmM1hyTzBaWFk3T2VZcG1IbnZrb1N6T24ydVpkZkRqU215bWtUbW54MUpPLWppa09qdg?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarNigeria"
-      ]
-    },
-    {
-      "id": "tn-2",
       "title": "Nigeria's solar boom faces cost and policy barriers",
       "summary": "Trending solar coverage from DW.com — use this Nigeria topic for your own posts and SEO content.",
       "source": "DW.com",
@@ -31,7 +20,7 @@
       ]
     },
     {
-      "id": "tn-3",
+      "id": "tn-2",
       "title": "Nigerian Startup Sunrisal Secures $25,000 ECOWAS Grant to Expand Solar Energy Access",
       "summary": "Trending solar coverage from MSME Africa — use this Nigeria topic for your own posts and SEO content.",
       "source": "MSME Africa",
@@ -42,19 +31,7 @@
       ]
     },
     {
-      "id": "tn-4",
-      "title": "Trump’s War on Iran is Pushing the Global South Toward Chinese Solar Panels in Record Numbers",
-      "summary": "Trending solar coverage from Futurism — use this Nigeria topic for your own posts and SEO content.",
-      "source": "Futurism",
-      "url": "https://news.google.com/rss/articles/CBMihAFBVV95cUxPYVdZandKZW9RaDR0eV85cFVDSDM3OWFiTzlXRmNETXZuZ25wVHhqRjZJNW1PWVh1bFo1bWJTTGE3My1zTW9nek5hMVo1OEM0alY5YzJUNjA0UU8xNTB1dTdDTmZWeDFkNU9rM0NJR2x4dDJESTZVZm1kLUozV1dONUVIbnQ?oc=5",
-      "tags": [
-        "#solarpanels",
-        "#solarNigeria",
-        "#solarenergy"
-      ]
-    },
-    {
-      "id": "tn-5",
+      "id": "tn-3",
       "title": "In Nigeria, Solar Panels Are the New Wedding Gift",
       "summary": "Trending solar coverage from Bloomberg.com — use this Nigeria topic for your own posts and SEO content.",
       "source": "Bloomberg.com",
@@ -66,13 +43,36 @@
       ]
     },
     {
-      "id": "tn-6",
+      "id": "tn-4",
+      "title": "From rot to revenue: How solar energy is cutting post-harvest losses in Nigeria's fishing village",
+      "summary": "Trending solar coverage from TheCable — use this Nigeria topic for your own posts and SEO content.",
+      "source": "TheCable",
+      "url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxPbV9aUzVyZmQxZEt0aGY2UXA4QXBCZlF0YmtuZmJ3cmRkLWE2eU1xYTZHSEdzOGt4elVpaE5HN0VYWXlQYVpDUU56QXFuYllrZWZQNkFqZUwxTVpnVmkwaFB3UjliTm81cGlFZjJKdkxpVW8tRC1Na2ZZQTBuU1BSZHdZSzhhWWw1X3Y3aHA1cTZYRHJZblBxZTV3UVFJeXZqVy1CVWFhajAwdkNpb2dTWFVvUzVKNmVNbV9SYw?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarNigeria"
+      ]
+    },
+    {
+      "id": "tn-5",
       "title": "The rise of private solar power in Nigeria",
       "summary": "Trending solar coverage from Dialogue Earth — use this Nigeria topic for your own posts and SEO content.",
       "source": "Dialogue Earth",
       "url": "https://news.google.com/rss/articles/CBMiggFBVV95cUxPRHQ2dTFGTnpfR3M5bU9OZXFBOTBhSGRFaEd6c3FBVlZzZGcydXhKMk9uQ2dXQUdwZHFPNDREVklFLVBfMVQyY3dURURCRmRoTThfZnpfdmVPNmFMSW5OTHllQXUtaERJaUFIYVJ3R2dxVk01cTNZUHVhNW9yYWZkTWJ3?oc=5",
       "tags": [
         "#solarpower",
+        "#solarNigeria",
+        "#solarenergy"
+      ]
+    },
+    {
+      "id": "tn-6",
+      "title": "Nigeria not ready for blanket ban on solar panel importation – experts",
+      "summary": "Trending solar coverage from Business News Nigeria — use this Nigeria topic for your own posts and SEO content.",
+      "source": "Business News Nigeria",
+      "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxNZkdsNlhNTDlZMkg2eloxSHEzbDd2MU1nVDNJQzBZc2hwTzZNdjVDdDhac2lmUlM3QlBWQWQ5MVhKa1RqQ3lqME16Ml9Jams1OVVKVFlnVmdfTmxfQVhMVEE3TXhsTEw4YkhNdFlPZTY2SGxOZ0FBNEYxZEF3MGV1LVg3R0huVGdUdGNrckVadUxpMlZxX3FhazVPaE9wTE1hYUdQVXh0dXY?oc=5",
+      "tags": [
+        "#solarpanel",
         "#solarNigeria",
         "#solarenergy"
       ]
@@ -174,7 +174,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "175K+"
+          "posts": "185K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -184,7 +184,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "45K+"
+          "posts": "44K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -204,7 +204,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "496K+"
+          "posts": "505K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -214,7 +214,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "93K+"
+          "posts": "95K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarnigeria/"
@@ -224,7 +224,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "44K+"
+          "posts": "43K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarboom/"

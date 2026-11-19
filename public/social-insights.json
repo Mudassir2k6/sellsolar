@@ -2,14 +2,14 @@
   "version": 2,
   "countryCode": "PK",
   "location": "Pakistan",
-  "lastUpdated": "2026-11-18T07:02:32+05:00",
-  "lastUpdatedLabel": "18 Nov 2026, 7:02 am PKT",
+  "lastUpdated": "2026-11-19T06:39:47+05:00",
+  "lastUpdatedLabel": "19 Nov 2026, 6:39 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarpakistan, solarrevolution, solarpanel, solarboom, solarsurge, solarrevolutions",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarpakistan, solarrevolution, solarpanel, solarboom, solarsurge, solarsuccess",
   "trendingNews": [
     {
       "id": "tn-1",
-      "title": "COP31: Pakistan's solar revolution has been so successful the national grid is crumbling",
+      "title": "Pakistan's solar revolution is so successful the national grid is lagging behind",
       "summary": "Trending solar coverage from BBC — use this Pakistan topic for your own posts and SEO content.",
       "source": "BBC",
       "url": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE1wSU4zWVRWTUg2YzIwUEVSejAwVzBJdnVyckhkT2JWUHJMbnJOS25ReXRUWF9USDI5UE5Ka1p6bUkxcmtpS1lKc1NLS0ZxemlLazNoYVFPc0FVc002NUE?oc=5",
@@ -175,7 +175,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "175K+"
+          "posts": "185K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -185,7 +185,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "45K+"
+          "posts": "44K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -205,7 +205,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "496K+"
+          "posts": "505K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -215,7 +215,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "93K+"
+          "posts": "95K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpakistan/"
@@ -255,20 +255,20 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "47K+"
+          "posts": "46K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarsurge/"
     },
     {
-      "tag": "#solarrevolutions",
+      "tag": "#solarsuccess",
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "34K+"
+          "posts": "18K+"
         }
       ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarrevolutions/"
+      "searchUrl": "https://www.instagram.com/explore/tags/solarsuccess/"
     }
   ],
   "contentIdeas": [

@@ -5,8 +5,10 @@ import { Megaphone, ArrowRight, ShieldCheck } from 'lucide-react';
 import {
   PARTNER_AD_EVENT,
   getApprovedPartnerAdsForMarquee,
+  syncApprovedPartnerAds,
 } from '../lib/partnerAdSubmissions';
 import { useAutoScrollLoop } from '../lib/useAutoScrollLoop';
+import AdvertiseHereForm from './AdvertiseHereForm';
 
 const cardBase =
   'rounded-2xl border bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm shadow-lg p-2.5 text-left overflow-hidden';
@@ -58,7 +60,7 @@ function AdvertiseItem({ onAdvertise }) {
       <p className="mt-1.5 text-xs font-extrabold text-gray-900 dark:text-white">Your brand here</p>
       <p className="truncate text-[10px] text-gray-500 dark:text-gray-400">Reach buyers across Pakistan</p>
       <span className="mt-0.5 inline-flex items-center gap-1 text-[11px] font-bold text-amber-700 dark:text-amber-300">
-        View packages <ArrowRight className="h-3 w-3" />
+        Submit your banner <ArrowRight className="h-3 w-3" />
       </span>
     </button>
   );
@@ -69,8 +71,10 @@ function AdvertiseItem({ onAdvertise }) {
  *  - "Sponsored" box that auto-scrolls through every approved partner banner (+ an "Advertise here" slot)
  *  - "Verify plates before buy" shortcut
  */
-export default function HeroSideAdCard({ onAdvertise, onVerifyPlates }) {
+export default function HeroSideAdCard({ onVerifyPlates }) {
   const [ads, setAds] = useState([]);
+  const [formOpen, setFormOpen] = useState(false);
+  const onAdvertise = () => setFormOpen(true);
 
   useEffect(() => {
     const refresh = () => {
@@ -81,6 +85,7 @@ export default function HeroSideAdCard({ onAdvertise, onVerifyPlates }) {
       }
     };
     refresh();
+    syncApprovedPartnerAds();
     window.addEventListener(PARTNER_AD_EVENT, refresh);
     window.addEventListener('storage', refresh);
     return () => {
@@ -147,6 +152,7 @@ export default function HeroSideAdCard({ onAdvertise, onVerifyPlates }) {
           <p className="mt-0.5 text-[10px] text-gray-500 dark:text-gray-400">Check used plates for Tier-1 quality.</p>
         </button>
       ) : null}
+      <AdvertiseHereForm isOpen={formOpen} onClose={() => setFormOpen(false)} />
     </aside>
   );
 }

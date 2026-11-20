@@ -478,8 +478,9 @@ export async function fetchAllDealersMerged(seedList = SEED_DEALERS) {
     }
 
     try {
+      // public_profiles = dealers + ad owners only, no e-mail, masked CNIC (admins get full values)
       const { data: profiles, error } = await supabase
-        .from('profiles')
+        .from('public_profiles')
         .select('*')
         .or('account_type.eq.dealer,is_verified_dealer.eq.true,role.eq.dealer')
         .limit(200);

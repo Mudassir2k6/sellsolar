@@ -21,13 +21,23 @@ Deno.serve(async (req) => {
     const configuredAdminEmail = Deno.env.get("ADMIN_EMAIL") ?? DEFAULT_ADMIN_EMAIL;
 
     const body = await req.json().catch(() => ({}));
-    const senderName = String(body.name || body.senderName || "Website Visitor").trim();
-    const senderEmail = String(body.email || body.senderEmail || "No email provided").trim();
-    const senderPhone = String(body.phone || body.senderPhone || "Not provided").trim();
-    const subject = String(body.subject || "New Customer Message via SellSolar").trim();
-    const message = String(body.message || "").trim();
-    const recipientEmail = String(body.recipientEmail || "info@sellsolar.pk").trim();
-    const ticketNumber = String(body.ticketNumber || `SLR-${Math.floor(100000 + Math.random() * 900000)}`).trim();
+    // All user-supplied text is length-capped and HTML-escaped (blocks HTML/link injection in the email).
+    const clean = (v: unknown, max = 300) =>
+      String(v ?? "")
+        .trim()
+        .slice(0, max)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    const senderName = clean(body.name || body.senderName || "Website Visitor", 120);
+    const senderEmail = clean(body.email || body.senderEmail || "No email provided", 160);
+    const senderPhone = clean(body.phone || body.senderPhone || "Not provided", 30);
+    const subject = clean(body.subject || "New Customer Message via SellSolar", 160);
+    const message = clean(body.message || "", 3000);
+    const recipientEmail = clean(body.recipientEmail || "info@sellsolar.pk", 160);
+    const ticketNumber = clean(body.ticketNumber || `SLR-${Math.floor(100000 + Math.random() * 900000)}`, 40);
     const dateStr = new Date().toLocaleString("en-PK", { timeZone: "Asia/Karachi" });
 
     // Target notification recipients

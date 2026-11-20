@@ -2970,7 +2970,7 @@ function hx({
   return useEffect(()=>{
     (async()=>{
       s(!0);
-      let p=supabase.from("profiles").select("*").eq("account_type","dealer").order("is_verified_dealer",{
+      let p=supabase.from("public_profiles").select("*").eq("account_type","dealer").order("is_verified_dealer",{
         ascending:!1
       }).order("created_at",{
         ascending:!1
@@ -6290,7 +6290,7 @@ function yx({
             const timeoutPromise = new Promise((_, reject) =>
               setTimeout(() => reject(new Error('timeout')), 3500)
             );
-            const queryPromise = supabase.from("profiles").select("*").eq("id", k.user_id).maybeSingle();
+            const queryPromise = supabase.from("public_profiles").select("*").eq("id", k.user_id).maybeSingle();
             const { data: x } = await Promise.race([queryPromise, timeoutPromise]);
             x && a(x);
           } catch(err) {}

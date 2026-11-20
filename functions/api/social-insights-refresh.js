@@ -7,8 +7,8 @@
  *
  * Security:
  *  - The caller must send a valid Supabase access token (Authorization: Bearer <token>).
- *  - The token's e-mail must be in the admin allow-list (defaults below + optional env
- *    SOCIAL_INSIGHTS_ADMIN_EMAILS="a@x.com,b@y.com").
+ *  - The user must be an admin in the DATABASE (profiles.is_admin / is_super_admin), checked
+ *    with the caller's own token. E-mail addresses are not trusted (sign-ups are auto-confirmed).
  *  - The GitHub token never reaches the browser. Set it as a Cloudflare Pages secret:
  *      GITHUB_DISPATCH_TOKEN  (fine-grained PAT, repo access: Mudassir2k6/sellsolar,
  *                              permission "Actions: Read and write")
@@ -21,7 +21,6 @@ const SUPABASE_ANON_KEY =
 
 const REPO = 'Mudassir2k6/sellsolar';
 const WORKFLOW_FILE = 'daily-social-insights-update.yml';
-const DEFAULT_ADMIN_EMAILS = ['mudassir2k6@gmail.com', 'admin@sellsolar.pk'];
 const COUNTRY_RE = /^(ALL|[A-Z]{2})$/;
 
 const json = (body, status = 200) =>
@@ -30,15 +29,30 @@ const json = (body, status = 200) =>
     headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
   });
 
-async function getVerifiedEmail(token) {
+/**
+ * Returns the verified user's e-mail + whether the DATABASE says they are an admin.
+ * (E-mail alone is not trusted: sign-ups are auto-confirmed, so anyone can register any address.)
+ */
+async function getVerifiedAdmin(token) {
   try {
-    const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
-      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${token}` },
-      signal: AbortSignal.timeout(5000),
-    });
+    const headers = { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${token}` };
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, { headers, signal: AbortSignal.timeout(5000) });
     if (!res.ok) return null;
     const user = await res.json();
-    return String(user?.email || '').toLowerCase() || null;
+    const id = String(user?.id || '');
+    if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
+
+    const pRes = await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${id}&select=is_admin,is_super_admin&limit=1`, {
+      headers,
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!pRes.ok) return null;
+    const rows = await pRes.json();
+    const p = Array.isArray(rows) ? rows[0] : null;
+    return {
+      email: String(user?.email || '').toLowerCase(),
+      isAdmin: Boolean(p && (p.is_admin === true || p.is_super_admin === true)),
+    };
   } catch {
     return null;
   }
@@ -51,17 +65,9 @@ export async function onRequest({ request, env }) {
   const token = auth.startsWith('Bearer ') ? auth.slice(7).trim() : '';
   if (!token) return json({ error: 'unauthorized', message: 'Please sign in as admin first.' }, 401);
 
-  const email = await getVerifiedEmail(token);
-  if (!email) return json({ error: 'unauthorized', message: 'Session expired. Sign in again.' }, 401);
-
-  const admins = [
-    ...DEFAULT_ADMIN_EMAILS,
-    ...String(env.SOCIAL_INSIGHTS_ADMIN_EMAILS || '')
-      .split(',')
-      .map((e) => e.trim().toLowerCase())
-      .filter(Boolean),
-  ];
-  if (!admins.includes(email)) return json({ error: 'forbidden', message: 'Admin access required.' }, 403);
+  const who = await getVerifiedAdmin(token);
+  if (!who) return json({ error: 'unauthorized', message: 'Session expired. Sign in again.' }, 401);
+  if (!who.isAdmin) return json({ error: 'forbidden', message: 'Admin access required.' }, 403);
 
   const ghToken = env.GITHUB_DISPATCH_TOKEN;
   if (!ghToken) {

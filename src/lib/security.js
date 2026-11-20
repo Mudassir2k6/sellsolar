@@ -10,6 +10,8 @@
  */
 
 // Memory and Session-based Rate Limiter Storage
+import { isSupabaseConfigured } from './supabase';
+
 const RATE_LIMIT_PREFIX = 'sellsolar_sec_rate_';
 const LOCKOUT_PREFIX = 'sellsolar_sec_lock_';
 
@@ -337,8 +339,25 @@ export function verifyAccountRecoveryCredentials(targetIdentifier, verificationC
     }
   }
 
-  // 6-digit Email OTP Verification check
-  if (cleanVerification.length === 6) {
+  // Admin identities can NEVER be recovered with client-side checks (those can be forged in the browser).
+  // The admin resets the password through the Supabase e-mail recovery link only.
+  const isAdminIdentity =
+    cleanTarget === 'admin@sellsolar.pk' ||
+    cleanTarget === 'admin' ||
+    cleanTarget === 'mudassir2k6@gmail.com' ||
+    cleanTarget === 'mudassir2k6' ||
+    cleanTarget === 'mudassir';
+  if (isAdminIdentity) {
+    return {
+      ok: false,
+      error: 'Admin password can only be reset with the secure link sent to the admin e-mail address.',
+    };
+  }
+
+  // 6-digit Email OTP Verification check.
+  // A locally generated OTP is readable from the visitor's own browser storage, so it proves nothing:
+  // it is only honoured when Supabase is not configured (offline demo mode).
+  if (cleanVerification.length === 6 && !isSupabaseConfigured()) {
     if (typeof window !== 'undefined') {
       try {
         const verifiedRaw = sessionStorage.getItem('sellsolar_otp_verified');
@@ -357,27 +376,6 @@ export function verifyAccountRecoveryCredentials(targetIdentifier, verificationC
         }
       } catch {}
     }
-  }
-
-  // Admin account security verification
-  const isAdminTarget =
-    cleanTarget === 'admin@sellsolar.pk' ||
-    cleanTarget === 'admin' ||
-    cleanTarget === 'mudassir2k6@gmail.com' ||
-    cleanTarget === 'mudassir2k6' ||
-    cleanTarget === 'mudassir';
-
-  if (isAdminTarget) {
-    // Admin verification: must supply registered admin phone '03001234567' or admin master security PIN '7860'
-    const validAdminPhone = '03001234567';
-    const adminMasterKey = '7860';
-    if (digitsVerification === validAdminPhone || cleanVerification === adminMasterKey) {
-      return { ok: true, isVerified: true, record: targetRecord };
-    }
-    return {
-      ok: false,
-      error: 'Security Verification Failed: Incorrect registered admin contact number or recovery PIN.',
-    };
   }
 
   // If user record exists in database, verify against registered phone or CNIC

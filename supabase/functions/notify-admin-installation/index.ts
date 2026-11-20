@@ -21,12 +21,22 @@ Deno.serve(async (req) => {
     const configuredAdminEmail = Deno.env.get("ADMIN_EMAIL") ?? DEFAULT_ADMIN_EMAIL;
 
     const body = await req.json().catch(() => ({}));
-    const fullName = String(body.fullName || body.full_name || "Valued Customer").trim();
-    const city = String(body.city || "Not specified").trim();
-    const address = String(body.address || "Not specified").trim();
-    const contactPhone = String(body.contactPhone || body.contact_phone || "Not specified").trim();
-    const systemSize = String(body.systemSize || body.system_size || "Standard / Complete System").trim();
-    const notes = String(body.notes || "").trim();
+    // All user-supplied text is length-capped and HTML-escaped (blocks HTML/link injection in the email).
+    const clean = (v: unknown, max = 300) =>
+      String(v ?? "")
+        .trim()
+        .slice(0, max)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    const fullName = clean(body.fullName || body.full_name || "Valued Customer", 120);
+    const city = clean(body.city || "Not specified", 80);
+    const address = clean(body.address || "Not specified", 300);
+    const contactPhone = clean(body.contactPhone || body.contact_phone || "Not specified", 30);
+    const systemSize = clean(body.systemSize || body.system_size || "Standard / Complete System", 120);
+    const notes = clean(body.notes || "", 1000);
     const dateStr = new Date().toLocaleString("en-PK", { timeZone: "Asia/Karachi" });
 
     // Collect all admin emails from database if available

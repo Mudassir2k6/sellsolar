@@ -257,6 +257,7 @@ export default function PasswordPage({
       } else {
         // Forgot password flow / Reset password via Email Link
         let updated = false;
+        let cloudPasswordUpdated = false;
 
         // 1. Update password in Supabase Auth directly (valid for recovery session from email link)
         if (isSupabaseConfigured()) {
@@ -264,8 +265,10 @@ export default function PasswordPage({
             const { data: sbData, error: sbUpdateErr } = await supabase.auth.updateUser({ password: newPassword });
             if (!sbUpdateErr && sbData?.user) {
               updated = true;
+              cloudPasswordUpdated = true;
             } else if (!sbUpdateErr) {
               updated = true;
+              cloudPasswordUpdated = true;
             } else {
               console.warn('Supabase updateUser notice:', sbUpdateErr.message);
             }
@@ -286,7 +289,8 @@ export default function PasswordPage({
             ) {
               users[key] = {
                 ...val,
-                password: newPassword,
+                // Never keep a plaintext copy once Supabase Auth holds the new password
+                ...(cloudPasswordUpdated ? {} : { password: newPassword }),
                 updatedAt: new Date().toISOString(),
               };
               updated = true;

@@ -963,7 +963,9 @@ export function AuthProvider({ children }) {
       // Save to local users store (indexed by email AND raw identifier/username)
       const localUsers = getStoredUsers();
       const userRecord = {
-        password: cleanPass,
+        // The real password lives only in Supabase Auth. Never keep a plaintext copy in the browser
+        // when a cloud account was created (offline/demo mode still needs the local copy).
+        password: isSupabaseConfigured() && supabaseUserId ? makeUnusableLocalSecret() : cleanPass,
         user: newUser,
         profile: newProfile,
         emailConfirmed: !needsEmailConfirmation,
@@ -1266,6 +1268,8 @@ export function AuthProvider({ children }) {
             const saveKey = (matchedEmail || authUser.email || authUser.id).toLowerCase();
             localUsers[saveKey] = {
               ...(localUsers[saveKey] || {}),
+              // Cloud login worked: drop any plaintext password kept from older versions.
+              password: makeUnusableLocalSecret(),
               user: authUser,
               profile: {
                 ...(localUsers[saveKey]?.profile || {}),
@@ -1378,6 +1382,23 @@ export function AuthProvider({ children }) {
       const cleanTarget = (targetEmail || user?.email || DEFAULT_ADMIN_EMAIL).trim().toLowerCase();
       const digitsOnly = cleanTarget.replace(/\D/g, '');
 
+      // Admin identities are never changed through browser-side records (those can be forged).
+      // Only a real Supabase session (signed in, or opened from the e-mail recovery link) may change it.
+      const isAdminIdentityTarget =
+        cleanTarget === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
+        cleanTarget === 'mudassir2k6@gmail.com' ||
+        cleanTarget === 'mudassir2k6' ||
+        cleanTarget === 'admin';
+      if (isAdminIdentityTarget && isSupabaseConfigured()) {
+        const { data: adminSess } = await supabase.auth.getSession();
+        if (!adminSess?.session?.user) {
+          throw new Error('Admin password can only be changed while signed in or from the secure e-mail recovery link.');
+        }
+        const { error: adminPwErr } = await supabase.auth.updateUser({ password: newPassword });
+        if (adminPwErr) throw new Error(adminPwErr.message || 'Could not update the admin password.');
+        return { success: true };
+      }
+
       // Security check: If unauthenticated, enforce rate limiting on password reset
       if (!user) {
         const rateCheck = checkRateLimit('password_reset', cleanTarget || 'global');
@@ -1469,7 +1490,19 @@ export function AuthProvider({ children }) {
       // Update Supabase if session active
       if (isSupabaseConfigured()) {
         try {
-          await supabase.auth.updateUser({ password: newPassword });
+          const { error: cloudPwErr } = await supabase.auth.updateUser({ password: newPassword });
+          if (!cloudPwErr) {
+            // The cloud account now holds the password: remove the plaintext copy saved above.
+            const fresh = getStoredUsers();
+            let changed = false;
+            for (const rec of Object.values(fresh)) {
+              if (rec && rec.password === newPassword) {
+                rec.password = makeUnusableLocalSecret();
+                changed = true;
+              }
+            }
+            if (changed) saveStoredUsers(fresh);
+          }
         } catch {
           // Ignored if local session
         }
@@ -1970,12 +2003,10 @@ export function AuthProvider({ children }) {
     // 2. If Supabase is configured, check database profiles table
     if (!userExists && isSupabaseConfigured()) {
       try {
-        const { data } = await supabase
-          .from('profiles')
-          .select('id, email')
-          .eq('email', cleanMail)
-          .maybeSingle();
-        if (data && data.id) {
+        // Profiles are not publicly readable: use the secure RPC.
+        const { data: existsData } = await supabase.rpc('contact_already_exists', { p_email: cleanMail, p_phone: '' });
+        const existsRow = Array.isArray(existsData) ? existsData[0] : existsData;
+        if (existsRow?.email_exists) {
           userExists = true;
         }
       } catch (sbErr) {
@@ -2086,8 +2117,10 @@ export function AuthProvider({ children }) {
     }
 
     // 4. Check local session/localStorage OTP (for offline or local accounts)
+    // (Only in offline/demo mode: a locally generated OTP lives in the visitor's own browser storage,
+    //  so with Supabase configured only the server-verified OTP above counts.)
     let storedData = null;
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && !isSupabaseConfigured()) {
       try {
         const raw = sessionStorage.getItem('sellsolar_reset_otp') || localStorage.getItem(`sellsolar_otp_${cleanMail}`);
         if (raw) storedData = JSON.parse(raw);

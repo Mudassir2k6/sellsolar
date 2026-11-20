@@ -52,8 +52,8 @@ export default function AdvertiseHereForm({ isOpen, onClose }) {
     try {
       const compressed = await compressImageFile(file, { maxEdge: 900, quality: 0.7 });
       const dataUrl = await fileToDataUrl(compressed);
-      // Keep localStorage safe — reject very large payloads
-      if (typeof dataUrl === 'string' && dataUrl.length > 900_000) {
+      // Banner is stored in the database and served to every visitor — keep it small
+      if (typeof dataUrl === 'string' && dataUrl.length > 400_000) {
         setError('Image is still too large after compression. Try a smaller photo.');
         return;
       }
@@ -91,7 +91,7 @@ export default function AdvertiseHereForm({ isOpen, onClose }) {
     }
     setSaving(true);
     try {
-      addPartnerAdSubmission({
+      await addPartnerAdSubmission({
         title: cleanTitle,
         subtitle: subtitle.trim(),
         advertiser: advertiser.trim() || cleanTitle,

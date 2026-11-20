@@ -4,6 +4,7 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Content-Security-Policy: object-src 'none'; base-uri 'self'; frame-ancestors 'none'
   Cache-Control: public, max-age=0, must-revalidate
   CDN-Cache-Control: no-cache, no-store, must-revalidate
   Cloudflare-CDN-Cache-Control: no-cache, no-store, must-revalidate

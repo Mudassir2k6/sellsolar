@@ -6,7 +6,7 @@ import { DEFAULT_ADVERTISEMENT_SETTINGS } from '../lib/advertisementDefaults';
 import HomeAdvertisementBoard from './HomeAdvertisementBoard';
 import {
   deletePartnerAdSubmission,
-  getPartnerAdSubmissions,
+  fetchAdminPartnerAds,
   PARTNER_AD_EVENT,
   setPartnerAdStatus,
 } from '../lib/partnerAdSubmissions';
@@ -32,8 +32,21 @@ function FieldGrid({ fields, onField }) {
 export default function AdminAdvertisementSettings({ value, onChange }) {
   const ad = { ...DEFAULT_ADVERTISEMENT_SETTINGS, ...(value || {}) };
   const [submissions, setSubmissions] = useState([]);
+  const [subsError, setSubsError] = useState('');
+  const [subsLoading, setSubsLoading] = useState(false);
 
-  const refreshSubs = () => setSubmissions(getPartnerAdSubmissions());
+  const refreshSubs = async () => {
+    setSubsLoading(true);
+    const { items, error } = await fetchAdminPartnerAds();
+    setSubmissions(items);
+    setSubsError(error);
+    setSubsLoading(false);
+  };
+  const runAction = async (action) => {
+    const err = await action();
+    if (err) setSubsError(err);
+    else await refreshSubs();
+  };
   useEffect(() => {
     refreshSubs();
     const onUpd = () => refreshSubs();
@@ -290,9 +303,15 @@ export default function AdminAdvertisementSettings({ value, onChange }) {
             onClick={refreshSubs}
             className="rounded-lg bg-gray-100 px-2 py-1 text-[10px] font-bold dark:bg-gray-800"
           >
-            Refresh
+            {subsLoading ? 'Loading…' : 'Refresh'}
           </button>
         </div>
+
+        {subsError ? (
+          <p className="rounded-lg bg-rose-50 px-3 py-2 text-[11px] font-semibold text-rose-700 dark:bg-rose-950/40 dark:text-rose-300">
+            {subsError}
+          </p>
+        ) : null}
 
         {submissions.length === 0 ? (
           <p className="rounded-xl border border-dashed border-gray-200 px-3 py-6 text-center text-xs text-gray-400 dark:border-gray-700">
@@ -336,10 +355,7 @@ export default function AdminAdvertisementSettings({ value, onChange }) {
                     <button
                       type="button"
                       title="Show on homepage"
-                      onClick={() => {
-                        setPartnerAdStatus(item.id, 'approved');
-                        refreshSubs();
-                      }}
+                      onClick={() => runAction(() => setPartnerAdStatus(item.id, 'approved'))}
                       className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-2 py-1.5 text-[10px] font-bold text-white hover:bg-emerald-700"
                     >
                       <CheckCircle2 className="h-3 w-3" /> Approve / Show
@@ -349,10 +365,7 @@ export default function AdminAdvertisementSettings({ value, onChange }) {
                     <button
                       type="button"
                       title="Hide from homepage"
-                      onClick={() => {
-                        setPartnerAdStatus(item.id, 'hidden');
-                        refreshSubs();
-                      }}
+                      onClick={() => runAction(() => setPartnerAdStatus(item.id, 'hidden'))}
                       className="inline-flex items-center gap-1 rounded-lg bg-amber-600 px-2 py-1.5 text-[10px] font-bold text-white hover:bg-amber-700"
                     >
                       <EyeOff className="h-3 w-3" /> Hide from display
@@ -361,10 +374,7 @@ export default function AdminAdvertisementSettings({ value, onChange }) {
                   {item.status === 'hidden' && (
                     <button
                       type="button"
-                      onClick={() => {
-                        setPartnerAdStatus(item.id, 'approved');
-                        refreshSubs();
-                      }}
+                      onClick={() => runAction(() => setPartnerAdStatus(item.id, 'approved'))}
                       className="inline-flex items-center gap-1 rounded-lg bg-sky-600 px-2 py-1.5 text-[10px] font-bold text-white hover:bg-sky-700"
                     >
                       <Eye className="h-3 w-3" /> Show again
@@ -374,8 +384,7 @@ export default function AdminAdvertisementSettings({ value, onChange }) {
                     type="button"
                     onClick={() => {
                       if (window.confirm('Delete this submission permanently?')) {
-                        deletePartnerAdSubmission(item.id);
-                        refreshSubs();
+                        runAction(() => deletePartnerAdSubmission(item.id));
                       }
                     }}
                     className="rounded-lg p-1.5 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40"

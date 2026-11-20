@@ -7,6 +7,7 @@ import { normalizeAdvertisementSettings } from '../lib/advertisementDefaults';
 import {
   createAdvertiseHerePlaceholders,
   getApprovedPartnerAdsForMarquee,
+  syncApprovedPartnerAds,
   PARTNER_AD_EVENT,
 } from '../lib/partnerAdSubmissions';
 import AdvertiseHereForm from './AdvertiseHereForm';
@@ -113,6 +114,7 @@ export default function HomeAdvertisementBoard({ onNavigate, configOverride }) {
 
   useEffect(() => {
     refreshApproved();
+    syncApprovedPartnerAds();
     const onUpdate = () => refreshApproved();
     window.addEventListener(PARTNER_AD_EVENT, onUpdate);
     window.addEventListener('storage', onUpdate);

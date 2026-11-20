@@ -207,16 +207,9 @@ async function contactAlreadyExists({ username, email, phone, cnic }) {
       }
 
       if (cleanCnic) {
-        const { data: cnicRow } = await supabase
-          .from('profiles')
-          .select('id, email')
-          .eq('cnic', cleanCnic)
-          .maybeSingle();
-        if (
-          cnicRow?.id &&
-          cnicRow.id !== DEFAULT_ADMIN_ID &&
-          cnicRow.email?.toLowerCase() !== DEFAULT_ADMIN_EMAIL.toLowerCase()
-        ) {
+        // Profiles are not publicly readable: use the secure duplicate-check RPC.
+        const { data: cnicTaken } = await supabase.rpc('cnic_already_exists', { p_cnic: cleanCnic });
+        if (cnicTaken === true) {
           return {
             field: 'cnic',
             message: 'This CNIC is already registered with another account.',
@@ -783,14 +776,18 @@ export default function AuthPage({ onSuccess, onBack, onForgotPassword, initialV
     setBusy(true);
     try {
       if (isSupabaseConfigured()) {
-        const { data: profData } = await supabase
-          .from('profiles')
-          .select('id, email')
-          .eq('email', cleanMail)
-          .maybeSingle();
+        // Profiles are not publicly readable any more: ask the secure RPC whether the e-mail is registered.
+        let emailRegistered = false;
+        try {
+          const { data: existsData } = await supabase.rpc('contact_already_exists', { p_email: cleanMail, p_phone: '' });
+          const existsRow = Array.isArray(existsData) ? existsData[0] : existsData;
+          emailRegistered = Boolean(existsRow?.email_exists);
+        } catch {
+          emailRegistered = true; // lookup failed: let Supabase Auth decide instead of blocking the user
+        }
 
         const isDefaultAdmin = cleanMail === 'mudassir2k6@gmail.com' || cleanMail === DEFAULT_ADMIN_EMAIL.toLowerCase();
-        if (!profData?.id && !isDefaultAdmin) {
+        if (!emailRegistered && !isDefaultAdmin) {
           setError('Email address does not exist. Please check your email or sign up first.');
           setBusy(false);
           return;

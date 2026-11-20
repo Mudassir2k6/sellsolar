@@ -62,6 +62,16 @@ export default function AdvertiseHereForm({ isOpen, onClose }) {
     return e && !/@sellsolar\.local$/i.test(e) ? e : '';
   })();
 
+  // Contact details that come from the signed-in account are locked (shown, not editable).
+  const accountName = String(
+    profile?.full_name || user?.user_metadata?.full_name || user?.user_metadata?.name || ''
+  ).trim();
+  const accountPhone = String(
+    profile?.phone || user?.user_metadata?.phone || (user ? readLocalPhone(user, profile) : '') || ''
+  ).trim();
+  const lockedField =
+    'cursor-not-allowed bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300 focus:ring-0 focus:border-gray-200';
+
   // Remember that the user wanted to advertise (survives a Google redirect); clear it once signed in.
   useEffect(() => {
     if (!isOpen) return;
@@ -76,15 +86,29 @@ export default function AdvertiseHereForm({ isOpen, onClose }) {
   // Auto-fetch name / email / mobile from the signed-in account (never overwrite what the user typed).
   useEffect(() => {
     if (!isOpen || !user) return;
-    const name =
-      profile?.full_name || user.user_metadata?.full_name || user.user_metadata?.name || '';
-    const phone = profile?.phone || user.user_metadata?.phone || readLocalPhone(user, profile) || '';
-    setContactName((cur) => cur || name);
-    setContactEmail((cur) => cur || accountEmail);
-    setContactPhone((cur) => cur || phone);
-  }, [isOpen, user, profile, accountEmail]);
+    // Account values always win for locked fields; a field with no account value stays typeable.
+    setContactName((cur) => accountName || cur);
+    setContactEmail((cur) => accountEmail || cur);
+    setContactPhone((cur) => accountPhone || cur);
+  }, [isOpen, user, accountName, accountEmail, accountPhone]);
+
+  // Clear everything (image, text, errors) so the next open always starts with a blank form.
+  const reset = () => {
+    setTitle('');
+    setSubtitle('');
+    setAdvertiser('');
+    setLinkUrl('');
+    setContactName('');
+    setContactPhone('');
+    setContactEmail('');
+    setImagePreview('');
+    setImageDataUrl('');
+    setError('');
+    setSaving(false);
+  };
 
   const closeAndForget = () => {
+    reset();
     try {
       sessionStorage.removeItem(PENDING_ADVERTISE_KEY);
     } catch {
@@ -151,19 +175,6 @@ export default function AdvertiseHereForm({ isOpen, onClose }) {
     }
   };
 
-  const reset = () => {
-    setTitle('');
-    setSubtitle('');
-    setAdvertiser('');
-    setLinkUrl('');
-    setContactName('');
-    setContactPhone('');
-    setContactEmail('');
-    setImagePreview('');
-    setImageDataUrl('');
-    setError('');
-  };
-
   const onSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -208,7 +219,6 @@ export default function AdvertiseHereForm({ isOpen, onClose }) {
       } catch {
         /* profile sync is best-effort */
       }
-      reset();
       closeAndForget();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not submit ad.');
@@ -312,7 +322,11 @@ export default function AdvertiseHereForm({ isOpen, onClose }) {
                 type="file"
                 accept="image/*"
                 className="hidden"
-                onChange={(e) => onPickImage(e.target.files?.[0])}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  e.target.value = ''; // allow picking the same file again after a reset
+                  onPickImage(file);
+                }}
               />
             </label>
           </div>
@@ -322,8 +336,11 @@ export default function AdvertiseHereForm({ isOpen, onClose }) {
               Your name
               <input
                 value={contactName}
+                readOnly={Boolean(accountName)}
+                aria-readonly={Boolean(accountName)}
+                title={accountName ? 'Taken from your account' : undefined}
                 onChange={(e) => setContactName(e.target.value)}
-                className="input-field mt-1 text-sm font-normal"
+                className={`input-field mt-1 text-sm font-normal ${accountName ? lockedField : ''}`}
               />
             </label>
             <label className="block text-xs font-bold text-gray-700 dark:text-gray-300">
@@ -332,9 +349,12 @@ export default function AdvertiseHereForm({ isOpen, onClose }) {
                 required
                 type="tel"
                 value={contactPhone}
+                readOnly={Boolean(accountPhone)}
+                aria-readonly={Boolean(accountPhone)}
+                title={accountPhone ? 'Taken from your account' : undefined}
                 onChange={(e) => setContactPhone(e.target.value)}
                 placeholder="03001234567"
-                className="input-field mt-1 text-sm font-normal"
+                className={`input-field mt-1 text-sm font-normal ${accountPhone ? lockedField : ''}`}
               />
             </label>
             <label className="block text-xs font-bold text-gray-700 dark:text-gray-300">
@@ -343,8 +363,10 @@ export default function AdvertiseHereForm({ isOpen, onClose }) {
                 type="email"
                 value={contactEmail}
                 readOnly={Boolean(accountEmail)}
+                aria-readonly={Boolean(accountEmail)}
+                title={accountEmail ? 'Taken from your account' : undefined}
                 onChange={(e) => setContactEmail(e.target.value)}
-                className="input-field mt-1 text-sm font-normal"
+                className={`input-field mt-1 text-sm font-normal ${accountEmail ? lockedField : ''}`}
               />
             </label>
           </div>

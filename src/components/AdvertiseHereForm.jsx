@@ -2,10 +2,26 @@
 
 import { useEffect, useState } from 'react';
 import { ImagePlus, Loader2, Megaphone, X } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import AuthPage from '../views/AuthPage';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { compressImageFile } from '../lib/images';
 import { addPartnerAdSubmission } from '../lib/partnerAdSubmissions';
 import { useToast } from '../context/ToastContext';
 import { isValidPhone, normalizePhone } from '../lib/auth';
+
+/** Set while the sign-in gate is open so the form can re-open after an OAuth (Google) redirect. */
+export const PENDING_ADVERTISE_KEY = 'sellsolar_pending_advertise';
+
+function readLocalPhone(user, profile) {
+  try {
+    const map = JSON.parse(localStorage.getItem('sellsolar_user_phones') || '{}');
+    const email = (user?.email || profile?.email || '').toLowerCase();
+    return (user?.id && map[user.id]) || (email && map[email]) || '';
+  } catch {
+    return '';
+  }
+}
 
 async function fileToDataUrl(file) {
   return new Promise((resolve, reject) => {
@@ -18,6 +34,7 @@ async function fileToDataUrl(file) {
 
 export default function AdvertiseHereForm({ isOpen, onClose }) {
   const toastCtx = useToast();
+  const { user, profile, loading: authLoading, refreshProfile } = useAuth();
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
   const [advertiser, setAdvertiser] = useState('');
@@ -40,7 +57,77 @@ export default function AdvertiseHereForm({ isOpen, onClose }) {
     };
   }, [isOpen]);
 
+  const accountEmail = (() => {
+    const e = String(user?.email || profile?.email || '').trim();
+    return e && !/@sellsolar\.local$/i.test(e) ? e : '';
+  })();
+
+  // Remember that the user wanted to advertise (survives a Google redirect); clear it once signed in.
+  useEffect(() => {
+    if (!isOpen) return;
+    try {
+      if (!user && !authLoading) sessionStorage.setItem(PENDING_ADVERTISE_KEY, '1');
+      if (user) sessionStorage.removeItem(PENDING_ADVERTISE_KEY);
+    } catch {
+      /* private mode */
+    }
+  }, [isOpen, user, authLoading]);
+
+  // Auto-fetch name / email / mobile from the signed-in account (never overwrite what the user typed).
+  useEffect(() => {
+    if (!isOpen || !user) return;
+    const name =
+      profile?.full_name || user.user_metadata?.full_name || user.user_metadata?.name || '';
+    const phone = profile?.phone || user.user_metadata?.phone || readLocalPhone(user, profile) || '';
+    setContactName((cur) => cur || name);
+    setContactEmail((cur) => cur || accountEmail);
+    setContactPhone((cur) => cur || phone);
+  }, [isOpen, user, profile, accountEmail]);
+
+  const closeAndForget = () => {
+    try {
+      sessionStorage.removeItem(PENDING_ADVERTISE_KEY);
+    } catch {
+      /* ignore */
+    }
+    onClose?.();
+  };
+
   if (!isOpen) return null;
+
+  // Not signed in yet: show sign in / create account first, then land straight on this form.
+  if (authLoading && !user) {
+    return (
+      <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+        <Loader2 className="h-8 w-8 animate-spin text-white" />
+      </div>
+    );
+  }
+  if (!user) {
+    return (
+      <div
+        className="fixed inset-0 z-[80] overflow-y-auto bg-white dark:bg-gray-950"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Sign in to advertise"
+      >
+        <div className="sticky top-0 z-10 flex items-center justify-center gap-2 border-b border-amber-200 bg-amber-50 px-4 py-2 text-center text-xs font-bold text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/80 dark:text-amber-200">
+          <Megaphone className="h-4 w-4 shrink-0" />
+          Sign in or create a free account to submit your banner. You will come straight back to the form.
+        </div>
+        <AuthPage
+          initialView="login"
+          hasOuterNavbar={false}
+          onBack={closeAndForget}
+          onSuccess={() => {}}
+          onForgotPassword={() => {
+            closeAndForget();
+            window.location.assign('/forgot-password');
+          }}
+        />
+      </div>
+    );
+  }
 
   const onPickImage = async (file) => {
     setError('');
@@ -85,8 +172,8 @@ export default function AdvertiseHereForm({ isOpen, onClose }) {
       setError('Headline is required.');
       return;
     }
-    if (contactPhone && !isValidPhone(normalizePhone(contactPhone))) {
-      setError('Phone must be 11 digits (e.g. 03001234567) or leave blank.');
+    if (!isValidPhone(normalizePhone(contactPhone))) {
+      setError('Mobile / WhatsApp number is required: 11 digits (e.g. 03001234567).');
       return;
     }
     setSaving(true);
@@ -108,8 +195,21 @@ export default function AdvertiseHereForm({ isOpen, onClose }) {
           type: 'success',
         });
       }
+      // Keep the account profile in sync (Google sign-ups have no number until now).
+      try {
+        const cleanPhone = normalizePhone(contactPhone);
+        if (user?.id && cleanPhone && cleanPhone !== (profile?.phone || '') && isSupabaseConfigured() && supabase) {
+          await supabase.from('profiles').update({ phone: cleanPhone }).eq('id', user.id).then(
+            () => {},
+            () => {}
+          );
+          if (typeof refreshProfile === 'function') await refreshProfile();
+        }
+      } catch {
+        /* profile sync is best-effort */
+      }
       reset();
-      onClose?.();
+      closeAndForget();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not submit ad.');
     } finally {
@@ -123,7 +223,7 @@ export default function AdvertiseHereForm({ isOpen, onClose }) {
       role="dialog"
       aria-modal="true"
       aria-label="Advertise here"
-      onClick={onClose}
+      onClick={closeAndForget}
     >
       <div
         className="card max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-gray-100 bg-white p-5 shadow-2xl dark:border-gray-800 dark:bg-gray-900 sm:p-6"
@@ -143,7 +243,7 @@ export default function AdvertiseHereForm({ isOpen, onClose }) {
           </div>
           <button
             type="button"
-            onClick={onClose}
+            onClick={closeAndForget}
             className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
             aria-label="Close"
           >
@@ -227,8 +327,9 @@ export default function AdvertiseHereForm({ isOpen, onClose }) {
               />
             </label>
             <label className="block text-xs font-bold text-gray-700 dark:text-gray-300">
-              WhatsApp
+              Mobile / WhatsApp *
               <input
+                required
                 type="tel"
                 value={contactPhone}
                 onChange={(e) => setContactPhone(e.target.value)}
@@ -241,6 +342,7 @@ export default function AdvertiseHereForm({ isOpen, onClose }) {
               <input
                 type="email"
                 value={contactEmail}
+                readOnly={Boolean(accountEmail)}
                 onChange={(e) => setContactEmail(e.target.value)}
                 className="input-field mt-1 text-sm font-normal"
               />

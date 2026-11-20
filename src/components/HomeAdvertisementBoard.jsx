@@ -10,7 +10,8 @@ import {
   syncApprovedPartnerAds,
   PARTNER_AD_EVENT,
 } from '../lib/partnerAdSubmissions';
-import AdvertiseHereForm from './AdvertiseHereForm';
+import AdvertiseHereForm, { PENDING_ADVERTISE_KEY } from './AdvertiseHereForm';
+import { useAuth } from '../context/AuthContext';
 
 function resolveHref(linkUrl, onNavigate) {
   if (!linkUrl) return null;
@@ -107,6 +108,20 @@ export default function HomeAdvertisementBoard({ onNavigate, configOverride }) {
   const adCfg = normalizeAdvertisementSettings(configOverride || settings?.advertisementSettings);
   const [formOpen, setFormOpen] = useState(false);
   const [approvedAds, setApprovedAds] = useState([]);
+  const { user, loading: authLoading } = useAuth();
+
+  // Came back from a Google sign-in started on "Submit your banner": open the form straight away.
+  useEffect(() => {
+    if (configOverride || authLoading || !user) return;
+    try {
+      if (sessionStorage.getItem(PENDING_ADVERTISE_KEY) === '1') {
+        sessionStorage.removeItem(PENDING_ADVERTISE_KEY);
+        setFormOpen(true);
+      }
+    } catch {
+      /* private mode */
+    }
+  }, [configOverride, authLoading, user]);
 
   const refreshApproved = () => {
     setApprovedAds(getApprovedPartnerAdsForMarquee());

@@ -3361,9 +3361,8 @@ function yx({
         if (typeof isSupabaseConfigured === 'function' && isSupabaseConfigured()) {
           const profileUpdatePayload = {};
           if (enteredPhone) {
+            // Only real `profiles` columns: unknown ones make the whole update fail.
             profileUpdatePayload.phone = enteredPhone;
-            profileUpdatePayload.mobile = enteredPhone;
-            profileUpdatePayload.contact_phone = enteredPhone;
           }
           if (enteredCity) {
             profileUpdatePayload.city = enteredCity;
@@ -5510,7 +5509,19 @@ function yx({
       title:_.title,brand:_.brand,category:_.category,condition:_.condition,price:parseFloat(_.price),city:_.city,capacity_kw:_.capacity_kw?parseFloat(_.capacity_kw):null,warranty_years:_.warranty_years !== null && _.warranty_years !== "" && !isNaN(Number(_.warranty_years)) ? parseFloat(Number(_.warranty_years).toFixed(4)) : null,image_url:_.image_url||null,description:_.description||null,seller_name:_.seller_name||r.full_name,seller_phone:_.seller_phone||r.phone,seller_email:(e?.email||r?.email||'').toLowerCase().trim()||null,user_id:isValidUuid(submitUserId)?submitUserId:null,status:D,featured:!1,sponsored:!1,is_sold:!1,views:0
     };
     try {
-      await supabase.from("solar_listings").insert(newProductData);
+      const { error: insErr } = await supabase.from("solar_listings").insert(newProductData);
+      if (insErr) {
+        m(insErr.message || "Could not save the ad. Please try again.");
+        k(null);
+        return;
+      }
+    } catch(err) {}
+    // Keep the profile in sync with the number used on the ad (Google users have none otherwise).
+    try {
+      const adPhone = String(newProductData.seller_phone || '').replace(/\D/g, '');
+      if (adPhone && isValidUuid(submitUserId)) {
+        await supabase.from("profiles").update({ phone: adPhone }).eq("id", submitUserId).then(() => {}, () => {});
+      }
     } catch(err) {}
     try {
       const raw = localStorage.getItem("sellsolar_custom_listings");
@@ -6332,8 +6343,8 @@ function yx({
     if (r.user_id && pMap[r.user_id]) resolvedPhone = pMap[r.user_id];
     else if (r.seller_email && pMap[r.seller_email]) resolvedPhone = pMap[r.seller_email];
     else if (s?.email && pMap[s.email]) resolvedPhone = pMap[s.email];
-    else if (r.seller_name && pMap[r.seller_name]) resolvedPhone = pMap[r.seller_name];
-    else if (canEditPhone) {
+    // Never borrow the viewer's number (e.g. an admin opening someone else's ad) and never match by display name.
+    else if (isOwner) {
       resolvedPhone = (currentProfile == null ? void 0 : currentProfile.phone) || (currentUser == null ? void 0 : currentUser.user_metadata?.phone) || (currentUser?.email && pMap[currentUser.email]) || null;
     }
   }
@@ -6343,7 +6354,7 @@ function yx({
   const supportWaUrl = (extra) => buildWhatsAppUrl(siteSettings, extra);
 
   useEffect(() => {
-    if (r && !r.seller_phone && resolvedPhone) {
+    if (r && !r.seller_phone && resolvedPhone && isOwner) {
       n(prev => prev ? ({ ...prev, seller_phone: resolvedPhone }) : prev);
       try {
         const raw = localStorage.getItem("sellsolar_custom_listings");
@@ -6730,6 +6741,22 @@ function yx({
                     !hasSellerPhone?jsxs("div",{
                       className:"rounded-xl border border-amber-200 dark:border-amber-800/80 bg-amber-50 dark:bg-amber-950/40 p-3 text-xs font-medium text-amber-800 dark:text-amber-200 space-y-2",children:[jsx("p",{
                         children:"The seller has not added a phone number to this ad yet. Use the online message, or WhatsApp SellSolar and we will connect you."
+                      }),(r.seller_email||'').trim()&&jsxs("div",{
+                        className:"flex items-center justify-between gap-2 rounded-lg bg-white/70 dark:bg-gray-900/40 border border-amber-200 dark:border-amber-800/70 px-3 py-2",children:[jsxs("a",{
+                          href:`mailto:${(r.seller_email||'').trim()}?subject=${encodeURIComponent('Inquiry: '+(r.title||'SellSolar ad'))}`,
+                          onClick:()=>{ if(r && r.id) recordProductInquiry(r.id, 'email'); },
+                          className:"flex min-w-0 items-center gap-1.5 font-bold text-amber-900 dark:text-amber-100 hover:underline",children:[jsx(Mail,{className:"h-4 w-4 shrink-0"}),jsx("span",{className:"truncate",children:(r.seller_email||'').trim()})]
+                        }),jsx("button",{
+                          type:"button",title:"Copy email",
+                          onClick:()=>{
+                            const em=(r.seller_email||'').trim();
+                            if(typeof navigator!=='undefined'&&navigator.clipboard){
+                              navigator.clipboard.writeText(em);
+                              if(toastCtx&&toastCtx.showToast) toastCtx.showToast({title:"Email Copied",message:`${em} copied to clipboard`,type:"success"});
+                            }
+                          },
+                          className:"shrink-0 rounded-lg p-1.5 hover:bg-amber-100 dark:hover:bg-amber-900/60 cursor-pointer",children:jsx(Copy,{className:"h-4 w-4"})
+                        })]
                       }),canEditPhone&&jsx("button",{
                         type:"button",onClick:()=>{setPhoneInputVal("");setPhoneInputError("");setEditPhoneModalOpen(!0);},className:"inline-flex items-center gap-1.5 rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-700 cursor-pointer",children:"Add phone number to this ad"
                       })]

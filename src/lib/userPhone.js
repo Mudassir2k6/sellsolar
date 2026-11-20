@@ -80,7 +80,8 @@ export async function persistUserPhoneAndAttachToAds({
 
   // 4) Supabase profiles + listings
   if (isSupabaseConfigured() && supabase) {
-    const profilePayload = { phone: clean, mobile: clean, contact_phone: clean };
+    // Only real columns: sending unknown columns makes PostgREST reject the whole update.
+    const profilePayload = { phone: clean };
     try {
       if (userId && isValidUuid(userId)) {
         await supabase.from('profiles').update(profilePayload).eq('id', userId);

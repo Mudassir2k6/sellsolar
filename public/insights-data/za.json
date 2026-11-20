@@ -2,10 +2,10 @@
   "version": 2,
   "countryCode": "ZA",
   "location": "South Africa",
-  "lastUpdated": "2026-11-19T06:39:47+05:00",
-  "lastUpdatedLabel": "19 Nov 2026, 6:39 am PKT",
+  "lastUpdated": "2026-11-20T06:37:29+05:00",
+  "lastUpdatedLabel": "20 Nov 2026, 6:37 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarsouthafrica, solarpanel, solartechnology",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarsouthafrica, solarpanel, solartechnology, solarinputs",
   "trendingNews": [
     {
       "id": "tn-1",
@@ -20,17 +20,6 @@
     },
     {
       "id": "tn-2",
-      "title": "Fresh global funding continues to accelerate the shift to solar energy",
-      "summary": "Trending solar coverage from Novus Press Bulletin — use this South Africa topic for your own posts and SEO content.",
-      "source": "Novus Press Bulletin",
-      "url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxQakRzWW9USE9ZekpJZkJDaldheWk1MElnd0hrV1JaVmhQbXlteW9HUjdoZ0k1eGNYM2tiUVllU1VZYmliSzVjUV9sQTRDUUVEOTZaQ0ZqN2NoQ1lVUnRCck5Cay04UzM3YnptckI2b0xCR3o1NW0xbzJZYXRuNGdQZGFSWWJFTUplSTYyRFktM3VJUFpabVRjOVF1LVo1d3dNUUs3S3pCa3FabHQy?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarSouthAfrica"
-      ]
-    },
-    {
-      "id": "tn-3",
       "title": "The 339-year-old town known for wine and the longest main street in South Africa now hosts one of the country’s only solar panel manufacturers",
       "summary": "Trending solar coverage from MyBroadband — use this South Africa topic for your own posts and SEO content.",
       "source": "MyBroadband",
@@ -39,6 +28,17 @@
         "#solarpanel",
         "#solarSouthAfrica",
         "#solarenergy"
+      ]
+    },
+    {
+      "id": "tn-3",
+      "title": "Fresh global funding continues to accelerate the shift to solar energy",
+      "summary": "Trending solar coverage from Novus Press Bulletin — use this South Africa topic for your own posts and SEO content.",
+      "source": "Novus Press Bulletin",
+      "url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxQakRzWW9USE9ZekpJZkJDaldheWk1MElnd0hrV1JaVmhQbXlteW9HUjdoZ0k1eGNYM2tiUVllU1VZYmliSzVjUV9sQTRDUUVEOTZaQ0ZqN2NoQ1lVUnRCck5Cay04UzM3YnptckI2b0xCR3o1NW0xbzJZYXRuNGdQZGFSWWJFTUplSTYyRFktM3VJUFpabVRjOVF1LVo1d3dNUUs3S3pCa3FabHQy?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarSouthAfrica"
       ]
     },
     {
@@ -67,14 +67,13 @@
     },
     {
       "id": "tn-6",
-      "title": "Ecoprogetti breathes new life into solar panel factory in South Africa",
-      "summary": "Trending solar coverage from Green Building Africa — use this South Africa topic for your own posts and SEO content.",
-      "source": "Green Building Africa",
-      "url": "https://news.google.com/rss/articles/CBMirgFBVV95cUxPRzhrZUIwa2d0V25SR19jQXFoU1NLR0RXdWZUX216OFhEdW94N3hzZmdvNkdVeTVLZEZqZmpPUTluQV82TkpVWWxPSTdmeXVMeUc5eFQtenJwS3I3VzAyRkE1WlFNMGh1aEJkRnFUWjdfWUVFQW9EQWw2VnBQZlM0aE9JVTZicTZyQzdjbmlPYWV3dVlaQ05UNURITzJqNWFkRVYxaFNidHd5UEk2Mnc?oc=5",
+      "title": "R360m Springs Fresh Produce Market solar energy project takes off",
+      "summary": "Trending solar coverage from Bizcommunity — use this South Africa topic for your own posts and SEO content.",
+      "source": "Bizcommunity",
+      "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxQWFVpZkJMS09iMHduV3p0cFNtTzJqVkZLYzBVWjNkel81T2J1YjFNbEYtR1FsdXU5aEFoSVVJUWNfRjdWN2NXdXFoQlZkcjRRV0hpZzVXME1lbUZjQ2E2RFRLV2VQb3NyQ080dTRiVVVVSWdnM3dfa0VZWW5IVkZia2w4RVl4WjlDS0RSalEtc3dBMnpLRTZUUE03QllxWm9IN3FZbl9iSHBldm52ZXZZ?oc=5",
       "tags": [
-        "#solarpanel",
-        "#solarSouthAfrica",
-        "#solarenergy"
+        "#solarenergy",
+        "#solarSouthAfrica"
       ]
     }
   ],
@@ -144,7 +143,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "1M+"
+          "posts": "993K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -174,7 +173,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "185K+"
+          "posts": "180K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -184,7 +183,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "44K+"
+          "posts": "45K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -194,7 +193,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "122K+"
+          "posts": "123K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -204,7 +203,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "505K+"
+          "posts": "504K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -214,7 +213,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "95K+"
+          "posts": "94K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarsouthafrica/"
@@ -238,6 +237,16 @@
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solartechnology/"
+    },
+    {
+      "tag": "#solarinputs",
+      "platforms": [
+        {
+          "name": "Instagram",
+          "posts": "26K+"
+        }
+      ],
+      "searchUrl": "https://www.instagram.com/explore/tags/solarinputs/"
     }
   ],
   "contentIdeas": [

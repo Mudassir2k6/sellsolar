@@ -2,8 +2,8 @@
   "version": 2,
   "countryCode": "MY",
   "location": "Malaysia",
-  "lastUpdated": "2026-11-19T06:39:47+05:00",
-  "lastUpdatedLabel": "19 Nov 2026, 6:39 am PKT",
+  "lastUpdated": "2026-11-20T06:37:29+05:00",
+  "lastUpdatedLabel": "20 Nov 2026, 6:37 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
   "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarmalaysia, solarpanel, solarsystem",
   "trendingNews": [
@@ -141,7 +141,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "1M+"
+          "posts": "993K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -171,7 +171,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "185K+"
+          "posts": "180K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -181,7 +181,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "44K+"
+          "posts": "45K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -191,7 +191,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "122K+"
+          "posts": "123K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -201,7 +201,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "505K+"
+          "posts": "504K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -211,7 +211,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "95K+"
+          "posts": "94K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarmalaysia/"

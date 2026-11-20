@@ -2,13 +2,59 @@
   "version": 2,
   "countryCode": "IN",
   "location": "India",
-  "lastUpdated": "2026-11-19T06:39:47+05:00",
-  "lastUpdatedLabel": "19 Nov 2026, 6:39 am PKT",
+  "lastUpdated": "2026-11-20T06:37:29+05:00",
+  "lastUpdatedLabel": "20 Nov 2026, 6:37 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarindia, solargrowth, solarpush",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarindia, solarpanel, solargrowth",
   "trendingNews": [
     {
       "id": "tn-1",
+      "title": "KSEB seeks nod for power procurement via Solar Energy Corporation of India schemes",
+      "summary": "Trending solar coverage from The Hindu — use this India topic for your own posts and SEO content.",
+      "source": "The Hindu",
+      "url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxObmdNNzFSQkxoWVRqNVZVd1JhT040STAteFRyZW5JRDFuSkw4TTQ4S29PNkIxZWFldnFCSmN1bXFvVHZWZDY4Z0Y2SkdBM1V4QkxYaGxJMGtuLU9RUVk0bnNLbWtpUGRvRVRvcGpiQTFjejdjY1l6QlhFa0ZhbzRVd3ZETjIyTTZQdU96NHZIeWFJcXM0Mm0tVzMybFZMd3lUR0wxVV9QOEx2MENVUV84UWRXRnNpQ1pEaHc1VmlraTZaSU1ETGQxcTdYazAzbkczODBGa0w0SExWSmpqZTQxM3VR0gHoAUFVX3lxTE1RaWdYRS1wcWdoeHB6TnIxME5TOElVb0tZbnY2WElQZWdOZmVCeExOWXZfRDRrZGIwYjQzc0lvM2loanE3ajNKR2J2WDdWSFV4Z2o3V2Ffc1pFc1FJai1aZ1hpejIzaFI5RFFRM3d1TTJxYnNfMFZBUFd6N1ZiTThWX0QyNURvUHVodlpkRVFfWTVRa0ZEazUxZVFSaklHVTgxODlGM2FRVVdLQ0pOektfdE12Y2JCRzlGM0ZkNGRCN2RpUUZpNUlEVnlZUFpab2dJLXBJdnB4Slp4eC05TGgyb1p0b1B5VC0?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarIndia"
+      ]
+    },
+    {
+      "id": "tn-2",
+      "title": "Policybazaar launches online solar panel insurance in India",
+      "summary": "Trending solar coverage from Insurance Asia — use this India topic for your own posts and SEO content.",
+      "source": "Insurance Asia",
+      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNUmlFQklpSmpvSmhCYU0zNG9BalpXaURxWTZESmpkRGRnbDQ1VUVBZElnMnpDdXVzeUtkUGxZanhaLUcxSUZJdndQZ0g3dlhuYkRIR3BDNjZoMkhmUXVHQTVObThPekdiR3htWGxlRGszcjlKWlRfTUh4a0ctaVQyMGdpTVZKSUF5QzNKbl9tOGJEZ0gwakN0NGYyV0VteFF6M2c?oc=5",
+      "tags": [
+        "#solarpanel",
+        "#solarIndia",
+        "#solarenergy"
+      ]
+    },
+    {
+      "id": "tn-3",
+      "title": "Policybazaar Rolls Out Online Solar Panel Insurance",
+      "summary": "Trending solar coverage from Energetica India Magazine — use this India topic for your own posts and SEO content.",
+      "source": "Energetica India Magazine",
+      "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxPVTRNZG1iUXhLcktfdGROSExuWnR1RmFVUHRiSXJjRlJ5dG5RYTZiYnFteklZWE1xTnFZaUxvTkk2M2VWNlRZODRWTXh4WnN3SloxXzROcjdZVnBpa01DT1JWUzRua19UTXZFTkdxdWJqV05uX3kwS2hwaWhBX085b2piZWpXYkxUSm1CU09jUElCcEE?oc=5",
+      "tags": [
+        "#solarpanel",
+        "#solarIndia",
+        "#solarenergy"
+      ]
+    },
+    {
+      "id": "tn-4",
+      "title": "Forget Traditional Franchises: How Ugrasen Solar Energy Built a Zero-Fee, Zero-Lock-In Clean Energy Powerhouse for Every Corner of India",
+      "summary": "Trending solar coverage from India CSR — use this India topic for your own posts and SEO content.",
+      "source": "India CSR",
+      "url": "https://news.google.com/rss/articles/CBMikgFBVV95cUxPN2ZyNWZXZGQ0UlkwblA1MUVtTVFMbFR1UXgxZTRHVGx1TXF4T3pXQ2FfdmQyamI4SFhCTFVlZVNMQ3hra25Nd2NDVXZRWDQ2RF85TmFBR3pmc0NVOEpybXZkY09wbXIzRXRxb3FWblhuaUd3QUdpOVg2TTNkdld1UjhyTzVSWFNuRHkzQ2FoWkQyQQ?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarIndia"
+      ]
+    },
+    {
+      "id": "tn-5",
       "title": "India’s Solar Energy Growth: Capacity, Schemes and Targets",
       "summary": "Trending solar coverage from Utkarsh Classes — use this India topic for your own posts and SEO content.",
       "source": "Utkarsh Classes",
@@ -19,7 +65,7 @@
       ]
     },
     {
-      "id": "tn-2",
+      "id": "tn-6",
       "title": "PM shares an article on how India’s solar energy journey is opening up new opportunities",
       "summary": "Trending solar coverage from PM India — use this India topic for your own posts and SEO content.",
       "source": "PM India",
@@ -27,51 +73,6 @@
       "tags": [
         "#solarenergy",
         "#solarIndia"
-      ]
-    },
-    {
-      "id": "tn-3",
-      "title": "Agrivoltaics: Integrating Agriculture with Solar Energy in India",
-      "summary": "Trending solar coverage from Drishti IAS — use this India topic for your own posts and SEO content.",
-      "source": "Drishti IAS",
-      "url": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxPcExfREFZbWNtZXNVU3c2Y3FLYXJaYVF6N1Q5TnBVelBGZXR1N1pQUzEzekVUMmZuQ3gyczd4OHdFaUtsNjc1OEZ5UFBmYi1SY01ITlZ5R3BWN0hNenMyOE11cnRZWUg4U19CTkpWOHhWQlotS0l2ZmlKNlZWbE8tOC1FZF9uODBBeF9qWmtnWW5ieVp6VlZBeUhyem5FQjVuQVZ4XzNwTWZ0MElNa0xDemFJOWJRcHMydFBNZEtsa2pJdw?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarIndia"
-      ]
-    },
-    {
-      "id": "tn-4",
-      "title": "SECI unveils new logo and tagline as it expands beyond solar energy",
-      "summary": "Trending solar coverage from Indian Television Dot Com — use this India topic for your own posts and SEO content.",
-      "source": "Indian Television Dot Com",
-      "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxNemlPdEJFR2lLcElBSi10TTZFVWM4eGNscHdJX0lXbmdEOTBMcDlRaEJDSG9tMDhSZ3p2RzdmakJBdUxGYVBMMW1uUnMtNTJNdmhLVzk1SWpyeC1VQ1ZRaU92T0Y5cGlBdWxqMEg1OWh3WDR6UDhXRk1zQTZEbDQ1Q2VLOFlmOG9raUJEb2dodUNwaFNncFp6WnlHOTdYbDZhZE1R?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarIndia"
-      ]
-    },
-    {
-      "id": "tn-5",
-      "title": "Solar energy: lessons from neighbors",
-      "summary": "Trending solar coverage from New Age BD — use this India topic for your own posts and SEO content.",
-      "source": "New Age BD",
-      "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxPZEtQajZmdUF3aVkyNUN0RDlTRDRWYkhsYVRwT1RPb2ZxaVV5ZVU2Y1dRNmRyMW1tWnhhYXl1YjQ5dzNIUGpBOXRvVHIxVEU2d0xVTVV6bFVQYnk3OW5zTDNNczRBSG9pMHZfQ1BPa0pTOE1jNWRzNm9uZTBkNDBzUEp5ai1mU28?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarIndia"
-      ]
-    },
-    {
-      "id": "tn-6",
-      "title": "India's Solar Growth Enters a New Era",
-      "summary": "Trending solar coverage from www.pib.gov.in — use this India topic for your own posts and SEO content.",
-      "source": "www.pib.gov.in",
-      "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE03T1NQNkhPaXhuT0NRSTB0TDhrSmM2WUs4WjVaaGJhMFdpandHOVJBTTlLMURPaGFWR09uS1FhNVVRU294R1N6SlRXUWxjVDBYODVSQlQzZjQ5OWxDUFVweklFVzZTVHJn?oc=5",
-      "tags": [
-        "#solargrowth",
-        "#solarIndia",
-        "#solarenergy"
       ]
     }
   ],
@@ -141,7 +142,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "1M+"
+          "posts": "993K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -171,7 +172,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "185K+"
+          "posts": "180K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -181,7 +182,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "44K+"
+          "posts": "45K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -191,7 +192,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "122K+"
+          "posts": "123K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -201,7 +202,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "505K+"
+          "posts": "504K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -211,30 +212,30 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "95K+"
+          "posts": "94K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarindia/"
+    },
+    {
+      "tag": "#solarpanel",
+      "platforms": [
+        {
+          "name": "Instagram",
+          "posts": "35K+"
+        }
+      ],
+      "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
     },
     {
       "tag": "#solargrowth",
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "34K+"
+          "posts": "36K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solargrowth/"
-    },
-    {
-      "tag": "#solarpush",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "28K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarpush/"
     }
   ],
   "contentIdeas": [

@@ -2,25 +2,13 @@
   "version": 2,
   "countryCode": "SG",
   "location": "Singapore",
-  "lastUpdated": "2026-11-19T06:39:47+05:00",
-  "lastUpdatedLabel": "19 Nov 2026, 6:39 am PKT",
+  "lastUpdated": "2026-11-20T06:37:29+05:00",
+  "lastUpdatedLabel": "20 Nov 2026, 6:37 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarsingapore, solarpush, solarpanel, solarsupply, solarindependence",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarsingapore, solarpanel, solarindependence, solarsupply, solarpush",
   "trendingNews": [
     {
       "id": "tn-1",
-      "title": "Singapore’s renewed solar push: Hanging panels, clay-like tiles for heritage buildings among plans",
-      "summary": "Trending solar coverage from The Straits Times — use this Singapore topic for your own posts and SEO content.",
-      "source": "The Straits Times",
-      "url": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxQWXFHTFFsSTFmVWRUSGxKX05hbWxwRUdFelZmd3YycDBqT1hYWWpobkx1ME1yQlMzMUlhTnhfR3JKSlhvbFJMdkNiakNreWZRNThyODl0bV8xWjFWaDR2aEZ0UVNaN3NnU0hlRzNiZ1lqR3hGWUtPXzdydVl2VGtCZk4wcmxWUmFqS24zR0w1VGFvR2ZrMWxhUFZreVdKUG5Sa1FCNUhTenFkLW1MU0RlOWpIUzNnUXdsTlhKT1h2Y0JVR0xpV05qTFZiaXlvcFVmaF9Wb2dUbFZCeDZKNmJN?oc=5",
-      "tags": [
-        "#solarpush",
-        "#solarSingapore",
-        "#solarenergy"
-      ]
-    },
-    {
-      "id": "tn-2",
       "title": "New solar panel recycling facility in Singapore can process 36,000 panels a year",
       "summary": "Trending solar coverage from Singapore Economic Development Board (EDB) — use this Singapore topic for your own posts and SEO content.",
       "source": "Singapore Economic Development Board (EDB)",
@@ -32,7 +20,7 @@
       ]
     },
     {
-      "id": "tn-3",
+      "id": "tn-2",
       "title": "EMA Steps Up Partnerships to Advance Solar Energy Technologies",
       "summary": "Trending solar coverage from Energy Market Authority (EMA) — use this Singapore topic for your own posts and SEO content.",
       "source": "Energy Market Authority (EMA)",
@@ -43,7 +31,7 @@
       ]
     },
     {
-      "id": "tn-4",
+      "id": "tn-3",
       "title": "Singapore and Switzerland ink deal to advance solar energy tech",
       "summary": "Trending solar coverage from Asian Power — use this Singapore topic for your own posts and SEO content.",
       "source": "Asian Power",
@@ -51,6 +39,18 @@
       "tags": [
         "#solarenergy",
         "#solarSingapore"
+      ]
+    },
+    {
+      "id": "tn-4",
+      "title": "To boost energy security, is solar independence for Singapore possible?",
+      "summary": "Trending solar coverage from The Straits Times — use this Singapore topic for your own posts and SEO content.",
+      "source": "The Straits Times",
+      "url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxPRXpNdHVjdVowdVFpRGtRV082M1dHQndBMllaODR0dUVFWDB3MTJCTUhGWWhLcHZXWVBiM0dGZnBVN3JtSEFoaEkxWmpjd3lfVElEQ1JOOFp0VHZKV1FHanVYelpXalRlb3FpVFZ5N0xZSDJOS05GLUdOWVlCSVZENG92N1FrYXRWcUdjV2R4dlZxQlZBeFFqUXVaWVd3QkdPbE1CTm5BVHZyblk0dEY4QXhhWXB0cEFPVW9BRw?oc=5",
+      "tags": [
+        "#solarindependence",
+        "#solarSingapore",
+        "#solarenergy"
       ]
     },
     {
@@ -144,7 +144,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "1M+"
+          "posts": "993K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -174,7 +174,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "185K+"
+          "posts": "180K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -184,7 +184,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "44K+"
+          "posts": "45K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -194,7 +194,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "122K+"
+          "posts": "123K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -204,7 +204,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "505K+"
+          "posts": "504K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -214,30 +214,30 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "95K+"
+          "posts": "94K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarsingapore/"
-    },
-    {
-      "tag": "#solarpush",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "27K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarpush/"
     },
     {
       "tag": "#solarpanel",
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "37K+"
+          "posts": "35K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
+    },
+    {
+      "tag": "#solarindependence",
+      "platforms": [
+        {
+          "name": "Instagram",
+          "posts": "42K+"
+        }
+      ],
+      "searchUrl": "https://www.instagram.com/explore/tags/solarindependence/"
     },
     {
       "tag": "#solarsupply",
@@ -250,14 +250,14 @@
       "searchUrl": "https://www.instagram.com/explore/tags/solarsupply/"
     },
     {
-      "tag": "#solarindependence",
+      "tag": "#solarpush",
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "40K+"
+          "posts": "27K+"
         }
       ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarindependence/"
+      "searchUrl": "https://www.instagram.com/explore/tags/solarpush/"
     }
   ],
   "contentIdeas": [

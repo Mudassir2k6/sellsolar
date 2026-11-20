@@ -2,10 +2,10 @@
   "version": 2,
   "countryCode": "US",
   "location": "United States",
-  "lastUpdated": "2026-11-19T06:39:47+05:00",
-  "lastUpdatedLabel": "19 Nov 2026, 6:39 am PKT",
+  "lastUpdated": "2026-11-20T06:37:29+05:00",
+  "lastUpdatedLabel": "20 Nov 2026, 6:37 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarusa, floridasolar, solarpanel, solarrooftop, solarinstallations",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarusa, solarpanel, solarrooftop, solarinstallations, solargenerates",
   "trendingNews": [
     {
       "id": "tn-1",
@@ -20,22 +20,10 @@
     },
     {
       "id": "tn-2",
-      "title": "Duke Energy proposes 300 MW of Florida solar with $1 billion in projected customer savings",
-      "summary": "Trending solar coverage from Energies Media — use this United States topic for your own posts and SEO content.",
-      "source": "Energies Media",
-      "url": "https://news.google.com/rss/articles/CBMifEFVX3lxTE1WWU1zWkVMUUF4QmJQYUh3eTgwNXFoakFRODN2RWcyNmNnZFBHZjhjaUl0UnB6UDlzTGRKVHRuOWdoelFjWndRdVpNdmM5clhDY20tTG0zLVZJN09wSFFOaXJJM2RTNF9FVW9ydGtOZ0R6a1pPT1lpeUJTM2Q?oc=5",
-      "tags": [
-        "#floridasolar",
-        "#solarUSA",
-        "#solarenergy"
-      ]
-    },
-    {
-      "id": "tn-3",
-      "title": "Solar panel recycler expands into ‘epicenter’ for solar installations in California",
-      "summary": "Trending solar coverage from Waste Dive — use this United States topic for your own posts and SEO content.",
-      "source": "Waste Dive",
-      "url": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxOTWVBNGcyNS1KbXdXUFo1OWd0QzZWem9SQXprdXpkc3lIZVI1X1BUUUdVdC1PT1ZOVVM4WTNKTHAyV0RMRmw4V094NlpmVGNaMS14cUpsSUF0TjFkU2ktVlFtUmIzUHJqeE1oQk5IaWFlRkQ4X1h1cE9mMHVnSWpYR3Q3dVdjd0p1aTJZ?oc=5",
+      "title": "Solar Panel Recycling expands U.S. operations with new California facility",
+      "summary": "Trending solar coverage from Recycling Product News — use this United States topic for your own posts and SEO content.",
+      "source": "Recycling Product News",
+      "url": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxQcTlxUWdhbk9kaXR0ZC1vUE51VjJTZkxIa2NkV3E3MTNrSmJXY2JTWUlYZmFuaFZObzIydTNDclAtYzR2a2tNTjF1WG4yMjFsQlJEZXFaUG0yM1hRM3JwWG9YY1JSSlM3WUJrZmNPVHQzd0phX3lwWkVTSVBBWWtNeVNfenJ0ckN3Q2RRdFRBTnBacWpHNnhRQmhQQjBVSFplamNaVzk0dUtKaGNxTkwxdVNXdWdJdG9pdy1naHoxUkU?oc=5",
       "tags": [
         "#solarpanel",
         "#solarUSA",
@@ -43,11 +31,22 @@
       ]
     },
     {
+      "id": "tn-3",
+      "title": "Building More Solar Energy Sources Means Rethinking Land Use For Agriculture And Conservation",
+      "summary": "Trending solar coverage from FlaglerLive — use this United States topic for your own posts and SEO content.",
+      "source": "FlaglerLive",
+      "url": "https://news.google.com/rss/articles/CBMiS0FVX3lxTE5mVWhnZUo5SlN4LW1GTk0xV0lKQ2pQZks2eEJrVmYyY3ByTVhnRlp2RHNlclN0NHFuelpQMk5Nb0F0WHdFc0pER2Fxcw?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarUSA"
+      ]
+    },
+    {
       "id": "tn-4",
-      "title": "Korea Zinc Partners With US SolarCycle on Solar Panel Recycling",
-      "summary": "Trending solar coverage from THE ELEC, Korea Electronics Industry Media — use this United States topic for your own posts and SEO content.",
-      "source": "THE ELEC, Korea Electronics Industry Media",
-      "url": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE92ZFBoektZU09VMFBUSjRzb3dpSDNLeHg3NlRpd1RuMXB2Rm9HRWQ3OHRDMTJLOG9tcFVjQnZXSjRWTmxNSmgtQVdFSWVNNlV5MXFob1JjbEdmY0JSQUZGZE45WWd1Vm8?oc=5",
+      "title": "Solar Panel Recycling Acquires California Site for Fifth US Facility",
+      "summary": "Trending solar coverage from Securities.io — use this United States topic for your own posts and SEO content.",
+      "source": "Securities.io",
+      "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxON2ZDa2pyd0pJd3dHNjNMRnBUYnJ3eFZPdWpycVc5T2huM0pUNnpyTGNVUnE0UzNDdjZVT29VU1NCbFpiYmVCMFB5eWdKblVmR1VyWEtzUmJUOXluTWhZT0tEWEp1a0tjZkR2amZDN1ZhNnpBcVBYQzAwdzZGX0pLUktpbHRyMVFxenlFRFZBakx1NHM2OGpIZFB4QQ?oc=5",
       "tags": [
         "#solarpanel",
         "#solarUSA",
@@ -56,24 +55,24 @@
     },
     {
       "id": "tn-5",
-      "title": "Solar Panel Recycling Expands to California with 42,000-Square-Foot Facility",
-      "summary": "Trending solar coverage from citybiz — use this United States topic for your own posts and SEO content.",
-      "source": "citybiz",
-      "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxQMW1oVjdfNTJHZEpEVVpDRzctNEpwdExQQnNyaW9QOTdCMTMyT1FBeTg1RjlnNlREUXRVQ1YzcHBFVnJWWHVVb0xYNUNnZDE5RDIzcmlGNHlmTXBUVlNRT3JUTVgzRWFDdjhOZW5UREZIZ2JyT1Y3UFVkZ09lTEdTeHhCTXFhb29rNUtXc0FsTEZJcnZmc2N1S2JWSTltcGhpLWVQTFZLVF9ieFc0cmo1SkdHNEw?oc=5",
+      "title": "End-of-Life Solar Panels: Regulations and Management",
+      "summary": "Trending solar coverage from U.S. Environmental Protection Agency (.gov) — use this United States topic for your own posts and SEO content.",
+      "source": "U.S. Environmental Protection Agency (.gov)",
+      "url": "https://news.google.com/rss/articles/CBMie0FVX3lxTE9VLWxPWUZjU0syN0hBQ1VBRnVsX19JSFAtNnlTVUdpUkUzMHkwZk5hM3hSUm1iNk1oTkFZNlJ5UGs3cUMwUVdHZ3EwODhfeW9vX2Z5N0lHN2JYbkFaNE82Z0xEdXJjSFlXR2xnRlhZdUFpWjdKdmlvNDRfZw?oc=5",
       "tags": [
-        "#solarpanel",
+        "#solarpanels",
         "#solarUSA",
         "#solarenergy"
       ]
     },
     {
       "id": "tn-6",
-      "title": "Solar Panel Recycling Acquires California Site for Fifth US Facility",
-      "summary": "Trending solar coverage from Securities.io — use this United States topic for your own posts and SEO content.",
-      "source": "Securities.io",
-      "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxON2ZDa2pyd0pJd3dHNjNMRnBUYnJ3eFZPdWpycVc5T2huM0pUNnpyTGNVUnE0UzNDdjZVT29VU1NCbFpiYmVCMFB5eWdKblVmR1VyWEtzUmJUOXluTWhZT0tEWEp1a0tjZkR2amZDN1ZhNnpBcVBYQzAwdzZGX0pLUktpbHRyMVFxenlFRFZBakx1NHM2OGpIZFB4QQ?oc=5",
+      "title": "A New Crop of Solar Panels Is the U.S.’s Best Hope of Catching China",
+      "summary": "Trending solar coverage from The New York Times — use this United States topic for your own posts and SEO content.",
+      "source": "The New York Times",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPWXg5WXJhQ29jY2xtUGRWdndidTNUdFlCRi16c201RGpyM0VwdHZvNGN4Y2l0el9ubmxnc0x5dWtmd2JRR01GRHRjSFNuMk9aeXYtYzNvTDR6MW1HWUtNT3E4ZEpZT1lXMW4zT00xRG9UbGI4OHNNbkdUMjFzdHdBWmNKUWhzUWpabDhSMXg5ckZkWVFTRWE5SkVBclA?oc=5",
       "tags": [
-        "#solarpanel",
+        "#solarpanels",
         "#solarUSA",
         "#solarenergy"
       ]
@@ -145,7 +144,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "1M+"
+          "posts": "993K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -175,7 +174,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "185K+"
+          "posts": "180K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -185,7 +184,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "44K+"
+          "posts": "45K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -195,7 +194,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "122K+"
+          "posts": "123K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -205,7 +204,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "505K+"
+          "posts": "504K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -215,27 +214,17 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "95K+"
+          "posts": "94K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarusa/"
-    },
-    {
-      "tag": "#floridasolar",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "13K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/floridasolar/"
     },
     {
       "tag": "#solarpanel",
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "37K+"
+          "posts": "35K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
@@ -255,10 +244,20 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "23K+"
+          "posts": "22K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarinstallations/"
+    },
+    {
+      "tag": "#solargenerates",
+      "platforms": [
+        {
+          "name": "Instagram",
+          "posts": "32K+"
+        }
+      ],
+      "searchUrl": "https://www.instagram.com/explore/tags/solargenerates/"
     }
   ],
   "contentIdeas": [

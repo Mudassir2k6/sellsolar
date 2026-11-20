@@ -2,8 +2,8 @@
   "version": 2,
   "countryCode": "KE",
   "location": "Kenya",
-  "lastUpdated": "2026-11-19T06:39:47+05:00",
-  "lastUpdatedLabel": "19 Nov 2026, 6:39 am PKT",
+  "lastUpdated": "2026-11-20T06:37:29+05:00",
+  "lastUpdatedLabel": "20 Nov 2026, 6:37 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
   "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarkenya, solarpanel",
   "trendingNews": [
@@ -20,17 +20,6 @@
     },
     {
       "id": "tn-2",
-      "title": "Solar energy in Kenya: checks on those using it illegally",
-      "summary": "Trending solar coverage from MalindiKenya.net — use this Kenya topic for your own posts and SEO content.",
-      "source": "MalindiKenya.net",
-      "url": "https://news.google.com/rss/articles/CBMiugFBVV95cUxNcUVPNGJiNDBwWjY2dU9UV0Zsako2bU9DeTduNlZyUkpOeUVGZm5xWjN2MTdnYlRRS0xfRnhEWXRCRlpYc1dsWmVSZVAxM0d5eS1FbGg4cHhrbTFaQjlqaXNiNFZyZGxSd0NlTmFVWFo2TEtfOGVoaTBIYmJNWThGZDZ2d3l3WkQ4ZGlGQUZvZlEtV2RGaHF6MUZQdEFVOGhlMWhDTTNkbUFfOUtaek5pUGdXVzZ3V1BEZ3c?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarKenya"
-      ]
-    },
-    {
-      "id": "tn-3",
       "title": "MOL, Sharp, IOM Implement Solar Panel Donation Project - Move Will Enhance Living Conditions in Power-short Areas of Kenya - | Information | Mitsui O.S.K. Lines",
       "summary": "Trending solar coverage from 商船三井 — use this Kenya topic for your own posts and SEO content.",
       "source": "商船三井",
@@ -42,7 +31,7 @@
       ]
     },
     {
-      "id": "tn-4",
+      "id": "tn-3",
       "title": "EDITORIAL: Solar energy provides Kenya’s path to a cheaper future",
       "summary": "Trending solar coverage from the-star.co.ke — use this Kenya topic for your own posts and SEO content.",
       "source": "the-star.co.ke",
@@ -53,7 +42,7 @@
       ]
     },
     {
-      "id": "tn-5",
+      "id": "tn-4",
       "title": "From circuits to sunshine: how Benjamin Kipruto found his calling in solar energy in Kenya",
       "summary": "Trending solar coverage from UNESCO — use this Kenya topic for your own posts and SEO content.",
       "source": "UNESCO",
@@ -64,13 +53,25 @@
       ]
     },
     {
-      "id": "tn-6",
+      "id": "tn-5",
       "title": "Kenya’s energy dilemma: Leading in renewables, lagging in solar power",
       "summary": "Trending solar coverage from Daily Nation — use this Kenya topic for your own posts and SEO content.",
       "source": "Daily Nation",
       "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxQOEtSdmZFWnVYVEI2MEk5WkkyNWdOTkVoNVA1dW85RGNhZ0pfLXU2R0dQUjBjRmNFeU9IR1VTMWFZYW42dG9VU3V0U1l6YmFRSG1JbWs0bUlOS1ZQLS1fbW5jY1Q5UllWR2dWekZ2ZXV2a3N4TW15ZlQ0aWV4TVNhOGhGbUxvT3dmNTBRTkFUYUFic0Q1OTNPT0ZveGI5SXJMVVV2QjdyWnM4c0FERS1v?oc=5",
       "tags": [
         "#solarpower",
+        "#solarKenya",
+        "#solarenergy"
+      ]
+    },
+    {
+      "id": "tn-6",
+      "title": "Solar Panel Technology Boosts Yields for Farmers in Kenya",
+      "summary": "Trending solar coverage from Voice of America English News — use this Kenya topic for your own posts and SEO content.",
+      "source": "Voice of America English News",
+      "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxQUkpEMUdmbDVEY01nQlYwUVJaVGowcXhxZVBNZ2QtZXFuenJTRjNyX0w4c2IzdDZTSXVfYk96bzFXSm41eHdubWpySVc1bVQxbHNJRnItd3djTVdVY1FLaU9vX3hxRTNKNHFZT0oxdHV6ZlJsUnREOWFlR096NXZxa01OdENydDVKbjRLeGc5cEQ5blEwX2Zod0NRS0Z2Z9IBoAFBVV95cUxNU25PTUw5bmxIRDBSZEJwZVpHbEZpNkxfblhvWHdDdzlYc21LMEtadjdIYUthVHNsMHJIZmFZcFJOdjc3VG01Q1hvWFE4bm9Ka25rc3dhZzJyWVRyRXF0dDBTTUdhaUpTQ2RVRkpqLWd1TlM1Unpia3UtQ1lPbGROaVkwY2lZX2E3UjY2cDAzQ1VUTDhfTVlhWEtsSzY4RHIy?oc=5",
+      "tags": [
+        "#solarpanel",
         "#solarKenya",
         "#solarenergy"
       ]
@@ -142,7 +143,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "1M+"
+          "posts": "993K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -172,7 +173,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "185K+"
+          "posts": "180K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -182,7 +183,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "44K+"
+          "posts": "45K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -192,7 +193,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "122K+"
+          "posts": "123K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -202,7 +203,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "505K+"
+          "posts": "504K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -212,7 +213,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "95K+"
+          "posts": "94K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarkenya/"

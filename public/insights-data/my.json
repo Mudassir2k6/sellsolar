@@ -2,8 +2,8 @@
   "version": 2,
   "countryCode": "MY",
   "location": "Malaysia",
-  "lastUpdated": "2026-11-20T06:37:29+05:00",
-  "lastUpdatedLabel": "20 Nov 2026, 6:37 am PKT",
+  "lastUpdated": "2026-11-21T06:02:51+05:00",
+  "lastUpdatedLabel": "21 Nov 2026, 6:02 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
   "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarmalaysia, solarpanel, solarsystem",
   "trendingNews": [
@@ -20,13 +20,14 @@
     },
     {
       "id": "tn-2",
-      "title": "Johor eyes additional 5GW of solar energy by 2031 to meet data centre demand",
+      "title": "MBSB to sponsor 61 underserved Muslim tradesmen for solar panel certification",
       "summary": "Trending solar coverage from The Edge Malaysia — use this Malaysia topic for your own posts and SEO content.",
       "source": "The Edge Malaysia",
-      "url": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE5rVFBGUjNVZnhoaUxXUzIwWHFxSGpZUnR6MFU3Y1B6UlUxRmp6YVprMm5LMTA0Uk1CYkhmS0hkN1FGV3U2UEZDbll4bXAwY0VS?oc=5",
+      "url": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE5lY0JMVm1TaGs0U2VzSHN1Szd6YWZpZ3JkN0FzWU14NDk3WnoyWFNXQ2ZobjNHa2pWcG1PMnF6NDhLcjdyM3dkcEFPWDR5UU52?oc=5",
       "tags": [
-        "#solarenergy",
-        "#solarMalaysia"
+        "#solarpanel",
+        "#solarMalaysia",
+        "#solarenergy"
       ]
     },
     {
@@ -64,10 +65,10 @@
     },
     {
       "id": "tn-6",
-      "title": "MBSB to sponsor 61 underserved Muslim tradesmen for solar panel certification",
-      "summary": "Trending solar coverage from The Edge Malaysia — use this Malaysia topic for your own posts and SEO content.",
-      "source": "The Edge Malaysia",
-      "url": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE5lY0JMVm1TaGs0U2VzSHN1Szd6YWZpZ3JkN0FzWU14NDk3WnoyWFNXQ2ZobjNHa2pWcG1PMnF6NDhLcjdyM3dkcEFPWDR5UU52?oc=5",
+      "title": "Public universities encouraged to install solar panel to save electricity consumption",
+      "summary": "Trending solar coverage from The Sun Malaysia — use this Malaysia topic for your own posts and SEO content.",
+      "source": "The Sun Malaysia",
+      "url": "https://news.google.com/rss/articles/CBMizwFBVV95cUxQSjdzeHJCNXo3dzg0R3lCNGR0N2I0aVVjd2hLbFRNNjZFN3FuQnBPRHdxNjNsaFE2Zm1STV9vUS1VSlhJYVdreUFLRXdpQ1RobFRkOHFnVVdnQ2puV1RhNG40NDVjN3ktVDJHQm5zdTZuVVRfeVNTRW1MYTZIcG5qajdTbXZiN2FzSXJ6NWN4VmVUN0JWU1pfSFJyc3I2eTA3em1SbzkwYTE0RmZIX1pFOGdxUTYwWGxRbkFnc2VxVGxpWTlfOHduU1hHazZkZ3M?oc=5",
       "tags": [
         "#solarpanel",
         "#solarMalaysia",
@@ -141,7 +142,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "993K+"
+          "posts": "990K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -191,7 +192,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "123K+"
+          "posts": "121K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -201,7 +202,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "504K+"
+          "posts": "512K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -211,7 +212,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "94K+"
+          "posts": "95K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarmalaysia/"
@@ -221,7 +222,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "35K+"
+          "posts": "37K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"

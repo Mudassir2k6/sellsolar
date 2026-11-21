@@ -2,8 +2,8 @@
   "version": 2,
   "countryCode": "CA",
   "location": "Canada",
-  "lastUpdated": "2026-11-20T06:37:29+05:00",
-  "lastUpdatedLabel": "20 Nov 2026, 6:37 am PKT",
+  "lastUpdated": "2026-11-21T06:02:51+05:00",
+  "lastUpdatedLabel": "21 Nov 2026, 6:02 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
   "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarcanada, solarpanel, solarmovement",
   "trendingNews": [
@@ -20,6 +20,17 @@
     },
     {
       "id": "tn-2",
+      "title": "Updates To Reclamation Security Requirements For Wind And Solar Energy Projects In Alberta",
+      "summary": "Trending solar coverage from Legal 500 — use this Canada topic for your own posts and SEO content.",
+      "source": "Legal 500",
+      "url": "https://news.google.com/rss/articles/CBMi9wFBVV95cUxNR3VENU1UTUhBQm55Y2tBeWRrWERZUGxtWjRqcG9RdVlmdFFzY1BCNTFxOWJpOVJuU2txNktXOGRiR1BmeVUwbkd2VWJvOUlaLUgwSDA4VkpZYzBBanlXUndQOGIwdEdveVp2cnVLTEh0d2JnR3VOSld5WGNsUmNGdk1zSHNmd29pSUI3OUVTcGlSMHRaWVFaM25VRm1RQjNiNkVXdE9ISVNGZVg0dWg4SGNDRmY4SnZBUlZGb2pBUE1BMHFRbXJfNGhaYWotQ1FGOHNXSWtLYzZ6TFZvcmw3WUVhV252ZGVBV241T1puTUI4WGpJNEIw?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarCanada"
+      ]
+    },
+    {
+      "id": "tn-3",
       "title": "Alberta introduces $14 solar panel recycling fee, landfill ban",
       "summary": "Trending solar coverage from Global News — use this Canada topic for your own posts and SEO content.",
       "source": "Global News",
@@ -31,7 +42,7 @@
       ]
     },
     {
-      "id": "tn-3",
+      "id": "tn-4",
       "title": "Mattamy Homes taps into sunny Alberta's solar energy",
       "summary": "Trending solar coverage from Yahoo News Canada — use this Canada topic for your own posts and SEO content.",
       "source": "Yahoo News Canada",
@@ -42,7 +53,7 @@
       ]
     },
     {
-      "id": "tn-4",
+      "id": "tn-5",
       "title": "Why this solar energy developer was denied coverage under a CGL policy",
       "summary": "Trending solar coverage from Canadian Underwriter — use this Canada topic for your own posts and SEO content.",
       "source": "Canadian Underwriter",
@@ -53,7 +64,7 @@
       ]
     },
     {
-      "id": "tn-5",
+      "id": "tn-6",
       "title": "Yukon Conservation Society wants to bring 'guerilla solar' movement north",
       "summary": "Trending solar coverage from CBC — use this Canada topic for your own posts and SEO content.",
       "source": "CBC",
@@ -62,17 +73,6 @@
         "#solarmovement",
         "#solarCanada",
         "#solarenergy"
-      ]
-    },
-    {
-      "id": "tn-6",
-      "title": "Canada’s new way for solar energy",
-      "summary": "Trending solar coverage from Your South Shore — use this Canada topic for your own posts and SEO content.",
-      "source": "Your South Shore",
-      "url": "https://news.google.com/rss/articles/CBMia0FVX3lxTE1XX0RnNGd0cm1oWHY2VVVFVEQ2Qk5meG1mOUljNXJRRHMxZ1hxektBUmhhVTdiTXhlSXQyUEUzNEIwQXpOVkJEQmxMbUIxZWY4TWZPVXo0VUlEczI4cUUyeVFlSmZMWFV0bGtv?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarCanada"
       ]
     }
   ],
@@ -142,7 +142,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "993K+"
+          "posts": "990K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -192,7 +192,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "123K+"
+          "posts": "121K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -202,7 +202,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "504K+"
+          "posts": "512K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -212,7 +212,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "94K+"
+          "posts": "95K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarcanada/"
@@ -222,7 +222,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "35K+"
+          "posts": "37K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"

@@ -2,24 +2,13 @@
   "version": 2,
   "countryCode": "KE",
   "location": "Kenya",
-  "lastUpdated": "2026-11-20T06:37:29+05:00",
-  "lastUpdatedLabel": "20 Nov 2026, 6:37 am PKT",
+  "lastUpdated": "2026-11-21T06:02:51+05:00",
+  "lastUpdatedLabel": "21 Nov 2026, 6:02 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
   "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarkenya, solarpanel",
   "trendingNews": [
     {
       "id": "tn-1",
-      "title": "Nandi to power Mother and Baby Health Complex with Solar Energy",
-      "summary": "Trending solar coverage from Kenya News Agency — use this Kenya topic for your own posts and SEO content.",
-      "source": "Kenya News Agency",
-      "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQbzFkUVhYaGROVlp0UVdxUm4tTzQ1WG9MNWVwT3pGQXFvNUtmdUJNRXJzVWNULWlXZ0VsbkdmNTdyUEtnZ0JCTkVaRlJEQS1tMW5tQUZPSGZJX2lLWWtxU2tMWHFDUTFEVWY4WjlidkFWUHhLSW0zOEt4WURLRHZZd3FPT0pKdDNSeHlVZ0JrZTliTDBJSVV3?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarKenya"
-      ]
-    },
-    {
-      "id": "tn-2",
       "title": "MOL, Sharp, IOM Implement Solar Panel Donation Project - Move Will Enhance Living Conditions in Power-short Areas of Kenya - | Information | Mitsui O.S.K. Lines",
       "summary": "Trending solar coverage from 商船三井 — use this Kenya topic for your own posts and SEO content.",
       "source": "商船三井",
@@ -31,7 +20,7 @@
       ]
     },
     {
-      "id": "tn-3",
+      "id": "tn-2",
       "title": "EDITORIAL: Solar energy provides Kenya’s path to a cheaper future",
       "summary": "Trending solar coverage from the-star.co.ke — use this Kenya topic for your own posts and SEO content.",
       "source": "the-star.co.ke",
@@ -42,7 +31,7 @@
       ]
     },
     {
-      "id": "tn-4",
+      "id": "tn-3",
       "title": "From circuits to sunshine: how Benjamin Kipruto found his calling in solar energy in Kenya",
       "summary": "Trending solar coverage from UNESCO — use this Kenya topic for your own posts and SEO content.",
       "source": "UNESCO",
@@ -53,7 +42,7 @@
       ]
     },
     {
-      "id": "tn-5",
+      "id": "tn-4",
       "title": "Kenya’s energy dilemma: Leading in renewables, lagging in solar power",
       "summary": "Trending solar coverage from Daily Nation — use this Kenya topic for your own posts and SEO content.",
       "source": "Daily Nation",
@@ -65,7 +54,7 @@
       ]
     },
     {
-      "id": "tn-6",
+      "id": "tn-5",
       "title": "Solar Panel Technology Boosts Yields for Farmers in Kenya",
       "summary": "Trending solar coverage from Voice of America English News — use this Kenya topic for your own posts and SEO content.",
       "source": "Voice of America English News",
@@ -74,6 +63,17 @@
         "#solarpanel",
         "#solarKenya",
         "#solarenergy"
+      ]
+    },
+    {
+      "id": "tn-6",
+      "title": "BII & Stanbic Bank Kenya in double commitment to off-grid solar energy company Sun King",
+      "summary": "Trending solar coverage from British International Investment — use this Kenya topic for your own posts and SEO content.",
+      "source": "British International Investment",
+      "url": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxPeE9Id2ZjOEFmcldkZF9nbW1rR2xFeDdaVGxURGtvQkZseXNRNzh5Ym5NVmltd0tmemVnOFhHR2ZqN1I4TU85cU1lR0NkUDZURkg1V0dJOXo4LXdkLVBVRkxFU25EV0xXN3VWMkdtUzZaOVd3cDE2T01aa1Q4bVpYbzAtQVNTN2d1WVJfN29XUWlEY1phZ3dDNldZTlRnNTNJYlB0WUFBdHVzbWR3akE3d3A3cWdwM1hMRTY5MEZVbXo4Vnd3b3dWRw?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarKenya"
       ]
     }
   ],
@@ -143,7 +143,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "993K+"
+          "posts": "990K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -193,7 +193,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "123K+"
+          "posts": "121K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -203,7 +203,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "504K+"
+          "posts": "512K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -213,7 +213,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "94K+"
+          "posts": "95K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarkenya/"
@@ -223,7 +223,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "35K+"
+          "posts": "37K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"

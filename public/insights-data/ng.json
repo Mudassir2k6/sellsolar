@@ -2,13 +2,25 @@
   "version": 2,
   "countryCode": "NG",
   "location": "Nigeria",
-  "lastUpdated": "2026-11-20T06:37:29+05:00",
-  "lastUpdatedLabel": "20 Nov 2026, 6:37 am PKT",
+  "lastUpdated": "2026-11-21T06:02:51+05:00",
+  "lastUpdatedLabel": "21 Nov 2026, 6:02 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
   "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarnigeria, solarboom, solarpanel, solarmanufacturing, solarprojects",
   "trendingNews": [
     {
       "id": "tn-1",
+      "title": "Africa's Solar Boom Shifts From Mega-Projects to Small-Scale Systems - IEA",
+      "summary": "Trending solar coverage from allAfrica.com — use this Nigeria topic for your own posts and SEO content.",
+      "source": "allAfrica.com",
+      "url": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE11NWRmcmNweEljVXhHcW52Zmh0MWwwNXZqdmlqcEVwRHFsWUhrVDh1XzZBazFFaVhsNXBCYVB1WFFLUnJMSnZEMjFGdGlnYm1nWFp0N09KMHg0alk?oc=5",
+      "tags": [
+        "#solarboom",
+        "#solarNigeria",
+        "#solarenergy"
+      ]
+    },
+    {
+      "id": "tn-2",
       "title": "NGYouthSDGs launches national solar energy competition for young Nigerians",
       "summary": "Trending solar coverage from Business News Nigeria — use this Nigeria topic for your own posts and SEO content.",
       "source": "Business News Nigeria",
@@ -19,7 +31,7 @@
       ]
     },
     {
-      "id": "tn-2",
+      "id": "tn-3",
       "title": "In Nigeria, Solar Panels Are the New Wedding Gift",
       "summary": "Trending solar coverage from Bloomberg.com — use this Nigeria topic for your own posts and SEO content.",
       "source": "Bloomberg.com",
@@ -31,7 +43,7 @@
       ]
     },
     {
-      "id": "tn-3",
+      "id": "tn-4",
       "title": "From rot to revenue: How solar energy is cutting post-harvest losses in Nigeria's fishing village",
       "summary": "Trending solar coverage from TheCable — use this Nigeria topic for your own posts and SEO content.",
       "source": "TheCable",
@@ -42,7 +54,7 @@
       ]
     },
     {
-      "id": "tn-4",
+      "id": "tn-5",
       "title": "Nigeria's solar boom faces cost and policy barriers",
       "summary": "Trending solar coverage from DW.com — use this Nigeria topic for your own posts and SEO content.",
       "source": "DW.com",
@@ -54,25 +66,13 @@
       ]
     },
     {
-      "id": "tn-5",
+      "id": "tn-6",
       "title": "Rethinking Nigeria’s proposed solar panel import policy",
       "summary": "Trending solar coverage from PwC — use this Nigeria topic for your own posts and SEO content.",
       "source": "PwC",
       "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxPX2ZtdVJBV2F4c2hoU0Y2T0NYb0Y0ZWRKTXRqVHF6WmFmLVVsZVhJdnNMdXN4dzNmWUNhdGNWbHJxYlF0VmRkYnBoUW12Z01fNW5SelVTVlhQcDJIa2h0TzVWOTNGYlZ1S1dVWHFlV1ZPSHB5dG9kSnlSSDhuUnhCNEotZzlkUUJPcnl1ejYtZ3J2M3diTU82ekIzXzJaZw?oc=5",
       "tags": [
         "#solarpanel",
-        "#solarNigeria",
-        "#solarenergy"
-      ]
-    },
-    {
-      "id": "tn-6",
-      "title": "The rise of private solar power in Nigeria",
-      "summary": "Trending solar coverage from Dialogue Earth — use this Nigeria topic for your own posts and SEO content.",
-      "source": "Dialogue Earth",
-      "url": "https://news.google.com/rss/articles/CBMiggFBVV95cUxPRHQ2dTFGTnpfR3M5bU9OZXFBOTBhSGRFaEd6c3FBVlZzZGcydXhKMk9uQ2dXQUdwZHFPNDREVklFLVBfMVQyY3dURURCRmRoTThfZnpfdmVPNmFMSW5OTHllQXUtaERJaUFIYVJ3R2dxVk01cTNZUHVhNW9yYWZkTWJ3?oc=5",
-      "tags": [
-        "#solarpower",
         "#solarNigeria",
         "#solarenergy"
       ]
@@ -144,7 +144,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "993K+"
+          "posts": "990K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -194,7 +194,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "123K+"
+          "posts": "121K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -204,7 +204,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "504K+"
+          "posts": "512K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -214,7 +214,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "94K+"
+          "posts": "95K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarnigeria/"
@@ -224,7 +224,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "43K+"
+          "posts": "46K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarboom/"

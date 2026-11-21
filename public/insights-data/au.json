@@ -2,25 +2,13 @@
   "version": 2,
   "countryCode": "AU",
   "location": "Australia",
-  "lastUpdated": "2026-11-20T06:37:29+05:00",
-  "lastUpdatedLabel": "20 Nov 2026, 6:37 am PKT",
+  "lastUpdated": "2026-11-21T06:02:51+05:00",
+  "lastUpdatedLabel": "21 Nov 2026, 6:02 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solaraustralia, solarpanel, solarwaste, solarboon, solarelectricity, solarcheap",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solaraustralia, solarpanel, solarwaste, solarboon, solarcheap, solarinnovations",
   "trendingNews": [
     {
       "id": "tn-1",
-      "title": "Global Warming and Solar Panel Performance in Australia",
-      "summary": "Trending solar coverage from Energy Matters — use this Australia topic for your own posts and SEO content.",
-      "source": "Energy Matters",
-      "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxQcjRReXM1VnlrWWZZTXgxUXBzdTJONTBVRVF3YTl6OEJ0NHI5dHRKTERYWG83ekpiS0lZWjRrbG1xRTU5bGRkY29PYUNpMjhoVjZOdGtrLUhhbUUwU3cxaXF5NGpJWDgwZHJsZ1JFX1FvNW1RTlVrS3RlS0FuNDM5MmpjbUxXRlp6ZExZbEhOam1KSG1BWl9xRTM0WlZMUQ?oc=5",
-      "tags": [
-        "#solarpanel",
-        "#solarAustralia",
-        "#solarenergy"
-      ]
-    },
-    {
-      "id": "tn-2",
       "title": "NSW leads Australia with new solar panel recycling mandate",
       "summary": "Trending solar coverage from NSW Government — use this Australia topic for your own posts and SEO content.",
       "source": "NSW Government",
@@ -32,7 +20,7 @@
       ]
     },
     {
-      "id": "tn-3",
+      "id": "tn-2",
       "title": "Rooftop solar waste is growing. Some experts say $10 fee per panel could help",
       "summary": "Trending solar coverage from ABC News & Headlines – Australian Broadcasting Corporation — use this Australia topic for your own posts and SEO content.",
       "source": "ABC News & Headlines – Australian Broadcasting Corporation",
@@ -44,7 +32,7 @@
       ]
     },
     {
-      "id": "tn-4",
+      "id": "tn-3",
       "title": "Solar panel & battery rebates Victoria 2026",
       "summary": "Trending solar coverage from RACV — use this Australia topic for your own posts and SEO content.",
       "source": "RACV",
@@ -56,7 +44,7 @@
       ]
     },
     {
-      "id": "tn-5",
+      "id": "tn-4",
       "title": "Submission on Solar Panel Reuse and Recycling in Australia",
       "summary": "Trending solar coverage from ALGA — use this Australia topic for your own posts and SEO content.",
       "source": "ALGA",
@@ -68,13 +56,25 @@
       ]
     },
     {
-      "id": "tn-6",
+      "id": "tn-5",
       "title": "Australia wants to sell Singapore solar power. But does anyone want it?",
       "summary": "Trending solar coverage from ABC News & Headlines – Australian Broadcasting Corporation — use this Australia topic for your own posts and SEO content.",
       "source": "ABC News & Headlines – Australian Broadcasting Corporation",
       "url": "https://news.google.com/rss/articles/CBMirgFBVV95cUxNZVMtem9CaVpMY0Y5d0J4bDhlTklaWjM2VUJlMTByUVdWb05zY1pnSzU3ZFJJbGZkYTkwZEFocTdkNUhlVzZJMWdBRkdUdU1kSGJacWpEa0ZGaWllczVURTNFQzNoMm1vcFQ1dHlITVlKc1REbGEtZExISVRFZWV4cWxrWDNuMklkTTV6YWgtbXpaeE5XU3Z4ekxKUlkybjFCV3h4a004RDhVR3NtUlE?oc=5",
       "tags": [
         "#solarpower",
+        "#solarAustralia",
+        "#solarenergy"
+      ]
+    },
+    {
+      "id": "tn-6",
+      "title": "Being a renter, Maiya missed out on solar boon but that is about to change",
+      "summary": "Trending solar coverage from ABC News & Headlines – Australian Broadcasting Corporation — use this Australia topic for your own posts and SEO content.",
+      "source": "ABC News & Headlines – Australian Broadcasting Corporation",
+      "url": "https://news.google.com/rss/articles/CBMilgFBVV95cUxQODdQdEc4NFlIN2tkb2t6clBsRG1RWDVJRnMtRUJqVE1PYXpiWVI2VHZoYVh6bC1NNXdUdDVMTmtOTlBQX1VUQzRDV0hIMmZJSEgxSnYzaDF2Mjd5aDFsZzRPVlpVZzJYX3AwM2tuc3FTUHpmN1VEXzNwOGlZYk91NnNxMGUwN2c2UDRfNUFqTlBhQzc1bUE?oc=5",
+      "tags": [
+        "#solarboon",
         "#solarAustralia",
         "#solarenergy"
       ]
@@ -146,7 +146,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "993K+"
+          "posts": "990K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -196,7 +196,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "123K+"
+          "posts": "121K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -206,7 +206,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "504K+"
+          "posts": "512K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -216,7 +216,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "94K+"
+          "posts": "95K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solaraustralia/"
@@ -226,7 +226,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "35K+"
+          "posts": "37K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
@@ -236,7 +236,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "26K+"
+          "posts": "27K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarwaste/"
@@ -246,30 +246,30 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "43K+"
+          "posts": "44K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarboon/"
-    },
-    {
-      "tag": "#solarelectricity",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "21K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarelectricity/"
     },
     {
       "tag": "#solarcheap",
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "31K+"
+          "posts": "30K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarcheap/"
+    },
+    {
+      "tag": "#solarinnovations",
+      "platforms": [
+        {
+          "name": "Instagram",
+          "posts": "39K+"
+        }
+      ],
+      "searchUrl": "https://www.instagram.com/explore/tags/solarinnovations/"
     }
   ],
   "contentIdeas": [

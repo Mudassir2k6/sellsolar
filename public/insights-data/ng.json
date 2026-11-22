@@ -2,13 +2,24 @@
   "version": 2,
   "countryCode": "NG",
   "location": "Nigeria",
-  "lastUpdated": "2026-11-21T06:02:51+05:00",
-  "lastUpdatedLabel": "21 Nov 2026, 6:02 am PKT",
+  "lastUpdated": "2026-11-22T05:03:09+05:00",
+  "lastUpdatedLabel": "22 Nov 2026, 5:03 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
   "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarnigeria, solarboom, solarpanel, solarmanufacturing, solarprojects",
   "trendingNews": [
     {
       "id": "tn-1",
+      "title": "NGYouthSDGs launches national solar energy competition for young Nigerians",
+      "summary": "Trending solar coverage from Business News Nigeria — use this Nigeria topic for your own posts and SEO content.",
+      "source": "Business News Nigeria",
+      "url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxNSHRsNkc5MWFFOVMwWFNJMjFtY0UwYlRfeGp0c081TWVXZ0ppN3ZmNk50cUJtb3dpNV9zWWYyeFhpSzNoUW5rd2lZZGd2b3NXcjktSHR0ZktOMm9iWnFDcm9ObWhKbm5WTy1EakVKRkxkMkVuSXl1ejFuNTFRQUFmM1hyTzBaWFk3T2VZcG1IbnZrb1N6T24ydVpkZkRqU215bWtUbW54MUpPLWppa09qdg?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarNigeria"
+      ]
+    },
+    {
+      "id": "tn-2",
       "title": "Africa's Solar Boom Shifts From Mega-Projects to Small-Scale Systems - IEA",
       "summary": "Trending solar coverage from allAfrica.com — use this Nigeria topic for your own posts and SEO content.",
       "source": "allAfrica.com",
@@ -17,17 +28,6 @@
         "#solarboom",
         "#solarNigeria",
         "#solarenergy"
-      ]
-    },
-    {
-      "id": "tn-2",
-      "title": "NGYouthSDGs launches national solar energy competition for young Nigerians",
-      "summary": "Trending solar coverage from Business News Nigeria — use this Nigeria topic for your own posts and SEO content.",
-      "source": "Business News Nigeria",
-      "url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxNSHRsNkc5MWFFOVMwWFNJMjFtY0UwYlRfeGp0c081TWVXZ0ppN3ZmNk50cUJtb3dpNV9zWWYyeFhpSzNoUW5rd2lZZGd2b3NXcjktSHR0ZktOMm9iWnFDcm9ObWhKbm5WTy1EakVKRkxkMkVuSXl1ejFuNTFRQUFmM1hyTzBaWFk3T2VZcG1IbnZrb1N6T24ydVpkZkRqU215bWtUbW54MUpPLWppa09qdg?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarNigeria"
       ]
     },
     {
@@ -144,7 +144,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "990K+"
+          "posts": "989K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -174,7 +174,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "180K+"
+          "posts": "176K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -184,7 +184,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "45K+"
+          "posts": "46K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -204,7 +204,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "512K+"
+          "posts": "486K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -224,7 +224,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "46K+"
+          "posts": "44K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarboom/"
@@ -234,7 +234,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "37K+"
+          "posts": "36K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
@@ -254,7 +254,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "10K+"
+          "posts": "11K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarprojects/"

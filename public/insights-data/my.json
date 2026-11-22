@@ -2,8 +2,8 @@
   "version": 2,
   "countryCode": "MY",
   "location": "Malaysia",
-  "lastUpdated": "2026-11-21T06:02:51+05:00",
-  "lastUpdatedLabel": "21 Nov 2026, 6:02 am PKT",
+  "lastUpdated": "2026-11-22T05:03:09+05:00",
+  "lastUpdatedLabel": "22 Nov 2026, 5:03 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
   "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarmalaysia, solarpanel, solarsystem",
   "trendingNews": [
@@ -20,6 +20,39 @@
     },
     {
       "id": "tn-2",
+      "title": "Johor eyes additional 5GW of solar energy by 2031 to meet data centre demand",
+      "summary": "Trending solar coverage from The Edge Malaysia — use this Malaysia topic for your own posts and SEO content.",
+      "source": "The Edge Malaysia",
+      "url": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE5rVFBGUjNVZnhoaUxXUzIwWHFxSGpZUnR6MFU3Y1B6UlUxRmp6YVprMm5LMTA0Uk1CYkhmS0hkN1FGV3U2UEZDbll4bXAwY0VS?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarMalaysia"
+      ]
+    },
+    {
+      "id": "tn-3",
+      "title": "Masdar starts construction on 200MW solar energy project in Malaysia",
+      "summary": "Trending solar coverage from The National — use this Malaysia topic for your own posts and SEO content.",
+      "source": "The National",
+      "url": "https://news.google.com/rss/articles/CBMixwFBVV95cUxOUm9icm1fenRFb3hiV014ekt6ZXlZbFJYZ1FwN1BxZHg2TFhQYlNubVhQeGlDVVNiNXR0RE4zRlZoNTV2RTE3TzNEeklCS0s5UUl5Q3ZNLVhyVE4weEcwTEpMTFU2dktMQUxNY1JUMklTNVhYeGRSVUxyWXZReXF1cC1DdUZ5MDY3QlpoejFPTTl3R0I0bU9USl9xcURlVkJyQWk4Y09FSWxOeF9GZnFrNXNzUW9XR1ZfeEtRcEpYdFRXa1BROHIw?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarMalaysia"
+      ]
+    },
+    {
+      "id": "tn-4",
+      "title": "Singapore Grants Two Companies To Import Solar Energy From Malaysia",
+      "summary": "Trending solar coverage from BusinessToday Malaysia — use this Malaysia topic for your own posts and SEO content.",
+      "source": "BusinessToday Malaysia",
+      "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxQSTdzRXZGVXNYVUpqbXphU1lmOUF1ZmY2ZWVpSVBQUVJzRUZiNElFeVlVczFVZlJ6NDB5WmpfdlE1N1B6RV9nWjJJUm5Yb245bUFPZ0dHcTlxVDZWR3p0ME9LSWxodUxlRWNycXNSZXpJMWwxT2pFQkZ0eVdTZEI3YmFKM2N2YnI3S0thajFoZFd3MlVGN0RVYkQ1bXdNRGZFYnBaNlhid0lnUUN2UkFyOURn?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarMalaysia"
+      ]
+    },
+    {
+      "id": "tn-5",
       "title": "MBSB to sponsor 61 underserved Muslim tradesmen for solar panel certification",
       "summary": "Trending solar coverage from The Edge Malaysia — use this Malaysia topic for your own posts and SEO content.",
       "source": "The Edge Malaysia",
@@ -31,48 +64,14 @@
       ]
     },
     {
-      "id": "tn-3",
-      "title": "Singapore Grants Two Companies To Import Solar Energy From Malaysia",
-      "summary": "Trending solar coverage from BusinessToday Malaysia — use this Malaysia topic for your own posts and SEO content.",
-      "source": "BusinessToday Malaysia",
-      "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxQSTdzRXZGVXNYVUpqbXphU1lmOUF1ZmY2ZWVpSVBQUVJzRUZiNElFeVlVczFVZlJ6NDB5WmpfdlE1N1B6RV9nWjJJUm5Yb245bUFPZ0dHcTlxVDZWR3p0ME9LSWxodUxlRWNycXNSZXpJMWwxT2pFQkZ0eVdTZEI3YmFKM2N2YnI3S0thajFoZFd3MlVGN0RVYkQ1bXdNRGZFYnBaNlhid0lnUUN2UkFyOURn?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarMalaysia"
-      ]
-    },
-    {
-      "id": "tn-4",
-      "title": "Huawei brings new era of AI-powered, grid-stabilising solar energy to Malaysia with launch of FusionSolar9.0",
-      "summary": "Trending solar coverage from Huawei — use this Malaysia topic for your own posts and SEO content.",
-      "source": "Huawei",
-      "url": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxOUTVtcFlsQ1FHejFmQkx6QnRGWWdNT29yQ28ybjZ2MVd0SEdYRDFTXzdycVpIWUdDX0ktOVA0TGVrZFViZnR6SXZhMXZkTEwydUIwWWdGQkhTYW5YX3ozc3ByR1N0WjNuRVhwTm1JYXV3QnMtX3Q5YnNaMVJDVnFRNkRsRThERUl5QTFLeWVxb1NZbHhFcmdoa3FNbC15VTV4aHphaDE4UWw3aGtYQVJValVESG91YmJUSlo1WXkyMEVxekVCV1N5bkVLN3RyZ3lx?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarMalaysia"
-      ]
-    },
-    {
-      "id": "tn-5",
-      "title": "Masdar starts construction on 200MW solar energy project in Malaysia",
-      "summary": "Trending solar coverage from The National — use this Malaysia topic for your own posts and SEO content.",
-      "source": "The National",
-      "url": "https://news.google.com/rss/articles/CBMixwFBVV95cUxOUm9icm1fenRFb3hiV014ekt6ZXlZbFJYZ1FwN1BxZHg2TFhQYlNubVhQeGlDVVNiNXR0RE4zRlZoNTV2RTE3TzNEeklCS0s5UUl5Q3ZNLVhyVE4weEcwTEpMTFU2dktMQUxNY1JUMklTNVhYeGRSVUxyWXZReXF1cC1DdUZ5MDY3QlpoejFPTTl3R0I0bU9USl9xcURlVkJyQWk4Y09FSWxOeF9GZnFrNXNzUW9XR1ZfeEtRcEpYdFRXa1BROHIw?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarMalaysia"
-      ]
-    },
-    {
       "id": "tn-6",
-      "title": "Public universities encouraged to install solar panel to save electricity consumption",
-      "summary": "Trending solar coverage from The Sun Malaysia — use this Malaysia topic for your own posts and SEO content.",
-      "source": "The Sun Malaysia",
-      "url": "https://news.google.com/rss/articles/CBMizwFBVV95cUxQSjdzeHJCNXo3dzg0R3lCNGR0N2I0aVVjd2hLbFRNNjZFN3FuQnBPRHdxNjNsaFE2Zm1STV9vUS1VSlhJYVdreUFLRXdpQ1RobFRkOHFnVVdnQ2puV1RhNG40NDVjN3ktVDJHQm5zdTZuVVRfeVNTRW1MYTZIcG5qajdTbXZiN2FzSXJ6NWN4VmVUN0JWU1pfSFJyc3I2eTA3em1SbzkwYTE0RmZIX1pFOGdxUTYwWGxRbkFnc2VxVGxpWTlfOHduU1hHazZkZ3M?oc=5",
+      "title": "Malaysia Solar Energy Market Expected to Reach MYR 5.04B in 2026 as LSS6 Accelerates Solar and Battery Storage",
+      "summary": "Trending solar coverage from EIN Presswire — use this Malaysia topic for your own posts and SEO content.",
+      "source": "EIN Presswire",
+      "url": "https://news.google.com/rss/articles/CBMi7gFBVV95cUxQUUdRSEN0eEZ6Q2xCRFFzSEY5Q3VFbjFCOEdRX1ZZcDJnQmIyTUwtdlBTMWo2MXUxVXl4WUVQcFYxWVRhanY5UWZPanZfWlBabUkyRlBlcGIteGU4QURFYXdoeUVzYUpHeml5dlZiTkxILUV0YV9SSG44bjNfNllPdFIwUGhWM0UzNlp4LUJOTng5TDJJTTg1T0RPbUpQaW5vM09vX180cnpVZjdoOE9NVmhjVU5VRlk5bWVpcVZVZWcyWGxoOTFQc1czSUNKcDVlZ1JRa1kxazhjczF1TFNRT1BITEJlbTluVVA5ckVB?oc=5",
       "tags": [
-        "#solarpanel",
-        "#solarMalaysia",
-        "#solarenergy"
+        "#solarenergy",
+        "#solarMalaysia"
       ]
     }
   ],
@@ -142,7 +141,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "990K+"
+          "posts": "989K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -172,7 +171,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "180K+"
+          "posts": "176K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -182,7 +181,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "45K+"
+          "posts": "46K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -202,7 +201,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "512K+"
+          "posts": "486K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -222,7 +221,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "37K+"
+          "posts": "36K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
@@ -232,7 +231,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "46K+"
+          "posts": "45K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarsystem/"

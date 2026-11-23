@@ -172,6 +172,15 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
   const [sheetCurrentPage, setSheetCurrentPage] = useState(1);
   const [catalogCurrentPage, setCatalogCurrentPage] = useState(1);
   const [isExpandedGuide, setIsExpandedGuide] = useState(false);
+  const [ratesVersion, setRatesVersion] = useState(0);
+
+  useEffect(() => {
+    const handleRatesUpdate = () => {
+      setRatesVersion((v) => v + 1);
+    };
+    window.addEventListener('sellsolar_daily_rates_updated', handleRatesUpdate);
+    return () => window.removeEventListener('sellsolar_daily_rates_updated', handleRatesUpdate);
+  }, []);
 
   // Synchronized category selector ensuring top filter tabs, daily rate sheet, and product catalog update in unison
   const handleSelectCategory = (catId) => {
@@ -554,7 +563,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
     });
 
     return pool;
-  }, [dailySheetDate, todayDateLabel, yesterdayDateLabel]);
+  }, [dailySheetDate, todayDateLabel, yesterdayDateLabel, ratesVersion]);
 
   // Autocomplete hints filtered from pool
   const searchHints = useMemo(() => {
@@ -841,7 +850,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
       const combined = `${item.brand} ${item.model} ${item.type || ''} ${item.capacity || ''} ${item.badge || ''}`.toLowerCase().replace(/[^a-z0-9]/g, ' ');
       return cleanTerms.every((t) => combined.includes(t));
     });
-  }, [dailySheetDate, sheetCategory, sheetFilterStatus, sheetSearchQuery]);
+  }, [dailySheetDate, sheetCategory, sheetFilterStatus, sheetSearchQuery, ratesVersion]);
 
   // Pagination calculations for Daily Rate Sheet (Wholesale Trade Sheet)
   const sheetPageSize = 10;

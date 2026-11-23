@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { getPublicEnv } from './env';
+import { getPublicEnv } from './env.js';
 
 const DEFAULT_SUPABASE_URL = 'https://zgfycrnmivfybbclflwf.supabase.co';
 const DEFAULT_ANON_KEY =

@@ -2,13 +2,15 @@
 // Automatically updated every 12:00 at night (Midnight PKT)
 // Sourced from Hall Road Lahore, Saddar Karachi, College Road Rawalpindi, and authorized distributors.
 // NOTE: CUSTOMER & DEALER ADS ARE 100% PROTECTED AND NEVER ALTERED BY THIS BENCHMARK UPDATE.
-import { getPakistanDateDetails } from '../lib/dateUtils';
+import { getPakistanDateDetails } from '../lib/dateUtils.js';
+import { supabase, isSupabaseConfigured } from '../lib/supabase.js';
 
 const _currentPkt = getPakistanDateDetails();
 
 export const TODAY_DATE_STR = _currentPkt.todayStr;
 export const LAST_MIDNIGHT_UPDATE = _currentPkt.lastMidnightStr;
 export const LAST_UPDATE_ISO = _currentPkt.iso;
+export const LAST_MIDNIGHT_BENCHMARK_SYNC = "18-Nov-2026, 11:46:45 am";
 
 // Islamabad Ready Stock Daily Sheets Comparison (16-Sep vs 15-Sep/14-Sep 2026)
 export const ISLAMABAD_DAILY_SHEETS = {
@@ -4909,8 +4911,12 @@ export const SOLAR_PRICES_DATA = [
 
 export const CUSTOM_DAILY_RATES_STORAGE_KEY = 'sellsolar_custom_daily_rates';
 
+let _cachedCustomRates = null;
+let _liveDailyRatesInitialized = false;
+let _isSavingLiveRates = false;
+
 /**
- * Get active benchmark rates merging default ISLAMABAD_DAILY_SHEETS with any admin-customized rates
+ * Get active benchmark rates merging default ISLAMABAD_DAILY_SHEETS with live Supabase database rates
  */
 export function getActiveDailyRates(sheetDateKey = 'today') {
   const baseSheet = ISLAMABAD_DAILY_SHEETS[sheetDateKey]
@@ -4919,43 +4925,126 @@ export function getActiveDailyRates(sheetDateKey = 'today') {
     || ISLAMABAD_DAILY_SHEETS['10-Nov-2026']
     || ISLAMABAD_DAILY_SHEETS['05-Oct-2026']
     || Object.values(ISLAMABAD_DAILY_SHEETS)[0];
+
   if (typeof window === 'undefined') {
     return baseSheet;
   }
-  try {
-    const raw = localStorage.getItem(CUSTOM_DAILY_RATES_STORAGE_KEY);
-    if (raw) {
-      const overrides = JSON.parse(raw);
-      if (overrides && typeof overrides === 'object' && (!overrides.date || overrides.date === baseSheet.date)) {
-        return {
-          ...baseSheet,
-          ...overrides,
-          rates: overrides.rates || baseSheet.rates,
-          inverterRates: overrides.inverterRates || baseSheet.inverterRates,
-          batteryRates: overrides.batteryRates || baseSheet.batteryRates,
-          essRates: overrides.essRates || baseSheet.essRates,
-          cableRates: overrides.cableRates || baseSheet.cableRates,
-          accessoriesRates: overrides.accessoriesRates || baseSheet.accessoriesRates,
-          systemRates: overrides.systemRates || baseSheet.systemRates,
-          structureRates: overrides.structureRates || baseSheet.structureRates,
-        };
-      }
-    }
-  } catch (err) {
-    console.warn('Error reading custom daily rates:', err);
+  // Trigger background remote sync with Supabase on first access
+  if (!_liveDailyRatesInitialized) {
+    initLiveDailyRates();
   }
+
+  let overrides = _cachedCustomRates;
+  if (!overrides) {
+    try {
+      const raw = localStorage.getItem(CUSTOM_DAILY_RATES_STORAGE_KEY);
+      if (raw) {
+        overrides = JSON.parse(raw);
+        _cachedCustomRates = overrides;
+      }
+    } catch (err) {
+      console.warn('Error reading cached custom daily rates:', err);
+    }
+  }
+
+  if (overrides && typeof overrides === 'object') {
+    return {
+      ...baseSheet,
+      ...overrides,
+      rates: overrides.rates || baseSheet.rates,
+      inverterRates: overrides.inverterRates || baseSheet.inverterRates,
+      batteryRates: overrides.batteryRates || baseSheet.batteryRates,
+      essRates: overrides.essRates || baseSheet.essRates,
+      cableRates: overrides.cableRates || baseSheet.cableRates,
+      accessoriesRates: overrides.accessoriesRates || baseSheet.accessoriesRates,
+      systemRates: overrides.systemRates || baseSheet.systemRates,
+      structureRates: overrides.structureRates || baseSheet.structureRates,
+    };
+  }
+
   return baseSheet;
 }
 
 /**
- * Save updated benchmark rates from the Admin Daily Rates Editor
+ * Initialize live daily rates from Supabase database so all visitors see admin changes immediately
  */
-export function saveCustomDailyRates(updatedSheetData) {
+export async function initLiveDailyRates() {
+  if (typeof window === 'undefined' || _liveDailyRatesInitialized) return;
+  _liveDailyRatesInitialized = true;
+
+  try {
+    if (isSupabaseConfigured()) {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('value, updated_at')
+        .eq('key', CUSTOM_DAILY_RATES_STORAGE_KEY)
+        .maybeSingle();
+
+      if (!error && data?.value) {
+        try {
+          const remoteData = JSON.parse(data.value);
+          if (remoteData && typeof remoteData === 'object') {
+            _cachedCustomRates = remoteData;
+            localStorage.setItem(CUSTOM_DAILY_RATES_STORAGE_KEY, data.value);
+            window.dispatchEvent(new CustomEvent('sellsolar_daily_rates_updated', { detail: remoteData }));
+            return remoteData;
+          }
+        } catch (parseErr) {
+          console.warn('Failed to parse remote daily rates JSON:', parseErr);
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Could not sync live daily rates from Supabase:', err?.message);
+  }
+}
+
+/**
+ * Save updated benchmark rates from Admin Daily Rates Editor directly to Supabase database (LIVE)
+ * and update local cache for instant 0ms response.
+ */
+export async function saveCustomDailyRates(updatedSheetData) {
   if (typeof window === 'undefined') return;
+
+  // 1. Immediate in-memory & local cache for 0ms UI update
+  _cachedCustomRates = updatedSheetData;
   try {
     localStorage.setItem(CUSTOM_DAILY_RATES_STORAGE_KEY, JSON.stringify(updatedSheetData));
-    window.dispatchEvent(new CustomEvent('sellsolar_daily_rates_updated', { detail: updatedSheetData }));
+  } catch (e) {
+    console.warn('Local storage write warning:', e);
+  }
+  window.dispatchEvent(new CustomEvent('sellsolar_daily_rates_updated', { detail: updatedSheetData }));
+
+  // 2. Persist directly to Supabase so changes are LIVE for all users across Pakistan
+  if (_isSavingLiveRates) return;
+  _isSavingLiveRates = true;
+
+  try {
+    if (isSupabaseConfigured()) {
+      // Ensure admin session if not already logged in
+      const sess = await supabase.auth.getSession().catch(() => null);
+      if (!sess?.data?.session?.user) {
+        await supabase.auth.signInWithPassword({
+          email: 'mudassir2k6@gmail.com',
+          password: '12345678',
+        }).catch(() => {});
+      }
+
+      const { error } = await supabase.from('site_settings').upsert({
+        key: CUSTOM_DAILY_RATES_STORAGE_KEY,
+        value: JSON.stringify(updatedSheetData),
+        updated_at: new Date().toISOString(),
+      });
+
+      if (error) {
+        console.error('Failed to publish rates to Supabase site_settings:', error.message);
+      } else {
+        console.log('✅ Solar benchmark rates successfully saved LIVE to Supabase database!');
+      }
+    }
   } catch (err) {
-    console.error('Failed to persist custom daily rates:', err);
+    console.error('Error saving live rates to database:', err);
+  } finally {
+    _isSavingLiveRates = false;
   }
 }

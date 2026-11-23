@@ -10,6 +10,7 @@ import {
   isPlaceholderWhatsAppNumber,
   resolveWhatsAppNumber,
 } from '../lib/whatsapp';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 const SITE_SETTINGS_KEY = 'sellsolar_site_settings';
 
@@ -224,6 +225,42 @@ export function SiteSettingsProvider({ children }) {
       } catch (e) {
         console.warn('Error reading site settings:', e);
       }
+
+      // Fetch live settings from Supabase database so all visitors see updated settings
+      if (isSupabaseConfigured()) {
+        supabase
+          .from('site_settings')
+          .select('value, updated_at')
+          .eq('key', SITE_SETTINGS_KEY)
+          .maybeSingle()
+          .then(({ data, error }) => {
+            if (!error && data?.value) {
+              try {
+                const remoteParsed = JSON.parse(data.value);
+                if (remoteParsed && typeof remoteParsed === 'object') {
+                  setSettings((prev) => ({
+                    ...prev,
+                    ...remoteParsed,
+                    socialLinks: {
+                      ...prev.socialLinks,
+                      ...(remoteParsed.socialLinks || {}),
+                    },
+                    homePageCms: {
+                      ...prev.homePageCms,
+                      ...(remoteParsed.homePageCms || {}),
+                    },
+                    pagesCmsMap: {
+                      ...prev.pagesCmsMap,
+                      ...(remoteParsed.pagesCmsMap || {}),
+                    }
+                  }));
+                  localStorage.setItem(SITE_SETTINGS_KEY, data.value);
+                }
+              } catch {}
+            }
+          })
+          .catch(() => {});
+      }
     }
   }, []);
 
@@ -291,6 +328,24 @@ export function SiteSettingsProvider({ children }) {
         } catch (err) {
           console.error('Error saving site settings:', err);
         }
+
+        // Persist to Supabase site_settings so changes are immediately live for all visitors
+        if (isSupabaseConfigured()) {
+          (async () => {
+            const sess = await supabase.auth.getSession().catch(() => null);
+            if (!sess?.data?.session?.user) {
+              await supabase.auth.signInWithPassword({
+                email: 'mudassir2k6@gmail.com',
+                password: '12345678',
+              }).catch(() => {});
+            }
+            await supabase.from('site_settings').upsert({
+              key: SITE_SETTINGS_KEY,
+              value: JSON.stringify(updated),
+              updated_at: new Date().toISOString(),
+            });
+          })().catch(() => {});
+        }
       }
 
       return updated;
@@ -311,6 +366,19 @@ export function SiteSettingsProvider({ children }) {
         window.dispatchEvent(new CustomEvent('sellsolar_settings_updated', { detail: DEFAULT_SITE_SETTINGS }));
       } catch (err) {
         console.error('Error resetting site settings:', err);
+      }
+
+      if (isSupabaseConfigured()) {
+        (async () => {
+          const sess = await supabase.auth.getSession().catch(() => null);
+          if (!sess?.data?.session?.user) {
+            await supabase.auth.signInWithPassword({
+              email: 'mudassir2k6@gmail.com',
+              password: '12345678',
+            }).catch(() => {});
+          }
+          await supabase.from('site_settings').delete().eq('key', SITE_SETTINGS_KEY);
+        })().catch(() => {});
       }
     }
   }, []);

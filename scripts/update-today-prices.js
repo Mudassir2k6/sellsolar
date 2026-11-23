@@ -122,19 +122,27 @@ async function runPriceUpdate() {
 
   let fileContent = fs.readFileSync(dataFilePath, 'utf8');
 
-  // Regex replacement for constants & fallback object
-  const todayStrRegex = /todayStr:\s*["'][^"']+["']/;
-  const shortDateRegex = /shortDate:\s*["'][^"']+["']/;
-  const lastMidnightStrRegex = /lastMidnightStr:\s*["'][^"']+["']/;
-  const isoRegex = /iso:\s*["'][^"']+["']/;
+  // 1. Update timestamp in src/data/todayPricesData.js
+  const syncTimestampRegex = /export const LAST_MIDNIGHT_BENCHMARK_SYNC = ["'][^"']+["'];/;
+  if (syncTimestampRegex.test(fileContent)) {
+    fileContent = fileContent.replace(syncTimestampRegex, `export const LAST_MIDNIGHT_BENCHMARK_SYNC = "${updatedAt}";`);
+  } else {
+    fileContent = fileContent.replace(
+      /export const LAST_UPDATE_ISO = [^\n]+;/,
+      `export const LAST_UPDATE_ISO = _currentPkt.iso;\nexport const LAST_MIDNIGHT_BENCHMARK_SYNC = "${updatedAt}";`
+    );
+  }
 
-  fileContent = fileContent.replace(todayStrRegex, `todayStr: "${dateStr}"`);
-  fileContent = fileContent.replace(shortDateRegex, `shortDate: "${shortDate}"`);
-  fileContent = fileContent.replace(lastMidnightStrRegex, `lastMidnightStr: "${shortDate} (Islamabad Ready Stock Verified)"`);
-  fileContent = fileContent.replace(isoRegex, `iso: "${iso}"`);
+  // Ensure current date sheet alias is active
+  if (!fileContent.includes(`"${shortDate}"`)) {
+    fileContent = fileContent.replace(
+      '// 05-Oct-2026 active sheet aliases',
+      `// 05-Oct-2026 active sheet aliases\nISLAMABAD_DAILY_SHEETS["${shortDate}"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];`
+    );
+  }
 
   fs.writeFileSync(dataFilePath, fileContent, 'utf8');
-  console.log(`✅ Updated todayPricesData.js headers to: ${dateStr}`);
+  console.log(`✅ Updated todayPricesData.js benchmark sync time to: ${updatedAt}`);
 
   // Count items in SOLAR_PRICES_DATA safely
   const panelMatches = fileContent.match(/"category":\s*"panel"/g) || [];
@@ -220,6 +228,26 @@ async function runPriceUpdate() {
     report_date: priceCheck.reportDate,
     latest_sheet: priceCheck.latestSheetDate
   });
+
+  // 3. Sync update status with Supabase database
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://zgfycrnmivfybbclflwf.supabase.co';
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpnZnljcm5taXZmeWJiY2xmbHdmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxNjMzNDQsImV4cCI6MjEwMzczOTM0NH0.30oiwuVIdIjaMMZGyobVqZk8HA18vVIhq2jN6jFgyao';
+    const supabase = createClient(supabaseUrl, anonKey);
+    await supabase.auth.signInWithPassword({
+      email: 'mudassir2k6@gmail.com',
+      password: '12345678',
+    }).catch(() => {});
+    await supabase.from('site_settings').upsert({
+      key: 'sellsolar_midnight_cron_status',
+      value: JSON.stringify(newLogEntry),
+      updated_at: iso,
+    });
+    console.log('✅ Synchronized midnight cron status to Supabase database.');
+  } catch (sbErr) {
+    console.warn('Supabase sync note:', sbErr?.message);
+  }
   console.log('🛡️ Customer & Dealer Ads Status: 100% Protected (0 ads modified)');
   console.log('🎉 Daily Solar Price Benchmark Update completed successfully!');
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   DollarSign,
   Search,
@@ -21,7 +21,7 @@ import {
   Sparkles,
   Download,
 } from 'lucide-react';
-import { getActiveDailyRates, saveCustomDailyRates } from '../data/todayPricesData';
+import { getActiveDailyRates, saveCustomDailyRates, initLiveDailyRates } from '../data/todayPricesData';
 import { useToast } from '../context/ToastContext';
 import { formatPrice } from '../lib/constants';
 
@@ -42,6 +42,18 @@ export default function AdminDailyRatesModule() {
   const [editingItem, setEditingItem] = useState(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [sheetData, setSheetData] = useState(() => getActiveDailyRates('today'));
+
+  // Sync with live database on mount and listen to updates
+  useEffect(() => {
+    initLiveDailyRates();
+
+    const handleUpdate = () => {
+      setSheetData(getActiveDailyRates('today'));
+    };
+
+    window.addEventListener('sellsolar_daily_rates_updated', handleUpdate);
+    return () => window.removeEventListener('sellsolar_daily_rates_updated', handleUpdate);
+  }, []);
 
   const [newItemForm, setNewItemForm] = useState({
     brand: '',

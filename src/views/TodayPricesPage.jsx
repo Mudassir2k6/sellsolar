@@ -38,7 +38,9 @@ import {
   LAST_MIDNIGHT_UPDATE,
   ISLAMABAD_DAILY_SHEETS,
   getActiveDailyRates,
+  getSyncedSolarCatalog,
 } from '../data/todayPricesData';
+import { syncDailyRatesFromSupabase } from '../lib/dailyRatesSync';
 import { getPakistanDateDetails } from '../lib/dateUtils';
 import { formatPrice } from '../lib/constants';
 
@@ -175,6 +177,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
   const [ratesVersion, setRatesVersion] = useState(0);
 
   useEffect(() => {
+    syncDailyRatesFromSupabase();
     const handleRatesUpdate = () => {
       setRatesVersion((v) => v + 1);
     };
@@ -681,9 +684,9 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
     return Array.from(new Set(items.map((i) => i.brand))).sort();
   }, [selectedCategory]);
 
-  // Filtered & Sorted items
+  // Filtered & Sorted items (synced with active daily sheet + live admin overrides)
   const filteredItems = useMemo(() => {
-    let result = [...SOLAR_PRICES_DATA];
+    let result = [...getSyncedSolarCatalog(SOLAR_PRICES_DATA)];
 
     if (selectedCategory !== 'all') {
       result = result.filter((item) => item.category === selectedCategory);
@@ -724,7 +727,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
     });
 
     return result;
-  }, [selectedCategory, selectedBrand, searchQuery, sortBy]);
+  }, [selectedCategory, selectedBrand, searchQuery, sortBy, ratesVersion]);
 
   // Filtered Islamabad Daily Sheet Rates
   const displayedSheetRates = useMemo(() => {

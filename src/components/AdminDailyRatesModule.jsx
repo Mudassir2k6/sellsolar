@@ -17,11 +17,18 @@ import {
   BatteryCharging,
   Boxes,
   Wrench,
-  RefreshCw,
   Sparkles,
-  Download,
+  ClipboardPaste,
+  Globe,
+  RotateCcw,
 } from 'lucide-react';
-import { getActiveDailyRates, saveCustomDailyRates, initLiveDailyRates } from '../data/todayPricesData';
+import { getActiveDailyRates, RAW_BASE_DAILY_SHEET, CUSTOM_DAILY_RATES_STORAGE_KEY } from '../data/todayPricesData';
+import {
+  parseWhatsAppRateSheet,
+  publishDailyRatesGlobal,
+  syncDailyRatesFromSupabase,
+} from '../lib/dailyRatesSync';
+import { getPakistanDateDetails } from '../lib/dateUtils';
 import { useToast } from '../context/ToastContext';
 import { formatPrice } from '../lib/constants';
 
@@ -41,19 +48,25 @@ export default function AdminDailyRatesModule() {
   const [editingIndex, setEditingIndex] = useState(null);
   const [editingItem, setEditingItem] = useState(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
+  const [isImporterOpen, setIsImporterOpen] = useState(false);
+  const [whatsappRawText, setWhatsappRawText] = useState('');
+  const [importMode, setImportMode] = useState('replace');
+  const [isPublishing, setIsPublishing] = useState(false);
   const [sheetData, setSheetData] = useState(() => getActiveDailyRates('today'));
 
-  // Sync with live database on mount and listen to updates
   useEffect(() => {
-    initLiveDailyRates();
-
+    syncDailyRatesFromSupabase();
     const handleUpdate = () => {
       setSheetData(getActiveDailyRates('today'));
     };
-
     window.addEventListener('sellsolar_daily_rates_updated', handleUpdate);
     return () => window.removeEventListener('sellsolar_daily_rates_updated', handleUpdate);
   }, []);
+
+  const parsedWhatsAppPreview = useMemo(() => {
+    if (!whatsappRawText.trim()) return null;
+    return parseWhatsAppRateSheet(whatsappRawText, sheetData, { mode: importMode });
+  }, [whatsappRawText, sheetData, importMode]);
 
   const [newItemForm, setNewItemForm] = useState({
     brand: '',
@@ -94,6 +107,65 @@ export default function AdminDailyRatesModule() {
     );
   }, [sheetData, activeCategory, searchQuery]);
 
+  const persistSheetLive = async (nextSheet, successTitle, successMessage) => {
+    setIsPublishing(true);
+    setSheetData(nextSheet);
+    try {
+      const result = await publishDailyRatesGlobal(nextSheet);
+      showToast({
+        title: result.syncedGlobal ? `${successTitle} (Live Globally)` : successTitle,
+        message: result.syncedGlobal
+          ? `${successMessage} Synced to Supabase for all visitors.`
+          : `${successMessage} Saved locally${result.error ? ` (${result.error})` : ''}.`,
+        type: 'success',
+      });
+    } finally {
+      setIsPublishing(false);
+    }
+  };
+
+  const handlePublishWhatsAppList = async () => {
+    if (!parsedWhatsAppPreview || parsedWhatsAppPreview.parsedItems.length === 0) {
+      showToast({
+        title: 'Nothing Parsed',
+        message: 'Paste a valid solar panel rate list first (e.g. "Longi 645 BF - Rs. 41/W").',
+        type: 'error',
+      });
+      return;
+    }
+
+    const pkt = getPakistanDateDetails();
+    const updatedSheet = {
+      ...sheetData,
+      date: pkt.todayStr,
+      label: `${pkt.shortDate} (Ready Stock)`,
+      rates: parsedWhatsAppPreview.nextRates,
+    };
+
+    await persistSheetLive(
+      updatedSheet,
+      `${parsedWhatsAppPreview.summary.total} Panel Rates Published`,
+      `${parsedWhatsAppPreview.summary.changed} changed, ${parsedWhatsAppPreview.summary.added} new.`
+    );
+
+    setWhatsappRawText('');
+    setIsImporterOpen(false);
+    setActiveCategory('panel');
+  };
+
+  const handleResetToRepoSheet = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(CUSTOM_DAILY_RATES_STORAGE_KEY);
+      window.dispatchEvent(new CustomEvent('sellsolar_daily_rates_updated'));
+    }
+    setSheetData(getActiveDailyRates('today'));
+    showToast({
+      title: 'Reset to Verified Repo Sheet',
+      message: `Restored ${RAW_BASE_DAILY_SHEET?.label || 'latest benchmark sheet'}.`,
+      type: 'info',
+    });
+  };
+
   const handleStartEdit = (item, idx) => {
     setEditingIndex(idx);
     setEditingItem({ ...item });
@@ -104,7 +176,7 @@ export default function AdminDailyRatesModule() {
     setEditingItem(null);
   };
 
-  const handleSaveEdit = (idx) => {
+  const handleSaveEdit = async (idx) => {
     const key = getCategoryKey(activeCategory);
     const updatedRates = [...(sheetData[key] || [])];
     const newRate = parseFloat(editingItem.rate) || 0;
@@ -118,22 +190,22 @@ export default function AdminDailyRatesModule() {
       prevRate: prev,
       change: diff,
       status,
+      isCarriedForward: false,
+      rateSource: 'admin_verified',
     };
 
     const newSheet = { ...sheetData, [key]: updatedRates };
-    setSheetData(newSheet);
-    saveCustomDailyRates(newSheet);
     setEditingIndex(null);
     setEditingItem(null);
 
-    showToast({
-      title: 'Rate Updated',
-      message: `${editingItem.brand} ${editingItem.model} updated live on the portal.`,
-      type: 'success',
-    });
+    await persistSheetLive(
+      newSheet,
+      'Rate Updated',
+      `${editingItem.brand} ${editingItem.model} updated live on the portal.`
+    );
   };
 
-  const handleAddNewItem = (e) => {
+  const handleAddNewItem = async (e) => {
     e?.preventDefault();
     if (!newItemForm.brand.trim() || !newItemForm.model.trim()) {
       showToast({ title: 'Validation Error', message: 'Brand and Model are required.', type: 'error' });
@@ -159,12 +231,12 @@ export default function AdminDailyRatesModule() {
       badge: newItemForm.badge.trim() || undefined,
       warranty: newItemForm.warranty.trim() || undefined,
       note: newItemForm.note.trim() || undefined,
+      isCarriedForward: false,
+      rateSource: 'admin_verified',
     };
 
     const updatedRates = [newItem, ...currentCategoryRates];
     const newSheet = { ...sheetData, [key]: updatedRates };
-    setSheetData(newSheet);
-    saveCustomDailyRates(newSheet);
 
     setNewItemForm({
       brand: '',
@@ -180,27 +252,23 @@ export default function AdminDailyRatesModule() {
     });
     setIsAddingNew(false);
 
-    showToast({
-      title: 'Benchmark Rate Added',
-      message: `${newItem.brand} ${newItem.model} benchmark added and published live.`,
-      type: 'success',
-    });
+    await persistSheetLive(
+      newSheet,
+      'Benchmark Rate Added',
+      `${newItem.brand} ${newItem.model} benchmark added and published live.`
+    );
   };
 
-  const handleDeleteItem = (idx) => {
-    if (!confirm('Are you sure you want to remove this benchmark item?')) return;
+  const handleDeleteItem = async (idx) => {
     const key = getCategoryKey(activeCategory);
     const currentCategoryRates = [...(sheetData[key] || [])];
     currentCategoryRates.splice(idx, 1);
     const newSheet = { ...sheetData, [key]: currentCategoryRates };
-    setSheetData(newSheet);
-    saveCustomDailyRates(newSheet);
-
-    showToast({
-      title: 'Item Removed',
-      message: 'The benchmark item has been removed from today\'s sheet.',
-      type: 'info',
-    });
+    await persistSheetLive(
+      newSheet,
+      'Item Removed',
+      "The benchmark item has been removed from today's sheet."
+    );
   };
 
   return (
@@ -208,7 +276,7 @@ export default function AdminDailyRatesModule() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <h1 className="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-2">
               <DollarSign className="h-6 w-6 text-emerald-500" />
               Daily Solar Price Benchmarks & Sheets
@@ -218,19 +286,134 @@ export default function AdminDailyRatesModule() {
             </span>
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            Update official daily Islamabad & Pakistan benchmark rates. Changes reflect instantly on the public Today's Prices page.
+            Update official daily Islamabad & Pakistan benchmark rates or paste a morning WhatsApp distributor sheet to publish globally in 1 click.
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setIsAddingNew(!isAddingNew)}
-          className="btn-primary text-xs flex items-center gap-2 shrink-0 self-start sm:self-auto"
-        >
-          {isAddingNew ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-          {isAddingNew ? 'Close Form' : 'Add New Benchmark Rate'}
-        </button>
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={() => setIsImporterOpen((prev) => !prev)}
+            className="px-3.5 py-2 rounded-xl border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 text-xs font-bold flex items-center gap-1.5 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors"
+          >
+            <ClipboardPaste className="h-4 w-4" />
+            {isImporterOpen ? 'Close WhatsApp Importer' : 'Paste WhatsApp Rate List'}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleResetToRepoSheet}
+            title="Restore verified repository benchmark sheet"
+            className="px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 text-xs font-bold flex items-center gap-1.5 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+          >
+            <RotateCcw className="h-3.5 w-3.5" />
+            Reset
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsAddingNew(!isAddingNew)}
+            className="btn-primary text-xs flex items-center gap-2"
+          >
+            {isAddingNew ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+            {isAddingNew ? 'Close Form' : 'Add New Benchmark Rate'}
+          </button>
+        </div>
       </div>
+
+      {/* WhatsApp Wholesale Rate Sheet Importer */}
+      {isImporterOpen && (
+        <div className="p-5 rounded-2xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/50 dark:bg-amber-950/20 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h3 className="text-sm font-black text-amber-950 dark:text-amber-200 flex items-center gap-2">
+                <Globe className="h-4 w-4 text-amber-600" />
+                One-Click Distributor WhatsApp Rate Importer (Live Sync)
+              </h3>
+              <p className="text-[11px] text-amber-800/80 dark:text-amber-300/80 mt-0.5">
+                Paste your morning rate list directly (e.g. brand headers + &quot;Astro 625 - Rs. 36.25/W - Expected Delivery 27/11/26&quot;). Automatically diffs &amp; publishes to all visitors.
+              </p>
+            </div>
+            <div className="flex items-center gap-1.5 bg-white dark:bg-gray-900 p-1 rounded-xl border border-amber-200 dark:border-gray-800 text-[11px] font-bold">
+              <button
+                type="button"
+                onClick={() => setImportMode('replace')}
+                className={`px-2.5 py-1 rounded-lg transition-colors ${importMode === 'replace' ? 'bg-amber-500 text-white' : 'text-gray-600 dark:text-gray-400'}`}
+              >
+                Replace List
+              </button>
+              <button
+                type="button"
+                onClick={() => setImportMode('merge')}
+                className={`px-2.5 py-1 rounded-lg transition-colors ${importMode === 'merge' ? 'bg-amber-500 text-white' : 'text-gray-600 dark:text-gray-400'}`}
+              >
+                Merge Updates
+              </button>
+            </div>
+          </div>
+
+          <textarea
+            rows={7}
+            value={whatsappRawText}
+            onChange={(e) => setWhatsappRawText(e.target.value)}
+            placeholder={`LONGI\n- Longi 645 BF - Rs. 41/W\nASTRO\n- Astro 625 - Rs. 36.25/W - Expected Delivery 27/11/26`}
+            className="w-full rounded-xl border border-amber-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-3 text-xs font-mono text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-400"
+          />
+
+          {parsedWhatsAppPreview && (
+            <div className="rounded-xl border border-amber-200/80 dark:border-gray-800 bg-white/90 dark:bg-gray-900/90 p-3 space-y-2">
+              <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-bold">
+                <span className="text-gray-900 dark:text-white">
+                  Parsed {parsedWhatsAppPreview.summary.total} panel rates
+                </span>
+                <div className="flex items-center gap-3 text-[11px]">
+                  <span className="text-red-600">Up: {parsedWhatsAppPreview.summary.up}</span>
+                  <span className="text-emerald-600">Down: {parsedWhatsAppPreview.summary.down}</span>
+                  <span className="text-blue-600">New: {parsedWhatsAppPreview.summary.added}</span>
+                  <span className="text-gray-500">Same: {parsedWhatsAppPreview.summary.unchanged}</span>
+                </div>
+              </div>
+              <div className="max-h-40 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5 text-[11px]">
+                {parsedWhatsAppPreview.parsedItems.map((item, idx) => (
+                  <div
+                    key={`${item.brand}-${item.model}-${idx}`}
+                    className="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-gray-50 dark:bg-gray-800/70 border border-gray-100 dark:border-gray-800"
+                  >
+                    <span className="truncate font-semibold text-gray-800 dark:text-gray-200 pr-2">
+                      {item.model}
+                    </span>
+                    <span className="font-black text-gray-900 dark:text-white shrink-0">
+                      Rs {item.rate.toFixed(2)}/W
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setWhatsappRawText('');
+                setIsImporterOpen(false);
+              }}
+              className="btn-secondary text-xs px-4 py-2"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              disabled={isPublishing || !parsedWhatsAppPreview?.parsedItems?.length}
+              onClick={handlePublishWhatsAppList}
+              className="btn-primary text-xs px-5 py-2 flex items-center gap-1.5 disabled:opacity-50"
+            >
+              <Globe className="h-4 w-4" />
+              {isPublishing ? 'Publishing Live...' : 'Publish Live Now'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Add New Rate Form */}
       {isAddingNew && (

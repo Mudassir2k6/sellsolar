@@ -31,11 +31,22 @@ export async function syncDailyRatesFromSupabase(force = false) {
         .eq('key', DAILY_RATES_SETTINGS_KEY)
         .maybeSingle();
 
-      if (error || !data?.value || typeof data.value !== 'object') {
+      if (error || !data?.value) {
         return null;
       }
 
-      const remoteWrapper = data.value;
+      let remoteWrapper = data.value;
+      if (typeof remoteWrapper === 'string') {
+        try {
+          remoteWrapper = JSON.parse(remoteWrapper);
+        } catch {
+          return null;
+        }
+      }
+      if (!remoteWrapper || typeof remoteWrapper !== 'object') {
+        return null;
+      }
+
       const remoteSheet = remoteWrapper.sheet || remoteWrapper;
       if (!remoteSheet || !Array.isArray(remoteSheet.rates)) {
         return null;

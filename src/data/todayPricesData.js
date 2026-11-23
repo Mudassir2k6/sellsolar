@@ -3,14 +3,13 @@
 // Sourced from Hall Road Lahore, Saddar Karachi, College Road Rawalpindi, and authorized distributors.
 // NOTE: CUSTOMER & DEALER ADS ARE 100% PROTECTED AND NEVER ALTERED BY THIS BENCHMARK UPDATE.
 import { getPakistanDateDetails } from '../lib/dateUtils.js';
-import { supabase, isSupabaseConfigured } from '../lib/supabase.js';
+import { AUTO_FETCHED_RATES } from './autoFetchedRates.js';
 
 const _currentPkt = getPakistanDateDetails();
 
 export const TODAY_DATE_STR = _currentPkt.todayStr;
 export const LAST_MIDNIGHT_UPDATE = _currentPkt.lastMidnightStr;
 export const LAST_UPDATE_ISO = _currentPkt.iso;
-export const LAST_MIDNIGHT_BENCHMARK_SYNC = "18-Nov-2026, 11:46:45 am";
 
 // Islamabad Ready Stock Daily Sheets Comparison (16-Sep vs 15-Sep/14-Sep 2026)
 export const ISLAMABAD_DAILY_SHEETS = {
@@ -1640,9 +1639,125 @@ ISLAMABAD_DAILY_SHEETS["17-Nov-2026"] = {
   "structureRates": ISLAMABAD_DAILY_SHEETS["05-Oct-2026"].structureRates
 };
 
-// Active sheet aliases (Latest sheet is 17-Nov-2026)
-ISLAMABAD_DAILY_SHEETS["today"] = ISLAMABAD_DAILY_SHEETS["17-Nov-2026"];
-ISLAMABAD_DAILY_SHEETS["yesterday"] = ISLAMABAD_DAILY_SHEETS["10-Nov-2026"];
+// 23-Nov-2026 rates (Verified Ready Stock Panel Sheet + Latest Inverters, Batteries, ESS, Smart Meters & Systems)
+ISLAMABAD_DAILY_SHEETS["23-Nov-2026"] = {
+  "sheetVersion": "23-Nov-2026-v1",
+  "publishedIso": "2026-11-23T00:00:00+05:00",
+  "date": "23-November-2026",
+  "label": "23-Nov-2026 (Ready Stock)",
+  "rates": [
+    {"brand": "LONGi", "model": "Longi 645W BF", "rate": 41.00, "prevRate": 41.00, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Astronergy", "model": "Astro 620W", "rate": 37.00, "prevRate": 37.00, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Astronergy", "model": "Astro 625W", "rate": 36.25, "prevRate": 36.90, "change": -0.65, "status": "down", "badge": "Expected Delivery 27/11/26", "note": "Expected Delivery 27/11/26"},
+    {"brand": "Astronergy", "model": "Astro 720W", "rate": 39.00, "prevRate": 38.75, "change": 0.25, "status": "up", "badge": "Ready Stock"},
+    {"brand": "JA Solar", "model": "JA 590W", "rate": 36.50, "prevRate": 36.50, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "JA Solar", "model": "JA 630W", "rate": 37.00, "prevRate": 37.00, "change": 0, "status": "stable", "badge": "Limited Stock Available", "note": "Limited Stock Available"},
+    {"brand": "Canadian Solar", "model": "Canadian 585W", "rate": 40.10, "prevRate": 40.00, "change": 0.10, "status": "up", "badge": "Ready Stock"},
+    {"brand": "Canadian Solar", "model": "Canadian 625W", "rate": 40.00, "prevRate": 40.00, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Canadian Solar", "model": "Canadian 630W HJT", "rate": 39.85, "prevRate": 39.85, "change": 0, "status": "stable", "badge": "HJT Series"},
+    {"brand": "Jinko Solar", "model": "Jinko 585W", "rate": 38.10, "prevRate": 38.50, "change": -0.40, "status": "down", "badge": "Ready Stock"},
+    {"brand": "Jinko Solar", "model": "Jinko 645W", "rate": 39.25, "prevRate": 39.25, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "OSDA", "model": "Osda 585W", "rate": 33.75, "prevRate": 34.25, "change": -0.50, "status": "down", "badge": "Ready Stock"},
+    {"brand": "OSDA", "model": "Osda 615W", "rate": 33.75, "prevRate": 35.00, "change": -1.25, "status": "down", "badge": "Ready Stock"},
+    {"brand": "Trox", "model": "Trox 590W", "rate": 35.00, "prevRate": 35.00, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Korean", "model": "Korean 585W", "rate": 35.00, "prevRate": 35.00, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Korean", "model": "Korean 615W", "rate": 35.50, "prevRate": 35.50, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Korean", "model": "Korean 670W", "rate": 40.50, "prevRate": 40.50, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Korean", "model": "Korean 715W", "rate": 38.50, "prevRate": 38.50, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Inverex", "model": "Inverex Mustang 620W", "rate": 42.00, "prevRate": 42.00, "change": 0, "status": "stable", "badge": "A-Grade w/ Docs"},
+    {"brand": "Inverex", "model": "Inverex Jollywood 625W", "rate": 42.00, "prevRate": 42.00, "change": 0, "status": "stable", "badge": "A-Grade w/ Docs"},
+    {"brand": "Inverex", "model": "Inverex Mustang 720W", "rate": 42.50, "prevRate": 42.50, "change": 0, "status": "stable", "badge": "A-Grade w/ Docs"},
+    {"brand": "Yingli", "model": "Yingli 630W", "rate": 36.00, "prevRate": 36.00, "change": 0, "status": "stable", "badge": "Ready Stock"}
+  ],
+  "inverterRates": ISLAMABAD_DAILY_SHEETS["17-Nov-2026"].inverterRates,
+  "batteryRates": ISLAMABAD_DAILY_SHEETS["17-Nov-2026"].batteryRates,
+  "essRates": ISLAMABAD_DAILY_SHEETS["17-Nov-2026"].essRates,
+  "cableRates": ISLAMABAD_DAILY_SHEETS["17-Nov-2026"].cableRates,
+  "accessoriesRates": ISLAMABAD_DAILY_SHEETS["17-Nov-2026"].accessoriesRates,
+  "systemRates": ISLAMABAD_DAILY_SHEETS["17-Nov-2026"].systemRates,
+  "structureRates": ISLAMABAD_DAILY_SHEETS["17-Nov-2026"].structureRates
+};
+
+export const RAW_BASE_DAILY_SHEET = ISLAMABAD_DAILY_SHEETS["23-Nov-2026"];
+
+export function makeRateItemKey(category, brand, model) {
+  return [
+    String(category || '').trim().toLowerCase(),
+    String(brand || '').trim().toLowerCase().replace(/\s+/g, ' '),
+    String(model || '').trim().toLowerCase().replace(/\s+/g, ' '),
+  ].join('|');
+}
+
+export const AUTO_FETCH_META = AUTO_FETCHED_RATES?.summary || {
+  totalChecked: 0,
+  updatedCount: 0,
+  liveMatchedCount: 0,
+  carriedForwardCount: 0,
+  sourcesChecked: [],
+};
+
+export function applyAutoFetchedRatesToSheet(baseSheet, autoSnapshot = AUTO_FETCHED_RATES) {
+  if (!baseSheet || !autoSnapshot || !autoSnapshot.items || Object.keys(autoSnapshot.items).length === 0) {
+    return baseSheet;
+  }
+  const categoryArrayMap = [
+    ['rates', 'panel'],
+    ['inverterRates', 'inverter'],
+    ['batteryRates', 'battery'],
+    ['essRates', 'ess'],
+    ['cableRates', 'cables_wiring'],
+    ['accessoriesRates', 'solar_accessories'],
+    ['systemRates', 'complete_system'],
+    ['structureRates', 'structure_accessories'],
+  ];
+  const nextSheet = {
+    ...baseSheet,
+    sheetVersion: `${baseSheet.sheetVersion || 'base'}-${autoSnapshot.version || 'auto'}`,
+    autoFetchSummary: autoSnapshot.summary || null,
+    lastAutoFetchIso: autoSnapshot.lastRunIso || null,
+  };
+
+  for (const [arrayProp, categoryName] of categoryArrayMap) {
+    const list = Array.isArray(baseSheet[arrayProp]) ? baseSheet[arrayProp] : [];
+    nextSheet[arrayProp] = list.map((item) => {
+      const key = makeRateItemKey(categoryName, item.brand, item.model);
+      const autoItem = autoSnapshot.items[key];
+      if (!autoItem) return item;
+
+      const baseMatchesSnapshot =
+        autoItem.baseRateAtFetch === undefined ||
+        autoItem.baseRateAtFetch === item.rate;
+
+      if (!baseMatchesSnapshot) {
+        return item;
+      }
+
+      if (autoItem.isCarriedForward) {
+        return {
+          ...item,
+          isCarriedForward: true,
+          rateSource: autoItem.rateSource || 'carried_forward',
+        };
+      }
+
+      return {
+        ...item,
+        rate: autoItem.rate !== undefined ? autoItem.rate : item.rate,
+        prevRate: autoItem.prevRate !== undefined ? autoItem.prevRate : item.prevRate,
+        change: autoItem.change !== undefined ? autoItem.change : item.change,
+        status: autoItem.status || item.status,
+        isCarriedForward: false,
+        rateSource: autoItem.rateSource || 'live_pk',
+        matchedUrl: autoItem.matchedUrl || undefined,
+      };
+    });
+  }
+  return nextSheet;
+}
+
+// Active sheet aliases (Latest sheet is 23-Nov-2026 + automated nightly Option B overlay)
+ISLAMABAD_DAILY_SHEETS["today"] = applyAutoFetchedRatesToSheet(RAW_BASE_DAILY_SHEET, AUTO_FETCHED_RATES);
+ISLAMABAD_DAILY_SHEETS["yesterday"] = ISLAMABAD_DAILY_SHEETS["17-Nov-2026"];
 ISLAMABAD_DAILY_SHEETS["24-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
 ISLAMABAD_DAILY_SHEETS["06-Oct-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
 ISLAMABAD_DAILY_SHEETS["16-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
@@ -1650,13 +1765,13 @@ ISLAMABAD_DAILY_SHEETS["15-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
 ISLAMABAD_DAILY_SHEETS["14-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
 ISLAMABAD_DAILY_SHEETS["24-Sept-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
 
-const todayKey = _currentPkt?.shortDate || "17-Nov-2026";
-const yesterdayKey = _currentPkt?.yesterdayShortDate || "10-Nov-2026";
+const todayKey = _currentPkt?.shortDate || "23-Nov-2026";
+const yesterdayKey = _currentPkt?.yesterdayShortDate || "17-Nov-2026";
 
 if (!ISLAMABAD_DAILY_SHEETS[todayKey]) {
   ISLAMABAD_DAILY_SHEETS[todayKey] = {
     ...ISLAMABAD_DAILY_SHEETS["today"],
-    date: _currentPkt?.todayStr || "17 November 2026",
+    date: _currentPkt?.todayStr || "23 November 2026",
     label: `${todayKey} (Ready Stock)`
   };
 }
@@ -1668,13 +1783,13 @@ if (_currentPkt?.yesterdayShortDate && !ISLAMABAD_DAILY_SHEETS[_currentPkt.yeste
 }
 
 export const MARKET_SUMMARY = {
-  "panelsPerWattAvg": "Rs 35.00 – 42.50 / W",
-  "panelsAvgRate": "Rs 38.75 / W",
+  "panelsPerWattAvg": "Rs 33.75 – 42.50 / W",
+  "panelsAvgRate": "Rs 38.05 / W",
   "invertersAvg": "Rs 42,500 – 1,185,750",
   "invertersAvgDetail": "Knox Krypton/Xenon/Zynex ~Rs 97k–345k • Zapher ~Rs 164k–1.19M • ASW/XEROX On-Grid ~Rs 120k–970k • SAJ/Itel Active",
   "batteriesAvg": "Rs 54,000 – 3,335,935",
   "batteriesAvgDetail": "Knox Powerwall/Powerbase/HV Packs ~Rs 130.5k–3.34M • Daewoo CATL 100–314Ah ~Rs 120k–660k • Itel ~Rs 54k–559k",
-  "panelsTrend": `Verified ready stock prices updated for ${todayKey}: Inverex 620W Mustang & 625W Jollywood at Rs 42.00 (720W at Rs 42.50), LONGi 645W BF at Rs 41.25, Canadian 585W at Rs 40.25 (625W at Rs 40.00), Jinko 585W at Rs 38.75 (645W BF at Rs 39.75), JA Solar 590W at Rs 37.00 (625W at Rs 37.25, 630W at Rs 36.90), Astronergy 625W BF at Rs 36.90 (720W at Rs 39.25), Korean 585W at Rs 37.00 (715W at Rs 38.50), TCL 720W at Rs 37.50, OSDA & Trox at Rs 35.00.`,
+  "panelsTrend": `Verified ready stock prices updated for ${todayKey}: LONGi 645W BF at Rs 41.00, Inverex 620W Mustang & 625W Jollywood at Rs 42.00 (720W at Rs 42.50), Canadian 585W at Rs 40.10 (625W at Rs 40.00, 630W HJT at Rs 39.85), Jinko 585W at Rs 38.10 (645W at Rs 39.25), Astronergy 620W at Rs 37.00 (625W at Rs 36.25 Delivery 27/11/26, 720W at Rs 39.00), JA Solar 590W at Rs 36.50 (630W at Rs 37.00), Korean 585W at Rs 35.00 (715W at Rs 38.50), Yingli 630W at Rs 36.00, Trox 590W at Rs 35.00, OSDA 585W/615W at Rs 33.75.`,
   "invertersTrend": "Knox Krypton/Xenon/Zynex (Rs 97k–345k), Zapher 5-Yr Warranty (Rs 164k–1.19M), ASW & XEROX G4/Pro On-Grid (Rs 120k–970k), SAJ & Itel Hybrid updated.",
   "batteriesTrend": "Knox LFP Powerwall/Powerbase, PowerStack HV & Complete HV Packs (Rs 130.5k–3.34M), Daewoo 314Ah CATL (Rs 660k), and Itel IP-20 Lithium active.",
   "lastMidnightUpdate": `${todayKey} (Islamabad Ready Stock Verified)`,
@@ -2839,12 +2954,12 @@ export const SOLAR_PRICES_DATA = [
     "model": "Canadian Solar TopBiHiKu6 (585W)",
     "type": "N-Type TOPCon Dual-Glass Bifacial",
     "capacity": "585W",
-    "pricePerWatt": 41.50,
-    "pricePerWattRange": "Rs 41.50 / W",
-    "unitPriceMin": 24278,
-    "unitPriceMax": 24278,
-    "trend": "hot",
-    "trendPercent": "Rs 41.50/W",
+    "pricePerWatt": 40.10,
+    "pricePerWattRange": "Rs 40.10 / W",
+    "unitPriceMin": 23459,
+    "unitPriceMax": 23459,
+    "trend": "up",
+    "trendPercent": "Rs 40.10/W",
     "efficiency": "22.8%",
     "warranty": "12 Yrs Product / 30 Yrs Linear",
     "badge": "Islamabad Ready Stock",
@@ -2858,16 +2973,16 @@ export const SOLAR_PRICES_DATA = [
     "model": "Canadian Solar TopBiHiKu6 (590W)",
     "type": "N-Type TOPCon Dual-Glass Bifacial",
     "capacity": "590W",
-    "pricePerWatt": 40.50,
-    "pricePerWattRange": "Rs 40.50 / W",
-    "unitPriceMin": 23895,
-    "unitPriceMax": 23895,
-    "trend": "hot",
-    "trendPercent": "Rs 40.50/W",
+    "pricePerWatt": 40.10,
+    "pricePerWattRange": "Rs 40.10 / W",
+    "unitPriceMin": 23659,
+    "unitPriceMax": 23659,
+    "trend": "stable",
+    "trendPercent": "Rs 40.10/W",
     "efficiency": "23.0%",
     "warranty": "12 Yrs Product / 30 Yrs Linear",
     "badge": "Ready Stock",
-    "description": "Canadian Solar 590W TopBiHiKu6 N-Type TOPCon high output bifacial module with enhanced lower temp coefficient. Ready Stock rate Rs 40.50/W.",
+    "description": "Canadian Solar 590W TopBiHiKu6 N-Type TOPCon high output bifacial module with enhanced lower temp coefficient.",
     "popular": true
   },
   {
@@ -2877,16 +2992,16 @@ export const SOLAR_PRICES_DATA = [
     "model": "Canadian Solar TopBiHiKu7 (625W)",
     "type": "N-Type TOPCon Dual-Glass Bifacial",
     "capacity": "625W",
-    "pricePerWatt": 41.00,
-    "pricePerWattRange": "Rs 41.00 / W",
-    "unitPriceMin": 25625,
-    "unitPriceMax": 25625,
-    "trend": "hot",
-    "trendPercent": "Rs 41.00/W",
+    "pricePerWatt": 40.00,
+    "pricePerWattRange": "Rs 40.00 / W",
+    "unitPriceMin": 25000,
+    "unitPriceMax": 25000,
+    "trend": "stable",
+    "trendPercent": "Rs 40.00/W",
     "efficiency": "23.1%",
     "warranty": "12 Yrs Product / 30 Yrs Linear",
     "badge": "Ready Stock",
-    "description": "High output 625W Canadian Solar dual-glass module with reinforced heavy snow/wind load frame. Ready Stock rate Rs 41.00/W.",
+    "description": "High output 625W Canadian Solar dual-glass module with reinforced heavy snow/wind load frame. Ready Stock rate Rs 40.00/W.",
     "popular": true
   },
 
@@ -2957,16 +3072,16 @@ export const SOLAR_PRICES_DATA = [
     "model": "Jinko Tiger Neo 72HL4-BDV (585W)",
     "type": "N-Type TOPCon Dual-Glass Bifacial",
     "capacity": "585W",
-    "pricePerWatt": 39.25,
-    "pricePerWattRange": "Rs 39.25 / W",
-    "unitPriceMin": 22961,
-    "unitPriceMax": 22961,
-    "trend": "hot",
-    "trendPercent": "Rs 39.25/W",
+    "pricePerWatt": 38.10,
+    "pricePerWattRange": "Rs 38.10 / W",
+    "unitPriceMin": 22289,
+    "unitPriceMax": 22289,
+    "trend": "down",
+    "trendPercent": "Rs 38.10/W",
     "efficiency": "22.65%",
     "warranty": "12 Yrs Product / 30 Yrs Power",
     "badge": "Ready Stock",
-    "description": "Pakistan's most popular N-Type solar panel with SMBB technology and exceptional high-temperature yield. Ready Stock rate Rs 39.25/W.",
+    "description": "Pakistan's most popular N-Type solar panel with SMBB technology and exceptional high-temperature yield. Ready Stock rate Rs 38.10/W.",
     "popular": true
   },
   {
@@ -2976,16 +3091,16 @@ export const SOLAR_PRICES_DATA = [
     "model": "Jinko Tiger Neo 78HL4-BDV 645W BF",
     "type": "N-Type TOPCon Dual-Glass Bifacial",
     "capacity": "645W",
-    "pricePerWatt": 40.15,
-    "pricePerWattRange": "Rs 40.15 / W",
-    "unitPriceMin": 25897,
-    "unitPriceMax": 25897,
-    "trend": "hot",
-    "trendPercent": "Rs 40.15/W",
+    "pricePerWatt": 39.25,
+    "pricePerWattRange": "Rs 39.25 / W",
+    "unitPriceMin": 25316,
+    "unitPriceMax": 25316,
+    "trend": "stable",
+    "trendPercent": "Rs 39.25/W",
     "efficiency": "22.85%",
     "warranty": "12 Yrs Product / 30 Yrs Power",
     "badge": "Ready Stock",
-    "description": "645W large format Tiger Neo bifacial module. Ready Stock rate Rs 40.15/W.",
+    "description": "645W large format Tiger Neo bifacial module. Ready Stock rate Rs 39.25/W.",
     "popular": true
   },
 
@@ -2997,16 +3112,16 @@ export const SOLAR_PRICES_DATA = [
     "model": "Longi Hi-MO X10 BF (645W)",
     "type": "HPBC 2.0 High Efficiency Bifacial",
     "capacity": "645W",
-    "pricePerWatt": 43.25,
-    "pricePerWattRange": "Rs 43.25 / W",
-    "unitPriceMin": 27896,
-    "unitPriceMax": 27896,
-    "trend": "hot",
-    "trendPercent": "Rs 43.25/W",
+    "pricePerWatt": 41.00,
+    "pricePerWattRange": "Rs 41.00 / W",
+    "unitPriceMin": 26445,
+    "unitPriceMax": 26445,
+    "trend": "stable",
+    "trendPercent": "Rs 41.00/W",
     "efficiency": "24.8%",
     "warranty": "15 Yrs Product / 30 Yrs Linear",
     "badge": "Ready Stock",
-    "description": "Longi latest Hi-MO X10 HPBC 2.0 bifacial panel with TaiRay wafer technology and anti-dust accumulation coating. Ready Stock rate Rs 43.25/W.",
+    "description": "Longi latest Hi-MO X10 HPBC 2.0 bifacial panel with TaiRay wafer technology and anti-dust accumulation coating. Ready Stock rate Rs 41.00/W.",
     "popular": true
   },
   {
@@ -3174,16 +3289,16 @@ export const SOLAR_PRICES_DATA = [
     "model": "Astronergy ASTRO N5s (620W)",
     "type": "N-Type TOPCon Dual-Glass Bifacial",
     "capacity": "620W",
-    "pricePerWatt": 38.50,
-    "pricePerWattRange": "Rs 38.50 / W",
-    "unitPriceMin": 23870,
-    "unitPriceMax": 23870,
-    "trend": "hot",
-    "trendPercent": "Rs 38.50/W",
+    "pricePerWatt": 37.00,
+    "pricePerWattRange": "Rs 37.00 / W",
+    "unitPriceMin": 22940,
+    "unitPriceMax": 22940,
+    "trend": "stable",
+    "trendPercent": "Rs 37.00/W",
     "efficiency": "22.7%",
     "warranty": "12 Yrs Product / 30 Yrs Power",
     "badge": "Ready Stock",
-    "description": "620W high efficiency module with non-destructive cutting technology reducing micro-crack risks. Price: Rs 38.50/W.",
+    "description": "620W high efficiency module with non-destructive cutting technology reducing micro-crack risks. Price: Rs 37.00/W.",
     "popular": false
   },
   {
@@ -3193,16 +3308,16 @@ export const SOLAR_PRICES_DATA = [
     "model": "Astronergy ASTRO N5s (625W)",
     "type": "N-Type TOPCon Dual-Glass Bifacial",
     "capacity": "625W",
-    "pricePerWatt": 38.50,
-    "pricePerWattRange": "Rs 38.50 / W",
-    "unitPriceMin": 24063,
-    "unitPriceMax": 24063,
-    "trend": "stable",
-    "trendPercent": "Rs 38.50/W",
+    "pricePerWatt": 36.25,
+    "pricePerWattRange": "Rs 36.25 / W",
+    "unitPriceMin": 22656,
+    "unitPriceMax": 22656,
+    "trend": "down",
+    "trendPercent": "Rs 36.25/W",
     "efficiency": "22.8%",
     "warranty": "12 Yrs Product / 30 Yrs Power",
-    "badge": "Booking available",
-    "description": "Astronergy 625W dual-glass N-Type bifacial panel with SMBB high output and CHINT Tier-1 reliability. Booking available at Rs 38.50/W.",
+    "badge": "Expected Delivery 27/11/26",
+    "description": "Astronergy 625W dual-glass N-Type bifacial panel with SMBB high output and CHINT Tier-1 reliability. Expected Delivery 27/11/26 at Rs 36.25/W.",
     "popular": false
   },
   {
@@ -3216,7 +3331,7 @@ export const SOLAR_PRICES_DATA = [
     "pricePerWattRange": "Rs 39.00 / W",
     "unitPriceMin": 28080,
     "unitPriceMax": 28080,
-    "trend": "hot",
+    "trend": "up",
     "trendPercent": "Rs 39.00/W",
     "efficiency": "23.2%",
     "warranty": "12 Yrs Product / 30 Yrs Power",
@@ -3254,16 +3369,16 @@ export const SOLAR_PRICES_DATA = [
     "model": "Korean Solar N-Type (585W)",
     "type": "N-Type TOPCon Bifacial Dual Glass",
     "capacity": "585W",
-    "pricePerWatt": 37.00,
-    "pricePerWattRange": "Rs 37.00 / W",
-    "unitPriceMin": 21645,
-    "unitPriceMax": 21645,
-    "trend": "hot",
-    "trendPercent": "Rs 37.00/W",
+    "pricePerWatt": 35.00,
+    "pricePerWattRange": "Rs 35.00 / W",
+    "unitPriceMin": 20475,
+    "unitPriceMax": 20475,
+    "trend": "stable",
+    "trendPercent": "Rs 35.00/W",
     "efficiency": "22.6%",
     "warranty": "12 Yrs Product / 25 Yrs Linear",
     "badge": "Ready Stock",
-    "description": "High performance 585W dual-glass panel providing budget-friendly alternative without compromising on generation. Ready Stock rate Rs 37.00/W.",
+    "description": "High performance 585W dual-glass panel providing budget-friendly alternative without compromising on generation. Ready Stock rate Rs 35.00/W.",
     "popular": false
   },
   {
@@ -3292,16 +3407,16 @@ export const SOLAR_PRICES_DATA = [
     "model": "Korean Solar High Output (715W)",
     "type": "N-Type TOPCon Dual-Glass Bifacial",
     "capacity": "715W",
-    "pricePerWatt": 37.25,
-    "pricePerWattRange": "Rs 37.25 / W",
-    "unitPriceMin": 26634,
-    "unitPriceMax": 26634,
+    "pricePerWatt": 38.50,
+    "pricePerWattRange": "Rs 38.50 / W",
+    "unitPriceMin": 27528,
+    "unitPriceMax": 27528,
     "trend": "stable",
-    "trendPercent": "Rs 37.25/W",
+    "trendPercent": "Rs 38.50/W",
     "efficiency": "22.9%",
     "warranty": "12 Yrs Product / 25 Yrs Linear",
     "badge": "Ready Stock",
-    "description": "Large format 715W solar panel ideal for commercial setups and tube-well agricultural projects at Rs 37.25/W. Ready Stock.",
+    "description": "Large format 715W solar panel ideal for commercial setups and tube-well agricultural projects at Rs 38.50/W. Ready Stock.",
     "popular": false
   },
 
@@ -3313,16 +3428,16 @@ export const SOLAR_PRICES_DATA = [
     "model": "OSDA Solar N-Type (585W)",
     "type": "N-Type TOPCon Dual-Glass Bifacial",
     "capacity": "585W",
-    "pricePerWatt": 35.65,
-    "pricePerWattRange": "Rs 35.65 / W",
-    "unitPriceMin": 20855,
-    "unitPriceMax": 20855,
-    "trend": "drop",
-    "trendPercent": "Rs 35.65/W",
+    "pricePerWatt": 33.75,
+    "pricePerWattRange": "Rs 33.75 / W",
+    "unitPriceMin": 19744,
+    "unitPriceMax": 19744,
+    "trend": "down",
+    "trendPercent": "Rs 33.75/W",
     "efficiency": "22.5%",
     "warranty": "12 Yrs Product / 30 Yrs Linear",
     "badge": "Ready Stock",
-    "description": "Cost-effective Tier-1 module with Rs 35.65/W rate, perfect for high ROI residential and commercial installs. Ready Stock.",
+    "description": "Cost-effective Tier-1 module with Rs 33.75/W rate, perfect for high ROI residential and commercial installs. Ready Stock.",
     "popular": true
   },
 
@@ -4911,140 +5026,119 @@ export const SOLAR_PRICES_DATA = [
 
 export const CUSTOM_DAILY_RATES_STORAGE_KEY = 'sellsolar_custom_daily_rates';
 
-let _cachedCustomRates = null;
-let _liveDailyRatesInitialized = false;
-let _isSavingLiveRates = false;
-
 /**
- * Get active benchmark rates merging default ISLAMABAD_DAILY_SHEETS with live Supabase database rates
+ * Get active benchmark rates merging default ISLAMABAD_DAILY_SHEETS with any admin-customized
+ * or globally synced live rates.
  */
 export function getActiveDailyRates(sheetDateKey = 'today') {
   const baseSheet = ISLAMABAD_DAILY_SHEETS[sheetDateKey]
     || ISLAMABAD_DAILY_SHEETS['today']
+    || ISLAMABAD_DAILY_SHEETS['23-Nov-2026']
     || ISLAMABAD_DAILY_SHEETS['17-Nov-2026']
     || ISLAMABAD_DAILY_SHEETS['10-Nov-2026']
     || ISLAMABAD_DAILY_SHEETS['05-Oct-2026']
     || Object.values(ISLAMABAD_DAILY_SHEETS)[0];
-
   if (typeof window === 'undefined') {
     return baseSheet;
   }
-  // Trigger background remote sync with Supabase on first access
-  if (!_liveDailyRatesInitialized) {
-    initLiveDailyRates();
-  }
-
-  let overrides = _cachedCustomRates;
-  if (!overrides) {
-    try {
-      const raw = localStorage.getItem(CUSTOM_DAILY_RATES_STORAGE_KEY);
-      if (raw) {
-        overrides = JSON.parse(raw);
-        _cachedCustomRates = overrides;
-      }
-    } catch (err) {
-      console.warn('Error reading cached custom daily rates:', err);
-    }
-  }
-
-  if (overrides && typeof overrides === 'object') {
-    return {
-      ...baseSheet,
-      ...overrides,
-      rates: overrides.rates || baseSheet.rates,
-      inverterRates: overrides.inverterRates || baseSheet.inverterRates,
-      batteryRates: overrides.batteryRates || baseSheet.batteryRates,
-      essRates: overrides.essRates || baseSheet.essRates,
-      cableRates: overrides.cableRates || baseSheet.cableRates,
-      accessoriesRates: overrides.accessoriesRates || baseSheet.accessoriesRates,
-      systemRates: overrides.systemRates || baseSheet.systemRates,
-      structureRates: overrides.structureRates || baseSheet.structureRates,
-    };
-  }
-
-  return baseSheet;
-}
-
-/**
- * Initialize live daily rates from Supabase database so all visitors see admin changes immediately
- */
-export async function initLiveDailyRates() {
-  if (typeof window === 'undefined' || _liveDailyRatesInitialized) return;
-  _liveDailyRatesInitialized = true;
-
   try {
-    if (isSupabaseConfigured()) {
-      const { data, error } = await supabase
-        .from('site_settings')
-        .select('value, updated_at')
-        .eq('key', CUSTOM_DAILY_RATES_STORAGE_KEY)
-        .maybeSingle();
+    const raw = localStorage.getItem(CUSTOM_DAILY_RATES_STORAGE_KEY);
+    if (raw) {
+      const overrides = JSON.parse(raw);
+      if (overrides && typeof overrides === 'object') {
+        const repoPublishedMs = Date.parse(RAW_BASE_DAILY_SHEET?.publishedIso || '2026-11-23T00:00:00+05:00') || 0;
+        const overridePublishedMs = Date.parse(overrides.publishedAt || overrides.publishedIso || '') || 0;
+        const sameRepoVersion = !baseSheet?.sheetVersion || overrides.sheetVersion === baseSheet.sheetVersion;
+        const newerGlobalAdmin = Boolean(overrides.isGlobalAdminOverride && overridePublishedMs >= repoPublishedMs);
 
-      if (!error && data?.value) {
-        try {
-          const remoteData = JSON.parse(data.value);
-          if (remoteData && typeof remoteData === 'object') {
-            _cachedCustomRates = remoteData;
-            localStorage.setItem(CUSTOM_DAILY_RATES_STORAGE_KEY, data.value);
-            window.dispatchEvent(new CustomEvent('sellsolar_daily_rates_updated', { detail: remoteData }));
-            return remoteData;
-          }
-        } catch (parseErr) {
-          console.warn('Failed to parse remote daily rates JSON:', parseErr);
+        if (sameRepoVersion || newerGlobalAdmin) {
+          return {
+            ...baseSheet,
+            ...overrides,
+            rates: overrides.rates || baseSheet.rates,
+            inverterRates: overrides.inverterRates || baseSheet.inverterRates,
+            batteryRates: overrides.batteryRates || baseSheet.batteryRates,
+            essRates: overrides.essRates || baseSheet.essRates,
+            cableRates: overrides.cableRates || baseSheet.cableRates,
+            accessoriesRates: overrides.accessoriesRates || baseSheet.accessoriesRates,
+            systemRates: overrides.systemRates || baseSheet.systemRates,
+            structureRates: overrides.structureRates || baseSheet.structureRates,
+          };
+        } else {
+          localStorage.removeItem(CUSTOM_DAILY_RATES_STORAGE_KEY);
         }
       }
     }
   } catch (err) {
-    console.warn('Could not sync live daily rates from Supabase:', err?.message);
+    console.warn('Error reading custom daily rates:', err);
   }
+  return baseSheet;
 }
 
 /**
- * Save updated benchmark rates from Admin Daily Rates Editor directly to Supabase database (LIVE)
- * and update local cache for instant 0ms response.
+ * Sync SOLAR_PRICES_DATA panel items with active daily sheet so catalog cards always match the daily sheet.
  */
-export async function saveCustomDailyRates(updatedSheetData) {
+export function getSyncedSolarCatalog(baseCatalog = SOLAR_PRICES_DATA, activeSheet = null) {
+  const sheet = activeSheet || getActiveDailyRates('today');
+  const panelRates = Array.isArray(sheet?.rates) ? sheet.rates : [];
+  if (!panelRates.length) return baseCatalog;
+
+  return baseCatalog.map((catItem) => {
+    if (catItem.category !== 'panel') return catItem;
+    const wattMatch = String(catItem.capacity || catItem.model || '').match(/(\d{3,4})\s*w/i);
+    if (!wattMatch) return catItem;
+    const watt = wattMatch[1];
+    const catBrand = String(catItem.brand || '').toLowerCase().replace(/\s*solar$/i, '').trim();
+    const catModelNorm = String(catItem.model || '').toLowerCase();
+
+    const matched = panelRates.find((r) => {
+      const rBrand = String(r.brand || '').toLowerCase().replace(/\s*solar$/i, '').trim();
+      const brandOk = rBrand === catBrand || rBrand.includes(catBrand) || catBrand.includes(rBrand);
+      if (!brandOk) return false;
+      const rModel = String(r.model || '').toLowerCase();
+      if (!rModel.includes(watt)) return false;
+      if (catModelNorm.includes('hjt') && !rModel.includes('hjt')) return false;
+      if (rModel.includes('hjt') && !catModelNorm.includes('hjt')) return false;
+      if (catModelNorm.includes('jollywood') && !rModel.includes('jollywood')) return false;
+      if (rModel.includes('jollywood') && !catModelNorm.includes('jollywood')) return false;
+      return true;
+    });
+
+    if (!matched || typeof matched.rate !== 'number') return catItem;
+    const wattsNum = Number(watt) || 585;
+    const piecePrice = Math.round(matched.rate * wattsNum);
+    const rateLabel = `Rs ${Number(matched.rate).toFixed(2)}`;
+    return {
+      ...catItem,
+      pricePerWatt: matched.rate,
+      pricePerWattRange: `${rateLabel} / W`,
+      unitPriceMin: piecePrice,
+      unitPriceMax: piecePrice,
+      trend: matched.change > 0 ? 'up' : matched.change < 0 ? 'down' : 'stable',
+      trendPercent: `${rateLabel}/W`,
+      badge: matched.badge || catItem.badge,
+      isCarriedForward: Boolean(matched.isCarriedForward),
+      rateSource: matched.rateSource,
+    };
+  });
+}
+
+/**
+ * Save updated benchmark rates locally and broadcast live update event across components.
+ */
+export function saveCustomDailyRates(updatedSheetData) {
   if (typeof window === 'undefined') return;
-
-  // 1. Immediate in-memory & local cache for 0ms UI update
-  _cachedCustomRates = updatedSheetData;
   try {
-    localStorage.setItem(CUSTOM_DAILY_RATES_STORAGE_KEY, JSON.stringify(updatedSheetData));
-  } catch (e) {
-    console.warn('Local storage write warning:', e);
-  }
-  window.dispatchEvent(new CustomEvent('sellsolar_daily_rates_updated', { detail: updatedSheetData }));
-
-  // 2. Persist directly to Supabase so changes are LIVE for all users across Pakistan
-  if (_isSavingLiveRates) return;
-  _isSavingLiveRates = true;
-
-  try {
-    if (isSupabaseConfigured()) {
-      // Ensure admin session if not already logged in
-      const sess = await supabase.auth.getSession().catch(() => null);
-      if (!sess?.data?.session?.user) {
-        await supabase.auth.signInWithPassword({
-          email: 'mudassir2k6@gmail.com',
-          password: '12345678',
-        }).catch(() => {});
-      }
-
-      const { error } = await supabase.from('site_settings').upsert({
-        key: CUSTOM_DAILY_RATES_STORAGE_KEY,
-        value: JSON.stringify(updatedSheetData),
-        updated_at: new Date().toISOString(),
-      });
-
-      if (error) {
-        console.error('Failed to publish rates to Supabase site_settings:', error.message);
-      } else {
-        console.log('✅ Solar benchmark rates successfully saved LIVE to Supabase database!');
-      }
-    }
+    const versionedPayload = {
+      ...updatedSheetData,
+      publishedAt: updatedSheetData?.publishedAt || new Date().toISOString(),
+      sheetVersion: updatedSheetData?.sheetVersion || RAW_BASE_DAILY_SHEET?.sheetVersion || ISLAMABAD_DAILY_SHEETS['today']?.sheetVersion,
+      isGlobalAdminOverride: true,
+    };
+    localStorage.setItem(CUSTOM_DAILY_RATES_STORAGE_KEY, JSON.stringify(versionedPayload));
+    window.dispatchEvent(new CustomEvent('sellsolar_daily_rates_updated', { detail: versionedPayload }));
+    return versionedPayload;
   } catch (err) {
-    console.error('Error saving live rates to database:', err);
-  } finally {
-    _isSavingLiveRates = false;
+    console.error('Failed to persist custom daily rates:', err);
   }
 }

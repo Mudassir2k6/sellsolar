@@ -813,16 +813,21 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         if (sheetFilterStatus === 'pakistan' && !item.brand.toLowerCase().includes('pakistan')) return false;
         if (sheetFilterStatus === 'mci' && !item.brand.toLowerCase().includes('mci')) return false;
         if (sheetFilterStatus === 'jukai' && !item.brand.toLowerCase().includes('jukai')) return false;
+        if (sheetFilterStatus === 'newage' && !item.brand.toLowerCase().includes('newage')) return false;
       } else if (sheetCategory === 'solar_accessories') {
-        if (sheetFilterStatus === 'knox' && !item.brand.toLowerCase().includes('knox') && !item.model.toLowerCase().includes('hv box') && !item.model.toLowerCase().includes('base wheel')) return false;
-        if (sheetFilterStatus === 'eastron' && !item.brand.toLowerCase().includes('eastron') && !item.model.toLowerCase().includes('eastron')) return false;
-        if (sheetFilterStatus === 'xerox' && !item.brand.toLowerCase().includes('xerox') && !item.model.toLowerCase().includes('xerox')) return false;
-        if (sheetFilterStatus === 'smart_meter' && !item.type?.toLowerCase().includes('meter') && !item.model?.toLowerCase().includes('meter')) return false;
+        const accText = `${item.brand || ''} ${item.model || ''} ${item.type || ''} ${item.capacity || ''} ${item.badge || ''}`.toLowerCase();
+        if (sheetFilterStatus === 'knox' && !accText.includes('knox') && !accText.includes('hv box') && !accText.includes('base wheel')) return false;
+        if (sheetFilterStatus === 'eastron' && !accText.includes('eastron')) return false;
+        if (sheetFilterStatus === 'xerox' && !accText.includes('xerox')) return false;
+        if (sheetFilterStatus === 'smart_meter' && !accText.includes('meter')) return false;
         if (sheetFilterStatus === 'chint' && !item.brand.toLowerCase().includes('chint') && !item.model.toLowerCase().includes('chint')) return false;
         if (sheetFilterStatus === 'cnc' && !item.brand.toLowerCase().includes('cnc') && !item.model.toLowerCase().includes('cnc')) return false;
         if (sheetFilterStatus === 'tomzen' && !item.brand.toLowerCase().includes('tomzen') && !item.model.toLowerCase().includes('tomz')) return false;
-        if (sheetFilterStatus === 'breaker' && !item.type?.toLowerCase().includes('breaker') && !item.type?.toLowerCase().includes('mcb')) return false;
-        if (sheetFilterStatus === 'spd' && !item.type?.toLowerCase().includes('surge') && !item.type?.toLowerCase().includes('spd')) return false;
+        if (sheetFilterStatus === 'breaker' && !accText.includes('breaker') && !accText.includes('mcb') && !accText.includes('mccb') && !accText.includes('brk')) return false;
+        if (sheetFilterStatus === 'spd' && !accText.includes('surge') && !accText.includes('spd')) return false;
+        if (sheetFilterStatus === 'db' && !accText.includes('db ') && !accText.includes('box') && !accText.includes('enclosure') && !accText.includes('way')) return false;
+        if (sheetFilterStatus === 'opas' && !accText.includes('opas') && !accText.includes('changeover') && !accText.includes('mts') && !accText.includes('protector')) return false;
+        if (sheetFilterStatus === 'earthing' && !accText.includes('copper rod') && !accText.includes('earthing') && !accText.includes('arrester') && !accText.includes('mc4') && !accText.includes('cable tie')) return false;
       } else if (sheetCategory === 'ess') {
         if (sheetFilterStatus === 'powertank' && !item.model?.toLowerCase().includes('power tank') && !item.model?.toLowerCase().includes('powertank')) return false;
         if (sheetFilterStatus === 'cabinet' && !item.model?.toLowerCase().includes('all-in-one') && !item.type?.toLowerCase().includes('all-in-one') && !item.model?.toLowerCase().includes('8kwh')) return false;
@@ -832,9 +837,12 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         if (sheetFilterStatus === 'residential' && !item.badge?.toLowerCase().includes('marla') && !item.badge?.toLowerCase().includes('kanal')) return false;
         if (sheetFilterStatus === 'commercial' && !item.badge?.toLowerCase().includes('plaza') && !item.badge?.toLowerCase().includes('factory') && !item.brand.toLowerCase().includes('zapher')) return false;
       } else if (sheetCategory === 'structure_accessories') {
-        if (sheetFilterStatus === 'structure' && !item.type?.toLowerCase().includes('structure') && !item.type?.toLowerCase().includes('frame')) return false;
-        if (sheetFilterStatus === 'cable' && !item.type?.toLowerCase().includes('wire') && !item.type?.toLowerCase().includes('cable')) return false;
-        if (sheetFilterStatus === 'protection' && !item.type?.toLowerCase().includes('breaker') && !item.type?.toLowerCase().includes('surge')) return false;
+        const structText = `${item.brand || ''} ${item.model || ''} ${item.type || ''} ${item.capacity || ''} ${item.badge || ''}`.toLowerCase();
+        if (sheetFilterStatus === 'frames' && !structText.includes('l2') && !structText.includes('l3') && !structText.includes('frame') && !structText.includes('mounting frame')) return false;
+        if (sheetFilterStatus === 'steel' && !structText.includes('girder') && !structText.includes('channel') && !structText.includes('pipe') && !structText.includes('plate')) return false;
+        if (sheetFilterStatus === 'hardware' && !structText.includes('clamp') && !structText.includes('bolt') && !structText.includes('nut') && !structText.includes('disk') && !structText.includes('disc') && !structText.includes('paint') && !structText.includes('spray') && !structText.includes('epoxy') && !structText.includes('electrode') && !structText.includes('roller') && !structText.includes('kerosene')) return false;
+        if (sheetFilterStatus === 'protection' && !structText.includes('lightning') && !structText.includes('earthing') && !structText.includes('earth') && !structText.includes('breaker') && !structText.includes('surge')) return false;
+        if (sheetFilterStatus === 'cable' && !structText.includes('wire') && !structText.includes('cable')) return false;
       } else if (sheetCategory === 'all') {
         if (sheetFilterStatus === 'panel' && item.itemCategory !== 'panel') return false;
         if (sheetFilterStatus === 'inverter' && item.itemCategory !== 'inverter') return false;
@@ -1617,38 +1625,106 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                 <span className="text-[10px] text-gray-500 dark:text-gray-400">80-95 units/day • Heavy 3-Phase Factory Net-Metered</span>
               </div>
             </div>
+          ) : sheetCategory === 'cables_wiring' ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 my-4">
+              <div className="rounded-xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-800/40 p-3.5">
+                <span className="text-[11px] text-amber-700 dark:text-amber-400 block font-medium">Fast & Pakistan Cables</span>
+                <div className="flex items-baseline gap-2 mt-0.5">
+                  <span className="text-base font-extrabold text-amber-700 dark:text-amber-300">Rs. 270 – 390/m</span>
+                </div>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">Fast 4mm² Rs 270/m (Coil 22.5k) • 6mm² Rs 390/m (Coil 31.5k)</span>
+              </div>
+
+              <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">MCI TIN XLPE/PVC</span>
+                <div className="flex items-baseline gap-2 mt-0.5">
+                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 220/m • 19.8k–28.8k</span>
+                </div>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">4mm² 90m Coil Rs 19,800 • 6mm² 90m Coil Rs 28,800</span>
+              </div>
+
+              <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Jukai XLPO/XLPO</span>
+                <div className="flex items-baseline gap-2 mt-0.5">
+                  <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400">Rs. 255 – 360/m</span>
+                </div>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">Jukai 4mm² Rs 255/m • Jukai 6mm² Rs 360/m</span>
+              </div>
+
+              <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Newage AC Coils</span>
+                <div className="flex items-baseline gap-2 mt-0.5">
+                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 17,500 – 27,500</span>
+                </div>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">4mm² AC Rs 17,500 • 6mm² AC Rs 27,500 (Market Rate)</span>
+              </div>
+            </div>
+          ) : sheetCategory === 'solar_accessories' ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 my-4">
+              <div className="rounded-xl bg-sky-50/50 dark:bg-sky-950/20 border border-sky-200/80 dark:border-sky-800/40 p-3.5">
+                <span className="text-[11px] text-sky-700 dark:text-sky-400 block font-medium">Chint Switchgear & MCCB</span>
+                <div className="flex items-baseline gap-2 mt-0.5">
+                  <span className="text-base font-extrabold text-sky-700 dark:text-sky-300">Rs. 550 – 10,500</span>
+                </div>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">AC 1P–4P (550–2.5k) • DC 2P/4P (2.7k–5.5k) • MCCB 100A (7k–9.5k)</span>
+              </div>
+
+              <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Tomzen Protection & MTS</span>
+                <div className="flex items-baseline gap-2 mt-0.5">
+                  <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400">Rs. 900 – 5,500</span>
+                </div>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">DC 2P Rs 1,200 • Fuse Rs 900 • V/A 2P/4P Rs 2k–5.5k • MTS 1.9k–2.4k</span>
+              </div>
+
+              <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">CNC, OPAS & DB Boxes</span>
+                <div className="flex items-baseline gap-2 mt-0.5">
+                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 1,200 – 5,000</span>
+                </div>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">DB 8–18 Way (1.2k–2.8k) • OPAS C/O (2.4k–2.5k) • CNC SPD (5k)</span>
+              </div>
+
+              <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Earthing, MC4 & Fire Breaker</span>
+                <div className="flex items-baseline gap-2 mt-0.5">
+                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 120 – 5,100</span>
+                </div>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">MC4 Rs 120 • Ties Rs 300–350 • Fire Brk Rs 700 • 4ft Copper Rs 5,100</span>
+              </div>
+            </div>
           ) : sheetCategory === 'structure_accessories' ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 my-4">
               <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
-                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">GI L2/L3 Structures</span>
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">14-Gauge L2 / L3 Frames</span>
                 <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-base font-extrabold text-slate-800 dark:text-slate-200">Rs. 4,200 – 5,400</span>
+                  <span className="text-base font-extrabold text-slate-800 dark:text-slate-200">Rs. 4,000 – 7,000</span>
                 </div>
-                <span className="text-[10px] text-gray-500 dark:text-gray-400">Heavy Duty 12-14 Gauge Hot-Dip Galvanized</span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">L2 Rs 4,000 • L2 700W Rs 5,500 • L3 Rs 7,000</span>
               </div>
 
               <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
-                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">TUV 4mm/6mm DC Wire</span>
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Mughal Girder & C-Channel</span>
                 <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400">Rs. 210 – 290/M</span>
+                  <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400">Rs. 435/ft • 2.3k–3.8k</span>
                 </div>
-                <span className="text-[10px] text-gray-500 dark:text-gray-400">Tinned Pure Copper Double Insulated Solar Cable</span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">Girder Rs 435/ft • 14/16 SWG Channel & Iron Pipe</span>
               </div>
 
               <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
-                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">DC Breakers & SPD</span>
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Clamps, Bolts & Discs</span>
                 <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 3,200 – 4,800</span>
+                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 23 – 600</span>
                 </div>
-                <span className="text-[10px] text-gray-500 dark:text-gray-400">1000V DC Surge Protective Device & Dual Breakers</span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">End/Mid Clamps Rs 140–230 • Rawlbolts Rs 65–100</span>
               </div>
 
               <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
-                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Earthing Bore Complete</span>
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Lightning & 4ft Earthing</span>
                 <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 18,500</span>
+                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 4,200 – 5,200</span>
                 </div>
-                <span className="text-[10px] text-gray-500 dark:text-gray-400">Pure Copper Rod (10ft) + Bentonite Chemical Kit</span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">Lightning Arrestor Rs 4,200 • 4ft Copper Rod Rs 5,200</span>
               </div>
             </div>
           ) : (
@@ -1706,10 +1782,14 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                         ? 'Filter inverters (e.g. Nitrox, 6kW, Knox, Huawei, Fronus...)'
                         : sheetCategory === 'battery'
                         ? 'Filter batteries (e.g. Narada, LiFePO4, Phoenix, TX2500...)'
+                        : sheetCategory === 'cables_wiring'
+                        ? 'Filter cables (e.g. Fast, Pakistan, MCI, Jukai, Newage, 4mm, 6mm...)'
+                        : sheetCategory === 'solar_accessories'
+                        ? 'Filter accessories (e.g. Chint, CNC, Tomzen, DB 14 Way, OPAS, MC4...)'
                         : sheetCategory === 'complete_system'
                         ? 'Filter systems (e.g. 5kW, 10kW Net Metering, Commercial...)'
                         : sheetCategory === 'structure_accessories'
-                        ? 'Filter structures (e.g. GI frame, DC cable, SPD, Earthing...)'
+                        ? 'Filter structures (e.g. L2 14G, C-Channel, Girder, Clamp, Rawlbolt, Earthing...)'
                         : 'Search across all solar rates (brand, model, spec...)'
                     }
                     className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80 pl-8 pr-3 py-1.5 text-xs text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
@@ -1804,12 +1884,13 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                     ))
                   ) : sheetCategory === 'cables_wiring' ? (
                     [
-                      { id: 'all', label: 'All DC Cables' },
+                      { id: 'all', label: 'All Cables' },
                       { id: 'changed', label: 'Rate Changed' },
                       { id: 'fast', label: 'Fast Cables' },
                       { id: 'pakistan', label: 'Pakistan Cables' },
                       { id: 'mci', label: 'MCI Cables' },
                       { id: 'jukai', label: 'JUKAI' },
+                      { id: 'newage', label: 'Newage AC' },
                     ].map((f) => (
                       <button
                         key={f.id}
@@ -1826,16 +1907,19 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                   ) : sheetCategory === 'solar_accessories' ? (
                     [
                       { id: 'all', label: 'All Accessories' },
+                      { id: 'chint', label: 'Chint' },
+                      { id: 'cnc', label: 'CNC' },
+                      { id: 'tomzen', label: 'Tomzen' },
+                      { id: 'breaker', label: 'Breakers & MCCB' },
+                      { id: 'spd', label: 'SPDs' },
+                      { id: 'db', label: 'DB & MCCB Boxes' },
+                      { id: 'opas', label: 'OPAS, C/O & MTS' },
+                      { id: 'earthing', label: 'Copper, MC4 & Ties' },
                       { id: 'knox', label: 'Knox HV Box' },
                       { id: 'smart_meter', label: 'Smart Meters' },
                       { id: 'eastron', label: 'Eastron' },
                       { id: 'xerox', label: 'XEROX' },
                       { id: 'changed', label: 'Rate Changed' },
-                      { id: 'chint', label: 'Chint' },
-                      { id: 'cnc', label: 'CNC' },
-                      { id: 'tomzen', label: 'Tomzen' },
-                      { id: 'breaker', label: 'Breakers (MCB)' },
-                      { id: 'spd', label: 'SPDs Surge Guard' },
                     ].map((f) => (
                       <button
                         key={f.id}
@@ -1892,10 +1976,11 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                   ) : sheetCategory === 'structure_accessories' ? (
                     [
                       { id: 'all', label: 'All Structures' },
+                      { id: 'frames', label: 'L2 / L3 14G Frames' },
+                      { id: 'steel', label: 'Girder, C-Channel & Pipe' },
+                      { id: 'hardware', label: 'Clamps, Bolts, Discs & Paint' },
+                      { id: 'protection', label: 'Lightning & Earthing' },
                       { id: 'changed', label: 'Rate Changed' },
-                      { id: 'structure', label: 'GI Structure' },
-                      { id: 'cable', label: 'DC Cable' },
-                      { id: 'protection', label: 'Protection & Earth' },
                     ].map((f) => (
                       <button
                         key={f.id}
@@ -2293,7 +2378,17 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                             </div>
                             <div className="text-right shrink-0">
                               <div className="text-base font-extrabold text-primary-600 dark:text-primary-400">
-                                {item.rate != null ? `Rs. ${Math.round(item.rate).toLocaleString()}${item.unit ? ` ${item.unit}` : ''}` : (item.priceDisplay || 'Rs. N/A')}
+                                {item.rate != null
+                                  ? `Rs. ${Math.round(item.rate).toLocaleString()}${
+                                      item.unitLabel
+                                        ? ` ${item.unitLabel}`
+                                        : item.itemCategory === 'cables_wiring'
+                                        ? ' / Meter'
+                                        : item.unit
+                                        ? ` ${item.unit}`
+                                        : ''
+                                    }`
+                                  : item.priceDisplay || 'Rs. N/A'}
                               </div>
                               {item.prevRate != null && (
                                 <div className="text-[10px] text-gray-500 dark:text-gray-400">
@@ -3018,10 +3113,10 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                               <div className="text-[11px] text-gray-500 dark:text-gray-400">{item.capacity} • {item.type}</div>
                             </td>
                             <td className="px-3 py-2.5 font-bold text-slate-800 dark:text-slate-200">
-                              {item.rate != null ? `Rs. ${item.rate.toLocaleString()}` : (item.priceDisplay || 'Rs. N/A')} {item.rate != null && (item.itemCategory === 'cables_wiring' || item.unit === 'per_meter') ? '/ Meter' : ''}
+                              {item.rate != null ? `Rs. ${item.rate.toLocaleString()}` : (item.priceDisplay || 'Rs. N/A')} {item.rate != null ? (item.unitLabel || ((item.itemCategory === 'cables_wiring' || item.unit === 'per_meter') ? '/ Meter' : '')) : ''}
                             </td>
                             <td className="px-3 py-2.5 text-gray-600 dark:text-gray-300">
-                              {item.prevRate != null ? `Rs. ${item.prevRate.toLocaleString()}` : '—'} {item.prevRate != null && (item.itemCategory === 'cables_wiring' || item.unit === 'per_meter') ? '/ Meter' : ''}
+                              {item.prevRate != null ? `Rs. ${item.prevRate.toLocaleString()}` : '—'} {item.prevRate != null ? (item.unitLabel || ((item.itemCategory === 'cables_wiring' || item.unit === 'per_meter') ? '/ Meter' : '')) : ''}
                             </td>
                             <td className="px-3 py-2.5">
                               {item.change < 0 ? (
@@ -3042,7 +3137,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                             </td>
                             <td className="px-3 py-2.5">
                               <div className="font-bold text-gray-900 dark:text-white">
-                                {item.rate != null ? `Rs. ${item.rate.toLocaleString()}` : (item.priceDisplay || 'Rs. N/A')} {item.rate != null && (item.itemCategory === 'cables_wiring' || item.unit === 'per_meter') ? '/ Meter' : ''}
+                                {item.rate != null ? `Rs. ${item.rate.toLocaleString()}` : (item.priceDisplay || 'Rs. N/A')} {item.rate != null ? (item.unitLabel || ((item.itemCategory === 'cables_wiring' || item.unit === 'per_meter') ? '/ Meter' : '')) : ''}
                               </div>
                               <div className="text-[10px] text-gray-500 dark:text-gray-400">
                                 {item.warranty || (item.itemCategory === 'cables_wiring' ? '25-Yr Outdoor Rating' : '2-Yr Replacement')}

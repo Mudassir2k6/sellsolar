@@ -5,14 +5,14 @@
 // with isCarriedForward: true so the UI can lightly highlight them.
 
 export const AUTO_FETCHED_RATES = {
-  "lastRunIso": "2026-11-23T10:57:11.212Z",
+  "lastRunIso": "2026-11-23T11:28:48.846Z",
   "reportDate": "23-Nov-2026",
-  "version": "auto-23-Nov-2026-73-0",
+  "version": "auto-23-Nov-2026-81-0",
   "summary": {
-    "totalChecked": 164,
+    "totalChecked": 236,
     "updatedCount": 0,
-    "liveMatchedCount": 73,
-    "carriedForwardCount": 91,
+    "liveMatchedCount": 81,
+    "carriedForwardCount": 155,
     "sourcesChecked": [
       "roshanex.pk",
       "multichoicesolar.pk",
@@ -50,10 +50,10 @@ export const AUTO_FETCHED_RATES = {
     "sourceHits": {
       "pakistansolarprices.com": 2,
       "solarpricepakistan.com.pk": 12,
-      "multichoicesolar.pk": 21,
+      "multichoicesolar.pk": 27,
       "knox.com.pk": 5,
       "sunsolar.pk": 11,
-      "alladin.pk": 15,
+      "alladin.pk": 17,
       "roshanex.pk": 7
     }
   },
@@ -72,7 +72,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "pakistansolarprices.com",
       "matchedUrl": "https://pakistansolarprices.com/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "panel|astronergy|astro 620w": {
       "category": "panel",
@@ -88,7 +88,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "solarpricepakistan.com.pk",
       "matchedUrl": "https://solarpricepakistan.com.pk/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "panel|astronergy|astro 625w": {
       "category": "panel",
@@ -104,7 +104,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "solarpricepakistan.com.pk",
       "matchedUrl": "https://solarpricepakistan.com.pk/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "panel|astronergy|astro 720w": {
       "category": "panel",
@@ -120,7 +120,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "solarpricepakistan.com.pk",
       "matchedUrl": "https://solarpricepakistan.com.pk/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "panel|ja solar|ja 590w": {
       "category": "panel",
@@ -136,7 +136,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "pakistansolarprices.com",
       "matchedUrl": "https://pakistansolarprices.com/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "panel|ja solar|ja 630w": {
       "category": "panel",
@@ -152,7 +152,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "panel|canadian solar|canadian 585w": {
       "category": "panel",
@@ -168,7 +168,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "solarpricepakistan.com.pk",
       "matchedUrl": "https://solarpricepakistan.com.pk/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "panel|canadian solar|canadian 625w": {
       "category": "panel",
@@ -184,7 +184,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "solarpricepakistan.com.pk",
       "matchedUrl": "https://solarpricepakistan.com.pk/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "panel|canadian solar|canadian 630w hjt": {
       "category": "panel",
@@ -200,7 +200,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "panel|jinko solar|jinko 585w": {
       "category": "panel",
@@ -216,7 +216,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "solarpricepakistan.com.pk",
       "matchedUrl": "https://solarpricepakistan.com.pk/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "panel|jinko solar|jinko 645w": {
       "category": "panel",
@@ -232,7 +232,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "solarpricepakistan.com.pk",
       "matchedUrl": "https://solarpricepakistan.com.pk/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "panel|osda|osda 585w": {
       "category": "panel",
@@ -248,7 +248,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "solarpricepakistan.com.pk",
       "matchedUrl": "https://solarpricepakistan.com.pk/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "panel|osda|osda 615w": {
       "category": "panel",
@@ -264,7 +264,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "panel|trox|trox 590w": {
       "category": "panel",
@@ -280,7 +280,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "panel|korean|korean 585w": {
       "category": "panel",
@@ -296,7 +296,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "panel|korean|korean 615w": {
       "category": "panel",
@@ -312,7 +312,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "solarpricepakistan.com.pk",
       "matchedUrl": "https://solarpricepakistan.com.pk/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "panel|korean|korean 670w": {
       "category": "panel",
@@ -328,7 +328,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "panel|korean|korean 715w": {
       "category": "panel",
@@ -344,7 +344,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "solarpricepakistan.com.pk",
       "matchedUrl": "https://solarpricepakistan.com.pk/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "panel|inverex|inverex mustang 620w": {
       "category": "panel",
@@ -360,7 +360,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "solarpricepakistan.com.pk",
       "matchedUrl": "https://solarpricepakistan.com.pk/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "panel|inverex|inverex jollywood 625w": {
       "category": "panel",
@@ -376,7 +376,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "panel|inverex|inverex mustang 720w": {
       "category": "panel",
@@ -392,7 +392,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "panel|yingli|yingli 630w": {
       "category": "panel",
@@ -408,7 +408,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "solarpricepakistan.com.pk",
       "matchedUrl": "https://solarpricepakistan.com.pk/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|knox|krypton eco 6600 wifi 6.2kw": {
       "category": "inverter",
@@ -424,7 +424,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "multichoicesolar.pk",
       "matchedUrl": "https://multichoicesolar.pk/product/knox-krypton-eco-6600/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|knox|krypton 6500 4.5kw": {
       "category": "inverter",
@@ -440,7 +440,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "multichoicesolar.pk",
       "matchedUrl": "https://multichoicesolar.pk/product/knox-krypton-6500-hybrid-solar-inverter/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|knox|krypton 9000 6.2kw": {
       "category": "inverter",
@@ -456,7 +456,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "knox.com.pk",
       "matchedUrl": "https://knox.com.pk/product/knox-krypton-9000-hybrid-solar-inverter/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|knox|krypton 9055 6.5kw dual mppt": {
       "category": "inverter",
@@ -472,7 +472,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "multichoicesolar.pk",
       "matchedUrl": "https://multichoicesolar.pk/product/knox-krypton-pv9055-6-5kw-hybrid-solar-inverter/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|knox|krypton 11008 8kw dual mppt": {
       "category": "inverter",
@@ -488,7 +488,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "sunsolar.pk",
       "matchedUrl": "https://sunsolar.pk/product/knox-krypton-11008-8kw-hybrid-inverter/",
       "tier": "secondary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|knox|krypton 12002 8.5kw 7\" hmi": {
       "category": "inverter",
@@ -504,7 +504,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "multichoicesolar.pk",
       "matchedUrl": "https://multichoicesolar.pk/product/knox-krypton-pv-12002-hybrid-solar-inverter/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|knox|krypton 13002 10kw 7\" hmi": {
       "category": "inverter",
@@ -520,7 +520,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "multichoicesolar.pk",
       "matchedUrl": "https://multichoicesolar.pk/product/knox-krypton-13002-hybrid-solar-inverter/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|knox|krypton 15002 11.5kw 7\" hmi": {
       "category": "inverter",
@@ -536,7 +536,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "multichoicesolar.pk",
       "matchedUrl": "https://multichoicesolar.pk/product/knox-krypton-pv-15002-hybrid-solar-inverter/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|knox|xenon 12066 ip66 6kw hmi lcd 7'": {
       "category": "inverter",
@@ -552,7 +552,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|knox|zynex 8kw 3mppt pv16000w": {
       "category": "inverter",
@@ -568,7 +568,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "multichoicesolar.pk",
       "matchedUrl": "https://multichoicesolar.pk/product/knox-zynex-8kw-hybrid-solar-inverter/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|knox|zynex 10kw 3mppt pv18000w": {
       "category": "inverter",
@@ -584,7 +584,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "multichoicesolar.pk",
       "matchedUrl": "https://multichoicesolar.pk/product/knox-zynex-10kw-hybrid-solar-inverter/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|zapher|zapher 6.6kw pv12000w": {
       "category": "inverter",
@@ -600,7 +600,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "alladin.pk",
       "matchedUrl": "https://alladin.pk/products/knox-zapher-6-6kw-pv12000w",
       "tier": "secondary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|zapher|zapher 9.2kw pv16000w": {
       "category": "inverter",
@@ -616,7 +616,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "multichoicesolar.pk",
       "matchedUrl": "https://multichoicesolar.pk/product/knox-zapher-16000-solar-inverter/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|zapher|zapher 11.2kw pv18000w": {
       "category": "inverter",
@@ -632,7 +632,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "multichoicesolar.pk",
       "matchedUrl": "https://multichoicesolar.pk/product/knox-zapher-11-2kw-ip66-18000w-hybrid-inverter/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|zapher|zapher 12kw.3p pv18000w": {
       "category": "inverter",
@@ -648,7 +648,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "multichoicesolar.pk",
       "matchedUrl": "https://multichoicesolar.pk/product/knox-zapher-12kw3-phase-pv18000w-hybrid-solar-inverter/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|zapher|zapher 15kw.3p pv24000w": {
       "category": "inverter",
@@ -664,7 +664,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "multichoicesolar.pk",
       "matchedUrl": "https://multichoicesolar.pk/product/knox-zapher-15kw-3-phase-pv24000w-input-solar-inverter/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|zapher|zapher 20kw.3p pv30000w": {
       "category": "inverter",
@@ -680,7 +680,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "multichoicesolar.pk",
       "matchedUrl": "https://multichoicesolar.pk/product/knox-zapher-20kw-3-phase-pv30000w-hybrid-solar-inverter/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|zapher|zapher 30kw.3p pv48000w-hv": {
       "category": "inverter",
@@ -696,7 +696,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "multichoicesolar.pk",
       "matchedUrl": "https://multichoicesolar.pk/product/knox-zapher-30kw-3-phase-pv48000w-hybrid-solar-inverter/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|zapher|zapher 50kw.3p pv65000w-hv": {
       "category": "inverter",
@@ -712,7 +712,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "multichoicesolar.pk",
       "matchedUrl": "https://multichoicesolar.pk/product/knox-zapher-50kw-3-phase-pv65000w-hv-hybrid-solar-inverter/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|asw|asw 5000-t pv7.5kw": {
       "category": "inverter",
@@ -728,7 +728,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "sunsolar.pk",
       "matchedUrl": "https://sunsolar.pk/product/knox-asw-5000-t-ongrid-inverter/",
       "tier": "secondary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|asw|asw 6000-t pv9kw": {
       "category": "inverter",
@@ -744,7 +744,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "sunsolar.pk",
       "matchedUrl": "https://sunsolar.pk/product/knox-asw6000-t-ongrid-inverter/",
       "tier": "secondary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|asw|asw 8k-lt-g2 pv12kw": {
       "category": "inverter",
@@ -760,7 +760,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "sunsolar.pk",
       "matchedUrl": "https://sunsolar.pk/product/knox-asw8k-lt-g2-pv-12kw-ongrid-inverter/",
       "tier": "secondary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|xerox|xerox g4 10kw pv15kw": {
       "category": "inverter",
@@ -776,7 +776,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "knox.com.pk",
       "matchedUrl": "https://knox.com.pk/product/xerox-g4-series-10kw/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|xerox|xerox g4 pro 10.2 pv17kw": {
       "category": "inverter",
@@ -792,7 +792,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|asw|asw 12k-lt-g2 pv18kw": {
       "category": "inverter",
@@ -808,7 +808,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "sunsolar.pk",
       "matchedUrl": "https://sunsolar.pk/product/knox-asw-12k-lt-g2-on-grid-inverter/",
       "tier": "secondary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|asw|asw 13k-lt-g2 pv19.5kw": {
       "category": "inverter",
@@ -824,7 +824,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "sunsolar.pk",
       "matchedUrl": "https://sunsolar.pk/product/knox-asw13k-lt-g2-on-grid-inverter/",
       "tier": "secondary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|xerox|xerox g4 pro 15.2 pv23kw": {
       "category": "inverter",
@@ -840,7 +840,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|xerox|xerox g4 pro 20.2 pv30kw": {
       "category": "inverter",
@@ -856,7 +856,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|xerox|xerox g4 pro 25.2 pv38kw": {
       "category": "inverter",
@@ -872,7 +872,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|xerox|xerox g4 pro 30k/45kpv": {
       "category": "inverter",
@@ -888,7 +888,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|xerox|xerox g4 pro 45k/60kpv": {
       "category": "inverter",
@@ -904,7 +904,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|xerox|xerox g4 pro 50k/75kpv": {
       "category": "inverter",
@@ -920,7 +920,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|xerox|xerox g4 pro 60k/90kpv": {
       "category": "inverter",
@@ -936,7 +936,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|xerox|xerox g4 pro 125k/187.5kpv with afci": {
       "category": "inverter",
@@ -952,7 +952,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|saj|06 kw single phase": {
       "category": "inverter",
@@ -968,7 +968,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|saj|08 kw single phase": {
       "category": "inverter",
@@ -984,7 +984,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|saj|10 kw single phase": {
       "category": "inverter",
@@ -1000,7 +1000,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "roshanex.pk",
       "matchedUrl": "https://roshanex.pk/saj-10kw-single-phase-hybrid-inverter/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|saj|12 kw single phase": {
       "category": "inverter",
@@ -1016,7 +1016,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "roshanex.pk",
       "matchedUrl": "https://roshanex.pk/saj-12kw-single-phase-hybrid-inverter/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|saj|12 kw three phase": {
       "category": "inverter",
@@ -1032,7 +1032,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "roshanex.pk",
       "matchedUrl": "https://roshanex.pk/saj-12kw-three-phase-hybrid-inverter/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|saj|16 kw three phase": {
       "category": "inverter",
@@ -1048,7 +1048,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "roshanex.pk",
       "matchedUrl": "https://roshanex.pk/saj-16kw-three-phase-hybrid-inverter/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|saj|20 kw three phase": {
       "category": "inverter",
@@ -1064,7 +1064,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "roshanex.pk",
       "matchedUrl": "https://roshanex.pk/saj-20kw-three-phase-hybrid-inverter/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|itel|1.6kw pv-3200": {
       "category": "inverter",
@@ -1080,7 +1080,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "alladin.pk",
       "matchedUrl": "https://alladin.pk/products/itel-1-6kw-ip54-hybrid-solar-inverter",
       "tier": "secondary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|itel|3kw pro pv-4500": {
       "category": "inverter",
@@ -1096,7 +1096,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|itel|4kw pro pv-6000": {
       "category": "inverter",
@@ -1112,7 +1112,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|itel|6kw pro pv-8000": {
       "category": "inverter",
@@ -1128,7 +1128,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|itel|8kw pv-16000": {
       "category": "inverter",
@@ -1144,7 +1144,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|itel|12kw pv-16000": {
       "category": "inverter",
@@ -1160,7 +1160,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|itel|6.6kw pv-13000 sp": {
       "category": "inverter",
@@ -1176,7 +1176,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|itel|8kw pv-16000 3p": {
       "category": "inverter",
@@ -1192,7 +1192,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|lcd series|6kw lcd hybrid inverter": {
       "category": "inverter",
@@ -1208,7 +1208,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|lcd series|8kw lcd hybrid inverter": {
       "category": "inverter",
@@ -1224,7 +1224,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|lcd series|10kw lcd hybrid inverter": {
       "category": "inverter",
@@ -1240,7 +1240,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|lcd series|12kw lcd sp hybrid inverter": {
       "category": "inverter",
@@ -1256,7 +1256,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|lcd series|12kw 3-phase lcd solar inverter": {
       "category": "inverter",
@@ -1272,7 +1272,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|lcd series|15kw 3-phase lcd solar inverter": {
       "category": "inverter",
@@ -1288,7 +1288,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|lcd series|20kw 3-phase lcd solar inverter": {
       "category": "inverter",
@@ -1304,7 +1304,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|solis|solis 06kw plus hybrid inverter": {
       "category": "inverter",
@@ -1320,7 +1320,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|solis|solis 08kw plus hybrid inverter": {
       "category": "inverter",
@@ -1336,7 +1336,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|solis|solis 10kw plus hybrid inverter": {
       "category": "inverter",
@@ -1352,7 +1352,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "sunsolar.pk",
       "matchedUrl": "https://sunsolar.pk/product/solis-10kw-hybrid-inverter-single-phase/",
       "tier": "secondary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|goodwe|goodwe 15 kw hv inverter - et model": {
       "category": "inverter",
@@ -1368,7 +1368,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "alladin.pk",
       "matchedUrl": "https://alladin.pk/products/goodwe-15kw-hybrid-inverter-3-phase-lv-ip66",
       "tier": "secondary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|goodwe|goodwe 30 kw hv inverter - et model": {
       "category": "inverter",
@@ -1384,7 +1384,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "roshanex.pk",
       "matchedUrl": "https://roshanex.pk/goodwe-gw30k-et-30kw-three-phase-hybrid-inverter/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|goodwe|goodwe 50 kw hv inverter": {
       "category": "inverter",
@@ -1400,7 +1400,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|goodwe|goodwe 100 kw hv inverter": {
       "category": "inverter",
@@ -1416,7 +1416,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|goodwe|goodwe 15kw hybrid 3-phase low voltage": {
       "category": "inverter",
@@ -1432,7 +1432,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "alladin.pk",
       "matchedUrl": "https://alladin.pk/products/goodwe-15kw-hybrid-inverter-3-phase-lv-ip66",
       "tier": "secondary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|inverex|nitrox 6kw single phase 48v": {
       "category": "inverter",
@@ -1448,7 +1448,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|inverex|nitrox 10kw three phase": {
       "category": "inverter",
@@ -1464,7 +1464,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|inverex|nitrox 12kw commercial": {
       "category": "inverter",
@@ -1480,7 +1480,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "inverter|huawei|sun2000-10ktl-m1 (10kw 3-phase)": {
       "category": "inverter",
@@ -1496,7 +1496,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|knox|powerwall 3.0 (25.6v-100ah)": {
       "category": "battery",
@@ -1512,7 +1512,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|knox|powerwall 4.15 (25.6v-100ah) 1.5c": {
       "category": "battery",
@@ -1528,7 +1528,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "knox.com.pk",
       "matchedUrl": "https://knox.com.pk/product/knox-powerwall-3-1-lithium-battery/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|knox|powerwall 6.0 (51.2v-100ah) 1c": {
       "category": "battery",
@@ -1544,7 +1544,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "multichoicesolar.pk",
       "matchedUrl": "https://multichoicesolar.pk/product/knox-powerwall-6-0/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|knox|powerwall 6.11 (51.2v-100ah) 1.5c": {
       "category": "battery",
@@ -1560,7 +1560,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "multichoicesolar.pk",
       "matchedUrl": "https://multichoicesolar.pk/product/knox-powerwall-6-0/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|knox|powerbase 10 (51.2v-200ah) touch lcd": {
       "category": "battery",
@@ -1576,7 +1576,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "alladin.pk",
       "matchedUrl": "https://alladin.pk/products/knox-powerbase-10-51-2v-200ah-lithium-iron-phosphate-lfp-battery",
       "tier": "secondary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|knox|powerbase 16 (51.2v-314ah)": {
       "category": "battery",
@@ -1592,7 +1592,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "knox.com.pk",
       "matchedUrl": "https://knox.com.pk/product/knox-powerbase-16-51-2v-314ah-lifepo4-lithium-battery/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|knox|powerbase 32 (51.2v-628ah)": {
       "category": "battery",
@@ -1608,7 +1608,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "alladin.pk",
       "matchedUrl": "https://alladin.pk/products/knox-powerbase-32-51-2v-628ah-lithium-iron-phosphate-lfp-battery",
       "tier": "secondary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|knox|powerstack 5-hv 5.32kwh (52ah) 1c": {
       "category": "battery",
@@ -1624,7 +1624,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|knox|powerstack 10-hv 10.24kwh (100ah) 1c": {
       "category": "battery",
@@ -1640,7 +1640,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|knox|hv battery 21.28kwh (4x5-hv + box & wheel)": {
       "category": "battery",
@@ -1656,7 +1656,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "alladin.pk",
       "matchedUrl": "https://alladin.pk/products/knox-powerbase-32-51-2v-628ah-lithium-iron-phosphate-lfp-battery",
       "tier": "secondary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|knox|hv battery 31.92kwh (6x5-hv + box & wheel)": {
       "category": "battery",
@@ -1672,7 +1672,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|knox|hv battery 51.2kwh (5x10-hv + box & wheel)": {
       "category": "battery",
@@ -1688,7 +1688,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|knox|hv battery 61.44kwh (6x10-hv + box & wheel)": {
       "category": "battery",
@@ -1704,7 +1704,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|daewoo|25v 100ah lifepo4": {
       "category": "battery",
@@ -1720,7 +1720,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|daewoo|51.2v 100ah lifepo4": {
       "category": "battery",
@@ -1736,7 +1736,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|daewoo|51v 200ah lifepo4": {
       "category": "battery",
@@ -1752,7 +1752,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|daewoo|51v 314ah lifepo4": {
       "category": "battery",
@@ -1768,7 +1768,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|lithium|51v 314ah ip-20": {
       "category": "battery",
@@ -1784,7 +1784,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "multichoicesolar.pk",
       "matchedUrl": "https://multichoicesolar.pk/product/knox-power-base-16kwh/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|lithium|51v 314ah ip-65": {
       "category": "battery",
@@ -1800,7 +1800,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "roshanex.pk",
       "matchedUrl": "https://roshanex.pk/dyness-powerbrick-plus-lithium-ion-battery-51-2v-314ah-ip65-16-08kwh/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|itel|12v 100ah": {
       "category": "battery",
@@ -1816,7 +1816,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|itel|25v 100ah": {
       "category": "battery",
@@ -1832,7 +1832,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "sunsolar.pk",
       "matchedUrl": "https://sunsolar.pk/product/itel-25-6v-100ah-lithium-battery/",
       "tier": "secondary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|itel|25v 200ah": {
       "category": "battery",
@@ -1848,7 +1848,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|itel|51v 100ah": {
       "category": "battery",
@@ -1864,7 +1864,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|itel|51v 200ah": {
       "category": "battery",
@@ -1880,7 +1880,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|itel|51v 314ah": {
       "category": "battery",
@@ -1896,7 +1896,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "alladin.pk",
       "matchedUrl": "https://alladin.pk/products/itel-16kwh-51-2v-314ah-lifepo4-lithium-battery-ip20",
       "tier": "secondary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|lithium storage|5kw lithium ip-20 battery": {
       "category": "battery",
@@ -1912,7 +1912,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|lithium storage|16kw lithium ip-65 battery": {
       "category": "battery",
@@ -1928,7 +1928,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|zilo energy|zilo nexa 2.5kw lifepo4 battery": {
       "category": "battery",
@@ -1944,7 +1944,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|zilo energy|zilo 5kw nexa smart lifepo4 battery": {
       "category": "battery",
@@ -1960,7 +1960,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|zilo energy|zilo 16kw nexa smart lifepo4 battery": {
       "category": "battery",
@@ -1976,7 +1976,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|zilo energy|zilo 12v nexa cube (12.8v | 100ah | 1280wh)": {
       "category": "battery",
@@ -1992,7 +1992,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|zilo energy|zilo 24v nexa cube (25.6v | 100ah | 2560wh)": {
       "category": "battery",
@@ -2008,7 +2008,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|goodwe|goodwe 05-kwh hv lithium battery": {
       "category": "battery",
@@ -2024,7 +2024,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "sunsolar.pk",
       "matchedUrl": "https://sunsolar.pk/product/goodwe-bat-s-series-5-12kwh-battery-hv-ip20/",
       "tier": "secondary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|goodwe|goodwe bdu (battery disconnect unit)": {
       "category": "battery",
@@ -2040,7 +2040,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "sunsolar.pk",
       "matchedUrl": "https://sunsolar.pk/product/goodwe-bat-s-series-5-12kwh-battery-hv-ip20/",
       "tier": "secondary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|goodwe|goodwe 16kwh ip65 battery (low voltage)": {
       "category": "battery",
@@ -2056,7 +2056,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "alladin.pk",
       "matchedUrl": "https://alladin.pk/products/goodwe-16kwh-battery",
       "tier": "secondary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|phoenix|tx 2500 tubular (230ah)": {
       "category": "battery",
@@ -2072,7 +2072,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "battery|phoenix|tx 1800 tubular (185ah)": {
       "category": "battery",
@@ -2088,7 +2088,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "ess|itel|power tank 500w/1kwh": {
       "category": "ess",
@@ -2104,7 +2104,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "ess|itel|3.6kw + 8kwh ess": {
       "category": "ess",
@@ -2120,55 +2120,55 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
-    "cables_wiring|fast cables|4mm² pure copper dc solar cable": {
+    "cables_wiring|fast cables|4 mm2 dc pvc-pvc": {
       "category": "cables_wiring",
       "brand": "Fast Cables",
-      "model": "4mm² Pure Copper DC Solar Cable",
-      "rate": 225,
+      "model": "4 mm2 DC PVC-PVC",
+      "rate": 270,
       "prevRate": 225,
-      "change": 0,
-      "status": "stable",
-      "baseRateAtFetch": 225,
+      "change": 45,
+      "status": "up",
+      "baseRateAtFetch": 270,
       "externalMarketRate": null,
       "isCarriedForward": true,
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
-    "cables_wiring|fast cables|6mm² pure copper dc solar cable": {
+    "cables_wiring|fast cables|6 mm2 dc pvc-pvc": {
       "category": "cables_wiring",
       "brand": "Fast Cables",
-      "model": "6mm² Pure Copper DC Solar Cable",
-      "rate": 310,
+      "model": "6 mm2 DC PVC-PVC",
+      "rate": 390,
       "prevRate": 310,
-      "change": 0,
-      "status": "stable",
-      "baseRateAtFetch": 310,
+      "change": 80,
+      "status": "up",
+      "baseRateAtFetch": 390,
       "externalMarketRate": null,
       "isCarriedForward": true,
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
-    "cables_wiring|pakistan cables|4mm² dc double insulated xlpo": {
+    "cables_wiring|pakistan cables|4 mm2 dc pvc/pvc": {
       "category": "cables_wiring",
       "brand": "Pakistan Cables",
-      "model": "4mm² DC Double Insulated XLPO",
-      "rate": 235,
+      "model": "4 mm2 DC PVC/PVC",
+      "rate": 270,
       "prevRate": 235,
-      "change": 0,
-      "status": "stable",
-      "baseRateAtFetch": 235,
+      "change": 35,
+      "status": "up",
+      "baseRateAtFetch": 270,
       "externalMarketRate": null,
       "isCarriedForward": true,
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "cables_wiring|pakistan cables|6mm² dc double insulated xlpo": {
       "category": "cables_wiring",
@@ -2184,183 +2184,231 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
-    "cables_wiring|mci cables|4mm² / 6mm² tinned copper solar wire": {
+    "cables_wiring|mci cables|4 mm2 tin xlpe/pvc": {
       "category": "cables_wiring",
       "brand": "MCI Cables",
-      "model": "4mm² / 6mm² Tinned Copper Solar Wire",
-      "rate": 215,
+      "model": "4 mm2 TIN XLPE/PVC",
+      "rate": 220,
       "prevRate": 215,
-      "change": 0,
-      "status": "stable",
-      "baseRateAtFetch": 215,
+      "change": 5,
+      "status": "up",
+      "baseRateAtFetch": 220,
       "externalMarketRate": null,
       "isCarriedForward": true,
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
-    "cables_wiring|jukai|4mm² / 6mm² solar photovoltaic cable": {
+    "cables_wiring|mci cables|6 mm2 xlpe/pvc": {
+      "category": "cables_wiring",
+      "brand": "MCI Cables",
+      "model": "6 mm2 XLPE/PVC",
+      "rate": 28800,
+      "prevRate": 28800,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 28800,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "cables_wiring|jukai|jukai 4mm2 xlpo/xlpo": {
       "category": "cables_wiring",
       "brand": "JUKAI",
-      "model": "4mm² / 6mm² Solar Photovoltaic Cable",
-      "rate": 195,
+      "model": "Jukai 4mm2 XLPO/XLPO",
+      "rate": 255,
       "prevRate": 195,
-      "change": 0,
-      "status": "new",
-      "baseRateAtFetch": 195,
+      "change": 60,
+      "status": "up",
+      "baseRateAtFetch": 255,
       "externalMarketRate": null,
       "isCarriedForward": true,
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
-    "solar_accessories|knox|hv box 52ah (102-800vdc)": {
-      "category": "solar_accessories",
-      "brand": "Knox",
-      "model": "HV BOX 52AH (102-800Vdc)",
-      "rate": 157435,
-      "prevRate": 157435,
-      "change": 0,
-      "status": "new",
-      "baseRateAtFetch": 157435,
-      "externalMarketRate": null,
-      "isCarriedForward": true,
-      "rateSource": "carried_forward",
-      "matchedUrl": null,
-      "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
-    },
-    "solar_accessories|knox|hv box 100ah (102-800vdc)": {
-      "category": "solar_accessories",
-      "brand": "Knox",
-      "model": "HV BOX 100AH (102-800Vdc)",
-      "rate": 191720,
-      "prevRate": 191720,
-      "change": 0,
-      "status": "new",
-      "baseRateAtFetch": 191720,
-      "externalMarketRate": 231999,
-      "isCarriedForward": false,
-      "rateSource": "knox.com.pk",
-      "matchedUrl": "https://knox.com.pk/product/knox-powerwall-6-1-lio-5-12-ip20/",
-      "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
-    },
-    "solar_accessories|knox|base wheel 52ah / 100ah": {
-      "category": "solar_accessories",
-      "brand": "Knox",
-      "model": "Base Wheel 52AH / 100AH",
-      "rate": 37665,
-      "prevRate": 37665,
-      "change": 0,
-      "status": "new",
-      "baseRateAtFetch": 37665,
-      "externalMarketRate": null,
-      "isCarriedForward": true,
-      "rateSource": "carried_forward",
-      "matchedUrl": null,
-      "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
-    },
-    "solar_accessories|eastron|eastron sdm630-modbus v2 (5-25kw)": {
-      "category": "solar_accessories",
-      "brand": "Eastron",
-      "model": "EASTRON SDM630-MODBUS V2 (5-25kW)",
-      "rate": 25000,
-      "prevRate": 25000,
-      "change": 0,
-      "status": "new",
-      "baseRateAtFetch": 25000,
-      "externalMarketRate": null,
-      "isCarriedForward": true,
-      "rateSource": "carried_forward",
-      "matchedUrl": null,
-      "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
-    },
-    "solar_accessories|eastron|eastron sdm630mct v2 (30-60kw)": {
-      "category": "solar_accessories",
-      "brand": "Eastron",
-      "model": "EASTRON SDM630MCT V2 (30-60kW)",
-      "rate": 34000,
-      "prevRate": 34000,
-      "change": 0,
-      "status": "new",
-      "baseRateAtFetch": 34000,
-      "externalMarketRate": null,
-      "isCarriedForward": true,
-      "rateSource": "carried_forward",
-      "matchedUrl": null,
-      "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
-    },
-    "solar_accessories|xerox|xerox g4 pro 125kw smart meter": {
-      "category": "solar_accessories",
-      "brand": "XEROX",
-      "model": "Xerox G4 Pro 125kW Smart Meter",
-      "rate": 57000,
-      "prevRate": 57000,
-      "change": 0,
-      "status": "new",
-      "baseRateAtFetch": 57000,
-      "externalMarketRate": 65000,
-      "isCarriedForward": false,
-      "rateSource": "sunsolar.pk",
-      "matchedUrl": "https://sunsolar.pk/product/knox-xerox-g4-pro-125kw-smart-meter/",
-      "tier": "secondary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
-    },
-    "solar_accessories|xerox|xerox g4 pro 125kw smart meter multi": {
-      "category": "solar_accessories",
-      "brand": "XEROX",
-      "model": "Xerox G4 Pro 125kW Smart Meter Multi",
-      "rate": 145000,
-      "prevRate": 145000,
-      "change": 0,
-      "status": "new",
-      "baseRateAtFetch": 145000,
-      "externalMarketRate": null,
-      "isCarriedForward": true,
-      "rateSource": "carried_forward",
-      "matchedUrl": null,
-      "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
-    },
-    "solar_accessories|chint|chint 2p 1000v dc circuit breaker (16a / 32a / 63a)": {
-      "category": "solar_accessories",
-      "brand": "Chint",
-      "model": "Chint 2P 1000V DC Circuit Breaker (16A / 32A / 63A)",
-      "rate": 2600,
-      "prevRate": 2600,
+    "cables_wiring|jukai|jukai 6mm2 xlpo/xlpo": {
+      "category": "cables_wiring",
+      "brand": "JUKAI",
+      "model": "Jukai 6mm2 XLPO/XLPO",
+      "rate": 360,
+      "prevRate": 360,
       "change": 0,
       "status": "stable",
-      "baseRateAtFetch": 2600,
+      "baseRateAtFetch": 360,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "cables_wiring|newage cables|4 mm2 ac": {
+      "category": "cables_wiring",
+      "brand": "Newage Cables",
+      "model": "4 mm2 AC",
+      "rate": 17500,
+      "prevRate": 17500,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 17500,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "cables_wiring|newage cables|6mm ac": {
+      "category": "cables_wiring",
+      "brand": "Newage Cables",
+      "model": "6mm AC",
+      "rate": 27500,
+      "prevRate": 27500,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 27500,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|chint|ac breaker 1p 25a/40a": {
+      "category": "solar_accessories",
+      "brand": "Chint",
+      "model": "AC Breaker 1P 25A/40A",
+      "rate": 550,
+      "prevRate": 550,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 550,
+      "externalMarketRate": 500,
+      "isCarriedForward": false,
+      "rateSource": "multichoicesolar.pk",
+      "matchedUrl": "https://multichoicesolar.pk/product/chint-nxb-63-1p-230v-miniature-circuit-breaker-mcb-overload-short-circuit-protection-10a-16a-20a/",
+      "tier": "primary",
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|chint|dc breaker 2p 32a": {
+      "category": "solar_accessories",
+      "brand": "Chint",
+      "model": "DC Breaker 2P 32A",
+      "rate": 2700,
+      "prevRate": 2600,
+      "change": 100,
+      "status": "up",
+      "baseRateAtFetch": 2700,
       "externalMarketRate": 2900,
       "isCarriedForward": false,
       "rateSource": "multichoicesolar.pk",
       "matchedUrl": "https://multichoicesolar.pk/product/chint-nb1-63dc-63a-500v-dc-miniature-circuit-breaker-mcb/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
-    "solar_accessories|chint|chint 4p 400v ac circuit breaker (32a / 63a)": {
+    "solar_accessories|chint|ac breaker 4p 63a": {
       "category": "solar_accessories",
       "brand": "Chint",
-      "model": "Chint 4P 400V AC Circuit Breaker (32A / 63A)",
-      "rate": 3850,
+      "model": "AC Breaker 4P 63A",
+      "rate": 2500,
       "prevRate": 3850,
-      "change": 0,
-      "status": "stable",
-      "baseRateAtFetch": 3850,
-      "externalMarketRate": 2950,
+      "change": -1350,
+      "status": "down",
+      "baseRateAtFetch": 2500,
+      "externalMarketRate": 2900,
       "isCarriedForward": false,
       "rateSource": "multichoicesolar.pk",
-      "matchedUrl": "https://multichoicesolar.pk/product/chint-nxb-63-4p-3-phase-ac-mcb-circuit-breaker-6ka-reliable-miniature-circuit-breaker-for-electrical-protection/",
+      "matchedUrl": "https://multichoicesolar.pk/product/chint-nb1-63dc-63a-500v-dc-miniature-circuit-breaker-mcb/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|chint|ac breaker 2p 63a": {
+      "category": "solar_accessories",
+      "brand": "Chint",
+      "model": "AC Breaker 2P 63A",
+      "rate": 1150,
+      "prevRate": 1150,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 1150,
+      "externalMarketRate": 1250,
+      "isCarriedForward": false,
+      "rateSource": "multichoicesolar.pk",
+      "matchedUrl": "https://multichoicesolar.pk/product/chint-nxb-63-2p-ac-400v-63a-miniature-circuit-breaker-mcb/",
+      "tier": "primary",
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|chint|ac spd 4p 40ka": {
+      "category": "solar_accessories",
+      "brand": "Chint",
+      "model": "AC SPD 4P 40KA",
+      "rate": 10500,
+      "prevRate": 10500,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 10500,
+      "externalMarketRate": 8250,
+      "isCarriedForward": false,
+      "rateSource": "multichoicesolar.pk",
+      "matchedUrl": "https://multichoicesolar.pk/product/chint-4p-ac-100a-mccb-three-phase-4-pole-circuit-breaker-overload-short-circuit-protection/",
+      "tier": "primary",
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|chint|dc brk 4p 1000v": {
+      "category": "solar_accessories",
+      "brand": "Chint",
+      "model": "DC BRK 4P 1000V",
+      "rate": 5500,
+      "prevRate": 5500,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 5500,
+      "externalMarketRate": 5000,
+      "isCarriedForward": false,
+      "rateSource": "multichoicesolar.pk",
+      "matchedUrl": "https://multichoicesolar.pk/product/chint-nxb-125-125a-mcb-circuit-breaker-high-breaking-capacity/",
+      "tier": "primary",
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|chint|mccb 100a 3p": {
+      "category": "solar_accessories",
+      "brand": "Chint",
+      "model": "MCCB 100A 3P",
+      "rate": 7000,
+      "prevRate": 7000,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 7000,
+      "externalMarketRate": 7500,
+      "isCarriedForward": false,
+      "rateSource": "multichoicesolar.pk",
+      "matchedUrl": "https://multichoicesolar.pk/product/chint-3p-ac-100a-mccb-three-phase-3-pole-circuit-breaker-overload-short-circuit-protection/",
+      "tier": "primary",
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|chint|mccb 100a 4p": {
+      "category": "solar_accessories",
+      "brand": "Chint",
+      "model": "MCCB 100A 4P",
+      "rate": 9500,
+      "prevRate": 9500,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 9500,
+      "externalMarketRate": 8250,
+      "isCarriedForward": false,
+      "rateSource": "multichoicesolar.pk",
+      "matchedUrl": "https://multichoicesolar.pk/product/chint-4p-ac-100a-mccb-three-phase-4-pole-circuit-breaker-overload-short-circuit-protection/",
+      "tier": "primary",
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "solar_accessories|chint|chint dc surge protective device (spd 1000v 40ka)": {
       "category": "solar_accessories",
@@ -2376,23 +2424,55 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "multichoicesolar.pk",
       "matchedUrl": "https://multichoicesolar.pk/product/chint-nxb-63-4p-3-phase-ac-mcb-circuit-breaker-6ka-reliable-miniature-circuit-breaker-for-electrical-protection/",
       "tier": "primary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
-    "solar_accessories|cnc|cnc 2p dc breaker (550v / 1000v 32a/63a)": {
+    "solar_accessories|cnc|dc breaker 2p 32a": {
       "category": "solar_accessories",
       "brand": "CNC",
-      "model": "CNC 2P DC Breaker (550V / 1000V 32A/63A)",
-      "rate": 2100,
+      "model": "DC Breaker 2P 32A",
+      "rate": 2000,
       "prevRate": 2100,
-      "change": 0,
-      "status": "stable",
-      "baseRateAtFetch": 2100,
+      "change": -100,
+      "status": "down",
+      "baseRateAtFetch": 2000,
       "externalMarketRate": 2500,
       "isCarriedForward": false,
       "rateSource": "alladin.pk",
       "matchedUrl": "https://alladin.pk/products/cnc-ycs6-c-2p-275v-ac-spd-house-surge-protector",
       "tier": "secondary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|cnc|ac breaker 4p 63a": {
+      "category": "solar_accessories",
+      "brand": "CNC",
+      "model": "AC Breaker 4P 63A",
+      "rate": 2200,
+      "prevRate": 2200,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 2200,
+      "externalMarketRate": 2500,
+      "isCarriedForward": false,
+      "rateSource": "alladin.pk",
+      "matchedUrl": "https://alladin.pk/products/cnc-ycs6-c-2p-275v-ac-spd-house-surge-protector",
+      "tier": "secondary",
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|cnc|ac spd 4p 40ka": {
+      "category": "solar_accessories",
+      "brand": "CNC",
+      "model": "AC SPD 4P 40KA",
+      "rate": 5000,
+      "prevRate": 5000,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 5000,
+      "externalMarketRate": 4650,
+      "isCarriedForward": false,
+      "rateSource": "alladin.pk",
+      "matchedUrl": "https://alladin.pk/products/cnc-125a-ac-mccb-3p",
+      "tier": "secondary",
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "solar_accessories|cnc|cnc dc spd 1000v 40ka surge arrester": {
       "category": "solar_accessories",
@@ -2408,71 +2488,567 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "alladin.pk",
       "matchedUrl": "https://alladin.pk/products/cnc-ycs6-c-2p-275v-ac-spd-house-surge-protector",
       "tier": "secondary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
-    "solar_accessories|tomzen|tomzen 2p dc breaker & disconnect (32a / 63a)": {
+    "solar_accessories|tomzen|ac 4p 63a": {
       "category": "solar_accessories",
       "brand": "Tomzen",
-      "model": "Tomzen 2P DC Breaker & Disconnect (32A / 63A)",
-      "rate": 2350,
+      "model": "AC 4P 63A",
+      "rate": 1700,
+      "prevRate": 1700,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 1700,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|tomzen|ac 2p 63a": {
+      "category": "solar_accessories",
+      "brand": "Tomzen",
+      "model": "AC 2P 63A",
+      "rate": 1100,
+      "prevRate": 1100,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 1100,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|tomzen|dc 2p 32a": {
+      "category": "solar_accessories",
+      "brand": "Tomzen",
+      "model": "DC 2P 32A",
+      "rate": 1200,
       "prevRate": 2350,
-      "change": 0,
-      "status": "stable",
-      "baseRateAtFetch": 2350,
+      "change": -1150,
+      "status": "down",
+      "baseRateAtFetch": 1200,
       "externalMarketRate": null,
       "isCarriedForward": true,
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
-    "solar_accessories|tomzen|tomzen dc spd 1000v 40ka surge protector": {
+    "solar_accessories|tomzen|ac spd 4p": {
       "category": "solar_accessories",
       "brand": "Tomzen",
-      "model": "Tomzen DC SPD 1000V 40kA Surge Protector",
-      "rate": 3400,
+      "model": "AC SPD 4P",
+      "rate": 3000,
+      "prevRate": 3000,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 3000,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|tomzen|dc fuse 20a, 32a": {
+      "category": "solar_accessories",
+      "brand": "Tomzen",
+      "model": "DC FUSE 20A, 32A",
+      "rate": 900,
+      "prevRate": 900,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 900,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|tomzen|ac spd 2p": {
+      "category": "solar_accessories",
+      "brand": "Tomzen",
+      "model": "AC SPD 2P",
+      "rate": 2000,
+      "prevRate": 2000,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 2000,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|tomzen|dc spd 2p": {
+      "category": "solar_accessories",
+      "brand": "Tomzen",
+      "model": "DC SPD 2P",
+      "rate": 2200,
       "prevRate": 3400,
-      "change": 0,
-      "status": "stable",
-      "baseRateAtFetch": 3400,
+      "change": -1200,
+      "status": "down",
+      "baseRateAtFetch": 2200,
       "externalMarketRate": null,
       "isCarriedForward": true,
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
-    "solar_accessories|tomzen|tomzen digital voltage & current protector (auto reset 63a)": {
+    "solar_accessories|tomzen|dc 2p+2p 63a": {
       "category": "solar_accessories",
       "brand": "Tomzen",
-      "model": "Tomzen Digital Voltage & Current Protector (Auto Reset 63A)",
-      "rate": 3800,
-      "prevRate": 3800,
+      "model": "DC 2P+2P 63A",
+      "rate": 2500,
+      "prevRate": 2500,
       "change": 0,
-      "status": "stable",
-      "baseRateAtFetch": 3800,
+      "status": "new",
+      "baseRateAtFetch": 2500,
       "externalMarketRate": null,
       "isCarriedForward": true,
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
-    "solar_accessories|protection db|ip65 waterproof distribution box (8 / 12 / 18 way)": {
+    "solar_accessories|tomzen|dc 2p 125a": {
+      "category": "solar_accessories",
+      "brand": "Tomzen",
+      "model": "DC 2P 125A",
+      "rate": 2000,
+      "prevRate": 2000,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 2000,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|tomzen|changeover 2p": {
+      "category": "solar_accessories",
+      "brand": "Tomzen",
+      "model": "Changeover 2P",
+      "rate": 1200,
+      "prevRate": 1200,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 1200,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|tomzen|vol/amp protector 2p": {
+      "category": "solar_accessories",
+      "brand": "Tomzen",
+      "model": "Vol/Amp Protector 2P",
+      "rate": 2000,
+      "prevRate": 3800,
+      "change": -1800,
+      "status": "down",
+      "baseRateAtFetch": 2000,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|tomzen|vol/amp protector 4p": {
+      "category": "solar_accessories",
+      "brand": "Tomzen",
+      "model": "Vol/Amp Protector 4P",
+      "rate": 5500,
+      "prevRate": 5500,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 5500,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|tomzen|mts 1p+1p c/o": {
+      "category": "solar_accessories",
+      "brand": "Tomzen",
+      "model": "MTS 1P+1P C/O",
+      "rate": 1900,
+      "prevRate": 1900,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 1900,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|tomzen|mts 2p+2p c/o": {
+      "category": "solar_accessories",
+      "brand": "Tomzen",
+      "model": "MTS 2P+2P C/O",
+      "rate": 2400,
+      "prevRate": 2400,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 2400,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|earthing|copper rod 4ft": {
+      "category": "solar_accessories",
+      "brand": "Earthing",
+      "model": "Copper Rod 4ft",
+      "rate": 5100,
+      "prevRate": 5100,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 5100,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|earthing|lightening arrester": {
+      "category": "solar_accessories",
+      "brand": "Earthing",
+      "model": "Lightening Arrester",
+      "rate": 4200,
+      "prevRate": 4200,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 4200,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|protection db|db 8 way": {
       "category": "solar_accessories",
       "brand": "Protection DB",
-      "model": "IP65 Waterproof Distribution Box (8 / 12 / 18 Way)",
-      "rate": 4500,
-      "prevRate": 4500,
+      "model": "DB 8 WAY",
+      "rate": 1200,
+      "prevRate": 1200,
       "change": 0,
-      "status": "stable",
-      "baseRateAtFetch": 4500,
+      "status": "new",
+      "baseRateAtFetch": 1200,
       "externalMarketRate": null,
       "isCarriedForward": true,
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|protection db|db 11 way": {
+      "category": "solar_accessories",
+      "brand": "Protection DB",
+      "model": "DB 11 Way",
+      "rate": 1600,
+      "prevRate": 1600,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 1600,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|protection db|db 14 way": {
+      "category": "solar_accessories",
+      "brand": "Protection DB",
+      "model": "DB 14 Way",
+      "rate": 2200,
+      "prevRate": 2200,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 2200,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|protection db|db 18 way": {
+      "category": "solar_accessories",
+      "brand": "Protection DB",
+      "model": "DB 18 Way",
+      "rate": 2800,
+      "prevRate": 2800,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 2800,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|connectors|mc4 connector": {
+      "category": "solar_accessories",
+      "brand": "Connectors",
+      "model": "MC4 Connector",
+      "rate": 120,
+      "prevRate": 250,
+      "change": -130,
+      "status": "down",
+      "baseRateAtFetch": 120,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|mccb switchgear|mccb(lot) 4p 100a": {
+      "category": "solar_accessories",
+      "brand": "MCCB Switchgear",
+      "model": "MCCB(LOT) 4P 100A",
+      "rate": 4000,
+      "prevRate": 4000,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 4000,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|opas|opas breaker c/o 4p": {
+      "category": "solar_accessories",
+      "brand": "OPAS",
+      "model": "OPAS BREAKER C/O 4P",
+      "rate": 2500,
+      "prevRate": 2500,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 2500,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|opas|opas rotary c/o 2p": {
+      "category": "solar_accessories",
+      "brand": "OPAS",
+      "model": "OPAS ROTARY C/O 2P",
+      "rate": 2400,
+      "prevRate": 2400,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 2400,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|protection db|mccb box": {
+      "category": "solar_accessories",
+      "brand": "Protection DB",
+      "model": "MCCB BOX",
+      "rate": 2300,
+      "prevRate": 2300,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 2300,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|accessories|cable tie 10\"": {
+      "category": "solar_accessories",
+      "brand": "Accessories",
+      "model": "CABLE TIE 10\"",
+      "rate": 300,
+      "prevRate": 300,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 300,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|accessories|cable tie 12\"": {
+      "category": "solar_accessories",
+      "brand": "Accessories",
+      "model": "CABLE TIE 12\"",
+      "rate": 350,
+      "prevRate": 350,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 350,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|safety switchgear|fire breaker": {
+      "category": "solar_accessories",
+      "brand": "Safety Switchgear",
+      "model": "FIRE BREAKER",
+      "rate": 700,
+      "prevRate": 700,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 700,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|knox|hv box 52ah (102-800vdc)": {
+      "category": "solar_accessories",
+      "brand": "Knox",
+      "model": "HV BOX 52AH (102-800Vdc)",
+      "rate": 157435,
+      "prevRate": 157435,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 157435,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|knox|hv box 100ah (102-800vdc)": {
+      "category": "solar_accessories",
+      "brand": "Knox",
+      "model": "HV BOX 100AH (102-800Vdc)",
+      "rate": 191720,
+      "prevRate": 191720,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 191720,
+      "externalMarketRate": 231999,
+      "isCarriedForward": false,
+      "rateSource": "knox.com.pk",
+      "matchedUrl": "https://knox.com.pk/product/knox-powerwall-6-1-lio-5-12-ip20/",
+      "tier": "primary",
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|knox|base wheel 52ah / 100ah": {
+      "category": "solar_accessories",
+      "brand": "Knox",
+      "model": "Base Wheel 52AH / 100AH",
+      "rate": 37665,
+      "prevRate": 37665,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 37665,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|eastron|eastron sdm630-modbus v2 (5-25kw)": {
+      "category": "solar_accessories",
+      "brand": "Eastron",
+      "model": "EASTRON SDM630-MODBUS V2 (5-25kW)",
+      "rate": 25000,
+      "prevRate": 25000,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 25000,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|eastron|eastron sdm630mct v2 (30-60kw)": {
+      "category": "solar_accessories",
+      "brand": "Eastron",
+      "model": "EASTRON SDM630MCT V2 (30-60kW)",
+      "rate": 34000,
+      "prevRate": 34000,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 34000,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|xerox|xerox g4 pro 125kw smart meter": {
+      "category": "solar_accessories",
+      "brand": "XEROX",
+      "model": "Xerox G4 Pro 125kW Smart Meter",
+      "rate": 57000,
+      "prevRate": 57000,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 57000,
+      "externalMarketRate": 65000,
+      "isCarriedForward": false,
+      "rateSource": "sunsolar.pk",
+      "matchedUrl": "https://sunsolar.pk/product/knox-xerox-g4-pro-125kw-smart-meter/",
+      "tier": "secondary",
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "solar_accessories|xerox|xerox g4 pro 125kw smart meter multi": {
+      "category": "solar_accessories",
+      "brand": "XEROX",
+      "model": "Xerox G4 Pro 125kW Smart Meter Multi",
+      "rate": 145000,
+      "prevRate": 145000,
+      "change": 0,
+      "status": "new",
+      "baseRateAtFetch": 145000,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "solar_accessories|earthing|pure copper earthing rod 10ft + bentonite chemical kit": {
       "category": "solar_accessories",
@@ -2488,23 +3064,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
-    },
-    "solar_accessories|connectors|genuine mc4 solar connectors (pair ip68 waterproof)": {
-      "category": "solar_accessories",
-      "brand": "Connectors",
-      "model": "Genuine MC4 Solar Connectors (Pair IP68 Waterproof)",
-      "rate": 250,
-      "prevRate": 250,
-      "change": 0,
-      "status": "stable",
-      "baseRateAtFetch": 250,
-      "externalMarketRate": null,
-      "isCarriedForward": true,
-      "rateSource": "carried_forward",
-      "matchedUrl": null,
-      "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "complete_system|knox zapher|system-1: zapher 30kw hv + 20kwh": {
       "category": "complete_system",
@@ -2520,7 +3080,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "alladin.pk",
       "matchedUrl": "https://alladin.pk/products/knox-system-1-knox-zapher-hv-ip65-30kw-hybrid-20kwh-battery-pack",
       "tier": "secondary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "complete_system|knox zapher|system-2: zapher 30kw hv + 30kwh": {
       "category": "complete_system",
@@ -2536,7 +3096,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "alladin.pk",
       "matchedUrl": "https://alladin.pk/products/knox-system-2-zapher-hv-ip65-30kw-hybrid-solar-inverter-with-30kwh-battery-pack-accessories",
       "tier": "secondary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "complete_system|knox zapher|system-3: zapher 50kw hv + 50kwh": {
       "category": "complete_system",
@@ -2552,7 +3112,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "alladin.pk",
       "matchedUrl": "https://alladin.pk/products/knox-system-4-zapher-hv-ip65-50kw-hybrid-solar-inverter-60kwh-battery-pack-with-accessories",
       "tier": "secondary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "complete_system|knox zapher|system-4: zapher 50kw hv + 60kwh": {
       "category": "complete_system",
@@ -2568,7 +3128,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "alladin.pk",
       "matchedUrl": "https://alladin.pk/products/knox-system-4-zapher-hv-ip65-50kw-hybrid-solar-inverter-60kwh-battery-pack-with-accessories",
       "tier": "secondary",
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "complete_system|turnkey packages|3.2kw hybrid residential system": {
       "category": "complete_system",
@@ -2584,7 +3144,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "complete_system|turnkey packages|5kw / 6kw hybrid home system": {
       "category": "complete_system",
@@ -2600,7 +3160,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "complete_system|turnkey packages|10kw three-phase net metering": {
       "category": "complete_system",
@@ -2616,7 +3176,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "complete_system|turnkey packages|15kw commercial net-metering": {
       "category": "complete_system",
@@ -2632,7 +3192,7 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
     "complete_system|turnkey packages|20kw industrial net-metering": {
       "category": "complete_system",
@@ -2648,39 +3208,631 @@ export const AUTO_FETCHED_RATES = {
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
-    "structure_accessories|gi elevated|l2 galvanized elevated frame (custom)": {
+    "structure_accessories|gi frame|14-gauge l2 solar mounting frame": {
       "category": "structure_accessories",
-      "brand": "GI Elevated",
-      "model": "L2 Galvanized Elevated Frame (Custom)",
-      "rate": 7200,
-      "prevRate": 7200,
+      "brand": "GI Frame",
+      "model": "14-Gauge L2 Solar Mounting Frame",
+      "rate": 4000,
+      "prevRate": 4000,
       "change": 0,
       "status": "stable",
-      "baseRateAtFetch": 7200,
+      "baseRateAtFetch": 4000,
       "externalMarketRate": null,
       "isCarriedForward": true,
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     },
-    "structure_accessories|gi elevated|l3 galvanized heavy elevated p1/p2": {
+    "structure_accessories|gi frame|14-gauge l2 solar mounting frame (700w)": {
       "category": "structure_accessories",
-      "brand": "GI Elevated",
-      "model": "L3 Galvanized Heavy Elevated P1/P2",
-      "rate": 8500,
-      "prevRate": 8500,
+      "brand": "GI Frame",
+      "model": "14-Gauge L2 Solar Mounting Frame (700W)",
+      "rate": 5500,
+      "prevRate": 5500,
       "change": 0,
       "status": "stable",
-      "baseRateAtFetch": 8500,
+      "baseRateAtFetch": 5500,
       "externalMarketRate": null,
       "isCarriedForward": true,
       "rateSource": "carried_forward",
       "matchedUrl": null,
       "tier": null,
-      "updatedAt": "2026-11-23T10:57:11.212Z"
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|gi frame|14-gauge l3 solar mounting frame": {
+      "category": "structure_accessories",
+      "brand": "GI Frame",
+      "model": "14-Gauge L3 Solar Mounting Frame",
+      "rate": 7000,
+      "prevRate": 7000,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 7000,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|mughal steel|mughal girder / feet": {
+      "category": "structure_accessories",
+      "brand": "Mughal Steel",
+      "model": "Mughal Girder / Feet",
+      "rate": 435,
+      "prevRate": 435,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 435,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|gi channel|c-channel 15.5ft (16 swg)": {
+      "category": "structure_accessories",
+      "brand": "GI Channel",
+      "model": "C-Channel 15.5FT (16 SWG)",
+      "rate": 2800,
+      "prevRate": 2800,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 2800,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|gi channel|c-channel 11.5ft (16 swg)": {
+      "category": "structure_accessories",
+      "brand": "GI Channel",
+      "model": "C-Channel 11.5FT (16 SWG)",
+      "rate": 2300,
+      "prevRate": 2300,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 2300,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|gi channel|c-channel 15.5ft (14 swg)": {
+      "category": "structure_accessories",
+      "brand": "GI Channel",
+      "model": "C-Channel 15.5FT (14 SWG)",
+      "rate": 3800,
+      "prevRate": 3800,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 3800,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|gi channel|c-channel 11.5ft (14 swg)": {
+      "category": "structure_accessories",
+      "brand": "GI Channel",
+      "model": "C-Channel 11.5FT (14 SWG)",
+      "rate": 2800,
+      "prevRate": 2800,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 2800,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|cutting tools|cutting disk - 14\"": {
+      "category": "structure_accessories",
+      "brand": "Cutting Tools",
+      "model": "Cutting Disk - 14\"",
+      "rate": 600,
+      "prevRate": 600,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 600,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|cutting tools|cutting milli disk-5\"": {
+      "category": "structure_accessories",
+      "brand": "Cutting Tools",
+      "model": "Cutting Milli Disk-5\"",
+      "rate": 100,
+      "prevRate": 100,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 100,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|cutting tools|cutting milli disk-4\"": {
+      "category": "structure_accessories",
+      "brand": "Cutting Tools",
+      "model": "Cutting Milli Disk-4\"",
+      "rate": 70,
+      "prevRate": 70,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 70,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|cutting tools|cutting milli disk-7\"": {
+      "category": "structure_accessories",
+      "brand": "Cutting Tools",
+      "model": "Cutting Milli Disk-7\"",
+      "rate": 150,
+      "prevRate": 150,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 150,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|cutting tools|cutting milli disk-9\"": {
+      "category": "structure_accessories",
+      "brand": "Cutting Tools",
+      "model": "Cutting Milli Disk-9\"",
+      "rate": 250,
+      "prevRate": 250,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 250,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|iron pipe|iron pipe 1.5\" x 1.5\" (18 swg)": {
+      "category": "structure_accessories",
+      "brand": "Iron Pipe",
+      "model": "Iron Pipe 1.5\" x 1.5\" (18 SWG)",
+      "rate": 2300,
+      "prevRate": 2300,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 2300,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|iron pipe|iron pipe 1.5\" x 1.5\" (16 swg)": {
+      "category": "structure_accessories",
+      "brand": "Iron Pipe",
+      "model": "Iron Pipe 1.5\" x 1.5\" (16 SWG)",
+      "rate": 2900,
+      "prevRate": 2900,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 2900,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|mounting plate|base plate 7\" x 7\"": {
+      "category": "structure_accessories",
+      "brand": "Mounting Plate",
+      "model": "Base Plate 7\" x 7\"",
+      "rate": 400,
+      "prevRate": 400,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 400,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|mounting plate|base plate 8\" x 8\"": {
+      "category": "structure_accessories",
+      "brand": "Mounting Plate",
+      "model": "Base Plate 8\" x 8\"",
+      "rate": 500,
+      "prevRate": 500,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 500,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|mounting plate|top plate": {
+      "category": "structure_accessories",
+      "brand": "Mounting Plate",
+      "model": "Top Plate",
+      "rate": 300,
+      "prevRate": 300,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 300,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|consumables|welding electrodes (box)": {
+      "category": "structure_accessories",
+      "brand": "Consumables",
+      "model": "Welding Electrodes (Box)",
+      "rate": 1100,
+      "prevRate": 1100,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 1100,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|consumables|magic epoxy (500 gram x 2)": {
+      "category": "structure_accessories",
+      "brand": "Consumables",
+      "model": "Magic Epoxy (500 gram x 2)",
+      "rate": 1700,
+      "prevRate": 1700,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 1700,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|paints & coat|paint enamel -qtr (black)": {
+      "category": "structure_accessories",
+      "brand": "Paints & Coat",
+      "model": "Paint Enamel -Qtr (Black)",
+      "rate": 800,
+      "prevRate": 800,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 800,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|paints & coat|roller": {
+      "category": "structure_accessories",
+      "brand": "Paints & Coat",
+      "model": "Roller",
+      "rate": 90,
+      "prevRate": 90,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 90,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|paints & coat|spray paint (silver) + (black)": {
+      "category": "structure_accessories",
+      "brand": "Paints & Coat",
+      "model": "Spray Paint (Silver) + (Black)",
+      "rate": 500,
+      "prevRate": 500,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 500,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|consumables|kerosene oil": {
+      "category": "structure_accessories",
+      "brand": "Consumables",
+      "model": "Kerosene Oil",
+      "rate": 500,
+      "prevRate": 500,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 500,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|fasteners|rawlbolts m10": {
+      "category": "structure_accessories",
+      "brand": "Fasteners",
+      "model": "Rawlbolts M10",
+      "rate": 65,
+      "prevRate": 65,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 65,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|fasteners|rawlbolts m10 power": {
+      "category": "structure_accessories",
+      "brand": "Fasteners",
+      "model": "Rawlbolts M10 Power",
+      "rate": 70,
+      "prevRate": 70,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 70,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|fasteners|power anchor bolt 4\"": {
+      "category": "structure_accessories",
+      "brand": "Fasteners",
+      "model": "Power Anchor Bolt 4\"",
+      "rate": 90,
+      "prevRate": 90,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 90,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|fasteners|power anchor bolt 6\"": {
+      "category": "structure_accessories",
+      "brand": "Fasteners",
+      "model": "Power Anchor Bolt 6\"",
+      "rate": 100,
+      "prevRate": 100,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 100,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|fasteners|rawlbolts m12": {
+      "category": "structure_accessories",
+      "brand": "Fasteners",
+      "model": "Rawlbolts M12",
+      "rate": 100,
+      "prevRate": 100,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 100,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|fasteners|nut + bolt + 2 x washers": {
+      "category": "structure_accessories",
+      "brand": "Fasteners",
+      "model": "Nut + Bolt + 2 x Washers",
+      "rate": 23,
+      "prevRate": 23,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 23,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|fasteners|nut + bolt + (collar)": {
+      "category": "structure_accessories",
+      "brand": "Fasteners",
+      "model": "Nut + Bolt + (Collar)",
+      "rate": 23,
+      "prevRate": 23,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 23,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|solar clamps|end clamp": {
+      "category": "structure_accessories",
+      "brand": "Solar Clamps",
+      "model": "END CLAMP",
+      "rate": 140,
+      "prevRate": 140,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 140,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|solar clamps|mid clamp": {
+      "category": "structure_accessories",
+      "brand": "Solar Clamps",
+      "model": "MID CLAMP",
+      "rate": 170,
+      "prevRate": 170,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 170,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|solar clamps|end clamp(75mm) with u bolt": {
+      "category": "structure_accessories",
+      "brand": "Solar Clamps",
+      "model": "END CLAMP(75mm) with U bolt",
+      "rate": 230,
+      "prevRate": 230,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 230,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|solar clamps|mid clamp(75mm) with u bolt": {
+      "category": "structure_accessories",
+      "brand": "Solar Clamps",
+      "model": "MID CLAMP(75mm) with U bolt",
+      "rate": 230,
+      "prevRate": 230,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 230,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|paints & coat|paint enamel - gallon (black)": {
+      "category": "structure_accessories",
+      "brand": "Paints & Coat",
+      "model": "Paint Enamel - Gallon (Black)",
+      "rate": 3400,
+      "prevRate": 3400,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 3400,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|safety & earth|lightning arrestor": {
+      "category": "structure_accessories",
+      "brand": "Safety & Earth",
+      "model": "Lightning Arrestor",
+      "rate": 4200,
+      "prevRate": 4200,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 4200,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|safety & earth|earthing rod (4ft copper)": {
+      "category": "structure_accessories",
+      "brand": "Safety & Earth",
+      "model": "Earthing Rod (4ft copper)",
+      "rate": 5200,
+      "prevRate": 5200,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 5200,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
+    },
+    "structure_accessories|solar clamps|clamp": {
+      "category": "structure_accessories",
+      "brand": "Solar Clamps",
+      "model": "Clamp",
+      "rate": 200,
+      "prevRate": 200,
+      "change": 0,
+      "status": "stable",
+      "baseRateAtFetch": 200,
+      "externalMarketRate": null,
+      "isCarriedForward": true,
+      "rateSource": "carried_forward",
+      "matchedUrl": null,
+      "tier": null,
+      "updatedAt": "2026-11-23T11:28:48.846Z"
     }
   }
 };

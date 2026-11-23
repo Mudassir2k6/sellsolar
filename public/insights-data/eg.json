@@ -2,8 +2,8 @@
   "version": 2,
   "countryCode": "EG",
   "location": "Egypt",
-  "lastUpdated": "2026-11-22T05:03:09+05:00",
-  "lastUpdatedLabel": "22 Nov 2026, 5:03 am PKT",
+  "lastUpdated": "2026-11-23T05:34:47+05:00",
+  "lastUpdatedLabel": "23 Nov 2026, 5:34 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
   "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solaregypt, solarpowered, solarpanel",
   "trendingNews": [
@@ -54,17 +54,6 @@
     },
     {
       "id": "tn-5",
-      "title": "Africa’s Unseen Solar Energy Revolution",
-      "summary": "Trending solar coverage from CleanTechnica — use this Egypt topic for your own posts and SEO content.",
-      "source": "CleanTechnica",
-      "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxOa0FJcnNmcXBjdmpuck1aczVaMVVSTXNheWFPOGRSdjRTUzUzWVBMUkJDZHZrMHBKSHdFRldSWUZjZGRkODlvSktMdXBVNUd6cHlhTVhXVzBLR1A0VlhpNmJvUWw0WUNRNzl5cjZDdlp0d2pSNnlCS3F5SENjQ3dmd2RyZ1czM3FtQ2dGcm8zdVY0WlNyZ2VaTnJoMkViams?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarEgypt"
-      ]
-    },
-    {
-      "id": "tn-6",
       "title": "IDSC's report: Egypt ranks among top 3 African markets for new solar energy additions",
       "summary": "Trending solar coverage from Egypt Today — use this Egypt topic for your own posts and SEO content.",
       "source": "Egypt Today",
@@ -72,6 +61,18 @@
       "tags": [
         "#solarenergy",
         "#solarEgypt"
+      ]
+    },
+    {
+      "id": "tn-6",
+      "title": "Egypt pilots solar-panel shade for crops as heat, water shortages squeeze farmers",
+      "summary": "Trending solar coverage from The Cool Down — use this Egypt topic for your own posts and SEO content.",
+      "source": "The Cool Down",
+      "url": "https://news.google.com/rss/articles/CBMikAFBVV95cUxPdnU4RkhaTDBsSjU0bWgxRmZ2b0FVSllUSnktbW1WZDh0N3VvMUx0YUlINmFBMXE5Zk81Z191ZlkzVHlYLWhiOGd6MXZyRnEtOTBEY3d1dGxtaC0yWVk1LXpHN3pBSElLeHZPS0dZa3FNMU5nNHlaTkdIaUdjY3RBeU1VaVV0ajBJUG9fRjVaOWc?oc=5",
+      "tags": [
+        "#solarpanel",
+        "#solarEgypt",
+        "#solarenergy"
       ]
     }
   ],
@@ -141,7 +142,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "989K+"
+          "posts": "994K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -171,7 +172,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "176K+"
+          "posts": "183K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -181,7 +182,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "46K+"
+          "posts": "45K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -191,7 +192,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "121K+"
+          "posts": "119K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -201,7 +202,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "486K+"
+          "posts": "511K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"

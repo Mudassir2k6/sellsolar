@@ -2,10 +2,10 @@
   "version": 2,
   "countryCode": "AE",
   "location": "United Arab Emirates",
-  "lastUpdated": "2026-11-22T05:03:09+05:00",
-  "lastUpdatedLabel": "22 Nov 2026, 5:03 am PKT",
+  "lastUpdated": "2026-11-23T05:34:47+05:00",
+  "lastUpdatedLabel": "23 Nov 2026, 5:34 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solaruae, solarpanel, solarplans, solarfarm, solarfarms",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solaruae, solarpanel, solarfarm, solarfarms, solarplans",
   "trendingNews": [
     {
       "id": "tn-1",
@@ -21,6 +21,18 @@
     },
     {
       "id": "tn-2",
+      "title": "Mozambique entrusts small solar panel factory to UAE’s Jampur Group",
+      "summary": "Trending solar coverage from pv magazine Global — use this United Arab Emirates topic for your own posts and SEO content.",
+      "source": "pv magazine Global",
+      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNM25rM2dUMk9vMFJwWFFjVF9YVGYxQmZDX1U5YkR1a2k1ZmlaRExBXzlId0ttVjlsS2tETkVDdTJZTGhibnFFUHlvUTJxbUNhc0xDUHgxamtuT2hpbmowWG5lM3Y3YmstSW5vc3AwTWowX0d5NTlLNHg1LWxxd1U4aU9ZXzhFalE1X010SFBxai1xd1ZZc0NKaUhfWU45ZW9rN1E?oc=5",
+      "tags": [
+        "#solarpanel",
+        "#solarUAE",
+        "#solarenergy"
+      ]
+    },
+    {
+      "id": "tn-3",
       "title": "Solar Energy: Myths, facts, and challenges",
       "summary": "Trending solar coverage from IQAir — use this United Arab Emirates topic for your own posts and SEO content.",
       "source": "IQAir",
@@ -31,30 +43,7 @@
       ]
     },
     {
-      "id": "tn-3",
-      "title": "Abu Dhabi launches Solar Energy Self-Supply Policy to boost clean energy",
-      "summary": "Trending solar coverage from Consultancy-me.com — use this United Arab Emirates topic for your own posts and SEO content.",
-      "source": "Consultancy-me.com",
-      "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPQVpPTzhZOUJqMUhnZ1N4WHNIUjV5REZsd01BTGtndnJZbC1nVC1wRkpmMTJRRjFhRHBBS2tZWnUwdFgzOFRacFZOb2FfUG1vbl9keUlNS2p4WF92NURkV3g5VTZNNVBVWnJoaUc2ZlBVV2d6VEpuMXBHREhVMEtFRUxJMlVyRl9ITkJMQ2NuMmpfbm5yRElIWE90S2ZLTld0ZG5wbFU0Mkx3VW0yWkx3RU95WFLSAboBQVVfeXFMTlhLWVZjTUZxQ3Qyc1lsTlZHbk5FR1U5Sy1FZFNYSjNyVWIxd3d6N3VnSWFmX2JtZGNGaWxDOVFDMUp3ZnhuY2NHUEswYV9iR1lkdkkyUVN5WGNBQTk1TTdOLWVualAxUTdUX2Qtc09QWFQwT1RhV09kRzRiQV9nUF9zSTVpZUFGd28zeklTSWlSYnBYRzVBQmYtRG9CcGtNZFV6MWE2djZJTXJCM2JKN0JjeVdDRDl2RHVR?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarUAE"
-      ]
-    },
-    {
       "id": "tn-4",
-      "title": "Sahaj Solar Plans 750 MW Solar Panel Plant in UAE with Strategic Partner",
-      "summary": "Trending solar coverage from Energetica India Magazine — use this United Arab Emirates topic for your own posts and SEO content.",
-      "source": "Energetica India Magazine",
-      "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxPWGRDZDlrWUQxdW9PVHVLcjczVC0wbUxXUlhKWFFRa3JpUG1jUGZCaHUzbFBMNHVnV2I3ZFNjSU9yWVBfRjctNXhWU3JRMDR6UFVhUE9IZUd1SmNiVWh5ZzYtanUzVi0tOWpJbWdobTRpQm5veEl1a3lHdklmQXFDRThzSFgycDlDeEFZcE10c2szd0ZuYV9NR3AwUWxLT0FYZVhUaGpObldJazhqZklV?oc=5",
-      "tags": [
-        "#solarplans",
-        "#solarUAE",
-        "#solarenergy"
-      ]
-    },
-    {
-      "id": "tn-5",
       "title": "Egypt rushes to catch up on solar energy as gas prices soar",
       "summary": "Trending solar coverage from Reuters — use this United Arab Emirates topic for your own posts and SEO content.",
       "source": "Reuters",
@@ -65,7 +54,7 @@
       ]
     },
     {
-      "id": "tn-6",
+      "id": "tn-5",
       "title": "Solar Power in the Gulf: Leaders and Laggards in Regulatory Support for Solar Power Deployment",
       "summary": "Trending solar coverage from Middle East Institute — use this United Arab Emirates topic for your own posts and SEO content.",
       "source": "Middle East Institute",
@@ -74,6 +63,17 @@
         "#solarpower",
         "#solarUAE",
         "#solarenergy"
+      ]
+    },
+    {
+      "id": "tn-6",
+      "title": "Abu Dhabi launches Solar Energy Self-Supply Policy to boost clean energy",
+      "summary": "Trending solar coverage from Consultancy-me.com — use this United Arab Emirates topic for your own posts and SEO content.",
+      "source": "Consultancy-me.com",
+      "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPQVpPTzhZOUJqMUhnZ1N4WHNIUjV5REZsd01BTGtndnJZbC1nVC1wRkpmMTJRRjFhRHBBS2tZWnUwdFgzOFRacFZOb2FfUG1vbl9keUlNS2p4WF92NURkV3g5VTZNNVBVWnJoaUc2ZlBVV2d6VEpuMXBHREhVMEtFRUxJMlVyRl9ITkJMQ2NuMmpfbm5yRElIWE90S2ZLTld0ZG5wbFU0Mkx3VW0yWkx3RU95WFLSAboBQVVfeXFMTlhLWVZjTUZxQ3Qyc1lsTlZHbk5FR1U5Sy1FZFNYSjNyVWIxd3d6N3VnSWFmX2JtZGNGaWxDOVFDMUp3ZnhuY2NHUEswYV9iR1lkdkkyUVN5WGNBQTk1TTdOLWVualAxUTdUX2Qtc09QWFQwT1RhV09kRzRiQV9nUF9zSTVpZUFGd28zeklTSWlSYnBYRzVBQmYtRG9CcGtNZFV6MWE2djZJTXJCM2JKN0JjeVdDRDl2RHVR?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarUAE"
       ]
     }
   ],
@@ -143,7 +143,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "989K+"
+          "posts": "994K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -173,7 +173,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "176K+"
+          "posts": "183K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -183,7 +183,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "46K+"
+          "posts": "45K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -193,7 +193,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "121K+"
+          "posts": "119K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -203,7 +203,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "486K+"
+          "posts": "511K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -229,16 +229,6 @@
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
     },
     {
-      "tag": "#solarplans",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "31K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarplans/"
-    },
-    {
       "tag": "#solarfarm",
       "platforms": [
         {
@@ -257,6 +247,16 @@
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarfarms/"
+    },
+    {
+      "tag": "#solarplans",
+      "platforms": [
+        {
+          "name": "Instagram",
+          "posts": "32K+"
+        }
+      ],
+      "searchUrl": "https://www.instagram.com/explore/tags/solarplans/"
     }
   ],
   "contentIdeas": [

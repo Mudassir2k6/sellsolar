@@ -2,20 +2,21 @@
   "version": 2,
   "countryCode": "US",
   "location": "United States",
-  "lastUpdated": "2026-11-22T05:03:09+05:00",
-  "lastUpdatedLabel": "22 Nov 2026, 5:03 am PKT",
+  "lastUpdated": "2026-11-23T05:34:47+05:00",
+  "lastUpdatedLabel": "23 Nov 2026, 5:34 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarusa, solarpanel, floridasolar, solarstorage",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarusa, solarcentury, solarpanel, solarrooftop, solargenerates, solardevelopment",
   "trendingNews": [
     {
       "id": "tn-1",
-      "title": "Mission Solar Energy puts supply chain transparency in the spotlight at RE+ 2026",
-      "summary": "Trending solar coverage from Solar Power World — use this United States topic for your own posts and SEO content.",
-      "source": "Solar Power World",
-      "url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxNUWl1T3R6UThMWmx3RlpQVTJweC15SFU1cVNRaFRlQk13Q21PRHNVcmRMcXNPWEFTOV9JNDFlcl9ZTkJqV2QwNzd4dVlqVU9JVEtUbVZkWnlGdUMzYU91c2ktd0FaR2t4Yi1ON2Y2d2ZMMDZJSFpUVDcyZ0I5NGVmOEI5MjFlZ0tEaE5qQWtwbVBDbTAyZjJWTGM0V25NZTFfbm5oX0ZLbG1RNHdWSGl4SXNOTUgxWVlCZWxNSG9RYS1pSFVy?oc=5",
+      "title": "The Solar Century: Landmark Moments in the History of Solar Energy",
+      "summary": "Trending solar coverage from Solar Energy Industries Association — use this United States topic for your own posts and SEO content.",
+      "source": "Solar Energy Industries Association",
+      "url": "https://news.google.com/rss/articles/CBMif0FVX3lxTE56X3Qtd21FRGVpZ3FKZlVoSXhCTjBaUllOUnpGOWdXNnpyMWlXZDlFRFhlQ3ZBR0tNN3RZdUhkZ3JzSktvMEQzaXMtcTFueWRfSWh2dFZaYUIwUjQ2cHBtLW1mT1ZvdXFRNmlzemUwTVdLTUFZR2pQamozdkZGa28?oc=5",
       "tags": [
-        "#solarenergy",
-        "#solarUSA"
+        "#solarcentury",
+        "#solarUSA",
+        "#solarenergy"
       ]
     },
     {
@@ -32,45 +33,48 @@
     },
     {
       "id": "tn-3",
-      "title": "Iran’s Solar Energy Policy in the Shadow of War",
-      "summary": "Trending solar coverage from WANA News Agency — use this United States topic for your own posts and SEO content.",
-      "source": "WANA News Agency",
-      "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTE9VRVhhTHVsRXZ5T2R1V01YRUdEellIdTJRQU9MMVE2d0ZmVGN0dk04QXg4Zk81emJ4V0ZNM3JDbnU5R3ZiRE5TNHdmMzRIMXpiNGJiTzlmdm9rM2VUS0V6UmtqRUktRTVaZlBMdUVURkI3UHVL?oc=5",
+      "title": "End-of-Life Solar Panels: Regulations and Management",
+      "summary": "Trending solar coverage from U.S. Environmental Protection Agency (.gov) — use this United States topic for your own posts and SEO content.",
+      "source": "U.S. Environmental Protection Agency (.gov)",
+      "url": "https://news.google.com/rss/articles/CBMie0FVX3lxTE9VLWxPWUZjU0syN0hBQ1VBRnVsX19JSFAtNnlTVUdpUkUzMHkwZk5hM3hSUm1iNk1oTkFZNlJ5UGs3cUMwUVdHZ3EwODhfeW9vX2Z5N0lHN2JYbkFaNE82Z0xEdXJjSFlXR2xnRlhZdUFpWjdKdmlvNDRfZw?oc=5",
       "tags": [
-        "#solarenergy",
-        "#solarUSA"
+        "#solarpanels",
+        "#solarUSA",
+        "#solarenergy"
       ]
     },
     {
       "id": "tn-4",
-      "title": "Learning a Better Way To Forecast Wind and Solar Energy Costs",
-      "summary": "Trending solar coverage from Department of Energy (.gov) — use this United States topic for your own posts and SEO content.",
-      "source": "Department of Energy (.gov)",
-      "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxOTHdkTVREYm1yWjFFS3psZTVzQVg5REN1ZWNWZFNXWjdqLVRjOWZpcVF1cTlhLUd3bERWS2kteHBRMXEwdHdpUUl0UUlJcXd3ZTdNS0dUZnI0b0tjMDB0RC1pUERDVUFWYThibk8zcll0V0YtNUNESmxtVHF0WFF2VTZWXzJobWtoQmc2THlWWjdDN3JBbUl1UzhXVVBzbE5f?oc=5",
+      "title": "A New Crop of Solar Panels Is the U.S.’s Best Hope of Catching China",
+      "summary": "Trending solar coverage from The New York Times — use this United States topic for your own posts and SEO content.",
+      "source": "The New York Times",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPWXg5WXJhQ29jY2xtUGRWdndidTNUdFlCRi16c201RGpyM0VwdHZvNGN4Y2l0el9ubmxnc0x5dWtmd2JRR01GRHRjSFNuMk9aeXYtYzNvTDR6MW1HWUtNT3E4ZEpZT1lXMW4zT00xRG9UbGI4OHNNbkdUMjFzdHdBWmNKUWhzUWpabDhSMXg5ckZkWVFTRWE5SkVBclA?oc=5",
       "tags": [
-        "#solarenergy",
-        "#solarUSA"
+        "#solarpanels",
+        "#solarUSA",
+        "#solarenergy"
       ]
     },
     {
       "id": "tn-5",
-      "title": "Building More Solar Energy Sources Means Rethinking Land Use For Agriculture And Conservation",
-      "summary": "Trending solar coverage from FlaglerLive — use this United States topic for your own posts and SEO content.",
-      "source": "FlaglerLive",
-      "url": "https://news.google.com/rss/articles/CBMiS0FVX3lxTE5mVWhnZUo5SlN4LW1GTk0xV0lKQ2pQZks2eEJrVmYyY3ByTVhnRlp2RHNlclN0NHFuelpQMk5Nb0F0WHdFc0pER2Fxcw?oc=5",
+      "title": "Should Solar Panel Recycling Be Mandated?",
+      "summary": "Trending solar coverage from RAND — use this United States topic for your own posts and SEO content.",
+      "source": "RAND",
+      "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE04eU5vcTB2enRTZ2FxQkg5S3YzcmdGbDFZdXVoblpQX29ZQU81bktscjZPWGVCWkVvQTNfM2R5NE1aYWhiOFNQQWQ5Y1NZZlFIUWF4dGdjY1NWTXBPWjNVWDhBZVdGV0p5?oc=5",
       "tags": [
-        "#solarenergy",
-        "#solarUSA"
+        "#solarpanel",
+        "#solarUSA",
+        "#solarenergy"
       ]
     },
     {
       "id": "tn-6",
-      "title": "Duke Energy proposes 300 MW of Florida solar with $1 billion in projected customer savings",
-      "summary": "Trending solar coverage from Energies Media — use this United States topic for your own posts and SEO content.",
-      "source": "Energies Media",
-      "url": "https://news.google.com/rss/articles/CBMifEFVX3lxTE1WWU1zWkVMUUF4QmJQYUh3eTgwNXFoakFRODN2RWcyNmNnZFBHZjhjaUl0UnB6UDlzTGRKVHRuOWdoelFjWndRdVpNdmM5clhDY20tTG0zLVZJN09wSFFOaXJJM2RTNF9FVW9ydGtOZ0R6a1pPT1lpeUJTM2Q?oc=5",
+      "title": "Solar Rooftop Potential",
+      "summary": "Trending solar coverage from Department of Energy (.gov) — use this United States topic for your own posts and SEO content.",
+      "source": "Department of Energy (.gov)",
+      "url": "https://news.google.com/rss/articles/CBMia0FVX3lxTFBuSk03WFQ0Yjd5U3AtM0hUdWxSNWNRS3FLTWlDZUU5WVRodU9QWHRLUWpCc2tEUkhaLWtQMC1CUnF5U3llSHcwWi1EZ0p6ZEFMRXdhclZ2ZldtZmVjOEE1dGg0Y3hiVDhUWVZr?oc=5",
       "tags": [
-        "#floridasolar",
+        "#solarrooftop",
         "#solarUSA",
         "#solarenergy"
       ]
@@ -142,7 +146,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "989K+"
+          "posts": "994K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -172,7 +176,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "176K+"
+          "posts": "183K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -182,7 +186,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "46K+"
+          "posts": "45K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -192,7 +196,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "121K+"
+          "posts": "119K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -202,7 +206,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "486K+"
+          "posts": "511K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -218,6 +222,16 @@
       "searchUrl": "https://www.instagram.com/explore/tags/solarusa/"
     },
     {
+      "tag": "#solarcentury",
+      "platforms": [
+        {
+          "name": "Instagram",
+          "posts": "34K+"
+        }
+      ],
+      "searchUrl": "https://www.instagram.com/explore/tags/solarcentury/"
+    },
+    {
       "tag": "#solarpanel",
       "platforms": [
         {
@@ -228,24 +242,34 @@
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
     },
     {
-      "tag": "#floridasolar",
+      "tag": "#solarrooftop",
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "13K+"
+          "posts": "45K+"
         }
       ],
-      "searchUrl": "https://www.instagram.com/explore/tags/floridasolar/"
+      "searchUrl": "https://www.instagram.com/explore/tags/solarrooftop/"
     },
     {
-      "tag": "#solarstorage",
+      "tag": "#solargenerates",
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "33K+"
+          "posts": "34K+"
         }
       ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarstorage/"
+      "searchUrl": "https://www.instagram.com/explore/tags/solargenerates/"
+    },
+    {
+      "tag": "#solardevelopment",
+      "platforms": [
+        {
+          "name": "Instagram",
+          "posts": "36K+"
+        }
+      ],
+      "searchUrl": "https://www.instagram.com/explore/tags/solardevelopment/"
     }
   ],
   "contentIdeas": [

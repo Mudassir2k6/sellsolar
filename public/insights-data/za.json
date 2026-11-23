@@ -2,8 +2,8 @@
   "version": 2,
   "countryCode": "ZA",
   "location": "South Africa",
-  "lastUpdated": "2026-11-22T05:03:09+05:00",
-  "lastUpdatedLabel": "22 Nov 2026, 5:03 am PKT",
+  "lastUpdated": "2026-11-23T05:34:47+05:00",
+  "lastUpdatedLabel": "23 Nov 2026, 5:34 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
   "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarsouthafrica, solarpanel, solartechnology",
   "trendingNews": [
@@ -21,18 +21,6 @@
     },
     {
       "id": "tn-2",
-      "title": "The 339-year-old town known for wine and the longest main street in South Africa now hosts one of the country’s only solar panel manufacturers",
-      "summary": "Trending solar coverage from MyBroadband — use this South Africa topic for your own posts and SEO content.",
-      "source": "MyBroadband",
-      "url": "https://news.google.com/rss/articles/CBMimwJBVV95cUxNSlg2MGdCUUttQUJoNndxd1pVMkVJS2RnZVJTZGliVThxLUlVS3k5NDd3TmJFOGNyVFRNV2xqWFAxV2tJMmJhamhOYzBVbndYWS15d3BMZTVqNXd6UnkzeFJpeDBKd2Uyenl1WXRNbDRSTFFVdnNsV3d4TXBpN21qTUVXYVZvaTNYclZscFl5ZDVRY1V2NDljeUZXTF9Wd2hqa3pwQkl2S3l6TU01ZzRBSUFwYWVwZEtJVGNXV1NTY2VEZktfZE5XN2tic3FTLTk3cmpPMVduZVNnWEdEYnhPb1hJVEd2T1pVSVk2dkQ5MTIxTmdVd2ZQZ1hJWk9COVpDVUJuYzc2Vmh2YmQwX20xWWFOVnhMWkRmMDlN?oc=5",
-      "tags": [
-        "#solarpanel",
-        "#solarSouthAfrica",
-        "#solarenergy"
-      ]
-    },
-    {
-      "id": "tn-3",
       "title": "South Africa- and India-focused solar energy firm receives new funding",
       "summary": "Trending solar coverage from Engineering News — use this South Africa topic for your own posts and SEO content.",
       "source": "Engineering News",
@@ -43,7 +31,7 @@
       ]
     },
     {
-      "id": "tn-4",
+      "id": "tn-3",
       "title": "South Africa is overlooking solar technology that can keep generating electricity after sunset",
       "summary": "Trending solar coverage from The Conversation — use this South Africa topic for your own posts and SEO content.",
       "source": "The Conversation",
@@ -55,7 +43,7 @@
       ]
     },
     {
-      "id": "tn-5",
+      "id": "tn-4",
       "title": "Ecoprogetti breathes new life into solar panel factory in South Africa",
       "summary": "Trending solar coverage from Green Building Africa — use this South Africa topic for your own posts and SEO content.",
       "source": "Green Building Africa",
@@ -67,7 +55,7 @@
       ]
     },
     {
-      "id": "tn-6",
+      "id": "tn-5",
       "title": "Warning to solar panel users in South Africa, and Facebook under siege",
       "summary": "Trending solar coverage from BusinessTech — use this South Africa topic for your own posts and SEO content.",
       "source": "BusinessTech",
@@ -76,6 +64,17 @@
         "#solarpanel",
         "#solarSouthAfrica",
         "#solarenergy"
+      ]
+    },
+    {
+      "id": "tn-6",
+      "title": "How fixed charges impact solar energy users in South Africa",
+      "summary": "Trending solar coverage from IOL — use this South Africa topic for your own posts and SEO content.",
+      "source": "IOL",
+      "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxPX1lydU50X2Y2a3E1WnBfNW93b2pFb2pRVU5lRjMyZmFaYXZpaEkwbGFqT2M5YzFvemFGM1M3b2tqTWxXYWxnaGR1R19mRG1ub01OOHFaWS04MTNKQkhFWkhxYWNHSWZENVhVSkExR1ZYbXNBRmdkckxIT193M29MWDhvM2F1OU1LUUNLXzJobTBfa0hIREZ6ZXlmUW84UGdxVzhMUTFCcEZMdUJia1h0cmZn?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarSouthAfrica"
       ]
     }
   ],
@@ -145,7 +144,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "989K+"
+          "posts": "994K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -175,7 +174,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "176K+"
+          "posts": "183K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -185,7 +184,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "46K+"
+          "posts": "45K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -195,7 +194,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "121K+"
+          "posts": "119K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -205,7 +204,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "486K+"
+          "posts": "511K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -235,7 +234,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "19K+"
+          "posts": "20K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solartechnology/"

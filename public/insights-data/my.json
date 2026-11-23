@@ -2,13 +2,25 @@
   "version": 2,
   "countryCode": "MY",
   "location": "Malaysia",
-  "lastUpdated": "2026-11-22T05:03:09+05:00",
-  "lastUpdatedLabel": "22 Nov 2026, 5:03 am PKT",
+  "lastUpdated": "2026-11-23T05:34:47+05:00",
+  "lastUpdatedLabel": "23 Nov 2026, 5:34 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
   "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarmalaysia, solarpanel, solarsystem",
   "trendingNews": [
     {
       "id": "tn-1",
+      "title": "MBSB to sponsor 61 underserved Muslim tradesmen for solar panel certification",
+      "summary": "Trending solar coverage from The Edge Malaysia — use this Malaysia topic for your own posts and SEO content.",
+      "source": "The Edge Malaysia",
+      "url": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE5lY0JMVm1TaGs0U2VzSHN1Szd6YWZpZ3JkN0FzWU14NDk3WnoyWFNXQ2ZobjNHa2pWcG1PMnF6NDhLcjdyM3dkcEFPWDR5UU52?oc=5",
+      "tags": [
+        "#solarpanel",
+        "#solarMalaysia",
+        "#solarenergy"
+      ]
+    },
+    {
+      "id": "tn-2",
       "title": "How four Malaysian school friends built a $1B solar energy empire",
       "summary": "Trending solar coverage from VnExpress International — use this Malaysia topic for your own posts and SEO content.",
       "source": "VnExpress International",
@@ -19,29 +31,7 @@
       ]
     },
     {
-      "id": "tn-2",
-      "title": "Johor eyes additional 5GW of solar energy by 2031 to meet data centre demand",
-      "summary": "Trending solar coverage from The Edge Malaysia — use this Malaysia topic for your own posts and SEO content.",
-      "source": "The Edge Malaysia",
-      "url": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE5rVFBGUjNVZnhoaUxXUzIwWHFxSGpZUnR6MFU3Y1B6UlUxRmp6YVprMm5LMTA0Uk1CYkhmS0hkN1FGV3U2UEZDbll4bXAwY0VS?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarMalaysia"
-      ]
-    },
-    {
       "id": "tn-3",
-      "title": "Masdar starts construction on 200MW solar energy project in Malaysia",
-      "summary": "Trending solar coverage from The National — use this Malaysia topic for your own posts and SEO content.",
-      "source": "The National",
-      "url": "https://news.google.com/rss/articles/CBMixwFBVV95cUxOUm9icm1fenRFb3hiV014ekt6ZXlZbFJYZ1FwN1BxZHg2TFhQYlNubVhQeGlDVVNiNXR0RE4zRlZoNTV2RTE3TzNEeklCS0s5UUl5Q3ZNLVhyVE4weEcwTEpMTFU2dktMQUxNY1JUMklTNVhYeGRSVUxyWXZReXF1cC1DdUZ5MDY3QlpoejFPTTl3R0I0bU9USl9xcURlVkJyQWk4Y09FSWxOeF9GZnFrNXNzUW9XR1ZfeEtRcEpYdFRXa1BROHIw?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarMalaysia"
-      ]
-    },
-    {
-      "id": "tn-4",
       "title": "Singapore Grants Two Companies To Import Solar Energy From Malaysia",
       "summary": "Trending solar coverage from BusinessToday Malaysia — use this Malaysia topic for your own posts and SEO content.",
       "source": "BusinessToday Malaysia",
@@ -52,15 +42,25 @@
       ]
     },
     {
-      "id": "tn-5",
-      "title": "MBSB to sponsor 61 underserved Muslim tradesmen for solar panel certification",
-      "summary": "Trending solar coverage from The Edge Malaysia — use this Malaysia topic for your own posts and SEO content.",
-      "source": "The Edge Malaysia",
-      "url": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE5lY0JMVm1TaGs0U2VzSHN1Szd6YWZpZ3JkN0FzWU14NDk3WnoyWFNXQ2ZobjNHa2pWcG1PMnF6NDhLcjdyM3dkcEFPWDR5UU52?oc=5",
+      "id": "tn-4",
+      "title": "Huawei brings new era of AI-powered, grid-stabilising solar energy to Malaysia with launch of FusionSolar9.0",
+      "summary": "Trending solar coverage from Huawei — use this Malaysia topic for your own posts and SEO content.",
+      "source": "Huawei",
+      "url": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxOUTVtcFlsQ1FHejFmQkx6QnRGWWdNT29yQ28ybjZ2MVd0SEdYRDFTXzdycVpIWUdDX0ktOVA0TGVrZFViZnR6SXZhMXZkTEwydUIwWWdGQkhTYW5YX3ozc3ByR1N0WjNuRVhwTm1JYXV3QnMtX3Q5YnNaMVJDVnFRNkRsRThERUl5QTFLeWVxb1NZbHhFcmdoa3FNbC15VTV4aHphaDE4UWw3aGtYQVJValVESG91YmJUSlo1WXkyMEVxekVCV1N5bkVLN3RyZ3lx?oc=5",
       "tags": [
-        "#solarpanel",
-        "#solarMalaysia",
-        "#solarenergy"
+        "#solarenergy",
+        "#solarMalaysia"
+      ]
+    },
+    {
+      "id": "tn-5",
+      "title": "Masdar starts construction on 200MW solar energy project in Malaysia",
+      "summary": "Trending solar coverage from The National — use this Malaysia topic for your own posts and SEO content.",
+      "source": "The National",
+      "url": "https://news.google.com/rss/articles/CBMixwFBVV95cUxOUm9icm1fenRFb3hiV014ekt6ZXlZbFJYZ1FwN1BxZHg2TFhQYlNubVhQeGlDVVNiNXR0RE4zRlZoNTV2RTE3TzNEeklCS0s5UUl5Q3ZNLVhyVE4weEcwTEpMTFU2dktMQUxNY1JUMklTNVhYeGRSVUxyWXZReXF1cC1DdUZ5MDY3QlpoejFPTTl3R0I0bU9USl9xcURlVkJyQWk4Y09FSWxOeF9GZnFrNXNzUW9XR1ZfeEtRcEpYdFRXa1BROHIw?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarMalaysia"
       ]
     },
     {
@@ -141,7 +141,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "989K+"
+          "posts": "994K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -171,7 +171,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "176K+"
+          "posts": "183K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -181,7 +181,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "46K+"
+          "posts": "45K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -191,7 +191,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "121K+"
+          "posts": "119K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -201,7 +201,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "486K+"
+          "posts": "511K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"

@@ -7959,7 +7959,9 @@ export default function App({ initialPathname, initialSlug }){
 
   const showFloatingPostBtn = !r && !pr && n !== "post-ad" && n !== "login" && n !== "password" && n !== "forgot-password" && n !== "reset-password";
 
-  const showMobileBottomNav = !r && !pr && n !== "post-ad" && n !== "login" && n !== "password" && n !== "forgot-password" && n !== "reset-password";
+  // Keep the bar visible on Sell Used / Sign In pages too, so it never "disappears" after a tap.
+  // Also keep it while auth is loading / right after sign-in, so it never flickers away.
+  const showMobileBottomNav = true;
 
   return jsxs(Fragment, {
     children: [

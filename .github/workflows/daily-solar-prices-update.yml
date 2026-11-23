@@ -42,13 +42,13 @@ jobs:
         run: |
           git config --global user.name "SellSolar Price Bot"
           git config --global user.email "bot@sellsolar.pk"
-          git add src/data/todayPricesData.js public/daily_price_update_log.json
+          git add src/data/todayPricesData.js src/data/autoFetchedRates.js public/daily_price_update_log.json
           if git diff --staged --quiet; then
             echo "No price changes to commit."
             echo "pushed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          git commit -m "chore: auto-update today's solar market benchmark prices (12:00 AM)"
+          git commit -m "chore: auto-update solar benchmark prices & fallback tracking (12:00 AM)"
           git pull --rebase --autostash origin main
           git push origin main
           echo "pushed=true" >> "$GITHUB_OUTPUT"
@@ -61,9 +61,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run deploy-cloudflare.yml --ref main
 
-      # Date-wise prices are ALWAYS shown on the website (latest sheet is carried forward),
-      # but tell the owner by email when no new rates were added for the day.
-      - name: Email alert - no price change
+      # Date-wise prices are ALWAYS shown on the website (previous verified rates are carried forward
+      # and lightly highlighted when no live Pakistani quote is matched).
+      - name: Email alert - carry-forward / no new live changes
         if: steps.prices.outputs.price_status == 'NO_CHANGE' && env.MAIL_USERNAME != '' && env.MAIL_PASSWORD != ''
         uses: dawidd6/action-send-mail@v3
         with:
@@ -74,17 +74,17 @@ jobs:
           password: ${{ env.MAIL_PASSWORD }}
           to: ${{ env.MAIL_TO }}
           from: SellSolar Price Bot <${{ env.MAIL_USERNAME }}>
-          subject: "SellSolar: No price change for ${{ steps.prices.outputs.report_date }}"
+          subject: "SellSolar: Nightly Rate Run (${{ steps.prices.outputs.report_date }}) - ${{ steps.prices.outputs.carried_forward_count }} Carried Forward"
           body: |
             Assalam o Alaikum,
 
-            No new solar prices were added for ${{ steps.prices.outputs.report_date }}.
+            The automated 12:00 AM Pakistan solar rate check completed for ${{ steps.prices.outputs.report_date }}.
 
-            The website still shows the date-wise price page for ${{ steps.prices.outputs.report_date }}
-            using the latest verified sheet (${{ steps.prices.outputs.latest_sheet }}), with all changes shown as "stable".
+            - Live matched items from Pakistani sources: ${{ steps.prices.outputs.live_matched_count }}
+            - Updated rates applied automatically: ${{ steps.prices.outputs.auto_updated_count }}
+            - Previous rates carried forward & lightly highlighted: ${{ steps.prices.outputs.carried_forward_count }}
 
-            If rates did change in the market, add a new dated sheet to src/data/todayPricesData.js
-            and push it - the site will publish it automatically.
+            Items with no live Pakistani quote keep their last verified rate (${{ steps.prices.outputs.latest_sheet }}) and are lightly highlighted on the website.
 
             Site: https://sellsolar.pk/today-prices
             Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

@@ -35,7 +35,7 @@ import {
   getInboxMessages,
 } from './services/inboxService';
 import { getStoredInstallationRequests } from './lib/installation';
-import { MARKET_SUMMARY } from './data/todayPricesData';
+import { MARKET_SUMMARY, getActiveDailyRates } from './data/todayPricesData';
 import {
   ArrowLeft,
   ArrowRight,
@@ -143,23 +143,111 @@ const AdminSuperDashboard = lazy(() => import('./components/AdminSuperDashboard'
 import { recordPageView, recordProductView, recordProductInquiry } from './services/analyticsService';
 import { getRealisticAdViews, recordAndIncrementAdView } from './lib/adViews';
 
-const TICKER_ITEMS = [
-  { text: 'LONGi 645W BF: Rs 43.25/W (Ready Stock)', color: 'text-emerald-400', icon: '🟢' },
-  { text: 'Canadian 625W: Rs 41.00/W • 590W: Rs 40.50/W', color: 'text-emerald-400', icon: '🟢' },
-  { text: 'Jinko 585W: Rs 39.25/W • 645W BF: Rs 40.15/W', color: 'text-emerald-400', icon: '🟢' },
-  { text: 'JA Solar 625W: Rs 38.00/W • 585W: Rs 38.50/W (Ready Stock)', color: 'text-emerald-400', icon: '🟢' },
-  { text: 'Astronergy 625W: Booking Available • 590W: Rs 38.00/W • 720W: Rs 39.00/W', color: 'text-emerald-400', icon: '⭐' },
-  { text: 'AIKO 665W: Rs 42.50/W (Rawat Stock)', color: 'text-emerald-400', icon: '🟢' },
-  { text: 'Inverex 620W: Rs 42.50/W (With Warranty Card)', color: 'text-emerald-400', icon: '🟢' },
-  { text: 'Korean 585W: Rs 37.00/W • 645W ABC: Rs 39.00/W • 715W: Rs 37.25/W', color: 'text-emerald-400', icon: '🟢' },
-  { text: 'TCL 720W: Rs 38.00/W', color: 'text-emerald-400', icon: '🟢' },
-  { text: 'OSDA 585W: Rs 35.65/W (Ready Stock)', color: 'text-emerald-400', icon: '🟢' },
-  { text: 'DAEWOO Lithium (N-Tech): 2.56kWh Rs 120k • 5.12kWh Rs 213k • 10.24kWh Trolley Rs 420k (10-Yr Warranty, 26-No Islamabad)', color: 'text-emerald-400', icon: '🔋' },
-  { text: 'LCD Series 6kW: Rs 195k', color: 'text-amber-400', icon: '🟡' },
-  { text: 'Solis 6kW+: Rs 207k', color: 'text-sky-400', icon: '⭕' },
-  { text: 'Zilo Nexa (PK 🇵🇰): Rs 65k–580k', color: 'text-emerald-400', icon: '🟢' },
-];
-const DOUBLE_TICKER_ITEMS = [...TICKER_ITEMS, ...TICKER_ITEMS];
+function buildLiveTickerItems(sheet) {
+  const rates = sheet?.rates || [];
+  const inverters = sheet?.inverterRates || [];
+  const batteries = sheet?.batteryRates || [];
+  const ess = sheet?.essRates || [];
+
+  const formatPanelRate = (r) =>
+    typeof r?.rate === 'number' ? `Rs ${r.rate.toFixed(2).replace(/\.00$/, '')}/W` : 'Rs N/A';
+
+  const brandOrder = [
+    { match: 'longi', label: 'LONGi', icon: '🟢' },
+    { match: 'canadian', label: 'Canadian', icon: '🟢' },
+    { match: 'jinko', label: 'Jinko', icon: '🟢' },
+    { match: 'ja', label: 'JA Solar', icon: '🟢' },
+    { match: 'astronergy', label: 'Astronergy', icon: '⭐' },
+    { match: 'inverex', label: 'Inverex', icon: '🟢' },
+    { match: 'korean', label: 'Korean', icon: '🟢' },
+    { match: 'tcl', label: 'TCL', icon: '🟢' },
+    { match: 'osda', label: 'OSDA', icon: '🟢' },
+    { match: 'trox', label: 'Trox', icon: '🟢' },
+    { match: 'yingli', label: 'Yingli', icon: '🟢' },
+  ];
+
+  const items = [];
+  brandOrder.forEach(({ match, label, icon }) => {
+    const matches = rates.filter((r) => (r.brand || '').toLowerCase().includes(match));
+    if (matches.length) {
+      const summaryText = matches
+        .map((r) => {
+          const cleanModel = (r.model || '')
+            .replace(new RegExp(`^${match}\\s*`, 'i'), '')
+            .replace(/^astro\s*/i, '')
+            .replace(/^canadian\s*/i, '')
+            .replace(/^jinko\s*/i, '')
+            .replace(/^ja\s*/i, '')
+            .replace(/^osda\s*/i, '')
+            .replace(/^korean\s*/i, '')
+            .replace(/^tcl\s*/i, '')
+            .replace(/^trox\s*/i, '')
+            .replace(/^yingli\s*/i, '')
+            .replace(/^inverex\s*/i, '')
+            .trim();
+          const noteSuffix = r.note ? ` (${r.note})` : '';
+          return `${cleanModel}: ${formatPanelRate(r)}${noteSuffix}`;
+        })
+        .join(' • ');
+      items.push({
+        text: `${label} — ${summaryText}`,
+        color: 'text-emerald-400',
+        icon,
+      });
+    }
+  });
+
+  const itelInvs = inverters.filter((i) => i.brand === 'Itel' && typeof i.rate === 'number');
+  if (itelInvs.length) {
+    const minItel = Math.min(...itelInvs.map((i) => i.rate));
+    const maxItel = Math.max(...itelInvs.map((i) => i.rate));
+    items.push({
+      text: `Itel Hybrid IP-54/IP-66: Rs ${Math.round(minItel / 1000)}k–${Math.round(maxItel / 1000)}k`,
+      color: 'text-sky-400',
+      icon: '⚡',
+    });
+  }
+
+  const daewooBats = batteries.filter((b) => b.brand === 'Daewoo' && typeof b.rate === 'number');
+  const daewooInv = inverters.find((i) => i.brand === 'Daewoo' && typeof i.rate === 'number');
+  if (daewooBats.length || daewooInv) {
+    const b12 = daewooBats.find((b) => b.model.includes('12V'));
+    const b25 = daewooBats.find((b) => b.model.includes('25'));
+    const b51 = daewooBats.find((b) => (b.model.includes('51.2V') || b.model.includes('51V')) && b.model.includes('100Ah'));
+    const b200 = daewooBats.find((b) => b.model.includes('200Ah'));
+    const b314 = daewooBats.find((b) => b.model.includes('314Ah'));
+    const parts = [
+      b12 ? `12V 100Ah Rs ${Math.round(b12.rate / 1000)}k` : null,
+      b25 ? `25V 100Ah Rs ${Math.round(b25.rate / 1000)}k` : null,
+      b51 ? `51.2V 100Ah Rs ${Math.round(b51.rate / 1000)}k` : null,
+      b200 ? `51V 200Ah Rs ${Math.round(b200.rate / 1000)}k` : null,
+      b314 ? `51V 314Ah CATL Rs ${Math.round(b314.rate / 1000)}k` : null,
+      daewooInv ? `10kW SP IP65 Rs ${Math.round(daewooInv.rate / 1000)}k` : null,
+    ].filter(Boolean);
+    if (parts.length) {
+      items.push({
+        text: `DAEWOO (1C • 5+10 Yrs): ${parts.join(' • ')}`,
+        color: 'text-emerald-400',
+        icon: '🔋',
+      });
+    }
+  }
+
+  const itelBats = batteries.filter((b) => b.brand === 'Itel' && typeof b.rate === 'number');
+  if (itelBats.length) {
+    const minB = Math.min(...itelBats.map((b) => b.rate));
+    const maxB = Math.max(...itelBats.map((b) => b.rate));
+    items.push({
+      text: `Itel IP-20 Lithium: Rs ${Math.round(minB / 1000)}k–${Math.round(maxB / 1000)}k • ESS Rs ${Math.round((ess[0]?.rate || 66000) / 1000)}k+`,
+      color: 'text-amber-400',
+      icon: '🔋',
+    });
+  }
+
+  return items.length
+    ? items
+    : [{ text: `Live Solar Benchmarks: ${MARKET_SUMMARY?.panelsPerWattAvg || 'Rs 34.25 – 42.50 / W'}`, color: 'text-emerald-400', icon: '🟢' }];
+}
 
 function TickerEntry({ item }) {
   return jsxs('span', {
@@ -180,6 +268,7 @@ function Xy({
     [l, o] = useState(!1),
     [isMobileSearchOpen, setIsMobileSearchOpen] = useState(!1),
     [isTickerPaused, setIsTickerPaused] = useState(!1),
+    [tickerItems, setTickerItems] = useState(() => buildLiveTickerItems(getActiveDailyRates('today'))),
     {
       user: c,
       profile: u,
@@ -204,10 +293,13 @@ function Xy({
 
   useEffect(() => {
     const j = () => n(window.scrollY > 20);
-    return (
-      window.addEventListener('scroll', j),
-      () => window.removeEventListener('scroll', j)
-    );
+    const syncTicker = () => setTickerItems(buildLiveTickerItems(getActiveDailyRates('today')));
+    window.addEventListener('scroll', j);
+    window.addEventListener('sellsolar_daily_rates_updated', syncTicker);
+    return () => {
+      window.removeEventListener('scroll', j);
+      window.removeEventListener('sellsolar_daily_rates_updated', syncTicker);
+    };
   }, []);
 
   useEffect(() => {
@@ -401,7 +493,7 @@ function Xy({
                       title: 'Hover to pause | Click to open Today’s Rates page',
                       children: jsx('div', {
                         className: 'ticker-track-slow font-semibold text-gray-300 flex items-center gap-3',
-                        children: DOUBLE_TICKER_ITEMS.map((item, idx) =>
+                        children: [...tickerItems, ...tickerItems].map((item, idx) =>
                           jsx(TickerEntry, { item }, `tk-${idx}`)
                         )
                       })
@@ -7506,10 +7598,16 @@ export default function App({ initialPathname, initialSlug }){
       id: "main",
       children: jsx(Bn, {
         onSuccess: () => {
-          const authUser = (typeof getStoredSession === 'function' ? getStoredSession()?.user : null) || t;
-          const userEmail = (authUser?.email || '').toLowerCase();
+          const storedSess = typeof getStoredSession === 'function' ? getStoredSession() : null;
+          const authUser = storedSess?.user || t;
+          const authProfile = storedSess?.profile || e;
+          const userEmail = (authUser?.email || authProfile?.email || '').toLowerCase();
           const isAdminUser = Boolean(
             isUserAdmin ||
+            authProfile?.is_admin ||
+            authProfile?.is_super_admin ||
+            authProfile?.role === 'admin' ||
+            authProfile?.role === 'super_admin' ||
             userEmail === 'mudassir2k6@gmail.com' ||
             userEmail === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
             userEmail === 'admin@sellsolar.pk'

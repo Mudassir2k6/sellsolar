@@ -108,6 +108,13 @@ function RateRow({ r, tab }) {
  */
 export default function HeroSideRatesCard({ onOpenRates }) {
   const [activeTab, setActiveTab] = useState('panel');
+  const [ratesRevision, setRatesRevision] = useState(0);
+
+  React.useEffect(() => {
+    const onUpdate = () => setRatesRevision((r) => r + 1);
+    window.addEventListener('sellsolar_daily_rates_updated', onUpdate);
+    return () => window.removeEventListener('sellsolar_daily_rates_updated', onUpdate);
+  }, []);
 
   const sheet = useMemo(() => {
     const { shortDate } = getPakistanDateDetails();
@@ -116,7 +123,7 @@ export default function HeroSideRatesCard({ onOpenRates }) {
     } catch {
       return { key: shortDate, data: null };
     }
-  }, []);
+  }, [ratesRevision]);
 
   const tabsWithRows = useMemo(
     () =>

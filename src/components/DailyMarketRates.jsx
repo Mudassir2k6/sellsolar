@@ -31,6 +31,7 @@ import {
   MARKET_SUMMARY,
   CUSTOM_DAILY_RATES_STORAGE_KEY
 } from '../data/todayPricesData';
+import { syncDailyRatesFromSupabase } from '../lib/dailyRatesSync';
 import { getPakistanDateDetails } from '../lib/dateUtils';
 import { formatPrice } from '../lib/constants';
 
@@ -130,22 +131,22 @@ const NATIONAL_RATE_BENCHMARKS = [
     spec: '585W N-Type SMBB / 22.65% Eff',
     unitType: 'per_watt',
     wattage: 585,
-    nationalAvgRate: 39.75,
-    prevRate: 40.00,
-    change: -0.25,
+    nationalAvgRate: 38.10,
+    prevRate: 38.50,
+    change: -0.40,
     status: 'down',
-    pricePerWatt: 'Rs 39.75 / W',
-    fullPiecePrice: 23254,
-    badge: 'Most In-Demand 585W',
+    pricePerWatt: 'Rs 38.10 / W',
+    fullPiecePrice: 22289,
+    badge: 'Ready Stock',
     warranty: '12 Yrs Product / 30 Yrs Power',
     cities: {
-      lahore: 39.50,
-      karachi: 39.25,
-      islamabad: 39.75,
-      rawalpindi: 39.75,
-      multan: 39.90,
-      faisalabad: 39.75,
-      peshawar: 40.00
+      lahore: 37.85,
+      karachi: 37.60,
+      islamabad: 38.10,
+      rawalpindi: 38.10,
+      multan: 38.25,
+      faisalabad: 38.10,
+      peshawar: 38.35
     },
     popular: true
   },
@@ -153,26 +154,26 @@ const NATIONAL_RATE_BENCHMARKS = [
     id: 'bench-panel-625w-ja',
     category: 'panel',
     brand: 'JA Solar',
-    model: 'DeepBlue 4.0 Pro 625W (N-Type Bifacial)',
-    spec: '625W N-Type Bifacial / A Grade Documented / Short Wire',
+    model: 'DeepBlue 4.0 Pro 630W (N-Type Bifacial)',
+    spec: '630W N-Type Bifacial / A Grade Documented',
     unitType: 'per_watt',
-    wattage: 625,
-    nationalAvgRate: 38.00,
-    prevRate: 38.25,
-    change: -0.25,
-    status: 'down',
-    pricePerWatt: 'Rs 38.00 / W',
-    fullPiecePrice: 23750,
-    badge: 'A Grade Documented (Deliv 30/09)',
-    warranty: 'A Grade Documented • Short Wire',
+    wattage: 630,
+    nationalAvgRate: 37.00,
+    prevRate: 36.90,
+    change: 0.10,
+    status: 'up',
+    pricePerWatt: 'Rs 37.00 / W',
+    fullPiecePrice: 23310,
+    badge: 'Limited Stock Available',
+    warranty: 'A Grade Documented',
     cities: {
-      lahore: 37.85,
-      karachi: 37.75,
-      islamabad: 38.00,
-      rawalpindi: 38.00,
-      multan: 38.25,
-      faisalabad: 38.00,
-      peshawar: 38.50
+      lahore: 36.85,
+      karachi: 36.75,
+      islamabad: 37.00,
+      rawalpindi: 37.00,
+      multan: 37.25,
+      faisalabad: 37.00,
+      peshawar: 37.40
     },
     popular: true
   },
@@ -184,22 +185,22 @@ const NATIONAL_RATE_BENCHMARKS = [
     spec: '625W N-Type TOPCon Dual-Glass / 22.8% Eff',
     unitType: 'per_watt',
     wattage: 625,
-    nationalAvgRate: 41.25,
-    prevRate: 41.50,
-    change: -0.25,
-    status: 'down',
-    pricePerWatt: 'Rs 41.25 / W',
-    fullPiecePrice: 25781,
+    nationalAvgRate: 40.00,
+    prevRate: 40.00,
+    change: 0.00,
+    status: 'stable',
+    pricePerWatt: 'Rs 40.00 / W',
+    fullPiecePrice: 25000,
     badge: '625W High Yield Ready',
     warranty: '12 Yrs Product / 30 Yrs Linear',
     cities: {
-      lahore: 41.00,
-      karachi: 40.75,
-      islamabad: 41.25,
-      rawalpindi: 41.25,
-      multan: 41.50,
-      faisalabad: 41.25,
-      peshawar: 41.75
+      lahore: 39.75,
+      karachi: 39.50,
+      islamabad: 40.00,
+      rawalpindi: 40.00,
+      multan: 40.25,
+      faisalabad: 40.00,
+      peshawar: 40.50
     },
     popular: true
   },
@@ -238,22 +239,22 @@ const NATIONAL_RATE_BENCHMARKS = [
     spec: '645W HPBC 2.0 Anti-Dust Glass',
     unitType: 'per_watt',
     wattage: 645,
-    nationalAvgRate: 43.50,
-    prevRate: 43.25,
-    change: 0.25,
-    status: 'up',
-    pricePerWatt: 'Rs 43.50 / W',
-    fullPiecePrice: 28058,
-    badge: 'Premium Flagship 645W',
+    nationalAvgRate: 41.00,
+    prevRate: 41.15,
+    change: -0.15,
+    status: 'down',
+    pricePerWatt: 'Rs 41.00 / W',
+    fullPiecePrice: 26445,
+    badge: 'Ready Stock',
     warranty: '15 Yrs Product / 30 Yrs Linear',
     cities: {
-      lahore: 43.25,
-      karachi: 43.00,
-      islamabad: 43.50,
-      rawalpindi: 43.50,
-      multan: 43.75,
-      faisalabad: 43.50,
-      peshawar: 44.00
+      lahore: 40.75,
+      karachi: 40.50,
+      islamabad: 41.00,
+      rawalpindi: 41.00,
+      multan: 41.25,
+      faisalabad: 41.00,
+      peshawar: 41.50
     },
     popular: true
   },
@@ -314,20 +315,20 @@ const NATIONAL_RATE_BENCHMARKS = [
     model: '3KW Pro PV-4500 Hybrid IP54',
     spec: '3.0 kW Hybrid / Single Source / 4500W PV',
     unitType: 'unit',
-    nationalAvgRate: 78000,
-    prevRate: 78000,
-    change: 0,
-    status: 'stable',
+    nationalAvgRate: 68000,
+    prevRate: 71000,
+    change: -3000,
+    status: 'down',
     badge: 'Best Value 3kW',
     warranty: '3-Year Replacement Warranty',
     cities: {
-      lahore: 77500,
-      karachi: 76500,
-      islamabad: 78000,
-      rawalpindi: 78000,
-      multan: 78500,
-      faisalabad: 78000,
-      peshawar: 79000
+      lahore: 67500,
+      karachi: 67000,
+      islamabad: 68000,
+      rawalpindi: 68000,
+      multan: 68500,
+      faisalabad: 68000,
+      peshawar: 69000
     },
     popular: true
   },
@@ -512,20 +513,20 @@ const NATIONAL_RATE_BENCHMARKS = [
     spec: '51.2V 100Ah / Smart BMS / Wall & Rack Mount',
     batteryType: 'Lithium (LiFePO4)',
     unitType: 'unit',
-    nationalAvgRate: 220000,
-    prevRate: 220000,
+    nationalAvgRate: 210000,
+    prevRate: 210000,
     change: 0,
     status: 'stable',
     badge: 'Most Affordable 5kWh Lithium',
     warranty: '5-Year Replacement Warranty',
     cities: {
-      lahore: 219000,
-      karachi: 217000,
-      islamabad: 220000,
-      rawalpindi: 220000,
-      multan: 222000,
-      faisalabad: 220000,
-      peshawar: 223000
+      lahore: 209000,
+      karachi: 208000,
+      islamabad: 210000,
+      rawalpindi: 210000,
+      multan: 211500,
+      faisalabad: 210000,
+      peshawar: 212500
     },
     popular: true
   },
@@ -635,6 +636,7 @@ export default function DailyMarketRates({ onNavigate, onSelectCategory, compact
   // Sync data with latest live verified rates on mount and listen to admin updates
   useEffect(() => {
     fetchLatestNationalRates();
+    syncDailyRatesFromSupabase();
 
     const handleRatesUpdate = () => {
       fetchLatestNationalRates();
@@ -646,55 +648,125 @@ export default function DailyMarketRates({ onNavigate, onSelectCategory, compact
     };
   }, []);
 
-  const fetchLatestNationalRates = () => {
-    setIsRefreshing(true);
-    try {
-      const activeSheet = getActiveDailyRates(pktDate.shortDate || '16-Sep-2026');
+  const buildSyncedCities = (baseRate, isPerWatt) => {
+    if (typeof baseRate !== 'number') return undefined;
+    if (isPerWatt) {
+      const roundQ = (v) => Number((Math.round(v * 4) / 4).toFixed(2));
+      return {
+        lahore: roundQ(baseRate - 0.25),
+        karachi: roundQ(baseRate - 0.50),
+        islamabad: roundQ(baseRate),
+        rawalpindi: roundQ(baseRate),
+        multan: roundQ(baseRate + 0.25),
+        faisalabad: roundQ(baseRate),
+        peshawar: roundQ(baseRate + 0.50),
+      };
+    }
+    const round500 = (v) => Math.round(v / 500) * 500;
+    return {
+      lahore: round500(baseRate - 1000),
+      karachi: round500(baseRate - 2000),
+      islamabad: round500(baseRate),
+      rawalpindi: round500(baseRate),
+      multan: round500(baseRate + 1500),
+      faisalabad: round500(baseRate),
+      peshawar: round500(baseRate + 2500),
+    };
+  };
 
-      // Update benchmark rates with any live admin adjustments
+  const fetchLatestNationalRates = (triggerRemote = false) => {
+    setIsRefreshing(true);
+    if (triggerRemote) {
+      syncDailyRatesFromSupabase(true);
+    }
+    try {
+      const activeSheet = getActiveDailyRates('today');
+
+      // Update benchmark rates with any live admin adjustments (and sync city spreads)
       const updated = NATIONAL_RATE_BENCHMARKS.map((item) => {
         if (item.category === 'panel') {
-          const match = (activeSheet.rates || []).find(
-            (r) => r.brand?.toLowerCase() === item.brand?.toLowerCase() && r.model?.includes(String(item.wattage))
-          );
+          const itemBrandBase = (item.brand || '').toLowerCase().replace(/\s*solar$/i, '').trim();
+          const match = (activeSheet.rates || []).find((r) => {
+            const rateBrandBase = (r.brand || '').toLowerCase().replace(/\s*solar$/i, '').trim();
+            return (
+              (rateBrandBase === itemBrandBase ||
+                rateBrandBase.includes(itemBrandBase) ||
+                itemBrandBase.includes(rateBrandBase)) &&
+              r.model?.includes(String(item.wattage))
+            );
+          });
           if (match && typeof match.rate === 'number') {
-            const diff = match.rate - (match.prevRate || match.rate);
+            const prev = typeof match.prevRate === 'number' ? match.prevRate : match.rate;
+            const diff = Number((match.rate - prev).toFixed(2));
             return {
               ...item,
               nationalAvgRate: match.rate,
-              prevRate: match.prevRate || item.prevRate,
+              prevRate: prev,
               change: diff,
               status: diff > 0 ? 'up' : diff < 0 ? 'down' : 'stable',
+              badge: match.badge || item.badge,
+              isCarriedForward: Boolean(match.isCarriedForward),
+              rateSource: match.rateSource,
               fullPiecePrice: Math.round(match.rate * (item.wattage || 550)),
               pricePerWatt: `Rs ${match.rate.toFixed(2)} / W`,
+              cities: buildSyncedCities(match.rate, true) || item.cities,
             };
           }
         } else if (item.category === 'inverter') {
-          const match = (activeSheet.inverterRates || []).find(
-            (r) => r.brand?.toLowerCase() === item.brand?.toLowerCase() && r.model?.toLowerCase().includes(item.model?.toLowerCase().slice(0, 10))
-          );
+          const itemBrandBase = (item.brand || '').toLowerCase().replace(/\s*solar$/i, '').trim();
+          const match = (activeSheet.inverterRates || []).find((r) => {
+            const rateBrandBase = (r.brand || '').toLowerCase().replace(/\s*solar$/i, '').trim();
+            const brandMatch =
+              rateBrandBase === itemBrandBase ||
+              rateBrandBase.includes(itemBrandBase) ||
+              itemBrandBase.includes(rateBrandBase);
+            const kwToken = (item.model || '').match(/\d+(\.\d+)?kw/i)?.[0]?.toLowerCase();
+            return brandMatch && (
+              r.model?.toLowerCase().includes(item.model?.toLowerCase().slice(0, 10)) ||
+              (kwToken && r.model?.toLowerCase().includes(kwToken))
+            );
+          });
           if (match && typeof match.rate === 'number') {
-            const diff = match.rate - (match.prevRate || match.rate);
+            const prev = typeof match.prevRate === 'number' ? match.prevRate : match.rate;
+            const diff = match.rate - prev;
             return {
               ...item,
               nationalAvgRate: match.rate,
-              prevRate: match.prevRate || item.prevRate,
+              prevRate: prev,
               change: diff,
               status: diff > 0 ? 'up' : diff < 0 ? 'down' : 'stable',
+              isCarriedForward: Boolean(match.isCarriedForward),
+              rateSource: match.rateSource,
+              cities: buildSyncedCities(match.rate, false) || item.cities,
             };
           }
         } else if (item.category === 'battery') {
-          const match = (activeSheet.batteryRates || []).find(
-            (r) => r.brand?.toLowerCase() === item.brand?.toLowerCase() && r.model?.toLowerCase().includes(item.model?.toLowerCase().slice(0, 10))
-          );
+          const itemBrandBase = (item.brand || '').toLowerCase().replace(/\s*solar$/i, '').trim();
+          const match = (activeSheet.batteryRates || []).find((r) => {
+            const rateBrandBase = (r.brand || '').toLowerCase().replace(/\s*solar$/i, '').trim();
+            const brandMatch =
+              rateBrandBase === itemBrandBase ||
+              rateBrandBase.includes(itemBrandBase) ||
+              itemBrandBase.includes(rateBrandBase);
+            const capToken = (item.model || '').match(/\d+v\s*\d+ah|\d+ah/i)?.[0]?.toLowerCase().replace(/\s+/g, '');
+            const rModelNorm = (r.model || '').toLowerCase().replace(/\s+/g, '');
+            return brandMatch && (
+              r.model?.toLowerCase().includes(item.model?.toLowerCase().slice(0, 10)) ||
+              (capToken && rModelNorm.includes(capToken))
+            );
+          });
           if (match && typeof match.rate === 'number') {
-            const diff = match.rate - (match.prevRate || match.rate);
+            const prev = typeof match.prevRate === 'number' ? match.prevRate : match.rate;
+            const diff = match.rate - prev;
             return {
               ...item,
               nationalAvgRate: match.rate,
-              prevRate: match.prevRate || item.prevRate,
+              prevRate: prev,
               change: diff,
               status: diff > 0 ? 'up' : diff < 0 ? 'down' : 'stable',
+              isCarriedForward: Boolean(match.isCarriedForward),
+              rateSource: match.rateSource,
+              cities: buildSyncedCities(match.rate, false) || item.cities,
             };
           }
         }
@@ -824,7 +896,7 @@ export default function DailyMarketRates({ onNavigate, onSelectCategory, compact
                 <button
                   type="button"
                   id="refresh-national-rates-btn"
-                  onClick={fetchLatestNationalRates}
+                  onClick={() => fetchLatestNationalRates(true)}
                   disabled={isRefreshing}
                   className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-750 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 transition-all cursor-pointer disabled:opacity-60"
                   title="Re-fetch latest rates from market feed"
@@ -955,7 +1027,11 @@ export default function DailyMarketRates({ onNavigate, onSelectCategory, compact
                 {ratesData.slice(0, 4).map((bench) => (
                   <div
                     key={bench.id}
-                    className="p-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-900/80 hover:border-primary-400 transition-all flex items-center justify-between gap-3"
+                    className={`p-3 rounded-xl border transition-all flex items-center justify-between gap-3 ${
+                      bench.isCarriedForward
+                        ? 'border-amber-300/80 dark:border-amber-700/60 bg-amber-50/70 dark:bg-amber-950/25 hover:border-amber-400'
+                        : 'border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-900/80 hover:border-primary-400'
+                    }`}
                   >
                     <div className="min-w-0">
                       <div className="text-xs font-bold text-gray-900 dark:text-white truncate">
@@ -969,9 +1045,15 @@ export default function DailyMarketRates({ onNavigate, onSelectCategory, compact
                       <div className="text-xs font-extrabold text-primary-600 dark:text-primary-400">
                         {bench.pricePerWatt || `Rs ${bench.nationalAvgRate?.toLocaleString()}`}
                       </div>
-                      <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">
-                        Ready Stock
-                      </div>
+                      {bench.isCarriedForward ? (
+                        <div className="text-[10px] text-amber-700 dark:text-amber-300 font-semibold">
+                          Prev. Rate Carried
+                        </div>
+                      ) : (
+                        <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                          Ready Stock
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -1225,7 +1307,11 @@ export default function DailyMarketRates({ onNavigate, onSelectCategory, compact
                     return (
                       <tr
                         key={item.id}
-                        className="hover:bg-amber-50/40 dark:hover:bg-gray-800/50 transition-colors"
+                        className={`transition-colors ${
+                          item.isCarriedForward
+                            ? 'bg-amber-50/75 dark:bg-amber-950/25 border-l-2 border-l-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/35'
+                            : 'hover:bg-amber-50/40 dark:hover:bg-gray-800/50'
+                        }`}
                       >
                         {/* Component Spec */}
                         <td className="py-3 px-4">
@@ -1247,6 +1333,14 @@ export default function DailyMarketRates({ onNavigate, onSelectCategory, compact
                                 {item.badge && (
                                   <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
                                     {item.badge}
+                                  </span>
+                                )}
+                                {item.isCarriedForward && (
+                                  <span
+                                    className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-100/90 dark:bg-amber-900/45 text-amber-800 dark:text-amber-300 border border-amber-300/70 dark:border-amber-700/50"
+                                    title="Live Pakistani quote not matched overnight; previous verified rate carried forward"
+                                  >
+                                    Prev. Rate
                                   </span>
                                 )}
                               </div>

@@ -331,8 +331,8 @@ export default function AdvertiseHereForm({ isOpen, onClose }) {
             </label>
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 sm:col-span-1">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <label className="block text-xs font-bold text-gray-700 dark:text-gray-300">
               Your name
               <input
                 value={contactName}
@@ -357,7 +357,8 @@ export default function AdvertiseHereForm({ isOpen, onClose }) {
                 className={`input-field mt-1 text-sm font-normal ${accountPhone ? lockedField : ''}`}
               />
             </label>
-            <label className="block text-xs font-bold text-gray-700 dark:text-gray-300">
+            {/* Full width so long addresses are fully readable on tablet / desktop */}
+            <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 sm:col-span-2">
               Email
               <input
                 type="email"
@@ -366,8 +367,7 @@ export default function AdvertiseHereForm({ isOpen, onClose }) {
                 aria-readonly={Boolean(accountEmail)}
                 title={accountEmail ? 'Taken from your account' : undefined}
                 onChange={(e) => setContactEmail(e.target.value)}
-                className={`input-field mt-1 text-sm font-normal ${accountEmail ? lockedField : ''}`}
-              />
+                className={`input-field mt-1 text-sm font-normal ${accountEmail ? lockedField : ''}`}              />
             </label>
           </div>
 

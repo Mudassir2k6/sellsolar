@@ -29,8 +29,11 @@ import {
   Sliders,
   Receipt,
   MapPin,
-  HelpCircle
+  HelpCircle,
+  Download,
+  LocateFixed
 } from 'lucide-react';
+import { downloadQuotationPdf } from '../lib/quotationPdf';
 import {
   APPLIANCE_CATEGORIES,
   DEFAULT_APPLIANCES,
@@ -77,6 +80,30 @@ const PAKISTAN_CITIES = [
   { id: 'quetta', name: 'Quetta & Balochistan', sunHours: 5.8, disco: 'QESCO' },
   { id: 'peshawar', name: 'Peshawar & KPK', sunHours: 5.0, disco: 'PESCO' },
 ];
+
+// Approximate city-centre coordinates, used only to pick the nearest region from the browser location.
+const REGION_COORDS = {
+  lahore: [31.5204, 74.3587],
+  karachi: [24.8607, 67.0011],
+  islamabad: [33.6844, 73.0479],
+  multan: [30.1575, 71.5249],
+  faisalabad: [31.4504, 73.135],
+  quetta: [30.1798, 66.975],
+  peshawar: [34.0151, 71.5249],
+};
+
+function nearestRegionId(lat, lon) {
+  let best = 'lahore';
+  let bestD = Infinity;
+  Object.entries(REGION_COORDS).forEach(([id, [la, lo]]) => {
+    const d = (lat - la) ** 2 + ((lon - lo) * Math.cos((lat * Math.PI) / 180)) ** 2;
+    if (d < bestD) {
+      bestD = d;
+      best = id;
+    }
+  });
+  return best;
+}
 
 export default function LoadCalculatorPage({ onNavigate, onSelectCategory }) {
   // Sizing Mode: 'bill' (Fast 10-Second Calculation) vs 'appliances' (Detailed load audit)
@@ -132,6 +159,33 @@ export default function LoadCalculatorPage({ onNavigate, onSelectCategory }) {
   const [electricityTariff, setElectricityTariff] = useState(62); // Average PKR / kWh in Pakistan with taxes
 
   const [copied, setCopied] = useState(false);
+  const [locating, setLocating] = useState(false);
+  const [locationNote, setLocationNote] = useState('');
+  const [pdfBusy, setPdfBusy] = useState(false);
+
+  // Pick the nearest supported region from the browser's location (asks the user for permission).
+  const handleUseMyLocation = () => {
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      setLocationNote('Location is not supported on this device. Please choose your region.');
+      return;
+    }
+    setLocating(true);
+    setLocationNote('');
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const id = nearestRegionId(pos.coords.latitude, pos.coords.longitude);
+        setSelectedCity(id);
+        const c = PAKISTAN_CITIES.find((x) => x.id === id);
+        setLocationNote(`Location detected: ${c ? c.name : id}`);
+        setLocating(false);
+      },
+      () => {
+        setLocationNote('Could not get your location. Please allow location access or choose your region.');
+        setLocating(false);
+      },
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 }
+    );
+  };
 
   // Apply Preset (Appliances Mode)
   const handleApplyPreset = (presetId) => {
@@ -438,9 +492,10 @@ export default function LoadCalculatorPage({ onNavigate, onSelectCategory }) {
 🔋 *Battery Bank:* ${systemType === 'ongrid' ? 'None (Net Metering Only)' : batteryType === 'lithium' ? `${calculations.lithiumKwhRequired} kWh LiFePO4 (48V)` : `${calculations.tubularKwhRequired} kWh Tubular Lead Acid`}
 🏡 *Rooftop Space Needed:* ~${calculations.rooftopAreaSqFt} Sq. Ft.
 💡 *Monthly Units:* ~${calculations.monthlyUnits} Units/Month
-💰 *Estimated Monthly Bill Saved:* Rs ${formatPrice(calculations.estimatedMonthlyBillPk)}
-💵 *Estimated Turnkey Cost:* Rs ${formatPrice(calculations.estimatedSystemCostMin)} - ${formatPrice(calculations.estimatedSystemCostMax)}
+💰 *Estimated Monthly Bill Saved:* ${formatPrice(calculations.estimatedMonthlyBillPk)}
+💵 *Estimated Turnkey Cost:* ${formatPrice(calculations.estimatedSystemCostMin)} - ${formatPrice(calculations.estimatedSystemCostMax)}
 ⏱️ *Estimated Payback Period:* ~${calculations.paybackYears} Years
+📍 *Location:* ${activeCityObj.name} (${activeCityObj.disco})
 ------------------------------------------------
 Calculated on SellSolar.pk Load Calculator:
 https://sellsolar.pk/calculator`;
@@ -448,6 +503,43 @@ https://sellsolar.pk/calculator`;
     navigator.clipboard.writeText(summary);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
+  };
+
+  // Download the quotation as a PDF file
+  const handleDownloadPdf = async () => {
+    if (pdfBusy) return;
+    setPdfBusy(true);
+    try {
+      const batteryLabel =
+        systemType === 'ongrid'
+          ? 'None (Net-Metered)'
+          : batteryType === 'lithium'
+            ? `${calculations.lithiumKwhRequired} kWh LiFePO4 (48V)`
+            : `${calculations.tubularKwhRequired} kWh Tubular`;
+      await downloadQuotationPdf({
+        location: `${activeCityObj.name} (${activeCityObj.disco})`,
+        rows: [
+          ['Recommended System', `${calculations.recommendedKw} kW (${systemType.toUpperCase()})`],
+          ['Solar Panels', `${calculations.numberOfPanels}x Plates (${panelWattage}W TOPCon = ${calculations.totalPanelCapacityActualKw} kW)`],
+          ['Inverter', `${calculations.recommendedKw} kW ${systemType.toUpperCase()}`],
+          ['Battery Storage', batteryLabel],
+          ['Rooftop Space Required', `~${calculations.rooftopAreaSqFt} Sq. Ft.`],
+          ['Monthly Units', `~${calculations.monthlyUnits} Units / Month`],
+          ['Estimated Monthly Bill Saved', `${formatPrice(calculations.estimatedMonthlyBillPk)}`],
+          ['Estimated Turnkey Budget', `${formatPrice(calculations.estimatedSystemCostMin)} - ${formatPrice(calculations.estimatedSystemCostMax)}`],
+          ['Estimated Payback Period', `~${calculations.paybackYears} Years`],
+        ],
+        notes: [
+          'This is an estimate for planning only. Final system size and price depend on a site survey and current market rates.',
+          'Check live plate, inverter and battery prices at https://sellsolar.pk/prices before you buy.',
+        ],
+      });
+    } catch (err) {
+      console.error('[LoadCalculator] PDF download failed', err);
+      if (typeof window !== 'undefined') window.alert('Could not create the PDF. Please try again.');
+    } finally {
+      setPdfBusy(false);
+    }
   };
 
   // Direct 1-Click WhatsApp Share
@@ -459,8 +551,8 @@ https://sellsolar.pk/calculator`;
 🔌 *Inverter:* ${calculations.recommendedKw} kW ${systemType.toUpperCase()}
 🔋 *Battery Storage:* ${systemType === 'ongrid' ? 'None (Net-Metered)' : batteryType === 'lithium' ? `${calculations.lithiumKwhRequired} kWh LiFePO4 (48V)` : `${calculations.tubularKwhRequired} kWh Tubular`}
 🏡 *Rooftop Space Required:* ~${calculations.rooftopAreaSqFt} Sq. Ft.
-💰 *Estimated Monthly Bill Saved:* Rs ${formatPrice(calculations.estimatedMonthlyBillPk)}
-💵 *Estimated Turnkey Budget:* Rs ${formatPrice(calculations.estimatedSystemCostMin)} - ${formatPrice(calculations.estimatedSystemCostMax)}
+💰 *Estimated Monthly Bill Saved:* ${formatPrice(calculations.estimatedMonthlyBillPk)}
+💵 *Estimated Turnkey Budget:* ${formatPrice(calculations.estimatedSystemCostMin)} - ${formatPrice(calculations.estimatedSystemCostMax)}
 ⏱️ *Estimated Payback Period:* ~${calculations.paybackYears} Years
 📍 *Location:* ${activeCityObj.name} (${activeCityObj.disco})
 ------------------------------------------------
@@ -542,6 +634,16 @@ https://sellsolar.pk/calculator`;
                     <span>Copy</span>
                   </>
                 )}
+              </button>
+              <button
+                type="button"
+                onClick={handleDownloadPdf}
+                disabled={pdfBusy}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/40 px-3 py-2 text-xs sm:text-sm font-bold text-amber-800 dark:text-amber-300 shadow-xs hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-wait"
+                title="Download quotation as PDF"
+              >
+                <Download className="h-4 w-4" />
+                <span>{pdfBusy ? 'Preparing…' : 'PDF'}</span>
               </button>
               <button
                 type="button"
@@ -775,6 +877,20 @@ https://sellsolar.pk/calculator`;
                     <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1.5">
                       Your City / Region (Solar Sunshine Peak Hours)
                     </label>
+                    <div className="mb-1.5 flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleUseMyLocation}
+                        disabled={locating}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-primary-200 dark:border-primary-800 bg-primary-50 dark:bg-primary-950/40 px-2.5 py-1 text-[11px] font-bold text-primary-700 dark:text-primary-300 hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-wait"
+                      >
+                        <LocateFixed className="h-3.5 w-3.5" />
+                        {locating ? 'Detecting…' : 'Use my location'}
+                      </button>
+                      {locationNote ? (
+                        <span className="text-[11px] font-semibold text-gray-500 dark:text-gray-400">{locationNote}</span>
+                      ) : null}
+                    </div>
                     <div className="relative">
                       <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-primary-500" />
                       <select
@@ -820,7 +936,7 @@ https://sellsolar.pk/calculator`;
                   <div className="rounded-2xl p-3.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-xs text-amber-900 dark:text-amber-200 flex items-start gap-2.5">
                     <Info className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                     <p className="leading-relaxed">
-                      At current Pakistan tariff rates (~Rs {electricityTariff}/unit with FC charges & taxes), a monthly bill of <strong>Rs {formatPrice(calculations.estimatedMonthlyBillPk)}</strong> consumes approximately <strong>{calculations.monthlyUnits} units/month</strong> (~{calculations.totalDailyKwh} units/day).
+                      At current Pakistan tariff rates (~Rs {electricityTariff}/unit with FC charges & taxes), a monthly bill of <strong>{formatPrice(calculations.estimatedMonthlyBillPk)}</strong> consumes approximately <strong>{calculations.monthlyUnits} units/month</strong> (~{calculations.totalDailyKwh} units/day).
                     </p>
                   </div>
                 </div>
@@ -1336,7 +1452,7 @@ https://sellsolar.pk/calculator`;
                     <DollarSign className="h-3.5 w-3.5 text-primary-400" /> Monthly Bill Saved
                   </div>
                   <div className="mt-1 text-base sm:text-lg font-black text-primary-300">
-                    Rs {formatPrice(calculations.estimatedMonthlyBillPk)}
+                    {formatPrice(calculations.estimatedMonthlyBillPk)}
                   </div>
                   <div className="text-[10px] text-gray-400">At Rs {electricityTariff}/unit</div>
                 </div>
@@ -1397,7 +1513,7 @@ https://sellsolar.pk/calculator`;
                       Estimated Turnkey Budget (Pakistan)
                     </div>
                     <div className="mt-1 text-lg sm:text-xl font-black text-white">
-                      Rs {formatPrice(calculations.estimatedSystemCostMin)} - {formatPrice(calculations.estimatedSystemCostMax)}
+                      {formatPrice(calculations.estimatedSystemCostMin)} - {formatPrice(calculations.estimatedSystemCostMax)}
                     </div>
                   </div>
                   <div className="text-right">
@@ -1422,6 +1538,17 @@ https://sellsolar.pk/calculator`;
                   <WhatsAppIcon className="h-4 w-4" />
                   <span>Send Quotation to WhatsApp</span>
                   <ArrowRight className="h-4 w-4" />
+                </button>
+
+                {/* PDF Download Button */}
+                <button
+                  type="button"
+                  onClick={handleDownloadPdf}
+                  disabled={pdfBusy}
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 py-3 text-xs sm:text-sm font-bold text-white transition-all cursor-pointer disabled:opacity-60 disabled:cursor-wait"
+                >
+                  <Download className="h-4 w-4" />
+                  <span>{pdfBusy ? 'Preparing PDF…' : 'Download Quotation PDF'}</span>
                 </button>
 
                 {onNavigate && (
@@ -1492,7 +1619,7 @@ https://sellsolar.pk/calculator`;
             </div>
             <div className="text-[11px] font-extrabold text-gray-900 dark:text-white truncate">
               {calculations.recommendedKw > 0 ? (
-                <>Rs {formatPrice(calculations.estimatedSystemCostMin)} - {formatPrice(calculations.estimatedSystemCostMax)}</>
+                <>{formatPrice(calculations.estimatedSystemCostMin)} - {formatPrice(calculations.estimatedSystemCostMax)}</>
               ) : (
                 'Select bill or load'
               )}
@@ -1507,6 +1634,16 @@ https://sellsolar.pk/calculator`;
               title="Share on WhatsApp"
             >
               <WhatsAppIcon className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={handleDownloadPdf}
+              disabled={pdfBusy}
+              className="p-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white shadow-xs cursor-pointer disabled:opacity-60"
+              title="Download quotation PDF"
+              aria-label="Download quotation PDF"
+            >
+              <Download className="h-4 w-4" />
             </button>
             <button
               type="button"

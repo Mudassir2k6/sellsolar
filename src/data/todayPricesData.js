@@ -1779,7 +1779,50 @@ ISLAMABAD_DAILY_SHEETS["23-Nov-2026"] = {
   ]
 };
 
-export const RAW_BASE_DAILY_SHEET = ISLAMABAD_DAILY_SHEETS["23-Nov-2026"];
+// 24-Nov-2026 rates (Verified Ready Stock Panel Sheet + Latest Inverters, Batteries, ESS, Cables, Accessories, Systems & 39 Structures)
+ISLAMABAD_DAILY_SHEETS["24-Nov-2026"] = {
+  "sheetVersion": "24-Nov-2026-v1",
+  "publishedIso": "2026-11-24T12:30:00+05:00",
+  "date": "24-November-2026",
+  "label": "24-Nov-2026 (Ready Stock)",
+  "rates": [
+    {"brand": "Jinko Solar", "model": "Jinko 585W", "rate": 38.00, "prevRate": 38.10, "change": -0.10, "status": "down", "badge": "Ready Stock"},
+    {"brand": "Jinko Solar", "model": "Jinko 645W", "rate": 39.25, "prevRate": 39.25, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "LONGi", "model": "Longi 645W BF", "rate": 41.00, "prevRate": 41.00, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Astronergy", "model": "Astro 620W", "rate": 37.00, "prevRate": 37.00, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Astronergy", "model": "Astro 625W", "rate": 36.25, "prevRate": 36.25, "change": 0, "status": "stable", "badge": "Expected Delivery 27/11/26", "note": "Expected Delivery 27/11/26"},
+    {"brand": "Astronergy", "model": "Astro 720W", "rate": 39.00, "prevRate": 39.00, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "JA Solar", "model": "JA 590W", "rate": 36.50, "prevRate": 36.50, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "JA Solar", "model": "JA 625W", "rate": 37.25, "prevRate": 37.25, "change": 0, "status": "new", "badge": "Limited Stock Available", "note": "Limited Stock Available"},
+    {"brand": "Canadian Solar", "model": "Canadian 585W", "rate": 40.10, "prevRate": 40.10, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Canadian Solar", "model": "Canadian 625W", "rate": 40.00, "prevRate": 40.00, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Canadian Solar", "model": "Canadian 630W HJT", "rate": 39.85, "prevRate": 39.85, "change": 0, "status": "stable", "badge": "HJT Series"},
+    {"brand": "OSDA", "model": "Osda 585W", "rate": 33.75, "prevRate": 33.75, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "OSDA", "model": "Osda 615W", "rate": 34.00, "prevRate": 33.75, "change": 0.25, "status": "up", "badge": "Ready Stock"},
+    {"brand": "Trox", "model": "Trox 590W", "rate": 35.00, "prevRate": 35.00, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Korean", "model": "Korean 585W", "rate": 35.00, "prevRate": 35.00, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Korean", "model": "Korean 615W", "rate": 35.50, "prevRate": 35.50, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Korean", "model": "Korean 670W", "rate": 40.50, "prevRate": 40.50, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Korean", "model": "Korean 715W", "rate": 38.50, "prevRate": 38.50, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Inverex", "model": "Inverex Mustang 620W", "rate": 42.00, "prevRate": 42.00, "change": 0, "status": "stable", "badge": "A-Grade w/ Docs"},
+    {"brand": "Inverex", "model": "Inverex Jollywood 625W", "rate": 42.00, "prevRate": 42.00, "change": 0, "status": "stable", "badge": "A-Grade w/ Docs"},
+    {"brand": "Inverex", "model": "Inverex Mustang 720W", "rate": 42.50, "prevRate": 42.50, "change": 0, "status": "stable", "badge": "A-Grade w/ Docs"},
+    {"brand": "Yingli", "model": "Yingli 630W", "rate": 36.00, "prevRate": 36.00, "change": 0, "status": "stable", "badge": "Ready Stock"},
+    {"brand": "Aiko", "model": "Aiko 640W", "rate": 41.75, "prevRate": 42.50, "change": -0.75, "status": "down", "badge": "ABC Ready Stock"},
+    {"brand": "Aiko", "model": "Aiko 650W", "rate": 41.75, "prevRate": 41.75, "change": 0, "status": "new", "badge": "ABC Ready Stock"},
+    {"brand": "Aiko", "model": "Aiko 665W", "rate": 42.50, "prevRate": 42.50, "change": 0, "status": "stable", "badge": "ABC Ready Stock"},
+    {"brand": "Aiko", "model": "Aiko 770W", "rate": 43.50, "prevRate": 44.50, "change": -1.00, "status": "down", "badge": "ABC Commercial"}
+  ],
+  "inverterRates": ISLAMABAD_DAILY_SHEETS["23-Nov-2026"].inverterRates,
+  "batteryRates": ISLAMABAD_DAILY_SHEETS["23-Nov-2026"].batteryRates,
+  "essRates": ISLAMABAD_DAILY_SHEETS["23-Nov-2026"].essRates,
+  "cableRates": ISLAMABAD_DAILY_SHEETS["23-Nov-2026"].cableRates,
+  "accessoriesRates": ISLAMABAD_DAILY_SHEETS["23-Nov-2026"].accessoriesRates,
+  "systemRates": ISLAMABAD_DAILY_SHEETS["23-Nov-2026"].systemRates,
+  "structureRates": ISLAMABAD_DAILY_SHEETS["23-Nov-2026"].structureRates
+};
+
+export const RAW_BASE_DAILY_SHEET = ISLAMABAD_DAILY_SHEETS["24-Nov-2026"];
 
 export function makeRateItemKey(category, brand, model) {
   return [
@@ -1856,9 +1899,9 @@ export function applyAutoFetchedRatesToSheet(baseSheet, autoSnapshot = AUTO_FETC
   return nextSheet;
 }
 
-// Active sheet aliases (Latest sheet is 23-Nov-2026 + automated nightly Option B overlay)
+// Active sheet aliases (Latest sheet is 24-Nov-2026 + automated nightly Option B overlay)
 ISLAMABAD_DAILY_SHEETS["today"] = applyAutoFetchedRatesToSheet(RAW_BASE_DAILY_SHEET, AUTO_FETCHED_RATES);
-ISLAMABAD_DAILY_SHEETS["yesterday"] = ISLAMABAD_DAILY_SHEETS["17-Nov-2026"];
+ISLAMABAD_DAILY_SHEETS["yesterday"] = ISLAMABAD_DAILY_SHEETS["23-Nov-2026"];
 ISLAMABAD_DAILY_SHEETS["24-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
 ISLAMABAD_DAILY_SHEETS["06-Oct-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
 ISLAMABAD_DAILY_SHEETS["16-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
@@ -1866,13 +1909,13 @@ ISLAMABAD_DAILY_SHEETS["15-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
 ISLAMABAD_DAILY_SHEETS["14-Sep-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
 ISLAMABAD_DAILY_SHEETS["24-Sept-2026"] = ISLAMABAD_DAILY_SHEETS["05-Oct-2026"];
 
-const todayKey = _currentPkt?.shortDate || "23-Nov-2026";
-const yesterdayKey = _currentPkt?.yesterdayShortDate || "17-Nov-2026";
+const todayKey = _currentPkt?.shortDate || "24-Nov-2026";
+const yesterdayKey = _currentPkt?.yesterdayShortDate || "23-Nov-2026";
 
 if (!ISLAMABAD_DAILY_SHEETS[todayKey]) {
   ISLAMABAD_DAILY_SHEETS[todayKey] = {
     ...ISLAMABAD_DAILY_SHEETS["today"],
-    date: _currentPkt?.todayStr || "23 November 2026",
+    date: _currentPkt?.todayStr || "24 November 2026",
     label: `${todayKey} (Ready Stock)`
   };
 }
@@ -1884,13 +1927,13 @@ if (_currentPkt?.yesterdayShortDate && !ISLAMABAD_DAILY_SHEETS[_currentPkt.yeste
 }
 
 export const MARKET_SUMMARY = {
-  "panelsPerWattAvg": "Rs 33.75 – 42.50 / W",
-  "panelsAvgRate": "Rs 38.05 / W",
+  "panelsPerWattAvg": "Rs 33.75 – 43.50 / W",
+  "panelsAvgRate": "Rs 38.65 / W",
   "invertersAvg": "Rs 42,500 – 1,185,750",
   "invertersAvgDetail": "Knox Krypton/Xenon/Zynex ~Rs 97k–345k • Zapher ~Rs 164k–1.19M • ASW/XEROX On-Grid ~Rs 120k–970k • SAJ/Itel Active",
   "batteriesAvg": "Rs 54,000 – 3,335,935",
   "batteriesAvgDetail": "Knox Powerwall/Powerbase/HV Packs ~Rs 130.5k–3.34M • Daewoo CATL 100–314Ah ~Rs 120k–660k • Itel ~Rs 54k–559k",
-  "panelsTrend": `Verified ready stock prices updated for ${todayKey}: LONGi 645W BF at Rs 41.00, Inverex 620W Mustang & 625W Jollywood at Rs 42.00 (720W at Rs 42.50), Canadian 585W at Rs 40.10 (625W at Rs 40.00, 630W HJT at Rs 39.85), Jinko 585W at Rs 38.10 (645W at Rs 39.25), Astronergy 620W at Rs 37.00 (625W at Rs 36.25 Delivery 27/11/26, 720W at Rs 39.00), JA Solar 590W at Rs 36.50 (630W at Rs 37.00), Korean 585W at Rs 35.00 (715W at Rs 38.50), Yingli 630W at Rs 36.00, Trox 590W at Rs 35.00, OSDA 585W/615W at Rs 33.75.`,
+  "panelsTrend": `Verified ready stock prices updated for ${todayKey}: Jinko 585W at Rs 38.00 (-0.10) & 645W at Rs 39.25, LONGi 645W BF at Rs 41.00, Aiko 640W/650W at Rs 41.75 (665W at Rs 42.50, 770W at Rs 43.50), Inverex 620W/625W at Rs 42.00 (720W at Rs 42.50), Canadian 585W at Rs 40.10 (625W at Rs 40.00, 630W HJT at Rs 39.85), Astronergy 620W at Rs 37.00 (625W at Rs 36.25 Delivery 27/11/26, 720W at Rs 39.00), JA Solar 590W at Rs 36.50 (625W Limited Stock at Rs 37.25), Korean 585W–715W (Rs 35.00–40.50), Yingli 630W at Rs 36.00, Trox 590W at Rs 35.00, OSDA 585W at Rs 33.75 & 615W at Rs 34.00.`,
   "invertersTrend": "Knox Krypton/Xenon/Zynex (Rs 97k–345k), Zapher 5-Yr Warranty (Rs 164k–1.19M), ASW & XEROX G4/Pro On-Grid (Rs 120k–970k), SAJ & Itel Hybrid updated.",
   "batteriesTrend": "Knox LFP Powerwall/Powerbase, PowerStack HV & Complete HV Packs (Rs 130.5k–3.34M), Daewoo 314Ah CATL (Rs 660k), and Itel IP-20 Lithium active.",
   "lastMidnightUpdate": `${todayKey} (Islamabad Ready Stock Verified)`,
@@ -3143,25 +3186,63 @@ export const SOLAR_PRICES_DATA = [
     "description": "High output 625W Canadian Solar dual-glass module with reinforced heavy snow/wind load frame. Ready Stock rate Rs 40.00/W.",
     "popular": true
   },
+  {
+    "id": "panel-canadian-630-hjt",
+    "category": "panel",
+    "brand": "Canadian Solar",
+    "model": "Canadian Solar HJT Bifacial (630W)",
+    "type": "Heterojunction (HJT) Dual-Glass Bifacial",
+    "capacity": "630W",
+    "pricePerWatt": 39.85,
+    "pricePerWattRange": "Rs 39.85 / W",
+    "unitPriceMin": 25106,
+    "unitPriceMax": 25106,
+    "trend": "stable",
+    "trendPercent": "Rs 39.85/W",
+    "efficiency": "23.4%",
+    "warranty": "15 Yrs Product / 30 Yrs Linear",
+    "badge": "HJT Ready Stock",
+    "description": "Canadian Solar 630W HJT high-efficiency bifacial module with ultra-low temperature coefficient at Rs 39.85/W.",
+    "popular": true
+  },
 
   // ---------------- AIKO SOLAR ----------------
   {
     "id": "panel-aiko-640",
     "category": "panel",
     "brand": "Aiko",
-    "model": "Aiko Neostar ABC (640W) Rawat Stock",
+    "model": "Aiko Neostar ABC (640W)",
     "type": "ABC All-Back-Contact N-Type Bifacial",
     "capacity": "640W",
-    "pricePerWatt": 42.50,
-    "pricePerWattRange": "Rs 42.50 / W",
-    "unitPriceMin": 27200,
-    "unitPriceMax": 27200,
-    "trend": "hot",
-    "trendPercent": "Rs 42.50/W Rawat",
+    "pricePerWatt": 41.75,
+    "pricePerWattRange": "Rs 41.75 / W",
+    "unitPriceMin": 26720,
+    "unitPriceMax": 26720,
+    "trend": "down",
+    "trendPercent": "Rs 41.75/W",
     "efficiency": "23.8%",
     "warranty": "15 Yrs Product / 30 Yrs Performance",
-    "badge": "Rawat Ready Stock",
-    "description": "Aiko All-Back-Contact (ABC) technology 640W panel with sleek gridless aesthetic and ultra-high shade tolerance. Rawat ready stock at Rs 42.50/W.",
+    "badge": "ABC Ready Stock",
+    "description": "Aiko All-Back-Contact (ABC) technology 640W panel with sleek gridless aesthetic and ultra-high shade tolerance at Rs 41.75/W.",
+    "popular": true
+  },
+  {
+    "id": "panel-aiko-650",
+    "category": "panel",
+    "brand": "Aiko",
+    "model": "Aiko Neostar ABC (650W)",
+    "type": "ABC All-Back-Contact N-Type Bifacial",
+    "capacity": "650W",
+    "pricePerWatt": 41.75,
+    "pricePerWattRange": "Rs 41.75 / W",
+    "unitPriceMin": 27138,
+    "unitPriceMax": 27138,
+    "trend": "new",
+    "trendPercent": "Rs 41.75/W",
+    "efficiency": "23.9%",
+    "warranty": "15 Yrs Product / 30 Yrs Performance",
+    "badge": "ABC Ready Stock",
+    "description": "Aiko 650W All-Back-Contact (ABC) high-yield solar module in ready stock at Rs 41.75/W.",
     "popular": true
   },
   {
@@ -3175,12 +3256,12 @@ export const SOLAR_PRICES_DATA = [
     "pricePerWattRange": "Rs 42.50 / W",
     "unitPriceMin": 28263,
     "unitPriceMax": 28263,
-    "trend": "hot",
+    "trend": "stable",
     "trendPercent": "Rs 42.50/W",
     "efficiency": "24.0%",
     "warranty": "15 Yrs Product / 30 Yrs Performance",
-    "badge": "Delivery from T-Chowk, Rawat",
-    "description": "Premium 665W Aiko ABC module delivering industry record conversion efficiency. Delivery from T-Chowk, Rawat at Rs 42.50/W.",
+    "badge": "ABC Ready Stock",
+    "description": "Premium 665W Aiko ABC module delivering industry record conversion efficiency at Rs 42.50/W.",
     "popular": false
   },
   {
@@ -3190,16 +3271,16 @@ export const SOLAR_PRICES_DATA = [
     "model": "Aiko Infinite ABC Commercial (770W)",
     "type": "ABC High-Power Commercial Bifacial",
     "capacity": "770W",
-    "pricePerWatt": 44.50,
-    "pricePerWattRange": "Rs 44.50 / W",
-    "unitPriceMin": 34265,
-    "unitPriceMax": 34265,
-    "trend": "hot",
-    "trendPercent": "Mega Plate",
+    "pricePerWatt": 43.50,
+    "pricePerWattRange": "Rs 43.50 / W",
+    "unitPriceMin": 33495,
+    "unitPriceMax": 33495,
+    "trend": "down",
+    "trendPercent": "-Rs 1.00/W",
     "efficiency": "24.2%",
     "warranty": "15 Yrs Product / 30 Yrs Performance",
     "badge": "770W Flagship",
-    "description": "Massive 770W capacity single module engineered for industrial rooftop and large commercial setups.",
+    "description": "Massive 770W capacity Aiko ABC module engineered for industrial rooftop and large commercial setups at Rs 43.50/W.",
     "popular": true
   },
 
@@ -3211,16 +3292,16 @@ export const SOLAR_PRICES_DATA = [
     "model": "Jinko Tiger Neo 72HL4-BDV (585W)",
     "type": "N-Type TOPCon Dual-Glass Bifacial",
     "capacity": "585W",
-    "pricePerWatt": 38.10,
-    "pricePerWattRange": "Rs 38.10 / W",
-    "unitPriceMin": 22289,
-    "unitPriceMax": 22289,
+    "pricePerWatt": 38.00,
+    "pricePerWattRange": "Rs 38.00 / W",
+    "unitPriceMin": 22230,
+    "unitPriceMax": 22230,
     "trend": "down",
-    "trendPercent": "Rs 38.10/W",
+    "trendPercent": "-Rs 0.10/W",
     "efficiency": "22.65%",
     "warranty": "12 Yrs Product / 30 Yrs Power",
     "badge": "Ready Stock",
-    "description": "Pakistan's most popular N-Type solar panel with SMBB technology and exceptional high-temperature yield. Ready Stock rate Rs 38.10/W.",
+    "description": "Pakistan's most popular N-Type solar panel with SMBB technology and exceptional high-temperature yield. Ready Stock rate Rs 38.00/W.",
     "popular": true
   },
   {
@@ -3388,16 +3469,16 @@ export const SOLAR_PRICES_DATA = [
     "model": "JA Solar DeepBlue 4.0 Pro 625W (N-Type Bifacial)",
     "type": "Bycium+ N-Type TOPCon Bifacial",
     "capacity": "625W",
-    "pricePerWatt": 38.00,
-    "pricePerWattRange": "Rs 38.00 / W",
-    "unitPriceMin": 23750,
-    "unitPriceMax": 23750,
-    "trend": "hot",
-    "trendPercent": "Rs 38.00/W",
+    "pricePerWatt": 37.25,
+    "pricePerWattRange": "Rs 37.25 / W",
+    "unitPriceMin": 23281,
+    "unitPriceMax": 23281,
+    "trend": "new",
+    "trendPercent": "Rs 37.25/W",
     "efficiency": "22.8%",
     "warranty": "A Grade Documented",
-    "badge": "Ready Stock",
-    "description": "JA Solar 625W N-Type Bifacial, A Grade documented. Ready Stock rate Rs 38.00/W.",
+    "badge": "Limited Stock Available",
+    "description": "JA Solar 625W N-Type Bifacial, A Grade documented. Limited Stock Available at Rs 37.25/W.",
     "popular": true
   },
 
@@ -3577,6 +3658,63 @@ export const SOLAR_PRICES_DATA = [
     "warranty": "12 Yrs Product / 30 Yrs Linear",
     "badge": "Ready Stock",
     "description": "Cost-effective Tier-1 module with Rs 33.75/W rate, perfect for high ROI residential and commercial installs. Ready Stock.",
+    "popular": true
+  },
+  {
+    "id": "panel-osda-615",
+    "category": "panel",
+    "brand": "OSDA",
+    "model": "OSDA Solar N-Type (615W)",
+    "type": "N-Type TOPCon Dual-Glass Bifacial",
+    "capacity": "615W",
+    "pricePerWatt": 34.00,
+    "pricePerWattRange": "Rs 34.00 / W",
+    "unitPriceMin": 20910,
+    "unitPriceMax": 20910,
+    "trend": "up",
+    "trendPercent": "+Rs 0.25/W",
+    "efficiency": "22.7%",
+    "warranty": "12 Yrs Product / 30 Yrs Linear",
+    "badge": "Ready Stock",
+    "description": "OSDA 615W N-Type bifacial panel in ready stock at Rs 34.00/W.",
+    "popular": true
+  },
+  {
+    "id": "panel-trox-590",
+    "category": "panel",
+    "brand": "Trox",
+    "model": "Trox Solar N-Type (590W)",
+    "type": "N-Type TOPCon Dual-Glass Bifacial",
+    "capacity": "590W",
+    "pricePerWatt": 35.00,
+    "pricePerWattRange": "Rs 35.00 / W",
+    "unitPriceMin": 20650,
+    "unitPriceMax": 20650,
+    "trend": "stable",
+    "trendPercent": "Rs 35.00/W",
+    "efficiency": "22.6%",
+    "warranty": "12 Yrs Product / 25 Yrs Linear",
+    "badge": "Ready Stock",
+    "description": "Trox 590W N-Type bifacial module available in ready stock at Rs 35.00/W.",
+    "popular": true
+  },
+  {
+    "id": "panel-yingli-630",
+    "category": "panel",
+    "brand": "Yingli",
+    "model": "Yingli Panda N-Type (630W)",
+    "type": "N-Type TOPCon Dual-Glass Bifacial",
+    "capacity": "630W",
+    "pricePerWatt": 36.00,
+    "pricePerWattRange": "Rs 36.00 / W",
+    "unitPriceMin": 22680,
+    "unitPriceMax": 22680,
+    "trend": "stable",
+    "trendPercent": "Rs 36.00/W",
+    "efficiency": "22.9%",
+    "warranty": "12 Yrs Product / 30 Yrs Linear",
+    "badge": "Ready Stock",
+    "description": "Yingli 630W N-Type bifacial panel available in ready stock at Rs 36.00/W.",
     "popular": true
   },
 

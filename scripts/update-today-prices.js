@@ -55,7 +55,7 @@ async function fetchSupabaseAdminOverrideSheet() {
     }
 
     const repoPublishedMs =
-      Date.parse(RAW_BASE_DAILY_SHEET?.publishedIso || '2026-11-23T00:00:00+05:00') || 0;
+      Date.parse(RAW_BASE_DAILY_SHEET?.publishedIso || '2026-11-24T12:30:00+05:00') || 0;
     const remotePublishedMs =
       Date.parse(remoteWrapper.publishedAt || remoteSheet.publishedAt || row.updated_at || '') || 0;
 

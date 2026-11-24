@@ -782,6 +782,8 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         if (sheetFilterStatus === 'korean' && !item.brand.toLowerCase().includes('korean')) return false;
         if (sheetFilterStatus === 'aiko' && !item.brand.toLowerCase().includes('aiko')) return false;
         if (sheetFilterStatus === 'osda' && !item.brand.toLowerCase().includes('osda')) return false;
+        if (sheetFilterStatus === 'trox' && !item.brand.toLowerCase().includes('trox')) return false;
+        if (sheetFilterStatus === 'yingli' && !item.brand.toLowerCase().includes('yingli')) return false;
         if (sheetFilterStatus === 'tcl' && !item.brand.toLowerCase().includes('tcl')) return false;
         if (sheetFilterStatus === 'lefn' && !item.brand.toLowerCase().includes('lefn')) return false;
       } else if (sheetCategory === 'inverter') {
@@ -1433,38 +1435,38 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
           {sheetCategory === 'panel' ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 my-4">
               <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
-                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Canadian Solar Stock</span>
-                <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 41.25 – 41.50/W</span>
-                </div>
-                <span className="text-[10px] text-gray-500 dark:text-gray-400">585W (Rs. 41.50) • 625W (Rs. 41.25)</span>
-              </div>
-
-              <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
                 <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Jinko Solar & LONGi</span>
                 <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 39.75 – 43.50/W</span>
+                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 38.00 – 41.00/W</span>
                 </div>
-                <span className="text-[10px] text-gray-500 dark:text-gray-400">Jinko 585W (39.75) • 645W (41.00) • X10 (43.50)</span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">Jinko 585W (38.00) • Jinko 645W (39.25) • Longi 645W (41.00)</span>
               </div>
 
               <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
-                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">LEFN 640W Best Value</span>
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Aiko ABC & Canadian Solar</span>
                 <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400">Rs. 33.50/W</span>
+                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 39.85 – 43.50/W</span>
+                </div>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">Aiko 640/650W (41.75) • 770W (43.50) • Canadian HJT (39.85)</span>
+              </div>
+
+              <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">OSDA, Trox & Yingli Value</span>
+                <div className="flex items-baseline gap-2 mt-0.5">
+                  <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400">Rs. 33.75 – 36.00/W</span>
                   <span className="inline-flex items-center text-[10px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 px-1.5 py-0.5 rounded">
-                    Lowest in PK
+                    Best Value
                   </span>
                 </div>
-                <span className="text-[10px] text-gray-500 dark:text-gray-400">Fresh container arrivals • Lowest rate in PK</span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">Osda 585 (33.75) • Osda 615 (34.00) • Trox (35) • Yingli 630 (36)</span>
               </div>
 
               <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
                 <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Astronergy & JA Solar</span>
                 <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 38.25 – 39.00/W</span>
+                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 36.25 – 39.00/W</span>
                 </div>
-                <span className="text-[10px] text-gray-500 dark:text-gray-400">JA 625W (38.25) • JA 585W (38.75) • Astro 590W/720W (39.00)</span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">Astro 625 (36.25) • JA 590 (36.50) • JA 625 (37.25) • Astro 720 (39)</span>
               </div>
             </div>
           ) : sheetCategory === 'inverter' ? (
@@ -1733,9 +1735,9 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
               <div className="rounded-xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-800/40 p-3.5">
                 <span className="text-[11px] text-amber-700 dark:text-amber-400 block font-medium">Solar Plates Live</span>
                 <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-base font-extrabold text-amber-600 dark:text-amber-400">Rs. 33.00 – 44.50/W</span>
+                  <span className="text-base font-extrabold text-amber-600 dark:text-amber-400">Rs. 33.75 – 43.50/W</span>
                 </div>
-                <span className="text-[10px] text-gray-600 dark:text-gray-400">LEFN 640W (33.50) • Jinko 585W (39.75) • Canadian (41.25)</span>
+                <span className="text-[10px] text-gray-600 dark:text-gray-400">OSDA 585 (33.75) • Jinko 585 (38.00) • Aiko (41.75–43.50)</span>
               </div>
 
               <div className="rounded-xl bg-blue-50/60 dark:bg-blue-950/20 border border-blue-200/80 dark:border-blue-800/40 p-3.5">
@@ -1809,8 +1811,10 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                       { id: 'ja', label: 'JA Solar' },
                       { id: 'astronergy', label: 'Astronergy' },
                       { id: 'korean', label: 'Korean' },
-                      { id: 'aiko', label: 'Aiko (Rawat)' },
+                      { id: 'aiko', label: 'Aiko' },
                       { id: 'osda', label: 'OSDA' },
+                      { id: 'trox', label: 'Trox' },
+                      { id: 'yingli', label: 'Yingli' },
                       { id: 'lefn', label: 'LEFN' },
                       { id: 'tcl', label: 'TCL' },
                     ].map((f) => (

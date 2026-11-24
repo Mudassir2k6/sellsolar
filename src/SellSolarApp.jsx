@@ -127,7 +127,7 @@ import { useToast } from './context/ToastContext';
 import { supabase, isSupabaseConfigured } from './lib/supabase';
 import { BRANDS, CATEGORIES, POSTABLE_CATEGORIES, CITIES, formatPrice } from './lib/constants';
 import { digitsOnlyPhone, isValidPhone, normalizePhone, isValidUuid } from './lib/auth';
-import { getLocalOrSeedListings, getLocalOrSeedListingById, matchesListingFilters } from './data/seedListings';
+import { getLocalOrSeedListings, getLocalOrSeedListingById, matchesListingFilters, isFeaturedActive } from './data/seedListings';
 import { getEquipmentFallbackImage, SELL_SOLAR_PROMO_IMAGE, TURNKEY_INSTALL_PROMO_IMAGE } from './utils/solarImages';
 import ThemeRadioToggle from './components/ThemeRadioToggle';
 import WarrantySelector, { formatWarrantyShort, formatWarrantyLong } from './components/WarrantySelector';
@@ -2368,7 +2368,7 @@ function ax({
                     }`,
                     children: r ? "Used" : "New"
                   }),
-                  (t.featured || t.is_featured) && jsxs("span", {
+                  isFeaturedActive(t) && jsxs("span", {
                     className: "flex items-center gap-1 rounded-md bg-amber-400 text-slate-950 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider shadow-sm",
                     children: [
                       jsx(Star, { className: "h-2.5 w-2.5 fill-current" }),
@@ -2526,7 +2526,7 @@ function lx({
   const t = useMemo(() => {
     const filtered = filterListingsByDateRange(allListings || [], dateRange);
     // Paid "Featured Ad" listings are pinned above everything else, whatever the date order.
-    const isFeatured = (l) => Boolean(l && (l.featured === true || l.is_featured === true));
+    const isFeatured = isFeaturedActive;
     const stamp = (l) => {
       const v = l && l.created_at ? new Date(l.created_at).getTime() : NaN;
       return Number.isFinite(v) ? v : null;
@@ -4386,7 +4386,7 @@ function yx({
                 children:"•"
               }),jsx("span",{
                 className:"font-bold text-gray-700",children:formatPrice(x.price)
-              }),x.featured&&jsxs(Fragment,{
+              }),isFeaturedActive(x)&&jsxs(Fragment,{
                 children:[jsx("span",{
                   children:"•"
                 }),jsx("span",{
@@ -5835,7 +5835,7 @@ function yx({
         }),jsxs("div",{
           className:"mt-1.5 flex flex-wrap items-center gap-2",children:[jsx("span",{
             className:`rounded-full px-2 py-0.5 text-xs font-bold ${P.status==="approved"?"bg-secondary-100 text-secondary-700":P.status==="pending"?"bg-warning-100 text-warning-700":P.status==="rejected"?"bg-error-100 text-error-700":"bg-gray-100 text-gray-600"}`,children:P.status.charAt(0).toUpperCase()+P.status.slice(1)
-          }),P.featured&&jsx("span",{
+          }),isFeaturedActive(P)&&jsx("span",{
             className:"rounded-full bg-primary-100 px-2 py-0.5 text-xs font-semibold text-primary-700",children:"Featured"
           }),P.sponsored&&jsx("span",{
             className:"rounded-full bg-accent-100 px-2 py-0.5 text-xs font-semibold text-accent-700",children:"Sponsored"
@@ -6852,7 +6852,7 @@ function yx({
                 }),jsxs("div",{
                   className:"absolute left-4 top-4 flex gap-2",children:[jsx("span",{
                     className:`rounded-full px-3 py-1 text-xs font-bold shadow-sm ${p?"bg-warning-500 text-white":"bg-secondary-500 text-white"}`,children:p?"Used":"New"
-                  }),r.featured&&jsxs("span",{
+                  }),isFeaturedActive(r)&&jsxs("span",{
                     className:"flex items-center gap-1 rounded-full bg-primary-500 px-3 py-1 text-xs font-bold text-white shadow-sm",children:[jsx(Tag,{
                       className:"h-3 w-3"
                     }),"Featured"]

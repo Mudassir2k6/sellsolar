@@ -287,6 +287,17 @@ export function getLocalOrSeedListings(filters = {}) {
 }
 
 /**
+ * A listing counts as Featured only while its paid window is open: the featured flag must be on
+ * and featured_until (set to +14 days by the database) must not have passed.
+ */
+export function isFeaturedActive(item) {
+  if (!item || !(item.featured === true || item.is_featured === true)) return false;
+  if (!item.featured_until) return true;
+  const until = new Date(item.featured_until).getTime();
+  return !Number.isFinite(until) || until > Date.now();
+}
+
+/**
  * Single source of truth for the marketplace filters (category, brand, condition,
  * city, price range, search text). Used for seed/local listings and for any local
  * listing merged into a Supabase result, so every filter behaves the same everywhere.

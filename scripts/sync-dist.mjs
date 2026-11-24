@@ -123,6 +123,22 @@ function optimizeHtmlDirectory(targetBaseDir) {
 
   const chunksDir = path.join(targetBaseDir, '_next', 'static', 'chunks');
 
+  // Chunks that make up the SellSolar app itself (lazy-loaded via next/dynamic). Without a hint the browser only
+  // starts downloading them AFTER the page's JS has run, so slow connections sit on the skeleton for a long time.
+  // Preloading them from <head> starts the download immediately. Detected from the FRESH build output (out/) so
+  // stale chunks that sync-dist preserves for old tabs are never referenced.
+  const freshChunksDir = path.join(outDir, '_next', 'static', 'chunks');
+  const appChunkFiles = [];
+  if (fs.existsSync(freshChunksDir)) {
+    for (const f of fs.readdirSync(freshChunksDir)) {
+      if (!f.endsWith('.js')) continue;
+      try {
+        const code = fs.readFileSync(path.join(freshChunksDir, f), 'utf8');
+        if (code.includes('sellsolar_custom_listings')) appChunkFiles.push(f);
+      } catch {}
+    }
+  }
+
   const streamlinedFavicons = [
     '<link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="any"/>',
     '<link rel="icon" type="image/svg+xml" href="/favicon.svg"/>',
@@ -148,6 +164,16 @@ function optimizeHtmlDirectory(targetBaseDir) {
           modified = true;
         }
 
+        // 1b. Preload the lazy app chunks (skip any already referenced by a <script> tag in this page)
+        const appPreloads = appChunkFiles
+          .filter((f) => !html.includes(`/_next/static/chunks/${f}`))
+          .map((f) => `<link rel="preload" href="/_next/static/chunks/${f}" as="script"/>`)
+          .join('');
+        if (appPreloads) {
+          html = html.replace('<head>', `<head>${appPreloads}`);
+          modified = true;
+        }
+
         // 2. Inline small font CSS to eliminate render-blocking external request
         if (fontCssFile && fontCssContent) {
           const fontLinkRegex = new RegExp(`<link[^>]*href=["']/_next/static/css/${fontCssFile}["'][^>]*>`, 'gi');
@@ -158,12 +184,15 @@ function optimizeHtmlDirectory(targetBaseDir) {
           }
         }
 
-        // 3. Convert all remaining render-blocking stylesheets to high-priority asynchronous preload (media="print" onload="this.media='all'")
-        // Completely eliminates "Render-Blocking Resources" warning on PageSpeed & SEO Site Checkup
+        // 3. Main stylesheet stays a normal (render-blocking) <link rel="stylesheet">.
+        // It used to be converted to media="print" onload="this.media='all'", but that made the page paint
+        // unstyled raw HTML (plain links / SEO text) on slow connections until the CSS arrived. Correct,
+        // flash-free rendering matters more than the "render-blocking" lint warning. We only raise its
+        // priority so the browser fetches it first.
         const blockingCssRegex = /<link\s+rel="stylesheet"\s+href="(\/_next\/static\/css\/[^"]+\.css)"\s+data-precedence="next"\s*\/?>/gi;
         if (blockingCssRegex.test(html)) {
           html = html.replace(blockingCssRegex, (match, href) => {
-            return `<link rel="preload" href="${href}" as="style" fetchpriority="high"/><link rel="stylesheet" href="${href}" media="print" onload="this.media='all'"/>`;
+            return `<link rel="stylesheet" href="${href}" fetchpriority="high"/>`;
           });
           modified = true;
         }

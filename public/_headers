@@ -10,11 +10,17 @@
   Cloudflare-CDN-Cache-Control: no-cache, no-store, must-revalidate
   X-SellSolar-Framework: nextjs
 
+# Hashed build assets never change, so they must be cached hard (browser + CDN).
+# Cloudflare MERGES matching rules, so the "/*" no-cache values above are detached first;
+# otherwise assets got "max-age=0, must-revalidate" + "max-age=31536000" together and every
+# refresh re-validated every file over the network (very slow on weak connections).
 /_next/static/*
+  ! Cache-Control
+  ! CDN-Cache-Control
+  ! Cloudflare-CDN-Cache-Control
   Cache-Control: public, max-age=31536000, immutable
 
 /_next/static/media/*
-  Cache-Control: public, max-age=31536000, immutable
   Access-Control-Allow-Origin: *
 
 /favicon.ico

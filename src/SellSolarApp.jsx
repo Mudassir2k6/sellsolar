@@ -6742,6 +6742,16 @@ function yx({
                     jsx("span",{className:"tabular-nums font-extrabold text-white",children:(viewCount || getRealisticAdViews(r) || 0).toLocaleString()}),
                     " views"
                   ]
+                }),photos.length > 1 && jsx("button",{
+                  type:"button","aria-label":"Previous photo",
+                  onClick:ev=>{ ev.stopPropagation(); setActivePhotoIdx(i=>(i-1+photos.length)%photos.length); },
+                  className:"absolute left-2 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white shadow-lg backdrop-blur-md border border-white/20 transition hover:bg-black/80 active:scale-95 cursor-pointer",
+                  children:jsx(ChevronLeft,{ className:"h-6 w-6" })
+                }),photos.length > 1 && jsx("button",{
+                  type:"button","aria-label":"Next photo",
+                  onClick:ev=>{ ev.stopPropagation(); setActivePhotoIdx(i=>(i+1)%photos.length); },
+                  className:"absolute right-2 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white shadow-lg backdrop-blur-md border border-white/20 transition hover:bg-black/80 active:scale-95 cursor-pointer",
+                  children:jsx(ChevronRight,{ className:"h-6 w-6" })
                 })]
               }),photos.length > 1 && jsx("div",{
                 className:"p-3 flex gap-2 overflow-x-auto bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800",children:photos.map((ph, idx)=>jsx("button",{

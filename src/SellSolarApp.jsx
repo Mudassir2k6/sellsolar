@@ -2544,6 +2544,18 @@ function lx({
     setVisibleCount(8);
   }, [t.length, currentCondition, currentCategory, dateRange, dateOrder]);
 
+  // One place that puts the whole listings section back to its default state.
+  const hasActiveFilters = Boolean(
+    dateRange !== "all" || dateOrder !== "desc" ||
+    (activeFilters && Object.values(activeFilters).some(v => v !== "" && v != null))
+  );
+  const resetAllFilters = () => {
+    setDateRange("all");
+    setDateOrder("desc");
+    setVisibleCount(8);
+    if (rf) rf();
+  };
+
   return jsx("section",{
     id:"listings",className:"bg-white dark:bg-gray-950 py-5 sm:py-6 border-b border-gray-200/60 dark:border-gray-800 transition-colors",children:jsxs("div",{
       className:"container-page",children:[
@@ -2633,9 +2645,20 @@ function lx({
                   ]
                 }),
                 rf&&jsxs("button",{
-                  onClick:()=>{ setDateRange("all"); setDateOrder("desc"); rf(); },className:"btn-ghost text-xs px-2.5 py-1.5 flex items-center gap-1.5",children:[
+                  type:"button",
+                  id:"reset-filters-btn",
+                  onClick:resetAllFilters,
+                  disabled:!hasActiveFilters,
+                  title:hasActiveFilters?"Reset all filters":"No filters applied",
+                  "aria-label":"Reset all filters",
+                  className:`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-bold transition-colors ${
+                    hasActiveFilters
+                      ?"border-red-300 bg-red-50 text-red-600 hover:bg-red-100 dark:border-red-800 dark:bg-red-950/40 dark:text-red-300 cursor-pointer"
+                      :"border-gray-200 bg-gray-100 text-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500 cursor-not-allowed opacity-70"
+                  }`,
+                  children:[
                     jsx(RefreshCw,{ className:"h-3.5 w-3.5" }),
-                    "Clear"
+                    "Reset Filters"
                   ]
                 }),
                 jsx("span",{
@@ -2700,9 +2723,9 @@ function lx({
               },c.key)),
               jsx("button",{
                 type:"button",
-                onClick:()=>{ setDateRange("all"); setDateOrder("desc"); rf && rf(); },
-                className:"font-bold text-gray-500 hover:text-red-500 dark:text-gray-400 underline-offset-2 hover:underline cursor-pointer ml-1",
-                children:"Clear all"
+                onClick:resetAllFilters,
+                className:"font-bold text-red-500 hover:text-red-600 dark:text-red-400 underline-offset-2 hover:underline cursor-pointer ml-1",
+                children:"Reset all filters"
               })
             ]
           });
@@ -2738,7 +2761,7 @@ function lx({
           }),jsx("p",{
             className:"mt-1 max-w-md mx-auto text-xs text-gray-500 dark:text-gray-400",children:"We couldn't find any equipment matching your active filters. Try broadening your criteria or search keywords."
           }),rf&&jsxs("button",{
-            onClick:rf,className:"btn-primary mt-4 text-xs inline-flex items-center gap-1.5 px-4 py-2",children:[jsx(RefreshCw,{
+            onClick:resetAllFilters,className:"btn-primary mt-4 text-xs inline-flex items-center gap-1.5 px-4 py-2",children:[jsx(RefreshCw,{
               className:"h-3.5 w-3.5"
             }),"Clear All Filters"]
           })]

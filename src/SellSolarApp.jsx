@@ -40,6 +40,7 @@ import {
   ArrowLeft,
   ArrowRight,
   ArrowUp,
+  ArrowDown,
   Award,
   BadgeCheck,
   BatteryCharging,
@@ -2525,12 +2526,28 @@ function lx({
 }){
   const [visibleCount, setVisibleCount] = useState(8);
   const [dateRange, setDateRange] = useState("all");
-  const t = useMemo(() => filterListingsByDateRange(allListings || [], dateRange), [allListings, dateRange]);
+  const [dateOrder, setDateOrder] = useState("desc"); // desc = newest first (default), asc = oldest first
+  const t = useMemo(() => {
+    const filtered = filterListingsByDateRange(allListings || [], dateRange);
+    const stamp = (l) => {
+      const v = l && l.created_at ? new Date(l.created_at).getTime() : NaN;
+      return Number.isFinite(v) ? v : null;
+    };
+    const dir = dateOrder === "asc" ? 1 : -1;
+    // Array.prototype.sort is stable, so listings with the same date keep their current order.
+    return [...filtered].sort((a, b) => {
+      const ta = stamp(a), tb = stamp(b);
+      if (ta === null && tb === null) return 0;
+      if (ta === null) return 1; // undated listings always go last
+      if (tb === null) return -1;
+      return (ta - tb) * dir;
+    });
+  }, [allListings, dateRange, dateOrder]);
   const n = dateRange === "all" ? totalN : t.length;
 
   useEffect(() => {
     setVisibleCount(8);
-  }, [t.length, currentCondition, currentCategory, dateRange]);
+  }, [t.length, currentCondition, currentCategory, dateRange, dateOrder]);
 
   return jsx("section",{
     id:"listings",className:"bg-white dark:bg-gray-950 py-5 sm:py-6 border-b border-gray-200/60 dark:border-gray-800 transition-colors",children:jsxs("div",{
@@ -2607,8 +2624,21 @@ function lx({
                     })
                   ]
                 }),
+                jsxs("button",{
+                  type:"button",
+                  onClick:()=>setDateOrder(o=>o==="desc"?"asc":"desc"),
+                  title:dateOrder==="desc"?"Newest first - click for oldest first":"Oldest first - click for newest first",
+                  "aria-label":dateOrder==="desc"?"Sorted newest first. Switch to oldest first":"Sorted oldest first. Switch to newest first",
+                  className:"inline-flex items-center gap-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-2.5 py-1 text-xs font-bold text-gray-700 dark:text-gray-300 shadow-2xs hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer",
+                  children:[
+                    dateOrder==="desc"
+                      ?jsx(ArrowDown,{ className:"h-3.5 w-3.5 text-primary-500" })
+                      :jsx(ArrowUp,{ className:"h-3.5 w-3.5 text-primary-500" }),
+                    dateOrder==="desc"?"Newest":"Oldest"
+                  ]
+                }),
                 rf&&jsxs("button",{
-                  onClick:()=>{ setDateRange("all"); rf(); },className:"btn-ghost text-xs px-2.5 py-1.5 flex items-center gap-1.5",children:[
+                  onClick:()=>{ setDateRange("all"); setDateOrder("desc"); rf(); },className:"btn-ghost text-xs px-2.5 py-1.5 flex items-center gap-1.5",children:[
                     jsx(RefreshCw,{ className:"h-3.5 w-3.5" }),
                     "Clear"
                   ]

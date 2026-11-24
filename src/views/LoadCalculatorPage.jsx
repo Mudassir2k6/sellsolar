@@ -495,7 +495,6 @@ export default function LoadCalculatorPage({ onNavigate, onSelectCategory }) {
 💰 *Estimated Monthly Bill Saved:* ${formatPrice(calculations.estimatedMonthlyBillPk)}
 💵 *Estimated Turnkey Cost:* ${formatPrice(calculations.estimatedSystemCostMin)} - ${formatPrice(calculations.estimatedSystemCostMax)}
 ⏱️ *Estimated Payback Period:* ~${calculations.paybackYears} Years
-📍 *Location:* ${activeCityObj.name} (${activeCityObj.disco})
 ------------------------------------------------
 Calculated on SellSolar.pk Load Calculator:
 https://sellsolar.pk/calculator`;
@@ -517,7 +516,6 @@ https://sellsolar.pk/calculator`;
             ? `${calculations.lithiumKwhRequired} kWh LiFePO4 (48V)`
             : `${calculations.tubularKwhRequired} kWh Tubular`;
       await downloadQuotationPdf({
-        location: `${activeCityObj.name} (${activeCityObj.disco})`,
         rows: [
           ['Recommended System', `${calculations.recommendedKw} kW (${systemType.toUpperCase()})`],
           ['Solar Panels', `${calculations.numberOfPanels}x Plates (${panelWattage}W TOPCon = ${calculations.totalPanelCapacityActualKw} kW)`],
@@ -554,7 +552,6 @@ https://sellsolar.pk/calculator`;
 💰 *Estimated Monthly Bill Saved:* ${formatPrice(calculations.estimatedMonthlyBillPk)}
 💵 *Estimated Turnkey Budget:* ${formatPrice(calculations.estimatedSystemCostMin)} - ${formatPrice(calculations.estimatedSystemCostMax)}
 ⏱️ *Estimated Payback Period:* ~${calculations.paybackYears} Years
-📍 *Location:* ${activeCityObj.name} (${activeCityObj.disco})
 ------------------------------------------------
 Calculated on SellSolar Pakistan Load Calculator:
 https://sellsolar.pk/calculator`;
@@ -1301,11 +1298,6 @@ https://sellsolar.pk/calculator`;
 
           {/* Right Column (Live Results & System Sizing Dashboard): 5 Columns on desktop */}
           <div id="sizing-result-card" className="space-y-5 lg:col-span-5 lg:sticky lg:top-24">
-            {/* Location banner: always visible on screen, in print and in screenshots */}
-            <div className="flex items-center gap-2 rounded-2xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 px-4 py-2.5 text-xs sm:text-sm font-bold text-amber-900 dark:text-amber-200">
-              <MapPin className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
-              <span>Location: {activeCityObj.name} ({activeCityObj.disco})</span>
-            </div>
             
             {/* System Preferences Card */}
             <div className="rounded-3xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm space-y-4">

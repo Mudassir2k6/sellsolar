@@ -48,13 +48,17 @@ export async function downloadQuotationPdf(quote) {
   doc.setTextColor(17, 24, 39);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
-  doc.text('Location:', margin, y);
-  doc.setFont('helvetica', 'normal');
-  doc.text(quote.location || '-', margin + 58, y);
-  y += 14;
-  doc.setDrawColor(229, 231, 235);
-  doc.line(margin, y, pageW - margin, y);
-  y += 22;
+  if (quote.location) {
+    doc.text('Location:', margin, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(quote.location, margin + 58, y);
+    y += 14;
+    doc.setDrawColor(229, 231, 235);
+    doc.line(margin, y, pageW - margin, y);
+    y += 22;
+  } else {
+    y = 100;
+  }
 
   // ---- Rows ----
   const labelW = 190;

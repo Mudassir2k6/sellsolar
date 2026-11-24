@@ -787,6 +787,8 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         if (sheetFilterStatus === 'tcl' && !item.brand.toLowerCase().includes('tcl')) return false;
         if (sheetFilterStatus === 'lefn' && !item.brand.toLowerCase().includes('lefn')) return false;
       } else if (sheetCategory === 'inverter') {
+        if (sheetFilterStatus === 'daewoo' && !item.brand.toLowerCase().includes('daewoo')) return false;
+        if (sheetFilterStatus === 'growatt' && !item.brand.toLowerCase().includes('growatt')) return false;
         if (sheetFilterStatus === 'knox' && !item.brand.toLowerCase().includes('knox') && !item.brand.toLowerCase().includes('zapher')) return false;
         if (sheetFilterStatus === 'asw' && !item.brand.toLowerCase().includes('asw') && !item.model.toLowerCase().includes('asw')) return false;
         if (sheetFilterStatus === 'xerox' && !item.brand.toLowerCase().includes('xerox') && !item.model.toLowerCase().includes('xerox')) return false;
@@ -802,6 +804,8 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         if (sheetFilterStatus === 'hybrid' && !item.type?.toLowerCase().includes('hybrid')) return false;
         if (sheetFilterStatus === 'ongrid' && !item.type?.toLowerCase().includes('on-grid') && !item.type?.toLowerCase().includes('grid-tied') && !item.type?.toLowerCase().includes('string')) return false;
       } else if (sheetCategory === 'battery') {
+        if (sheetFilterStatus === 'daewoo' && !item.brand.toLowerCase().includes('daewoo')) return false;
+        if (sheetFilterStatus === 'growatt' && !item.brand.toLowerCase().includes('growatt')) return false;
         if (sheetFilterStatus === 'knox' && !item.brand.toLowerCase().includes('knox')) return false;
         if (sheetFilterStatus === 'hv_pack' && !item.model.toLowerCase().includes('hv') && !item.model.toLowerCase().includes('powerstack')) return false;
         if (sheetFilterStatus === 'zilo' && !item.brand.toLowerCase().includes('zilo')) return false;
@@ -831,7 +835,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         if (sheetFilterStatus === 'opas' && !accText.includes('opas') && !accText.includes('changeover') && !accText.includes('mts') && !accText.includes('protector')) return false;
         if (sheetFilterStatus === 'earthing' && !accText.includes('copper rod') && !accText.includes('earthing') && !accText.includes('arrester') && !accText.includes('mc4') && !accText.includes('cable tie')) return false;
       } else if (sheetCategory === 'ess') {
-        if (sheetFilterStatus === 'powertank' && !item.model?.toLowerCase().includes('power tank') && !item.model?.toLowerCase().includes('powertank')) return false;
+        if (sheetFilterStatus === 'powertank' && !item.model?.toLowerCase().includes('power tank') && !item.model?.toLowerCase().includes('powertank') && !item.model?.toLowerCase().includes('power rover')) return false;
         if (sheetFilterStatus === 'cabinet' && !item.model?.toLowerCase().includes('all-in-one') && !item.type?.toLowerCase().includes('all-in-one') && !item.model?.toLowerCase().includes('8kwh')) return false;
         if (sheetFilterStatus === 'itel' && !item.brand.toLowerCase().includes('itel')) return false;
       } else if (sheetCategory === 'complete_system') {
@@ -852,6 +856,8 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
         if (sheetFilterStatus === 'cables_wiring' && item.itemCategory !== 'cables_wiring') return false;
         if (sheetFilterStatus === 'solar_accessories' && item.itemCategory !== 'solar_accessories') return false;
         if (sheetFilterStatus === 'ess' && item.itemCategory !== 'ess') return false;
+        if (sheetFilterStatus === 'daewoo' && !item.brand.toLowerCase().includes('daewoo')) return false;
+        if (sheetFilterStatus === 'growatt' && !item.brand.toLowerCase().includes('growatt')) return false;
         if (sheetFilterStatus === 'knox' && !item.brand.toLowerCase().includes('knox') && !item.brand.toLowerCase().includes('zapher')) return false;
         if (sheetFilterStatus === 'goodwe' && !item.brand.toLowerCase().includes('goodwe')) return false;
         if (sheetFilterStatus === 'itel' && !item.brand.toLowerCase().includes('itel')) return false;
@@ -1472,35 +1478,35 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
           ) : sheetCategory === 'inverter' ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 my-4">
               <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
-                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">LCD Series & Solis Plus</span>
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Growatt Hybrid (1P & 3P)</span>
                 <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-base font-extrabold text-blue-600 dark:text-blue-400">Rs. 195k – 745k</span>
+                  <span className="text-base font-extrabold text-blue-600 dark:text-blue-400">Rs. 185k – 730k</span>
                 </div>
-                <span className="text-[10px] text-gray-500 dark:text-gray-400">LCD 6kW (195k) • Solis 6kW+ (207k) • 12kW SP (410k)</span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">6kW IP65 (185k) • 10kW 3P (400k) • 15kW (495k) • 25kW (730k)</span>
               </div>
 
               <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
-                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Inverex Nitrox Hybrids</span>
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Inverex Nitrox & LCD Series</span>
                 <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 266k – 549k</span>
+                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 195k – 549k</span>
                 </div>
-                <span className="text-[10px] text-gray-500 dark:text-gray-400">6kW Single Phase • 10kW 3P (+5k) • 12kW Commercial</span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">LCD 6kW (195k) • Nitrox 6kW (266k) • 10kW 3P (465k)</span>
               </div>
 
               <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
-                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">On-Grid Net Metering</span>
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Growatt On-Grid (3-Phase)</span>
                 <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400">Rs. 167k – 187k</span>
+                  <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400">Rs. 157k – 450k</span>
                 </div>
-                <span className="text-[10px] text-gray-500 dark:text-gray-400">Knox 10kW G4 (167k) • Growatt MOD 10kW (174k) • Sungrow</span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">10kW (157k) • 15kW (191k) • 33kW (355k) • 40kW (450k)</span>
               </div>
 
               <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
                 <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">GoodWe HV & Zapher IP66</span>
                 <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 192k – 1.33M</span>
+                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 164k – 1.33M</span>
                 </div>
-                <span className="text-[10px] text-gray-500 dark:text-gray-400">Zapher 6.6k IP66 (192k) • GoodWe 15k HV (625k)</span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">Zapher 6.6k IP66 (164k) • GoodWe 15k HV (625k)</span>
               </div>
             </div>
           ) : sheetCategory === 'battery' ? (
@@ -1530,11 +1536,11 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
               </div>
 
               <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
-                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Inverex PowerWall Series</span>
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Growatt Lithium Batteries</span>
                 <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 265.5k – 564k</span>
+                  <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400">Rs. 207k – 555k</span>
                 </div>
-                <span className="text-[10px] text-gray-500 dark:text-gray-400">5.12kWh Wallmount • 11.8kWh Heavy Duty Storage</span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">Growatt 5kW (207k) • Growatt 16kW (555k) • Smart BMS</span>
               </div>
 
               <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
@@ -1546,27 +1552,27 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
               </div>
 
               <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
-                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Osaka, AGS & Daewoo</span>
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Daewoo Lithion (N-Tech I-11)</span>
                 <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 31,500 – 47,000</span>
+                  <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400">Rs. 56k – 660k</span>
                 </div>
-                <span className="text-[10px] text-gray-500 dark:text-gray-400">AGS SP Tall 1200 • Osaka Pro 1800 • Daewoo DIB Maintenance-Free</span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">12V (56k) • 25V (117k) • 51.2V (213k) • 200Ah (400k) • 314Ah CATL (660k)</span>
               </div>
             </div>
           ) : sheetCategory === 'ess' ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 my-4">
               <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
-                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Power Tank 500W/1KWh</span>
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Power Tank & Power Rover</span>
                 <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-base font-extrabold text-violet-600 dark:text-violet-400">Rs. 65,000</span>
+                  <span className="text-base font-extrabold text-violet-600 dark:text-violet-400">Rs. 66k – 124k</span>
                 </div>
-                <span className="text-[10px] text-gray-500 dark:text-gray-400">Portable ESS Station • 3-Year Replacement</span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">500W/1kWh (66k) • Rover (68k) • Tank 1000 (124k)</span>
               </div>
 
               <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
                 <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">3.6KW + 8KWh ESS Cabinet</span>
                 <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Call for Rate</span>
+                  <span className="text-base font-extrabold text-gray-900 dark:text-white">Rs. 325,000</span>
                   <span className="inline-flex items-center text-[10px] font-bold text-violet-700 dark:text-violet-300 bg-violet-500/10 px-1.5 py-0.5 rounded">
                     All-in-One
                   </span>
@@ -1575,19 +1581,19 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
               </div>
 
               <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
-                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Itel Hybrid IP-54 Inverters</span>
+                <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Itel Hybrid IP-54 & IP-66</span>
                 <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-base font-extrabold text-blue-600 dark:text-blue-400">Rs. 44k – 138k</span>
+                  <span className="text-base font-extrabold text-blue-600 dark:text-blue-400">Rs. 42.5k – 310k</span>
                 </div>
-                <span className="text-[10px] text-gray-500 dark:text-gray-400">1.6kW to 6kW Pro • Single Source Compatible</span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">IP-54 1.6kW–12kW (42.5k–256k) • IP-66 12kW (310k)</span>
               </div>
 
               <div className="rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/80 p-3.5">
                 <span className="text-[11px] text-gray-500 dark:text-gray-400 block font-medium">Itel IP-20 Lithium Batteries</span>
                 <div className="flex items-baseline gap-2 mt-0.5">
-                  <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400">Rs. 58k – 590k</span>
+                  <span className="text-base font-extrabold text-emerald-600 dark:text-emerald-400">Rs. 54k – 558k</span>
                 </div>
-                <span className="text-[10px] text-gray-500 dark:text-gray-400">12V, 25V, 51V (100Ah - 314Ah) • 5-Year Replacement</span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">12V (54k) • 25V 100/200Ah • 51V 100/200/314Ah (5-Yr Repl)</span>
               </div>
             </div>
           ) : sheetCategory === 'complete_system' ? (
@@ -1833,6 +1839,8 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                   ) : sheetCategory === 'inverter' ? (
                     [
                       { id: 'all', label: 'All Inverters' },
+                      { id: 'daewoo', label: 'Daewoo IP65' },
+                      { id: 'growatt', label: 'Growatt' },
                       { id: 'knox', label: 'Knox' },
                       { id: 'zapher', label: 'Zapher IP66' },
                       { id: 'krypton', label: 'Krypton IP20' },
@@ -1864,6 +1872,8 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                   ) : sheetCategory === 'battery' ? (
                     [
                       { id: 'all', label: 'All Batteries' },
+                      { id: 'daewoo', label: 'Daewoo Lithion' },
+                      { id: 'growatt', label: 'Growatt Lithium' },
                       { id: 'knox', label: 'Knox LFP / HV' },
                       { id: 'hv_pack', label: 'HV Packs / PowerStack' },
                       { id: 'changed', label: 'Rate Changed' },
@@ -1941,7 +1951,7 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                     [
                       { id: 'all', label: 'All ESS' },
                       { id: 'changed', label: 'Rate Changed' },
-                      { id: 'powertank', label: 'Power Tank 500W' },
+                      { id: 'powertank', label: 'Power Tank & Rover' },
                       { id: 'cabinet', label: 'All-in-One 8KWh' },
                       { id: 'itel', label: 'Itel' },
                     ].map((f) => (
@@ -2006,6 +2016,8 @@ export default function TodayPricesPage({ onNavigate, onSelectCategory }) {
                       { id: 'panel', label: 'Panels' },
                       { id: 'inverter', label: 'Inverters' },
                       { id: 'battery', label: 'Batteries' },
+                      { id: 'daewoo', label: 'Daewoo Lithion' },
+                      { id: 'growatt', label: 'Growatt' },
                       { id: 'knox', label: 'Knox' },
                       { id: 'cables_wiring', label: 'Cables & Wiring' },
                       { id: 'solar_accessories', label: 'Accessories' },

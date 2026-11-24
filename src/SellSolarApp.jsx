@@ -2634,7 +2634,7 @@ function lx({
                     dateOrder==="desc"
                       ?jsx(ArrowDown,{ className:"h-3.5 w-3.5 text-primary-500" })
                       :jsx(ArrowUp,{ className:"h-3.5 w-3.5 text-primary-500" }),
-                    dateOrder==="desc"?"Newest":"Oldest"
+                    dateOrder==="desc"?"Newest first":"Oldest first"
                   ]
                 }),
                 rf&&jsxs("button",{

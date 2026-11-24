@@ -7,7 +7,19 @@ export const CATEGORIES = {
   structure_accessories: 'Structures & Accessories',
   cables_wiring: 'Solar Cables & Wiring',
   solar_accessories: 'Protection & Accessories',
+  electric_equipment: 'Electric Equipment',
+  others: 'Others',
 };
+
+/** Categories a seller can pick when posting an ad (order = dropdown order). */
+export const POSTABLE_CATEGORIES = [
+  'panel',
+  'inverter',
+  'battery',
+  'complete_system',
+  'electric_equipment',
+  'others',
+];
 
 export const CITIES = [
   'Lahore',
@@ -58,6 +70,7 @@ export const BRANDS = [
   'Narada',
   'Pylontech',
   'Dyness',
+  'Other',
 ];
 
 export function formatPrice(value) {

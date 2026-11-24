@@ -34,6 +34,8 @@ const CATEGORY_TABS = [
   { id: 'inverter', label: 'Inverters', icon: Zap },
   { id: 'battery', label: 'Batteries', icon: BatteryCharging },
   { id: 'complete_system', label: 'Systems', icon: Boxes },
+  { id: 'electric_equipment', label: 'Electric Equipment', icon: Zap },
+  { id: 'others', label: 'Others', icon: Boxes },
 ];
 
 export default function GlobalNavbarSearch({

@@ -331,6 +331,8 @@ export default function EditSolarAdModal({
                 <option value="complete_system">Complete Solar Systems</option>
                 <option value="structure_accessories">Structures & Mounting</option>
                 <option value="accessories">Accessories & Wiring</option>
+                <option value="electric_equipment">Electric Equipment</option>
+                <option value="others">Others</option>
               </select>
             </div>
 

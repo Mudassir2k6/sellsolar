@@ -123,7 +123,7 @@ import { dedupeSellerAds } from './lib/listingsOwnership';import {
 import { useAuth, DEFAULT_ADMIN_ID, DEFAULT_ADMIN_EMAIL, getStoredUsers, saveStoredUsers, getUserPhonesMap, saveUserPhonesMap, getDeletedAds, markAdAsDeleted, isAdDeleted } from './context/AuthContext';
 import { useToast } from './context/ToastContext';
 import { supabase, isSupabaseConfigured } from './lib/supabase';
-import { BRANDS, CATEGORIES, CITIES, formatPrice } from './lib/constants';
+import { BRANDS, CATEGORIES, POSTABLE_CATEGORIES, CITIES, formatPrice } from './lib/constants';
 import { digitsOnlyPhone, isValidPhone, normalizePhone, isValidUuid } from './lib/auth';
 import { getLocalOrSeedListings, getLocalOrSeedListingById } from './data/seedListings';
 import { getEquipmentFallbackImage, SELL_SOLAR_PROMO_IMAGE, TURNKEY_INSTALL_PROMO_IMAGE } from './utils/solarImages';
@@ -1691,6 +1691,10 @@ function Xy({
   value:"battery",label:"Batteries",icon:BatteryCharging
 },{
   value:"complete_system",label:"Systems",icon:Boxes
+},{
+  value:"electric_equipment",label:"Electric Equipment",icon:Zap
+},{
+  value:"others",label:"Others",icon:Package
 }],ex=["","Lahore","Karachi","Islamabad","Rawalpindi","Faisalabad","Multan","Gujranwala","Peshawar"],tx=["","Longi","Canadian Solar","Jinko","Trina","Inverex","Tesla","Homage","Phoenix","Osaka","AGS"],rx=[{
   value:"",label:"Any Condition"
 },{
@@ -2039,6 +2043,28 @@ function nx({
                     active: t.category === "complete_system"
                   },
                   {
+                    label: "Electric Equipment",
+                    sub: "Breakers, UPS & more",
+                    icon: Zap,
+                    action: () => {
+                      e("category", "electric_equipment");
+                      const el = document.getElementById("listings");
+                      el && el.scrollIntoView({ behavior: "smooth", block: "start" });
+                    },
+                    active: t.category === "electric_equipment"
+                  },
+                  {
+                    label: "Others",
+                    sub: "Other solar items",
+                    icon: Package,
+                    action: () => {
+                      e("category", "others");
+                      const el = document.getElementById("listings");
+                      el && el.scrollIntoView({ behavior: "smooth", block: "start" });
+                    },
+                    active: t.category === "others"
+                  },
+                  {
                     label: "Daily Rates",
                     sub: (MARKET_SUMMARY?.panelsPerWattAvg ? `${MARKET_SUMMARY.panelsPerWattAvg} Live` : "Rs 33.50 – 43.50/W Live"),
                     icon: TrendingUp,
@@ -2178,6 +2204,10 @@ const sx=[{
   value:"battery",icon:BatteryCharging,desc:"Lithium LiFePO4 & tubular batteries",gradient:"from-secondary-500 to-secondary-600",count:"95+ Ads"
 },{
   value:"complete_system",icon:Boxes,desc:"Full solar packages with net-metering",gradient:"from-amber-500 to-amber-600",count:"60+ Ads"
+},{
+  value:"electric_equipment",icon:Zap,desc:"Breakers, cables, UPS & other electric gear",gradient:"from-sky-500 to-sky-600",count:"New"
+},{
+  value:"others",icon:Package,desc:"Anything else related to solar",gradient:"from-gray-500 to-gray-600",count:"New"
 }];
 
 function ix({
@@ -2597,7 +2627,9 @@ function lx({
             { id:"panel", label:"Solar Panels", icon:Sun },
             { id:"inverter", label:"Inverters", icon:Zap },
             { id:"battery", label:"Batteries", icon:BatteryCharging },
-            { id:"complete_system", label:"Complete Systems", icon:Boxes }
+            { id:"complete_system", label:"Complete Systems", icon:Boxes },
+            { id:"electric_equipment", label:"Electric Equipment", icon:Zap },
+            { id:"others", label:"Others", icon:Package }
           ].map(cat => {
             const isSelected = (!currentCategory && cat.id === "") || currentCategory === cat.id;
             return jsxs("button", {
@@ -3188,7 +3220,7 @@ function hx({
       })]
     })]
   })
-}const px=["panel","inverter","battery","complete_system"],gx=["new","used"];
+}const px=POSTABLE_CATEGORIES,gx=["new","used"];
 function yx({
   onBack:t,onPosted:e,hasOuterNavbar=false,onNavigate
 }){
@@ -6008,6 +6040,10 @@ function yx({
                     value:"battery",children:"Batteries"
                   }),jsx("option",{
                     value:"complete_system",children:"Complete Systems"
+                  }),jsx("option",{
+                    value:"electric_equipment",children:"Electric Equipment"
+                  }),jsx("option",{
+                    value:"others",children:"Others"
                   })]
                 })]
               })]

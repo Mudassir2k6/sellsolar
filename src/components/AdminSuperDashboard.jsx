@@ -105,7 +105,7 @@ import {
   isInboxMessageUnread,
 } from '../services/inboxService';
 import { getAnalyticsSummary, resetAllAnalyticsToZero } from '../services/analyticsService';
-import { formatPrice } from '../lib/constants';
+import { formatPrice, CATEGORIES } from '../lib/constants';
 import AdminDailyRatesModule from './AdminDailyRatesModule';
 import AdminDealersModule from './AdminDealersModule';
 import AdminInstallationsModule from './AdminInstallationsModule';
@@ -1694,6 +1694,41 @@ export default function AdminSuperDashboard({
     showToast({
       title: 'Listing Updated',
       message: `Featured status has been ${nextFeatured ? 'enabled' : 'disabled'}.`,
+      type: 'success',
+    });
+  };
+
+  // Admin: change an ad's category (updates only the category column)
+  const handleChangeCategory = async (listingId, nextCategory) => {
+    const previous = listingsList;
+    const updated = listingsList.map((item) =>
+      item.id === listingId ? { ...item, category: nextCategory } : item
+    );
+    setListingsList(updated);
+    try {
+      localStorage.setItem('sellsolar_custom_listings', JSON.stringify(updated));
+    } catch {}
+
+    if (isValidUuid(listingId) && isSupabaseConfigured()) {
+      const { error } = await supabase
+        .from('solar_listings')
+        .update({ category: nextCategory })
+        .eq('id', listingId);
+      if (error) {
+        console.warn('Supabase change category error:', error);
+        setListingsList(previous);
+        showToast({
+          title: 'Category not changed',
+          message: error.message || 'Could not update the category. Please try again.',
+          type: 'error',
+        });
+        return;
+      }
+    }
+
+    showToast({
+      title: 'Category Updated',
+      message: `Ad moved to "${CATEGORIES[nextCategory] || nextCategory}".`,
       type: 'success',
     });
   };
@@ -5060,7 +5095,7 @@ export default function AdminSuperDashboard({
                             </div>
                           </td>
                           <td className="p-3.5 text-gray-500">
-                            {item.brand} • <span className="capitalize">{item.category}</span>
+                            {item.brand} • <span>{CATEGORIES[item.category] || item.category}</span>
                           </td>
                           <td className="p-3.5 text-gray-500">{item.city}</td>
                           <td className="p-3.5 font-bold text-amber-600 dark:text-amber-400">
@@ -6416,7 +6451,23 @@ export default function AdminSuperDashboard({
                               ) : null}
                               <div>
                                 <p className="font-bold text-gray-900 dark:text-white truncate max-w-xs">{item.title}</p>
-                                <p className="text-[11px] text-gray-400 capitalize">{item.category} • {item.condition}</p>
+                                <div className="mt-0.5 flex items-center gap-1.5 flex-wrap">
+                                  <select
+                                    value={CATEGORIES[item.category] ? item.category : (item.category || 'panel')}
+                                    onChange={(e) => handleChangeCategory(item.id, e.target.value)}
+                                    title="Change category"
+                                    aria-label="Change category"
+                                    className="max-w-[170px] rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-1.5 py-0.5 text-[11px] font-semibold text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-amber-400"
+                                  >
+                                    {!CATEGORIES[item.category] && item.category ? (
+                                      <option value={item.category}>{item.category}</option>
+                                    ) : null}
+                                    {Object.entries(CATEGORIES).map(([value, label]) => (
+                                      <option key={value} value={value}>{label}</option>
+                                    ))}
+                                  </select>
+                                  <span className="text-[11px] text-gray-400 capitalize">• {item.condition}</span>
+                                </div>
                               </div>
                             </div>
                           </td>

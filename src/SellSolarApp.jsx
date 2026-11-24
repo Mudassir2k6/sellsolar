@@ -7431,8 +7431,41 @@ function _x({
             if (raw) {
               const parsed = JSON.parse(raw);
               if (Array.isArray(parsed) && parsed.length > 0) {
+                // A cached local copy can be stale: the ad may have been removed by its seller or an admin
+                // on another device. Ask the cloud which cached ads are gone so they never come back from
+                // this browser's cache (they are marked deleted, not erased, so owner "Deleted Ads" still works).
+                const goneIds = new Set();
+                const liveIds = new Set(combined.map((c) => String(c.id)));
+                const toCheck = parsed
+                  .map((it) => it && it.id)
+                  .filter((id) => id && isValidUuid(id) && !liveIds.has(String(id)))
+                  .slice(0, 200);
+                if (toCheck.length > 0) {
+                  try {
+                    const { data: states } = await supabase
+                      .from('solar_listings')
+                      .select('id,is_deleted,status')
+                      .in('id', toCheck);
+                    (states || []).forEach((r) => {
+                      if (r.is_deleted === true || r.status === 'deleted') goneIds.add(String(r.id));
+                    });
+                  } catch {}
+                  if (goneIds.size > 0) {
+                    try {
+                      localStorage.setItem(
+                        'sellsolar_custom_listings',
+                        JSON.stringify(
+                          parsed.map((it) =>
+                            it && goneIds.has(String(it.id)) ? { ...it, is_deleted: true, status: 'deleted' } : it
+                          )
+                        )
+                      );
+                    } catch {}
+                  }
+                }
                 parsed.forEach((item) => {
                   if (item?.is_deleted || item?.status === 'deleted') return;
+                  if (item && goneIds.has(String(item.id))) return;
                   // Local ads must obey the active filters too (they used to leak into every filtered list).
                   if (!matchesListingFilters(item, e)) return;
                   if (!combined.some((c) => c.id === item.id)) {

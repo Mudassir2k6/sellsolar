@@ -13,6 +13,8 @@ export const DEFAULT_ADVERTISEMENT_SETTINGS = {
   /** Homepage: static spotlight cards under the scroll strip + packages teaser above the footer */
   spotlightEnabled: true,
   packagesTeaserEnabled: true,
+  /** Pre-filled days in the admin "Feature this listing" dialog (admin can still pick any days / no expiry) */
+  featuredDefaultDays: 14,
   /** Marketplace listing plans (pricing page + homepage teaser) - admin editable */
   listingPlans: [
     {
@@ -377,6 +379,7 @@ export function normalizeAdvertisementSettings(raw) {
     googleAdsInMarquee: raw.googleAdsInMarquee !== false,
     googleAdSenseClientId:
       typeof raw.googleAdSenseClientId === 'string' ? raw.googleAdSenseClientId : base.googleAdSenseClientId,
+    featuredDefaultDays: Math.max(1, Math.min(3650, parseInt(raw.featuredDefaultDays, 10) || base.featuredDefaultDays)),
     spotlightEnabled: raw.spotlightEnabled !== false,
     packagesTeaserEnabled: raw.packagesTeaserEnabled !== false,
     packages: Array.isArray(raw.packages) && raw.packages.length > 0 ? raw.packages : base.packages,

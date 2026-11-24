@@ -231,6 +231,22 @@ export default function AdminAdvertisementSettings({ value, onChange }) {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block sm:col-span-2">
+          Featured Ad default duration (days)
+          <input
+            type="number"
+            min={1}
+            max={3650}
+            value={ad.featuredDefaultDays ?? 14}
+            onChange={(e) =>
+              patch({ featuredDefaultDays: Math.max(1, Math.min(3650, parseInt(e.target.value, 10) || 1)) })
+            }
+            className="input-field text-xs mt-1 w-32"
+          />
+          <span className="block mt-1 text-[10px] font-normal text-gray-400">
+            Pre-filled when you click "Feature" on a listing. You can still choose any number of days, or no expiry, per listing.
+          </span>
+        </label>
         <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block">
           Packages page link
           <input

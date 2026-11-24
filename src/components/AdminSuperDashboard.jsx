@@ -291,6 +291,7 @@ export default function AdminSuperDashboard({
   const [activeTab, setActiveTab] = useState(initialTab);
   const [usersList, setUsersList] = useState([]);
   const [listingsList, setListingsList] = useState([]);
+  const [featureDialog, setFeatureDialog] = useState(null);
   const [inboxMessages, setInboxMessages] = useState([]);
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [replyText, setReplyText] = useState('');
@@ -759,6 +760,8 @@ export default function AdminSuperDashboard({
     }
     const enrichedListings = fetchedListings.map(l => ({
       ...l,
+      // DB column is "featured"; the dashboard UI reads is_featured.
+      is_featured: Boolean(l.featured || l.is_featured),
       views: getRealisticAdViews(l),
     }));
     setListingsList(enrichedListings);
@@ -1665,35 +1668,76 @@ export default function AdminSuperDashboard({
   };
 
 
-  // Toggle Featured Listing
-  const handleToggleFeatured = async (listingId) => {
-    let nextFeatured = false;
-    const updated = listingsList.map((item) => {
-      if (item.id === listingId) {
-        nextFeatured = !item.is_featured;
-        return { ...item, is_featured: nextFeatured, featured: nextFeatured };
+  // Featured listings: admin chooses how many days (or no expiry) every time.
+  const FEATURED_NO_EXPIRY_ISO = '2099-12-31T00:00:00.000Z';
+
+  const featuredStatusText = (item) => {
+    if (!(item?.is_featured || item?.featured)) return '';
+    if (!item.featured_until) return 'Featured';
+    const t = new Date(item.featured_until).getTime();
+    if (!Number.isFinite(t)) return 'Featured';
+    if (t >= Date.UTC(2099, 0, 1)) return 'Featured · no expiry';
+    const left = Math.ceil((t - Date.now()) / 86400000);
+    return left <= 0 ? 'Featured · expired' : `Featured · ${left}d left`;
+  };
+
+  // Opens the "Featured duration" dialog (turn on / change duration / remove).
+  const handleToggleFeatured = (listingId) => {
+    const item = listingsList.find((i) => i.id === listingId);
+    if (!item) return;
+    const isOn = Boolean(item.is_featured || item.featured);
+    let days = Math.max(1, parseInt(settings?.advertisementSettings?.featuredDefaultDays, 10) || 14);
+    let noExpiry = false;
+    if (isOn && item.featured_until) {
+      const t = new Date(item.featured_until).getTime();
+      if (Number.isFinite(t)) {
+        if (t >= Date.UTC(2099, 0, 1)) noExpiry = true;
+        else if (t > Date.now()) days = Math.ceil((t - Date.now()) / 86400000);
       }
-      return item;
-    });
+    }
+    setFeatureDialog({ id: listingId, title: item.title || 'this listing', isOn, days, noExpiry });
+  };
+
+  const applyFeatured = async ({ id, enable, days, noExpiry }) => {
+    const previous = listingsList;
+    const until = enable
+      ? (noExpiry ? FEATURED_NO_EXPIRY_ISO : new Date(Date.now() + days * 86400000).toISOString())
+      : null;
+    const updated = listingsList.map((item) =>
+      item.id === id ? { ...item, is_featured: enable, featured: enable, featured_until: until } : item
+    );
     setListingsList(updated);
     try {
       localStorage.setItem('sellsolar_custom_listings', JSON.stringify(updated));
     } catch {}
 
-    if (isValidUuid(listingId) && isSupabaseConfigured()) {
-      try {
-        await supabase
-          .from('solar_listings')
-          .update({ is_featured: nextFeatured, featured: nextFeatured })
-          .eq('id', listingId);
-      } catch (sbErr) {
-        console.warn('Supabase toggle featured error:', sbErr);
+    if (isValidUuid(id) && isSupabaseConfigured()) {
+      const { error } = await supabase
+        .from('solar_listings')
+        .update({ featured: enable, featured_until: until })
+        .eq('id', id);
+      if (error) {
+        console.warn('Supabase featured update error:', error);
+        setListingsList(previous);
+        try {
+          localStorage.setItem('sellsolar_custom_listings', JSON.stringify(previous));
+        } catch {}
+        showToast({
+          title: 'Featured not saved',
+          message: error.message || 'Could not save to the cloud. Sign in with your real admin account and try again.',
+          type: 'error',
+        });
+        return;
       }
     }
 
     showToast({
       title: 'Listing Updated',
-      message: `Featured status has been ${nextFeatured ? 'enabled' : 'disabled'}.`,
+      message: !enable
+        ? 'Featured status removed.'
+        : noExpiry
+          ? 'Featured with no expiry.'
+          : `Featured for ${days} day${days === 1 ? '' : 's'} (until ${new Date(until).toLocaleDateString()}).`,
       type: 'success',
     });
   };
@@ -5149,7 +5193,7 @@ export default function AdminSuperDashboard({
                                 }`}
                                 title="Toggle Featured"
                               >
-                                ⭐ {item.is_featured ? 'Featured' : 'Feature'}
+                                ⭐ {item.is_featured ? (featuredStatusText(item) || 'Featured') : 'Feature'}
                               </button>
                               <button
                                 type="button"
@@ -6505,7 +6549,7 @@ export default function AdminSuperDashboard({
                                 title="Click to toggle Featured"
                               >
                                 <Star className={`w-3 h-3 ${item.is_featured ? 'fill-current' : ''}`} />
-                                {item.is_featured ? 'Featured' : 'Add Feature'}
+                                {item.is_featured ? (featuredStatusText(item) || 'Featured') : 'Add Feature'}
                               </button>
 
                               {/* Toggle Hot Sell Button */}
@@ -8374,7 +8418,7 @@ export default function AdminSuperDashboard({
                                   title="Toggle Featured on Marketplace"
                                 >
                                   <Star className={`w-3 h-3 ${(ad.is_featured || ad.featured) ? 'fill-current' : ''}`} />
-                                  <span>{(ad.is_featured || ad.featured) ? 'Featured' : '+Feature'}</span>
+                                  <span>{(ad.is_featured || ad.featured) ? (featuredStatusText(ad) || 'Featured') : '+Feature'}</span>
                                 </button>
 
                                 <button
@@ -8596,6 +8640,99 @@ export default function AdminSuperDashboard({
             totalListings: listingsList.length,
           }}
         />
+      )}
+
+      {/* Featured duration dialog (admin sets the number of days) */}
+      {featureDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs" onClick={() => setFeatureDialog(null)}>
+          <div
+            className="w-full max-w-sm rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xl p-5 space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div>
+              <h3 className="text-sm font-black text-gray-900 dark:text-white">
+                {featureDialog.isOn ? 'Change Featured duration' : 'Feature this listing'}
+              </h3>
+              <p className="mt-0.5 text-[11px] text-gray-500 dark:text-gray-400 line-clamp-2">{featureDialog.title}</p>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-[11px] font-bold text-gray-700 dark:text-gray-300">
+                Featured for how many days?
+                <input
+                  type="number"
+                  min={1}
+                  max={3650}
+                  disabled={featureDialog.noExpiry}
+                  value={featureDialog.days}
+                  onChange={(e) =>
+                    setFeatureDialog({ ...featureDialog, days: Math.max(1, Math.min(3650, parseInt(e.target.value, 10) || 1)) })
+                  }
+                  className="input-field text-sm mt-1 disabled:opacity-50"
+                />
+              </label>
+              <div className="flex flex-wrap gap-1.5">
+                {[7, 14, 30, 60, 90].map((d) => (
+                  <button
+                    key={d}
+                    type="button"
+                    disabled={featureDialog.noExpiry}
+                    onClick={() => setFeatureDialog({ ...featureDialog, days: d })}
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-colors disabled:opacity-40 ${
+                      featureDialog.days === d && !featureDialog.noExpiry
+                        ? 'bg-amber-500 text-white border-amber-500'
+                        : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700'
+                    }`}
+                  >
+                    {d}d
+                  </button>
+                ))}
+              </div>
+              <label className="flex items-center gap-2 text-[11px] font-bold text-gray-700 dark:text-gray-300 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={featureDialog.noExpiry}
+                  onChange={(e) => setFeatureDialog({ ...featureDialog, noExpiry: e.target.checked })}
+                />
+                No expiry (stay featured until I remove it)
+              </label>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-end gap-2 pt-1">
+              {featureDialog.isOn && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const d = featureDialog;
+                    setFeatureDialog(null);
+                    applyFeatured({ id: d.id, enable: false });
+                  }}
+                  className="mr-auto px-3 py-1.5 rounded-lg text-[11px] font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                >
+                  Remove featured
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setFeatureDialog(null)}
+                className="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const d = featureDialog;
+                  setFeatureDialog(null);
+                  applyFeatured({ id: d.id, enable: true, days: d.days, noExpiry: d.noExpiry });
+                }}
+                className="px-3 py-1.5 rounded-lg text-[11px] font-black bg-amber-500 text-white hover:bg-amber-600"
+              >
+                {featureDialog.isOn ? 'Save' : 'Feature it'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Edit Solar Ad Modal for Dashboard */}

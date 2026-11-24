@@ -1,6 +1,19 @@
 import React from 'react';
 import socialInsights from '../../public/social-insights.json';
 
+const SEO_HIDDEN_STYLE = {
+  position: 'absolute',
+  width: '1px',
+  height: '1px',
+  margin: '-1px',
+  padding: 0,
+  border: 0,
+  overflow: 'hidden',
+  clip: 'rect(0, 0, 0, 0)',
+  clipPath: 'inset(50%)',
+  whiteSpace: 'nowrap',
+};
+
 export default function SeoCrawlerFallback({ slug = [], meta = {} }) {
   const pageKey = slug && slug.length > 0 ? slug[0] : 'home';
   const heading = meta?.title?.split('|')[0]?.trim() || "Buy & Sell Used Solar Plates, Inverters & Batteries in Pakistan";
@@ -14,7 +27,10 @@ export default function SeoCrawlerFallback({ slug = [], meta = {} }) {
   const liveUpdated = socialInsights?.lastUpdatedLabel || '';
 
   return (
-    <div id="seo-static-crawler-snapshot" className="sr-only" aria-hidden="false">
+    // Visually hidden with INLINE styles (not only the `sr-only` class) so this crawler text can never
+    // flash as raw unstyled content while the stylesheet is still downloading on a slow connection.
+    // It stays in the DOM and is still fully readable by search engines.
+    <div id="seo-static-crawler-snapshot" className="sr-only" aria-hidden="false" style={SEO_HIDDEN_STYLE}>
       <header>
         <h2 className="text-xl font-bold">{heading}</h2>
         <p>

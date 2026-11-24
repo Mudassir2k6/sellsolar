@@ -126,7 +126,7 @@ import { useToast } from './context/ToastContext';
 import { supabase, isSupabaseConfigured } from './lib/supabase';
 import { BRANDS, CATEGORIES, POSTABLE_CATEGORIES, CITIES, formatPrice } from './lib/constants';
 import { digitsOnlyPhone, isValidPhone, normalizePhone, isValidUuid } from './lib/auth';
-import { getLocalOrSeedListings, getLocalOrSeedListingById } from './data/seedListings';
+import { getLocalOrSeedListings, getLocalOrSeedListingById, matchesListingFilters } from './data/seedListings';
 import { getEquipmentFallbackImage, SELL_SOLAR_PROMO_IMAGE, TURNKEY_INSTALL_PROMO_IMAGE } from './utils/solarImages';
 import ThemeRadioToggle from './components/ThemeRadioToggle';
 import WarrantySelector, { formatWarrantyShort, formatWarrantyLong } from './components/WarrantySelector';
@@ -1696,7 +1696,7 @@ function Xy({
   value:"electric_equipment",label:"Electric Equipment",icon:Zap
 },{
   value:"others",label:"Others",icon:Package
-}],ex=["","Lahore","Karachi","Islamabad","Rawalpindi","Faisalabad","Multan","Gujranwala","Peshawar"],tx=["","Longi","Canadian Solar","Jinko","Trina","Inverex","Tesla","Homage","Phoenix","Osaka","AGS"],rx=[{
+}],ex=["","Lahore","Karachi","Islamabad","Rawalpindi","Faisalabad","Multan","Gujranwala","Peshawar","Sialkot","Quetta"],tx=["",...Array.from(new Set(["Longi","Canadian Solar","Jinko","Trina","Inverex","Tesla","Homage","Phoenix","Osaka","AGS","Crown",...BRANDS]))],rx=[{
   value:"",label:"Any Condition"
 },{
   value:"new",label:"New"
@@ -1846,7 +1846,11 @@ function nx({
                       className:"flex-1 flex gap-1 overflow-x-auto p-1.5 sm:p-2 scrollbar-none scroll-smooth",children:Zy.map(s=>{
                         const a=s.icon,l=t.category===s.value;
                         return jsxs("button",{
-                          onClick:()=>e("category",s.value),className:`flex shrink-0 items-center gap-1.5 sm:gap-2 rounded-lg px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                          onClick:()=>{
+                            e("category",s.value);
+                            // Show the results straight away (same behaviour as the category cards below).
+                            setTimeout(()=>{ const el=document.getElementById("listings"); el&&el.scrollIntoView({ behavior:"smooth", block:"start" }); },60);
+                          },className:`flex shrink-0 items-center gap-1.5 sm:gap-2 rounded-lg px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                             l?"bg-primary-500 text-white shadow-xs":"text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800 border border-transparent"
                           }`,children:[
                             jsx(a,{ className:"h-4 w-4" }),
@@ -1997,7 +2001,7 @@ function nx({
               }),
               jsx("div",{
                 ref:categoryScrollRef,
-                className:"flex items-center gap-1.5 sm:gap-2 overflow-x-auto py-1 px-3 sm:px-2 scrollbar-none scroll-smooth lg:grid lg:grid-cols-7 lg:gap-2 lg:overflow-visible lg:px-0",
+                className:"flex items-center gap-1.5 sm:gap-2 overflow-x-auto py-1 px-3 sm:px-2 scrollbar-none scroll-smooth lg:grid lg:grid-cols-6 lg:gap-2 lg:overflow-visible lg:px-0",
                 children:[
                   {
                     label: "Solar Panels",
@@ -2064,28 +2068,6 @@ function nx({
                       el && el.scrollIntoView({ behavior: "smooth", block: "start" });
                     },
                     active: t.category === "others"
-                  },
-                  {
-                    label: "Daily Rates",
-                    sub: (MARKET_SUMMARY?.panelsPerWattAvg ? `${MARKET_SUMMARY.panelsPerWattAvg} Live` : "Rs 33.50 – 43.50/W Live"),
-                    icon: TrendingUp,
-                    action: np || (() => {
-                      const el = document.getElementById("daily-market-rates");
-                      el && el.scrollIntoView({ behavior: "smooth", block: "start" });
-                    }),
-                    highlight: true
-                  },
-                  {
-                    label: "Solar Calculator",
-                    sub: "Find System kW",
-                    icon: Calculator,
-                    action: nc
-                  },
-                  {
-                    label: "Verified Dealers",
-                    sub: "80+ Certified",
-                    icon: Store,
-                    action: nd
                   }
                 ].map(cat => jsxs("button", {
                   type: "button",
@@ -2214,9 +2196,13 @@ const sx=[{
 function ix({
   onSelectCategory:t,
   onSelectCity:onCity,
-  onSelectBrand:onBrand
+  onSelectBrand:onBrand,
+  filters:activeFilters = {}
 }){
   const [activeBrowseTab, setActiveBrowseTab] = useState("category");
+  const chipBase = "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[11px] font-bold shrink-0 transition-all shadow-2xs cursor-pointer";
+  const chipIdle = "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:border-primary-400 hover:text-primary-600 dark:hover:text-primary-400";
+  const chipOn = "border-primary-600 bg-primary-500 text-white shadow-xs";
 
   const browseCities = [
     "Lahore","Karachi","Islamabad","Rawalpindi","Faisalabad","Multan","Peshawar","Gujranwala","Sialkot","Quetta"
@@ -2255,10 +2241,13 @@ function ix({
           children: activeBrowseTab==="category"
             ? sx.map(cat => {
                 const Icon = cat.icon;
+                const on = activeFilters.category === cat.value;
                 return jsxs("button",{
                   type:"button",
-                  onClick:()=>t(cat.value),
-                  className:"inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-primary-400 hover:text-primary-600 dark:hover:text-primary-400 text-[11px] font-bold text-gray-700 dark:text-gray-200 shrink-0 transition-all shadow-2xs",
+                  "aria-pressed":on,
+                  title:on?"Click again to remove this filter":undefined,
+                  onClick:()=>t(on?"":cat.value),
+                  className:`${chipBase} ${on?chipOn:chipIdle}`,
                   children:[
                     jsx("div",{ className:`flex h-5 w-5 items-center justify-center rounded-md bg-gradient-to-br ${cat.gradient} text-white shrink-0`, children:jsx(Icon,{className:"h-3 w-3",strokeWidth:2}) }),
                     CATEGORIES[cat.value]
@@ -2266,22 +2255,28 @@ function ix({
                 },cat.value);
               })
             : activeBrowseTab==="city"
-            ? browseCities.map(city =>
-                jsxs("button",{
+            ? browseCities.map(city => {
+                const on = activeFilters.city === city;
+                return jsxs("button",{
                   type:"button",
-                  onClick:()=>onCity&&onCity(city),
-                  className:"inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-primary-400 hover:text-primary-600 text-[11px] font-bold text-gray-700 dark:text-gray-200 shrink-0 transition-all shadow-2xs",
-                  children:[jsx(MapPin,{className:"h-3 w-3 text-primary-500 shrink-0"}),city]
-                },city)
-              )
-            : browseBrands.map(brand =>
-                jsxs("button",{
+                  "aria-pressed":on,
+                  title:on?"Click again to remove this filter":undefined,
+                  onClick:()=>onCity&&onCity(on?"":city),
+                  className:`${chipBase} ${on?chipOn:chipIdle}`,
+                  children:[jsx(MapPin,{className:`h-3 w-3 shrink-0 ${on?"text-white":"text-primary-500"}`}),city]
+                },city);
+              })
+            : browseBrands.map(brand => {
+                const on = activeFilters.brand === brand;
+                return jsxs("button",{
                   type:"button",
-                  onClick:()=>onBrand&&onBrand(brand),
-                  className:"inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-amber-400 hover:text-amber-700 text-[11px] font-bold text-gray-700 dark:text-gray-200 shrink-0 transition-all shadow-2xs",
-                  children:[jsx(Award,{className:"h-3 w-3 text-amber-500 shrink-0"}),brand]
-                },brand)
-              )
+                  "aria-pressed":on,
+                  title:on?"Click again to remove this filter":undefined,
+                  onClick:()=>onBrand&&onBrand(on?"":brand),
+                  className:`${chipBase} ${on?"border-amber-600 bg-amber-500 text-white shadow-xs":"border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:border-amber-400 hover:text-amber-700"}`,
+                  children:[jsx(Award,{className:`h-3 w-3 shrink-0 ${on?"text-white":"text-amber-500"}`}),brand]
+                },brand);
+              })
         })
       ]
     })
@@ -2522,7 +2517,7 @@ function ax({
 }
 
 function lx({
-  listings:allListings,loading:e,error:r,totalCount:totalN,onSelectListing:s,onResetFilters:rf,onNavigate:nav,currentCondition,onConditionChange,currentCategory,onCategoryChange,isCarousel
+  listings:allListings,loading:e,error:r,totalCount:totalN,onSelectListing:s,onResetFilters:rf,onNavigate:nav,currentCondition,onConditionChange,currentCategory,onCategoryChange,isCarousel,filters:activeFilters,onRemoveFilter
 }){
   const [visibleCount, setVisibleCount] = useState(8);
   const [dateRange, setDateRange] = useState("all");
@@ -2677,6 +2672,41 @@ function lx({
             }, cat.id || "all");
           })
         }),
+        (()=>{
+          // Shows every filter that is currently narrowing the list (from any control on the page),
+          // so it is always clear why a list is short or empty - and each one can be removed with a click.
+          const f = activeFilters || {};
+          const chips = [];
+          if (f.category) chips.push({ key:"category", label:`Category: ${CATEGORIES[f.category] || f.category}` });
+          if (f.city) chips.push({ key:"city", label:`City: ${f.city}` });
+          if (f.brand) chips.push({ key:"brand", label:`Brand: ${f.brand}` });
+          if (f.condition) chips.push({ key:"condition", label:`Condition: ${f.condition === "new" ? "Brand New" : "Used"}` });
+          if (f.query) chips.push({ key:"query", label:`Search: "${f.query}"` });
+          if (f.minPrice) chips.push({ key:"minPrice", label:`Min: ${formatPrice(f.minPrice)}` });
+          if (f.maxPrice) chips.push({ key:"maxPrice", label:`Max: ${formatPrice(f.maxPrice)}` });
+          if (dateRange !== "all") chips.push({ key:"__date", label:`Posted: ${(LISTING_DATE_RANGES.find(o=>o.id===dateRange)||{}).label || dateRange}` });
+          if (chips.length === 0) return null;
+          return jsxs("div",{
+            id:"active-filters-bar",
+            className:"flex flex-wrap items-center gap-1.5 mb-3.5 text-[11px]",
+            children:[
+              jsx("span",{ className:"font-bold text-gray-500 dark:text-gray-400 mr-0.5", children:"Active filters:" }),
+              ...chips.map(c=>jsxs("button",{
+                type:"button",
+                title:"Remove this filter",
+                onClick:()=>{ if (c.key==="__date") setDateRange("all"); else onRemoveFilter && onRemoveFilter(c.key); },
+                className:"inline-flex items-center gap-1 rounded-full border border-primary-300 dark:border-primary-700 bg-primary-50 dark:bg-primary-950/50 px-2.5 py-1 font-bold text-primary-800 dark:text-primary-200 hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-colors cursor-pointer",
+                children:[c.label, jsx(X,{ className:"h-3 w-3" })]
+              },c.key)),
+              jsx("button",{
+                type:"button",
+                onClick:()=>{ setDateRange("all"); setDateOrder("desc"); rf && rf(); },
+                className:"font-bold text-gray-500 hover:text-red-500 dark:text-gray-400 underline-offset-2 hover:underline cursor-pointer ml-1",
+                children:"Clear all"
+              })
+            ]
+          });
+        })(),
         e?jsx("div",{
           id:"listings-skeleton-grid",
           className:"grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4",children:[1,2,3,4,5,6,7,8].map(sk=>jsxs("div",{
@@ -7375,6 +7405,8 @@ function _x({
               if (Array.isArray(parsed) && parsed.length > 0) {
                 parsed.forEach((item) => {
                   if (item?.is_deleted || item?.status === 'deleted') return;
+                  // Local ads must obey the active filters too (they used to leak into every filtered list).
+                  if (!matchesListingFilters(item, e)) return;
                   if (!combined.some((c) => c.id === item.id)) {
                     combined.unshift(item);
                   }
@@ -7415,6 +7447,7 @@ function _x({
       onSelectCategory:C,
       compact:true
     }),jsx(ix,{
+      filters:e,
       onSelectCategory:C,
       onSelectCity:(cityName)=>{
         y("city", cityName);
@@ -7433,6 +7466,11 @@ function _x({
       currentCategory:e.category,
       onCategoryChange:(newCat)=>{
         y("category", newCat);
+        p(cnt => cnt + 1);
+      },
+      filters:e,
+      onRemoveFilter:(keys)=>{
+        (Array.isArray(keys)?keys:[keys]).forEach(k=>y(k,""));
         p(cnt => cnt + 1);
       }
     })]

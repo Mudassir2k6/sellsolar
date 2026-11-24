@@ -282,14 +282,26 @@ export function getLocalOrSeedListings(filters = {}) {
     if (deletedAdsMap[String(item.id)]) return false;
     // Hide disabled ads from marketplace display
     if (item.is_ad_disabled || item.status === 'disabled') return false;
-    if (filters.category && item.category !== filters.category) return false;
-    if (filters.brand && item.brand !== filters.brand) return false;
-    if (filters.condition && item.condition !== filters.condition) return false;
-    if (filters.city && item.city !== filters.city) return false;
-    if (filters.minPrice && Number(item.price) < Number(filters.minPrice)) return false;
-    if (filters.maxPrice && Number(item.price) > Number(filters.maxPrice)) return false;
-    if (filters.query) {
-      const q = filters.query.toLowerCase().trim();
+    return matchesListingFilters(item, filters);
+  });
+}
+
+/**
+ * Single source of truth for the marketplace filters (category, brand, condition,
+ * city, price range, search text). Used for seed/local listings and for any local
+ * listing merged into a Supabase result, so every filter behaves the same everywhere.
+ */
+export function matchesListingFilters(item, filters = {}) {
+  if (!item) return false;
+  if (filters.category && item.category !== filters.category) return false;
+  if (filters.brand && item.brand !== filters.brand) return false;
+  if (filters.condition && item.condition !== filters.condition) return false;
+  if (filters.city && item.city !== filters.city) return false;
+  if (filters.minPrice && Number(item.price) < Number(filters.minPrice)) return false;
+  if (filters.maxPrice && Number(item.price) > Number(filters.maxPrice)) return false;
+  if (filters.query) {
+    const q = String(filters.query).toLowerCase().trim();
+    if (q) {
       const match =
         (item.title && item.title.toLowerCase().includes(q)) ||
         (item.brand && item.brand.toLowerCase().includes(q)) ||
@@ -297,8 +309,8 @@ export function getLocalOrSeedListings(filters = {}) {
         (item.city && item.city.toLowerCase().includes(q));
       if (!match) return false;
     }
-    return true;
-  });
+  }
+  return true;
 }
 
 export function getLocalOrSeedListingById(id) {

@@ -34,7 +34,12 @@ export default function SellSolarBootShell() {
         <SkeletonBlock className="h-14 w-full rounded-2xl" />
       </div>
 
-      <p className="sr-only" role="status" aria-live="polite">
+      <p
+        className="sr-only"
+        role="status"
+        aria-live="polite"
+        style={{ position: 'absolute', width: '1px', height: '1px', margin: '-1px', padding: 0, overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }}
+      >
         Loading SellSolar marketplace…
       </p>
     </div>

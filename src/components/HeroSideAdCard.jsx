@@ -99,21 +99,27 @@ export default function HeroSideAdCard({ onVerifyPlates }) {
     () => [...ads.map((ad) => ({ key: `ad-${ad.id}`, ad })), { key: 'advertise-here', ad: null }],
     [ads]
   );
-  const loops = items.length > 1; // two or more entries -> scroll; a lone CTA stays still
+  // Always scroll (like the rates card). The loop needs content taller than the box, so a short
+  // list is repeated until one "half" holds at least MIN_PER_LOOP slots.
+  const loops = true;
+  const MIN_PER_LOOP = 4;
+  const repeats = Math.max(1, Math.ceil(MIN_PER_LOOP / items.length));
 
   const scrollRef = useRef(null);
   const { pause, resume } = useAutoScrollLoop(scrollRef, {
     enabled: loops,
-    resetKey: items.length,
+    resetKey: `${items.length}-${repeats}`,
     pxPerSecond: 20,
   });
 
   const renderItems = (prefix) =>
-    items.map((item) => (
-      <div key={`${prefix}-${item.key}`} className="pb-2">
-        {item.ad ? <BannerItem ad={item.ad} /> : <AdvertiseItem onAdvertise={onAdvertise} />}
-      </div>
-    ));
+    Array.from({ length: repeats }).flatMap((_, rep) =>
+      items.map((item) => (
+        <div key={`${prefix}-${rep}-${item.key}`} className="pb-2" aria-hidden={rep > 0 || prefix !== 'a' ? 'true' : undefined}>
+          {item.ad ? <BannerItem ad={item.ad} /> : <AdvertiseItem onAdvertise={onAdvertise} />}
+        </div>
+      ))
+    );
 
   return (
     <aside

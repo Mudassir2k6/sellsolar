@@ -217,7 +217,6 @@ export default function AdminAdvertisementSettings({ value, onChange }) {
           ['scrollEnabled', 'Scroll strip'],
           ['staticEnabled', 'Static cards'],
           ['spotlightEnabled', 'Homepage spotlight slot'],
-          ['packagesTeaserEnabled', 'Homepage packages teaser'],
         ].map(([key, label]) => (
           <label key={key} className="flex items-center gap-2 cursor-pointer">
             <input

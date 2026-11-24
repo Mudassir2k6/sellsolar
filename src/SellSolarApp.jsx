@@ -20,7 +20,7 @@ const LoadCalculatorPage = lazy(() => import('./views/LoadCalculatorPage'));
 import SolarLoadCalculator from './components/SolarLoadCalculator';
 import FloatingPostAdButton from './components/FloatingPostAdButton';
 import HomeAdvertisementBoard from './components/HomeAdvertisementBoard';
-import { HomeStaticSpotlight, HomePackagesTeaser } from './components/HomeSpotlightAndPackages';
+import { HomeStaticSpotlight } from './components/HomeSpotlightAndPackages';
 import HeroSideRatesCard from './components/HeroSideRatesCard';
 import HeroSideAdCard from './components/HeroSideAdCard';
 const CompanyMarketplacePage = lazy(() => import('./views/CompanyMarketplacePage'));
@@ -7501,7 +7501,7 @@ function _x({
         (Array.isArray(keys)?keys:[keys]).forEach(k=>y(k,""));
         p(cnt => cnt + 1);
       }
-    }),jsx(HomePackagesTeaser,{ onNavigate:nav })]
+    })]
   })
 }
 

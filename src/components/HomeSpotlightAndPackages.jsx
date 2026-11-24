@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Megaphone, Plus, ArrowRight, Check, Star } from 'lucide-react';
+import { Megaphone, Plus, ArrowRight, Star } from 'lucide-react';
 import { useSiteSettings } from '../context/SiteSettingsContext';
 import { normalizeAdvertisementSettings, collectSpotlightAds } from '../lib/advertisementDefaults';
 import { AdLink } from './HomeAdvertisementBoard';
@@ -120,127 +120,6 @@ export function HomeStaticSpotlight({ onNavigate }) {
             )
           )}
         </div>
-      </div>
-    </section>
-  );
-}
-
-/**
- * Compact advertising + listing plans teaser shown after the listings (above the footer).
- * Prices come from the same admin-editable settings as the /pricing page.
- */
-export function HomePackagesTeaser({ onNavigate }) {
-  const { settings } = useSiteSettings();
-  const adCfg = normalizeAdvertisementSettings(settings?.advertisementSettings);
-  if (adCfg.enabled === false || adCfg.packagesTeaserEnabled === false) return null;
-
-  const packages = (adCfg.packages || []).filter((p) => p.isActive !== false);
-  const plans = (adCfg.listingPlans || []).filter((p) => p.isActive !== false);
-  if (packages.length === 0 && plans.length === 0) return null;
-  const packagesLink = adCfg.packagesPageLink || '/pricing';
-
-  return (
-    <section
-      id="sellsolar-home-packages"
-      aria-label="Advertising packages and listing plans"
-      className="bg-gray-50 dark:bg-gray-900/40 border-b border-gray-200/60 dark:border-gray-800"
-    >
-      <div className="container-page py-6 sm:py-8 space-y-6">
-        <div className="flex flex-wrap items-end justify-between gap-2">
-          <div>
-            <h2 className="text-lg sm:text-xl font-bold tracking-tight text-gray-900 dark:text-white">
-              Advertise &amp; sell faster on SellSolar
-            </h2>
-            <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-              Homepage banner packages and listing plans — start free.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => goTo(onNavigate, packagesLink)}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-primary-600 px-3.5 py-2 text-xs font-bold text-white shadow-xs hover:bg-primary-700 transition-colors"
-          >
-            View all plans <ArrowRight className="h-3.5 w-3.5" />
-          </button>
-        </div>
-
-        {packages.length > 0 && (
-          <div>
-            <p className="mb-2 text-[11px] font-extrabold uppercase tracking-wider text-gray-400">Homepage advertisement</p>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-              {packages.map((pkg) => (
-                <button
-                  key={pkg.id}
-                  type="button"
-                  onClick={() => goTo(onNavigate, packagesLink)}
-                  className={`relative text-left rounded-2xl border bg-white dark:bg-gray-900 p-3.5 shadow-xs hover:shadow-sm transition-all cursor-pointer ${
-                    pkg.highlighted
-                      ? 'border-2 border-violet-500'
-                      : 'border-gray-200 dark:border-gray-800 hover:border-primary-300 dark:hover:border-primary-700'
-                  }`}
-                >
-                  {pkg.highlighted && (
-                    <span className="absolute -top-2.5 left-3 rounded-full bg-violet-600 px-2 py-0.5 text-[9px] font-extrabold uppercase text-white">
-                      Best value
-                    </span>
-                  )}
-                  <p className="text-sm font-bold text-gray-900 dark:text-white">{pkg.name}</p>
-                  <p className="mt-1 text-lg font-black text-gray-900 dark:text-white">
-                    {pkg.priceLabel || `Rs. ${pkg.price}`}{' '}
-                    <span className="text-[10px] font-medium text-gray-400">/ {pkg.period}</span>
-                  </p>
-                  <ul className="mt-2 space-y-1 text-[11px] text-gray-600 dark:text-gray-300">
-                    {(pkg.features || []).slice(0, 2).map((f) => (
-                      <li key={f} className="flex items-start gap-1.5">
-                        <Check className="h-3 w-3 text-emerald-500 shrink-0 mt-0.5" />
-                        <span className="line-clamp-1">{f}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {plans.length > 0 && (
-          <div>
-            <p className="mb-2 text-[11px] font-extrabold uppercase tracking-wider text-gray-400">Marketplace listing plans</p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {plans.map((plan) => (
-                <button
-                  key={plan.id}
-                  type="button"
-                  onClick={() => goTo(onNavigate, plan.ctaLink || 'pricing')}
-                  className={`text-left rounded-2xl border bg-white dark:bg-gray-900 p-3.5 shadow-xs hover:shadow-sm transition-all cursor-pointer ${
-                    plan.highlighted
-                      ? 'border-2 border-primary-500'
-                      : 'border-gray-200 dark:border-gray-800 hover:border-primary-300 dark:hover:border-primary-700'
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-bold text-gray-900 dark:text-white">{plan.name}</p>
-                    {plan.badge ? (
-                      <span className="rounded-full bg-primary-600 px-2 py-0.5 text-[9px] font-extrabold uppercase text-white">
-                        {plan.badge}
-                      </span>
-                    ) : null}
-                  </div>
-                  <p className="mt-1 text-lg font-black text-gray-900 dark:text-white">
-                    {plan.priceLabel}{' '}
-                    <span className="text-[10px] font-medium text-gray-400">/ {plan.period}</span>
-                  </p>
-                  <p className="mt-1 line-clamp-1 text-[11px] text-gray-600 dark:text-gray-300">
-                    <FeatureText text={(plan.features || [])[0] || plan.description} />
-                  </p>
-                  <span className="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-primary-600 dark:text-primary-400">
-                    {plan.ctaText || 'Learn more'} <ArrowRight className="h-3 w-3" />
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </section>
   );

@@ -91,6 +91,38 @@ export default function AdminAdvertisementSettings({ value, onChange }) {
     patch({ packages: (ad.packages || []).filter((_, i) => i !== index) });
   };
 
+  const updatePlan = (index, field, val) => {
+    const listingPlans = [...(ad.listingPlans || [])];
+    listingPlans[index] = { ...listingPlans[index], [field]: val };
+    patch({ listingPlans });
+  };
+
+  const addPlan = () => {
+    patch({
+      listingPlans: [
+        ...(ad.listingPlans || []),
+        {
+          id: `plan-${Date.now()}`,
+          eyebrow: 'New plan',
+          name: 'New Plan',
+          priceLabel: 'Rs. 0',
+          period: 'month',
+          description: '',
+          features: ['Feature line 1'],
+          ctaText: 'Get started',
+          ctaLink: 'post-ad',
+          badge: '',
+          highlighted: false,
+          isActive: true,
+        },
+      ],
+    });
+  };
+
+  const removePlan = (index) => {
+    patch({ listingPlans: (ad.listingPlans || []).filter((_, i) => i !== index) });
+  };
+
   const updateAdList = (listKey, index, field, val) => {
     const list = [...(ad[listKey] || [])];
     list[index] = { ...list[index], [field]: val };
@@ -184,6 +216,8 @@ export default function AdminAdvertisementSettings({ value, onChange }) {
           ['enabled', 'Master ON'],
           ['scrollEnabled', 'Scroll strip'],
           ['staticEnabled', 'Static cards'],
+          ['spotlightEnabled', 'Homepage spotlight slot'],
+          ['packagesTeaserEnabled', 'Homepage packages teaser'],
         ].map(([key, label]) => (
           <label key={key} className="flex items-center gap-2 cursor-pointer">
             <input
@@ -275,6 +309,86 @@ export default function AdminAdvertisementSettings({ value, onChange }) {
                 value={(pkg.features || []).join('\n')}
                 onChange={(e) =>
                   updatePackage(
+                    idx,
+                    'features',
+                    e.target.value
+                      .split('\n')
+                      .map((s) => s.trim())
+                      .filter(Boolean)
+                  )
+                }
+                className="input-field text-xs mt-0.5 font-normal"
+              />
+            </label>
+          </div>
+        ))}
+      </div>
+
+      <div className="space-y-3 pt-2 border-t border-violet-200/60 dark:border-violet-900/40">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs font-black text-gray-900 dark:text-white">Marketplace listing plans (pricing page + homepage)</p>
+            <p className="text-[10px] text-gray-400">
+              Wrap text in **double stars** to make it bold in a feature line. Link: post-ad, dealers, contact, pricing...
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={addPlan}
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-violet-600 text-white hover:bg-violet-700"
+          >
+            <Plus className="h-3 w-3" /> Add plan
+          </button>
+        </div>
+        {(ad.listingPlans || []).map((plan, idx) => (
+          <div
+            key={plan.id || idx}
+            className="p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 space-y-2"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="text-[10px] font-mono text-gray-400">{plan.id}</span>
+              <div className="flex items-center gap-2">
+                <label className="flex items-center gap-1 text-[10px] font-bold">
+                  <input
+                    type="checkbox"
+                    checked={plan.isActive !== false}
+                    onChange={(e) => updatePlan(idx, 'isActive', e.target.checked)}
+                  />
+                  Active
+                </label>
+                <label className="flex items-center gap-1 text-[10px] font-bold">
+                  <input
+                    type="checkbox"
+                    checked={!!plan.highlighted}
+                    onChange={(e) => updatePlan(idx, 'highlighted', e.target.checked)}
+                  />
+                  Highlight
+                </label>
+                <button type="button" onClick={() => removePlan(idx)} className="text-rose-500 p-1">
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+            <FieldGrid
+              fields={[
+                ['eyebrow', 'Small label (above name)', plan.eyebrow],
+                ['name', 'Name', plan.name],
+                ['priceLabel', 'Price label', plan.priceLabel],
+                ['period', 'Period (after the slash)', plan.period],
+                ['description', 'Description', plan.description],
+                ['badge', 'Badge (e.g. Most Popular)', plan.badge],
+                ['ctaText', 'Button text', plan.ctaText],
+                ['ctaLink', 'Button link (page)', plan.ctaLink],
+              ]}
+              onField={(field, val) => updatePlan(idx, field, val)}
+            />
+            <label className="text-[10px] font-bold text-gray-500 block">
+              Features (one per line)
+              <textarea
+                rows={4}
+                value={(plan.features || []).join('\n')}
+                onChange={(e) =>
+                  updatePlan(
                     idx,
                     'features',
                     e.target.value
@@ -408,7 +522,7 @@ export default function AdminAdvertisementSettings({ value, onChange }) {
       {renderAdEditor(
         'staticAds',
         'Static spotlight ads',
-        'Large cards under the scroll strip (legacy CMS).'
+        'Shown as the "Featured spotlight" cards right under the homepage scroll strip (first 2 active, real ads only; empty slots show "Advertise here").'
       )}
 
       <div className="pt-4 border-t border-violet-200/60 dark:border-violet-900/40 space-y-2">

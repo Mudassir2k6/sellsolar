@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { SELL_SOLAR_PROMO_IMAGE, TURNKEY_INSTALL_PROMO_IMAGE } from '../utils/solarImages';
 import { DEFAULT_ADVERTISEMENT_SETTINGS, normalizeAdvertisementSettings } from '../lib/advertisementDefaults';
 import {
@@ -138,8 +138,53 @@ export const DEFAULT_SITE_SETTINGS = {
 
 export const SiteSettingsContext = createContext(null);
 
+/**
+ * Publishes site settings to Supabase so ALL visitors see them.
+ * Writing is protected by RLS (is_admin()), so the admin must be signed in with a real
+ * Supabase account. Never fakes success: resolves with { ok, reason, message }.
+ */
+async function publishSiteSettings(updated) {
+  let result;
+  try {
+    if (!isSupabaseConfigured()) {
+      result = { ok: false, reason: 'not-configured', message: 'Cloud database is not configured.' };
+    } else {
+      const sess = await supabase.auth.getSession().catch(() => null);
+      if (!sess?.data?.session?.user) {
+        result = {
+          ok: false,
+          reason: 'not-signed-in',
+          message:
+            'Saved on this device only. Log out and sign in with your real admin account (mudassir2k6@gmail.com) to publish changes to all users.',
+        };
+      } else {
+        const { error } = await supabase.from('site_settings').upsert({
+          key: SITE_SETTINGS_KEY,
+          value: JSON.stringify(updated),
+          updated_at: new Date().toISOString(),
+        });
+        result = error
+          ? { ok: false, reason: 'rejected', message: `Cloud rejected the save: ${error.message}` }
+          : { ok: true, reason: 'published', message: 'Published live for all users.' };
+      }
+    }
+  } catch (err) {
+    result = { ok: false, reason: 'error', message: err?.message || 'Could not reach the cloud database.' };
+  }
+  if (typeof window !== 'undefined') {
+    try {
+      window.dispatchEvent(new CustomEvent('sellsolar_settings_sync', { detail: result }));
+    } catch {}
+  }
+  return result;
+}
+
 export function SiteSettingsProvider({ children }) {
   const [settings, setSettings] = useState(DEFAULT_SITE_SETTINGS);
+  const settingsRef = useRef(DEFAULT_SITE_SETTINGS);
+  useEffect(() => {
+    settingsRef.current = settings;
+  }, [settings]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -252,7 +297,10 @@ export function SiteSettingsProvider({ children }) {
                     pagesCmsMap: {
                       ...prev.pagesCmsMap,
                       ...(remoteParsed.pagesCmsMap || {}),
-                    }
+                    },
+                    advertisementSettings: normalizeAdvertisementSettings(
+                      remoteParsed.advertisementSettings || prev.advertisementSettings
+                    ),
                   }));
                   localStorage.setItem(SITE_SETTINGS_KEY, data.value);
                 }
@@ -265,7 +313,7 @@ export function SiteSettingsProvider({ children }) {
   }, []);
 
   const updateSiteSettings = useCallback((newPartialSettings) => {
-    setSettings((prev) => {
+    const prev = settingsRef.current;
       const nextPartial = { ...newPartialSettings };
       if (Object.prototype.hasOwnProperty.call(nextPartial, 'whatsAppNumber')) {
         nextPartial.whatsAppNumber = resolveWhatsAppNumber(nextPartial.whatsAppNumber);
@@ -319,37 +367,22 @@ export function SiteSettingsProvider({ children }) {
           : prev.advertisementSettings,
       };
 
-      if (typeof window !== 'undefined') {
-        try {
-          localStorage.setItem(SITE_SETTINGS_KEY, JSON.stringify(updated));
-          // Keep legacy key in sync for older listeners
-          localStorage.setItem('sellsolar_settings', JSON.stringify(updated));
-          window.dispatchEvent(new CustomEvent('sellsolar_settings_updated', { detail: updated }));
-        } catch (err) {
-          console.error('Error saving site settings:', err);
-        }
+    settingsRef.current = updated;
+    setSettings(updated);
 
-        // Persist to Supabase site_settings so changes are immediately live for all visitors
-        if (isSupabaseConfigured()) {
-          (async () => {
-            const sess = await supabase.auth.getSession().catch(() => null);
-            if (!sess?.data?.session?.user) {
-              await supabase.auth.signInWithPassword({
-                email: 'mudassir2k6@gmail.com',
-                password: '12345678',
-              }).catch(() => {});
-            }
-            await supabase.from('site_settings').upsert({
-              key: SITE_SETTINGS_KEY,
-              value: JSON.stringify(updated),
-              updated_at: new Date().toISOString(),
-            });
-          })().catch(() => {});
-        }
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(SITE_SETTINGS_KEY, JSON.stringify(updated));
+        // Keep legacy key in sync for older listeners
+        localStorage.setItem('sellsolar_settings', JSON.stringify(updated));
+        window.dispatchEvent(new CustomEvent('sellsolar_settings_updated', { detail: updated }));
+      } catch (err) {
+        console.error('Error saving site settings:', err);
       }
+    }
 
-      return updated;
-    });
+    // Publish to Supabase so every visitor sees it. Resolves with { ok, reason, message }.
+    return publishSiteSettings(updated);
   }, []);
 
   const updateHomePageCms = useCallback((partialHomeCms) => {
@@ -359,6 +392,7 @@ export function SiteSettingsProvider({ children }) {
   }, [updateSiteSettings]);
 
   const resetToDefaultSettings = useCallback(() => {
+    settingsRef.current = DEFAULT_SITE_SETTINGS;
     setSettings(DEFAULT_SITE_SETTINGS);
     if (typeof window !== 'undefined') {
       try {
@@ -371,12 +405,8 @@ export function SiteSettingsProvider({ children }) {
       if (isSupabaseConfigured()) {
         (async () => {
           const sess = await supabase.auth.getSession().catch(() => null);
-          if (!sess?.data?.session?.user) {
-            await supabase.auth.signInWithPassword({
-              email: 'mudassir2k6@gmail.com',
-              password: '12345678',
-            }).catch(() => {});
-          }
+          // Requires a real signed-in admin session (RLS); no credentials are embedded in the client.
+          if (!sess?.data?.session?.user) return;
           await supabase.from('site_settings').delete().eq('key', SITE_SETTINGS_KEY);
         })().catch(() => {});
       }

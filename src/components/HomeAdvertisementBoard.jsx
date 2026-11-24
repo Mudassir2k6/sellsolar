@@ -13,7 +13,7 @@ import {
 import AdvertiseHereForm, { PENDING_ADVERTISE_KEY } from './AdvertiseHereForm';
 import { useAuth } from '../context/AuthContext';
 
-function resolveHref(linkUrl, onNavigate) {
+export function resolveHref(linkUrl, onNavigate) {
   if (!linkUrl) return null;
   if (linkUrl.startsWith('http://') || linkUrl.startsWith('https://')) return linkUrl;
   const path = linkUrl.replace(/^\//, '');
@@ -23,7 +23,7 @@ function resolveHref(linkUrl, onNavigate) {
   return { type: 'href', href: linkUrl.startsWith('/') ? linkUrl : `/${linkUrl}` };
 }
 
-function AdLink({ ad, onNavigate, className, children, onAdvertiseClick }) {
+export function AdLink({ ad, onNavigate, className, children, onAdvertiseClick }) {
   if (ad?.adType === 'advertise_here') {
     return (
       <button type="button" onClick={onAdvertiseClick} className={`text-left ${className}`}>

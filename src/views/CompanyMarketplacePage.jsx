@@ -49,6 +49,7 @@ import { sendContactMessage } from '../services/inboxService';
 import EmailContactModal from '../components/EmailContactModal';
 import { useSiteSettings } from '../context/SiteSettingsContext';
 import { normalizeAdvertisementSettings } from '../lib/advertisementDefaults';
+import { FeatureText } from '../components/HomeSpotlightAndPackages';
 import { DEFAULT_SUPPORT_PHONE, resolveWhatsAppNumber, buildWhatsAppUrl } from '../lib/whatsapp';
 import { useAuth } from '../context/AuthContext';
 import { isValidPhone, normalizePhone } from '../lib/auth';
@@ -1491,6 +1492,12 @@ function PricingContent({ onNavigate, onPostAd }) {
   const { settings } = useSiteSettings();
   const adCfg = normalizeAdvertisementSettings(settings?.advertisementSettings);
   const adPackages = (adCfg.packages || []).filter((p) => p.isActive !== false);
+  const listingPlans = (adCfg.listingPlans || []).filter((p) => p.isActive !== false);
+  const runPlanCta = (plan) => {
+    const link = String(plan.ctaLink || 'post-ad').replace(/^\//, '');
+    if (link === 'post-ad' && onPostAd) onPostAd();
+    else if (onNavigate) onNavigate(link);
+  };
 
   const runCta = (pkg) => {
     const link = pkg.ctaLink || 'contact';
@@ -1574,139 +1581,65 @@ function PricingContent({ onNavigate, onPostAd }) {
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">For sellers posting solar equipment ads</p>
       </div>
 
-      {/* Pricing Tiers */}
+      {/* Listing plans (admin editable: Admin > Site Settings > Advertisements) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
-        {/* Tier 1: Free */}
-        <div className="rounded-3xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 sm:p-8 shadow-sm flex flex-col justify-between">
-          <div>
-            <span className="text-xs font-extrabold uppercase tracking-wider text-gray-400">Individual Seller</span>
-            <h3 className="text-2xl font-black text-gray-900 dark:text-white mt-1">Free Ad</h3>
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              For homeowners and individuals selling solar gear.
-            </p>
-            <div className="mt-5 text-3xl font-black text-gray-900 dark:text-white">
-              Rs. 0 <span className="text-xs font-medium text-gray-400">/ forever</span>
+        {listingPlans.map((plan) => (
+          <div
+            key={plan.id}
+            className={`rounded-3xl bg-white dark:bg-gray-900 p-6 sm:p-8 flex flex-col justify-between relative ${
+              plan.highlighted
+                ? 'border-2 border-primary-500 shadow-lg'
+                : 'border border-gray-200 dark:border-gray-800 shadow-sm'
+            }`}
+          >
+            {plan.badge ? (
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary-600 text-white font-extrabold text-[10px] uppercase tracking-wider px-3 py-0.5 shadow-sm">
+                {plan.badge}
+              </div>
+            ) : null}
+            <div>
+              <span
+                className={`text-xs font-extrabold uppercase tracking-wider ${
+                  plan.highlighted ? 'text-primary-600 dark:text-primary-400' : 'text-gray-400'
+                }`}
+              >
+                {plan.eyebrow}
+              </span>
+              <h3 className="text-2xl font-black text-gray-900 dark:text-white mt-1">{plan.name}</h3>
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{plan.description}</p>
+              <div
+                className={`mt-5 text-3xl font-black ${
+                  plan.highlighted ? 'text-primary-600 dark:text-primary-400' : 'text-gray-900 dark:text-white'
+                }`}
+              >
+                {plan.priceLabel} <span className="text-xs font-medium text-gray-400">/ {plan.period}</span>
+              </div>
+
+              <ul className="mt-6 space-y-3 text-xs text-gray-600 dark:text-gray-300">
+                {(plan.features || []).map((f) => (
+                  <li key={f} className="flex items-center gap-2">
+                    <Check
+                      className={`h-4 w-4 shrink-0 ${plan.highlighted ? 'text-primary-500' : 'text-emerald-500'}`}
+                    />
+                    <span>
+                      <FeatureText text={f} />
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </div>
 
-            <ul className="mt-6 space-y-3 text-xs text-gray-600 dark:text-gray-300">
-              <li className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-emerald-500 shrink-0" />
-                Post up to 5 active equipment ads
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-emerald-500 shrink-0" />
-                Direct buyer WhatsApp & Phone connection
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-emerald-500 shrink-0" />
-                Up to 8 high-resolution photos
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-emerald-500 shrink-0" />
-                60 days listing validity
-              </li>
-            </ul>
-          </div>
-
-          <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800">
-            <button
-              type="button"
-              onClick={onPostAd}
-              className="w-full btn-secondary text-xs py-2.5"
-            >
-              Post Free Ad
-            </button>
-          </div>
-        </div>
-
-        {/* Tier 2: Featured Boost */}
-        <div className="rounded-3xl border-2 border-primary-500 bg-white dark:bg-gray-900 p-6 sm:p-8 shadow-lg flex flex-col justify-between relative">
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary-600 text-white font-extrabold text-[10px] uppercase tracking-wider px-3 py-0.5 shadow-sm">
-            Most Popular
-          </div>
-          <div>
-            <span className="text-xs font-extrabold uppercase tracking-wider text-primary-600 dark:text-primary-400">Quick Sale</span>
-            <h3 className="text-2xl font-black text-gray-900 dark:text-white mt-1">Featured Ad</h3>
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              Pin your listing to the top of category searches.
-            </p>
-            <div className="mt-5 text-3xl font-black text-primary-600 dark:text-primary-400">
-              Rs. 999 <span className="text-xs font-medium text-gray-400">/ 14 days</span>
+            <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800">
+              <button
+                type="button"
+                onClick={() => runPlanCta(plan)}
+                className={`w-full text-xs py-2.5 ${plan.highlighted ? 'btn-primary shadow-sm' : 'btn-secondary'}`}
+              >
+                {plan.ctaText || 'Get started'}
+              </button>
             </div>
-
-            <ul className="mt-6 space-y-3 text-xs text-gray-600 dark:text-gray-300">
-              <li className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-primary-500 shrink-0" />
-                <strong>5x more buyer views</strong> on average
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-primary-500 shrink-0" />
-                Featured golden border & badge
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-primary-500 shrink-0" />
-                Pinned to top of search results
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-primary-500 shrink-0" />
-                Highlighted in social media channels
-              </li>
-            </ul>
           </div>
-
-          <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800">
-            <button
-              type="button"
-              onClick={() => onNavigate && onNavigate('post-ad')}
-              className="w-full btn-primary text-xs py-2.5 shadow-sm"
-            >
-              Get Featured Ad
-            </button>
-          </div>
-        </div>
-
-        {/* Tier 3: Verified Dealer Pro */}
-        <div className="rounded-3xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 sm:p-8 shadow-sm flex flex-col justify-between">
-          <div>
-            <span className="text-xs font-extrabold uppercase tracking-wider text-gray-400">Solar Merchants</span>
-            <h3 className="text-2xl font-black text-gray-900 dark:text-white mt-1">Dealer Pro</h3>
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              For commercial importers, distributors, and shops.
-            </p>
-            <div className="mt-5 text-3xl font-black text-gray-900 dark:text-white">
-              Rs. 2,999 <span className="text-xs font-medium text-gray-400">/ month</span>
-            </div>
-
-            <ul className="mt-6 space-y-3 text-xs text-gray-600 dark:text-gray-300">
-              <li className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-emerald-500 shrink-0" />
-                <strong>Unlimited</strong> equipment listings
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-emerald-500 shrink-0" />
-                Official Verified Dealer Blue Badge
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-emerald-500 shrink-0" />
-                Dedicated storefront profile page
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-emerald-500 shrink-0" />
-                Priority listing in Dealer Directory
-              </li>
-            </ul>
-          </div>
-
-          <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800">
-            <button
-              type="button"
-              onClick={() => onNavigate && onNavigate('dealers')}
-              className="w-full btn-secondary text-xs py-2.5"
-            >
-              Explore Dealer Directory
-            </button>
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );

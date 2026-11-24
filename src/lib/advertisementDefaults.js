@@ -10,6 +10,69 @@ export const DEFAULT_ADVERTISEMENT_SETTINGS = {
   /** Show Google AdSense-style slots in the same moving strip as partner ads */
   googleAdsInMarquee: true,
   googleAdSenseClientId: '',
+  /** Homepage: static spotlight cards under the scroll strip + packages teaser above the footer */
+  spotlightEnabled: true,
+  packagesTeaserEnabled: true,
+  /** Marketplace listing plans (pricing page + homepage teaser) - admin editable */
+  listingPlans: [
+    {
+      id: 'plan-free',
+      eyebrow: 'Individual Seller',
+      name: 'Free Ad',
+      priceLabel: 'Rs. 0',
+      period: 'forever',
+      description: 'For homeowners and individuals selling solar gear.',
+      features: [
+        'Post up to 5 active equipment ads',
+        'Direct buyer WhatsApp & Phone connection',
+        'Up to 8 high-resolution photos',
+        '60 days listing validity',
+      ],
+      ctaText: 'Post Free Ad',
+      ctaLink: 'post-ad',
+      badge: '',
+      highlighted: false,
+      isActive: true,
+    },
+    {
+      id: 'plan-featured',
+      eyebrow: 'Quick Sale',
+      name: 'Featured Ad',
+      priceLabel: 'Rs. 999',
+      period: '14 days',
+      description: 'Pin your listing to the top of category searches.',
+      features: [
+        '**5x more buyer views** on average',
+        'Featured golden border & badge',
+        'Pinned to top of search results',
+        'Highlighted in social media channels',
+      ],
+      ctaText: 'Get Featured Ad',
+      ctaLink: 'post-ad',
+      badge: 'Most Popular',
+      highlighted: true,
+      isActive: true,
+    },
+    {
+      id: 'plan-dealer',
+      eyebrow: 'Solar Merchants',
+      name: 'Dealer Pro',
+      priceLabel: 'Rs. 2,999',
+      period: 'month',
+      description: 'For commercial importers, distributors, and shops.',
+      features: [
+        '**Unlimited** equipment listings',
+        'Official Verified Dealer Blue Badge',
+        'Dedicated storefront profile page',
+        'Priority listing in Dealer Directory',
+      ],
+      ctaText: 'Explore Dealer Directory',
+      ctaLink: 'dealers',
+      badge: '',
+      highlighted: false,
+      isActive: true,
+    },
+  ],
   packages: [
     {
       id: 'free',
@@ -314,10 +377,31 @@ export function normalizeAdvertisementSettings(raw) {
     googleAdsInMarquee: raw.googleAdsInMarquee !== false,
     googleAdSenseClientId:
       typeof raw.googleAdSenseClientId === 'string' ? raw.googleAdSenseClientId : base.googleAdSenseClientId,
+    spotlightEnabled: raw.spotlightEnabled !== false,
+    packagesTeaserEnabled: raw.packagesTeaserEnabled !== false,
     packages: Array.isArray(raw.packages) && raw.packages.length > 0 ? raw.packages : base.packages,
+    listingPlans:
+      Array.isArray(raw.listingPlans) && raw.listingPlans.length > 0 ? raw.listingPlans : base.listingPlans,
     scrollAds,
     staticAds,
   };
+}
+
+/** True for built-in demo/seed ads that must never be shown as real spotlight campaigns. */
+export function isDemoAd(ad) {
+  return /dummy/i.test(String(ad?.id || '')) || /\(demo\)|\bdemo\b/i.test(`${ad?.advertiser || ''} ${ad?.subtitle || ''}`);
+}
+
+/** Real (non-demo) static spotlight ads, paid packages first. Used by the homepage spotlight slot. */
+export function collectSpotlightAds(adCfg, limit = 2) {
+  if (!adCfg || adCfg.enabled === false || adCfg.staticEnabled === false || adCfg.spotlightEnabled === false) {
+    return [];
+  }
+  const rank = (a) => (a.packageId === 'static' || a.packageId === 'combo' ? 0 : a.packageId === 'free' ? 1 : 2);
+  return (adCfg.staticAds || [])
+    .filter((a) => a.isActive !== false && !isDemoAd(a) && a.id !== 'static-pricing')
+    .sort((a, b) => rank(a) - rank(b))
+    .slice(0, limit);
 }
 
 /** Partner, Google, and static items in scroll order — one continuous marquee */

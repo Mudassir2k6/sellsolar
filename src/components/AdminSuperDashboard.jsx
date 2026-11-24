@@ -1912,14 +1912,27 @@ export default function AdminSuperDashboard({
         (cleanedNumber ? `+${cleanedNumber}` : '+92 308 3888043'),
       supportPhone: cmsForm.supportPhone || '+92 308 3888043',
     };
-    updateSiteSettings(payload);
+    const publishing = updateSiteSettings(payload);
     setCmsForm(payload);
     setCmsSaved(true);
     setTimeout(() => setCmsSaved(false), 3000);
-    showToast({
-      title: 'Website Settings Saved',
-      message: 'Brand identity, WhatsApp configuration and contact info updated live.',
-      type: 'success',
+    // Only claim "live" once the cloud actually accepted the save.
+    Promise.resolve(publishing).then((res) => {
+      if (res?.ok) {
+        showToast({
+          title: 'Published Live',
+          message: 'Website settings, packages and ads are now live for all users.',
+          type: 'success',
+        });
+      } else {
+        showToast({
+          title: 'Saved on this device only',
+          message:
+            res?.message ||
+            'Not published to other users. Sign in with your real admin account and save again.',
+          type: 'error',
+        });
+      }
     });
   };
 

@@ -20,6 +20,7 @@ const LoadCalculatorPage = lazy(() => import('./views/LoadCalculatorPage'));
 import SolarLoadCalculator from './components/SolarLoadCalculator';
 import FloatingPostAdButton from './components/FloatingPostAdButton';
 import HomeAdvertisementBoard from './components/HomeAdvertisementBoard';
+import { HomeStaticSpotlight, HomePackagesTeaser } from './components/HomeSpotlightAndPackages';
 import HeroSideRatesCard from './components/HeroSideRatesCard';
 import HeroSideAdCard from './components/HeroSideAdCard';
 const CompanyMarketplacePage = lazy(() => import('./views/CompanyMarketplacePage'));
@@ -2524,6 +2525,8 @@ function lx({
   const [dateOrder, setDateOrder] = useState("desc"); // desc = newest first (default), asc = oldest first
   const t = useMemo(() => {
     const filtered = filterListingsByDateRange(allListings || [], dateRange);
+    // Paid "Featured Ad" listings are pinned above everything else, whatever the date order.
+    const isFeatured = (l) => Boolean(l && (l.featured === true || l.is_featured === true));
     const stamp = (l) => {
       const v = l && l.created_at ? new Date(l.created_at).getTime() : NaN;
       return Number.isFinite(v) ? v : null;
@@ -2531,6 +2534,8 @@ function lx({
     const dir = dateOrder === "asc" ? 1 : -1;
     // Array.prototype.sort is stable, so listings with the same date keep their current order.
     return [...filtered].sort((a, b) => {
+      const fa = isFeatured(a), fb = isFeatured(b);
+      if (fa !== fb) return fa ? -1 : 1;
       const ta = stamp(a), tb = stamp(b);
       if (ta === null && tb === null) return 0;
       if (ta === null) return 1; // undated listings always go last
@@ -7461,7 +7466,7 @@ function _x({
   return jsxs(Fragment,{
     children:[jsx(nx,{
       filters:e,onFilterChange:y,onSearch:w,onReset:j,onNavigatePrices:nav?()=>nav("prices"):void 0,onNavigateCalculator:nav?()=>nav("calculator"):void 0,onNavigateDealers:nav?()=>nav("dealers"):void 0,onNavigateInstallation:nav?()=>nav("install"):void 0,onNavigatePricing:nav?()=>nav("pricing"):void 0,onNavigateVerification:nav?()=>nav("verification"):void 0
-    }),jsx(HomeAdvertisementBoard,{ onNavigate:nav }),jsx(PakWheelsSellCards,{
+    }),jsx(HomeAdvertisementBoard,{ onNavigate:nav }),jsx(HomeStaticSpotlight,{ onNavigate:nav }),jsx(PakWheelsSellCards,{
       onPostAd:()=>nav?nav("post-ad"):void 0,
       onInstall:()=>nav?nav("install"):void 0,
       onNavigate:nav
@@ -7496,7 +7501,7 @@ function _x({
         (Array.isArray(keys)?keys:[keys]).forEach(k=>y(k,""));
         p(cnt => cnt + 1);
       }
-    })]
+    }),jsx(HomePackagesTeaser,{ onNavigate:nav })]
   })
 }
 

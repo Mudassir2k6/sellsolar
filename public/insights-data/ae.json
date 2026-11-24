@@ -2,10 +2,10 @@
   "version": 2,
   "countryCode": "AE",
   "location": "United Arab Emirates",
-  "lastUpdated": "2026-11-23T05:34:47+05:00",
-  "lastUpdatedLabel": "23 Nov 2026, 5:34 am PKT",
+  "lastUpdated": "2026-11-24T09:34:54+05:00",
+  "lastUpdatedLabel": "24 Nov 2026, 9:34 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solaruae, solarpanel, solarfarm, solarfarms, solarplans",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solaruae, solarpanel, solarfarm, solarfarms",
   "trendingNews": [
     {
       "id": "tn-1",
@@ -55,6 +55,17 @@
     },
     {
       "id": "tn-5",
+      "title": "Red Sun: Solar Energy as China's Strategic Tool in the Middle East",
+      "summary": "Trending solar coverage from www.inss.org.il — use this United Arab Emirates topic for your own posts and SEO content.",
+      "source": "www.inss.org.il",
+      "url": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE9NMjZ0dlpnYlZvcExiUWFwcTk4UklDX3lRdXlCcGg3ZTlTTEI3NmlQWE1jVWM2ZDZOblRuQ29zYmR2MXRJSzhlZ3U3a0xtM2NvTEE1aTVfM1Ywd094UWQyNkc4MHU5dw?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarUAE"
+      ]
+    },
+    {
+      "id": "tn-6",
       "title": "Solar Power in the Gulf: Leaders and Laggards in Regulatory Support for Solar Power Deployment",
       "summary": "Trending solar coverage from Middle East Institute — use this United Arab Emirates topic for your own posts and SEO content.",
       "source": "Middle East Institute",
@@ -63,17 +74,6 @@
         "#solarpower",
         "#solarUAE",
         "#solarenergy"
-      ]
-    },
-    {
-      "id": "tn-6",
-      "title": "Abu Dhabi launches Solar Energy Self-Supply Policy to boost clean energy",
-      "summary": "Trending solar coverage from Consultancy-me.com — use this United Arab Emirates topic for your own posts and SEO content.",
-      "source": "Consultancy-me.com",
-      "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPQVpPTzhZOUJqMUhnZ1N4WHNIUjV5REZsd01BTGtndnJZbC1nVC1wRkpmMTJRRjFhRHBBS2tZWnUwdFgzOFRacFZOb2FfUG1vbl9keUlNS2p4WF92NURkV3g5VTZNNVBVWnJoaUc2ZlBVV2d6VEpuMXBHREhVMEtFRUxJMlVyRl9ITkJMQ2NuMmpfbm5yRElIWE90S2ZLTld0ZG5wbFU0Mkx3VW0yWkx3RU95WFLSAboBQVVfeXFMTlhLWVZjTUZxQ3Qyc1lsTlZHbk5FR1U5Sy1FZFNYSjNyVWIxd3d6N3VnSWFmX2JtZGNGaWxDOVFDMUp3ZnhuY2NHUEswYV9iR1lkdkkyUVN5WGNBQTk1TTdOLWVualAxUTdUX2Qtc09QWFQwT1RhV09kRzRiQV9nUF9zSTVpZUFGd28zeklTSWlSYnBYRzVBQmYtRG9CcGtNZFV6MWE2djZJTXJCM2JKN0JjeVdDRDl2RHVR?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarUAE"
       ]
     }
   ],
@@ -143,7 +143,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "994K+"
+          "posts": "1M+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -173,7 +173,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "183K+"
+          "posts": "179K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -203,7 +203,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "511K+"
+          "posts": "499K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -213,7 +213,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "95K+"
+          "posts": "97K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solaruae/"
@@ -223,7 +223,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "36K+"
+          "posts": "37K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
@@ -233,7 +233,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "30K+"
+          "posts": "31K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarfarm/"
@@ -243,20 +243,10 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "46K+"
+          "posts": "45K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarfarms/"
-    },
-    {
-      "tag": "#solarplans",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "32K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarplans/"
     }
   ],
   "contentIdeas": [

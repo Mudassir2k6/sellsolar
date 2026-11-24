@@ -2,8 +2,8 @@
   "version": 2,
   "countryCode": "SA",
   "location": "Saudi Arabia",
-  "lastUpdated": "2026-11-23T05:34:47+05:00",
-  "lastUpdatedLabel": "23 Nov 2026, 5:34 am PKT",
+  "lastUpdated": "2026-11-24T09:34:54+05:00",
+  "lastUpdatedLabel": "24 Nov 2026, 9:34 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
   "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarsaudiarabia, solarpanel, goingsolar",
   "trendingNews": [
@@ -44,6 +44,17 @@
     },
     {
       "id": "tn-4",
+      "title": "Saudi Arabia Solar Energy Market: Renewable Expansion, Mega Projects & Investment Trends Outlook",
+      "summary": "Trending solar coverage from Vocal — use this Saudi Arabia topic for your own posts and SEO content.",
+      "source": "Vocal",
+      "url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxQalBFM0E2cEU0YnBYeU1WcDhrenhpREcxTGF3a0dMVEx4Tm11ZzlsZFVseXBLMkI5Y0ctTnl2SDJJZW1wNGd6VGNaNllkVXZDZm0zOTJfckx3Q3VnVmxaeFFWUEh3WUVwNjEzczkySmFsakY3aFkxLVVKTDZITTlXRThObDF0UmNpWDZHbUUxc28xLURENWFTeGcxRjAzU0kxekhLdEFCQlBJc3lqQTJWVUR4eG50dXJUZjZZeGhBU2oyTzg?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarSaudiArabia"
+      ]
+    },
+    {
+      "id": "tn-5",
       "title": "Saudi Arabia Innovates to Support Renewable Energy Goals",
       "summary": "Trending solar coverage from POWER Magazine — use this Saudi Arabia topic for your own posts and SEO content.",
       "source": "POWER Magazine",
@@ -52,17 +63,6 @@
         "#renewableenergy",
         "#solarSaudiArabia",
         "#solarenergy"
-      ]
-    },
-    {
-      "id": "tn-5",
-      "title": "Saudi Arabia Solar Energy Market: Renewable Expansion, Mega Projects & Investment Trends Outlook",
-      "summary": "Trending solar coverage from Vocal — use this Saudi Arabia topic for your own posts and SEO content.",
-      "source": "Vocal",
-      "url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxQalBFM0E2cEU0YnBYeU1WcDhrenhpREcxTGF3a0dMVEx4Tm11ZzlsZFVseXBLMkI5Y0ctTnl2SDJJZW1wNGd6VGNaNllkVXZDZm0zOTJfckx3Q3VnVmxaeFFWUEh3WUVwNjEzczkySmFsakY3aFkxLVVKTDZITTlXRThObDF0UmNpWDZHbUUxc28xLURENWFTeGcxRjAzU0kxekhLdEFCQlBJc3lqQTJWVUR4eG50dXJUZjZZeGhBU2oyTzg?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarSaudiArabia"
       ]
     },
     {
@@ -144,7 +144,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "994K+"
+          "posts": "1M+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -174,7 +174,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "183K+"
+          "posts": "179K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -204,7 +204,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "511K+"
+          "posts": "499K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -214,7 +214,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "95K+"
+          "posts": "97K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarsaudiarabia/"
@@ -224,7 +224,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "36K+"
+          "posts": "37K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"

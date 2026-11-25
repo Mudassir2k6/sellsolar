@@ -37,6 +37,7 @@ export default function DealersPage({ onNavigate, onBack, hasOuterNavbar = false
   const [selectedSource, setSelectedSource] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [verifiedOnly, setVerifiedOnly] = useState(false);
+  const [revealedPhoneKeys, setRevealedPhoneKeys] = useState(() => new Set());
 
   // Fetch DB dealers + registered dealer profiles + admin-saved dealers, merge with seed directory
   useEffect(() => {
@@ -85,6 +86,19 @@ export default function DealersPage({ onNavigate, onBack, hasOuterNavbar = false
   const sourceCounts = useMemo(() => getSourceDealerCounts(dealersList), [dealersList]);
 
   // Helper for WhatsApp click-to-chat
+  const dealerCardKey = (dealer) => String(dealer?.id || dealer?.phone || dealer?.business_name || '');
+
+  const toggleDealerPhone = (dealer) => {
+    const key = dealerCardKey(dealer);
+    if (!key || !dealer?.phone) return;
+    setRevealedPhoneKeys((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
   const getWhatsAppLink = (dealer) => {
     const rawPhone = dealer.phone || '';
     const cleanDigits = rawPhone.replace(/[^0-9]/g, '');
@@ -472,14 +486,36 @@ export default function DealersPage({ onNavigate, onBack, hasOuterNavbar = false
 
                   {/* Card Actions: Call & WhatsApp */}
                   <div className="mt-4 pt-3.5 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-2">
-                    {/* Call Button */}
-                    <a
-                      href={`tel:${dealer.phone}`}
-                      className="py-2.5 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 hover:border-amber-500 hover:text-amber-600 dark:hover:text-amber-400 text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-2xs"
-                    >
-                      <Phone className="h-3.5 w-3.5 text-amber-500" />
-                      <span>Call Dealer</span>
-                    </a>
+                    {/* View number (no tel: popup on desktop) */}
+                    {(() => {
+                      const cardKey = dealerCardKey(dealer);
+                      const showPhone = revealedPhoneKeys.has(cardKey);
+                      return (
+                        <button
+                          type="button"
+                          onClick={() => toggleDealerPhone(dealer)}
+                          className="py-2.5 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 hover:border-amber-500 hover:text-amber-600 dark:hover:text-amber-400 text-xs font-bold transition-all flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 shadow-2xs min-h-[42px]"
+                          aria-expanded={showPhone}
+                          aria-label={showPhone ? `Phone ${dealer.phone}` : 'View dealer phone number'}
+                        >
+                          <span className="inline-flex items-center gap-1.5">
+                            <Phone className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+                            {showPhone ? (
+                              <span className="font-mono text-[11px] sm:text-xs tracking-wide text-amber-600 dark:text-amber-400">
+                                {dealer.phone}
+                              </span>
+                            ) : (
+                              <span>View Number</span>
+                            )}
+                          </span>
+                          {showPhone ? (
+                            <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+                              Tap again to hide
+                            </span>
+                          ) : null}
+                        </button>
+                      );
+                    })()}
 
                     {/* WhatsApp Button */}
                     <a

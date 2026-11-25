@@ -280,6 +280,7 @@ export function getLocalOrSeedListings(filters = {}) {
   return all.filter((item) => {
     // Hide permanently deleted ads (admin-deleted blacklist)
     if (deletedAdsMap[String(item.id)]) return false;
+    if (item.is_deleted === true || item.status === 'deleted') return false;
     // Hide disabled ads from marketplace display
     if (item.is_ad_disabled || item.status === 'disabled') return false;
     return matchesListingFilters(item, filters);
@@ -346,5 +347,7 @@ export function getLocalOrSeedListingById(id) {
 
   if (deletedAdsMap[String(id)]) return null;
   const all = [...userCustomListings, ...SEED_LISTINGS];
-  return all.find((item) => String(item.id) === String(id)) || null;
+  const found = all.find((item) => String(item.id) === String(id)) || null;
+  if (found && (found.is_deleted === true || found.status === 'deleted')) return null;
+  return found;
 }

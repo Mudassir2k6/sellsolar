@@ -315,6 +315,13 @@ export default function AdminSuperDashboard({
 
   // Pages & Content CMS State
   const [customPages, setCustomPages] = useState([]);
+  useEffect(() => {
+    if (!Array.isArray(settings?.customPages)) return;
+    setCustomPages(settings.customPages);
+    try {
+      localStorage.setItem('sellsolar_custom_pages', JSON.stringify(settings.customPages));
+    } catch {}
+  }, [settings?.customPages]);
   const [pageFilter, setPageFilter] = useState('all'); // 'all' | 'core' | 'marketplace' | 'company' | 'support' | 'legal' | 'custom'
   const [pageSearchQuery, setPageSearchQuery] = useState('');
   const [editingPage, setEditingPage] = useState(null);
@@ -908,11 +915,15 @@ export default function AdminSuperDashboard({
       }).catch(() => {});
     }
 
-    // 4. Custom Pages & CMS
+    // 4. Custom Pages & CMS — cloud settings win over this browser's local copy
     try {
-      const rawPages = localStorage.getItem('sellsolar_custom_pages');
-      if (rawPages) {
-        setCustomPages(JSON.parse(rawPages));
+      const fromSettings = settings?.customPages;
+      if (Array.isArray(fromSettings)) {
+        setCustomPages(fromSettings);
+        localStorage.setItem('sellsolar_custom_pages', JSON.stringify(fromSettings));
+      } else {
+        const rawPages = localStorage.getItem('sellsolar_custom_pages');
+        if (rawPages) setCustomPages(JSON.parse(rawPages));
       }
     } catch {}
   };
@@ -2287,6 +2298,7 @@ export default function AdminSuperDashboard({
       currentCustom.push(newPage);
       localStorage.setItem('sellsolar_custom_pages', JSON.stringify(currentCustom));
       setCustomPages(currentCustom);
+      updateSiteSettings({ customPages: currentCustom });
       setIsAddingPage(false);
       setNewPageForm({ path: '', title: '', description: '', heroHeading: '', category: 'Custom' });
       showToast({
@@ -2307,6 +2319,7 @@ export default function AdminSuperDashboard({
       const filtered = currentCustom.filter((p) => p.path !== pagePath);
       localStorage.setItem('sellsolar_custom_pages', JSON.stringify(filtered));
       setCustomPages(filtered);
+      updateSiteSettings({ customPages: filtered });
       showToast({ title: 'Page Deleted', message: 'Custom page deleted.', type: 'info' });
     } catch {}
   };

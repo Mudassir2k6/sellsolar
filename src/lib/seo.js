@@ -514,12 +514,20 @@ export function parseLocation(pathname = '/', hash = '') {
     return { page: 'social-insights', listingId: null, hash };
   }
 
-  // Check if it matches a custom CMS page in localStorage
+  // Custom CMS pages: prefer cloud-synced site settings, then legacy local admin cache
   if (typeof window !== 'undefined') {
     try {
-      const rawCustom = localStorage.getItem('sellsolar_custom_pages');
-      if (rawCustom) {
-        const customPages = JSON.parse(rawCustom);
+      let customPages = null;
+      const rawSite = localStorage.getItem('sellsolar_site_settings');
+      if (rawSite) {
+        const site = JSON.parse(rawSite);
+        if (Array.isArray(site.customPages)) customPages = site.customPages;
+      }
+      if (!customPages) {
+        const rawCustom = localStorage.getItem('sellsolar_custom_pages');
+        if (rawCustom) customPages = JSON.parse(rawCustom);
+      }
+      if (customPages) {
         const cleanP = path.toLowerCase();
         const match = customPages.find((p) => {
           const itemPath = (p.path || '').toLowerCase();

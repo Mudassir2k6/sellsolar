@@ -1,4 +1,10 @@
 import { SOLAR_PANEL_IMAGE, INVERTER_IMAGE, BATTERY_IMAGE, COMPLETE_SYSTEM_IMAGE } from '../utils/solarImages';
+import { isSupabaseConfigured } from '../lib/supabase';
+
+/** Demo/sample listings only when there is no live cloud database (local dev). */
+export function useDemoSeedListings() {
+  return typeof window !== 'undefined' ? !isSupabaseConfigured() : false;
+}
 
 export const SEED_LISTINGS = [
   {
@@ -287,7 +293,9 @@ export function getLocalOrSeedListings(filters = {}) {
     } catch {}
   }
 
-  const all = [...userCustomListings, ...SEED_LISTINGS];
+  const all = useDemoSeedListings()
+    ? [...userCustomListings, ...SEED_LISTINGS]
+    : [...userCustomListings];
 
   return all.filter((item) => {
     // Hide permanently deleted ads (admin-deleted blacklist)
@@ -356,7 +364,9 @@ export function getLocalOrSeedListingById(id) {
   }
 
   if (deletedAdsMap[String(id)]) return null;
-  const all = [...userCustomListings, ...SEED_LISTINGS];
+  const all = useDemoSeedListings()
+    ? [...userCustomListings, ...SEED_LISTINGS]
+    : [...userCustomListings];
   const found = all.find((item) => String(item.id) === String(id)) || null;
   if (found && isListingHiddenFromBuyers(found)) return null;
   return found;

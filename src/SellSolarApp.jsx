@@ -126,7 +126,7 @@ import { useToast } from './context/ToastContext';
 import { supabase, isSupabaseConfigured } from './lib/supabase';
 import { BRANDS, CATEGORIES, POSTABLE_CATEGORIES, CITIES, formatPrice } from './lib/constants';
 import { digitsOnlyPhone, isValidPhone, normalizePhone, isValidUuid } from './lib/auth';
-import { getLocalOrSeedListings, getLocalOrSeedListingById, matchesListingFilters, isFeaturedActive, isListingPublicVisible, isListingHiddenFromBuyers } from './data/seedListings';
+import { getLocalOrSeedListings, getLocalOrSeedListingById, matchesListingFilters, isFeaturedActive, isListingPublicVisible, isListingHiddenFromBuyers, useDemoSeedListings } from './data/seedListings';
 import { getEquipmentFallbackImage, SELL_SOLAR_PROMO_IMAGE, TURNKEY_INSTALL_PROMO_IMAGE } from './utils/solarImages';
 import ThemeRadioToggle from './components/ThemeRadioToggle';
 import WarrantySelector, { formatWarrantyShort, formatWarrantyLong } from './components/WarrantySelector';
@@ -6514,7 +6514,14 @@ function yx({
           supabase.from("solar_listings").select("*").eq("is_deleted", false).order("created_at", { ascending: false }).limit(60),
           new Promise((resolve) => setTimeout(() => resolve({ data: null }), 4000)),
         ]);
-        if (res?.data?.length) apply([...res.data, ...getLocalOrSeedListings()]);
+        if (res?.data?.length) {
+          const cloud = res.data.filter(isListingPublicVisible);
+          const cloudIds = new Set(cloud.map((d) => String(d.id)));
+          const extraLocal = (getLocalOrSeedListings() || []).filter(
+            (item) => isListingPublicVisible(item) && !cloudIds.has(String(item.id))
+          );
+          apply([...cloud, ...extraLocal]);
+        }
       } catch (err) {}
     })();
     return () => { cancelled = true; };
@@ -7230,13 +7237,17 @@ function _x({
   const calcBanner = settings?.homePageCms?.calculatorBanner;
   const initialListingsRef = useRef(null);
   if (initialListingsRef.current === null) {
-    // Paint local/seed listings instantly; Supabase refreshes them in the background.
+    // Live site: start empty and load from cloud (no demo seed flash). Offline dev may paint seeds instantly.
     try {
-      const startFilters = initialFilters ? { ...Vu, ...initialFilters } : Vu;
-      const deletedMap = getDeletedAds();
-      initialListingsRef.current = (getLocalOrSeedListings(startFilters) || []).filter(
-        (item) => !deletedMap[String(item.id)] && isListingPublicVisible(item)
-      );
+      if (useDemoSeedListings()) {
+        const startFilters = initialFilters ? { ...Vu, ...initialFilters } : Vu;
+        const deletedMap = getDeletedAds();
+        initialListingsRef.current = (getLocalOrSeedListings(startFilters) || []).filter(
+          (item) => !deletedMap[String(item.id)] && isListingPublicVisible(item)
+        );
+      } else {
+        initialListingsRef.current = [];
+      }
     } catch {
       initialListingsRef.current = [];
     }

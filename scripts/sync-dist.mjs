@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { execSync } from 'child_process';
 
 const root = process.cwd();
 const outDir = path.join(root, 'out');
@@ -247,4 +248,26 @@ try {
   console.warn('[perf] Note during optimization:', perfErr.message);
 }
 
+// 8. Publish build id so open tabs (incl. embedded browsers) auto-reload after deploy
+function resolveBuildId() {
+  if (process.env.GITHUB_SHA) return String(process.env.GITHUB_SHA).slice(0, 12);
+  try {
+    return execSync('git rev-parse --short HEAD', { encoding: 'utf8' }).trim();
+  } catch {
+    return `local-${Date.now()}`;
+  }
+}
+
+const buildVersion = {
+  buildId: resolveBuildId(),
+  builtAt: new Date().toISOString(),
+};
+const buildVersionJson = JSON.stringify(buildVersion, null, 2);
+for (const dir of [outDir, distDir]) {
+  if (fs.existsSync(dir)) {
+    fs.writeFileSync(path.join(dir, 'build-version.json'), buildVersionJson, 'utf8');
+  }
+}
+
 console.log('[deploy] Synced out/ → dist/ for Cloudflare/Netlify publish compatibility.');
+console.log(`[deploy] build-version.json → ${buildVersion.buildId}`);

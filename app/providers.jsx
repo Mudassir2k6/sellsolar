@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/context/ThemeContext';
 import { ToastProvider } from '@/context/ToastContext';
 import { SiteSettingsProvider } from '@/context/SiteSettingsContext';
 import { ErrorBoundary } from '@/ErrorBoundary';
+import DeployVersionWatcher from '@/components/DeployVersionWatcher';
 
 export default function Providers({ children }) {
   return (
@@ -12,7 +13,10 @@ export default function Providers({ children }) {
       <ThemeProvider>
         <SiteSettingsProvider>
           <AuthProvider>
-            <ToastProvider>{children}</ToastProvider>
+            <ToastProvider>
+              <DeployVersionWatcher />
+              {children}
+            </ToastProvider>
           </AuthProvider>
         </SiteSettingsProvider>
       </ThemeProvider>

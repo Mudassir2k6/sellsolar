@@ -198,6 +198,19 @@ function buildLiveTickerItems(sheet) {
     }
   });
 
+  const inverexInvs = inverters.filter((i) => i.brand === 'Inverex' && typeof i.rate === 'number');
+  const inverexBats = batteries.filter((b) => b.brand === 'Inverex' && typeof b.rate === 'number');
+  if (inverexInvs.length) {
+    const vMin = Math.min(...inverexInvs.filter((i) => i.model.includes('Veyron') || i.model.includes('Yukon')).map((i) => i.rate));
+    const n66 = inverexInvs.find((i) => i.model.includes('6.6kW'));
+    const bMin = inverexBats.length ? Math.min(...inverexBats.map((b) => b.rate)) : null;
+    items.push({
+      text: `INVEREX: Veyron/Yukon Rs ${Math.round(vMin / 1000)}k+ • Nitrox 6.6k Rs ${Math.round((n66?.rate || 247000) / 1000)}k • Lithium Rs ${Math.round((bMin || 69000) / 1000)}k+`,
+      color: 'text-amber-300',
+      icon: '⚡',
+    });
+  }
+
   const itelInvs = inverters.filter((i) => i.brand === 'Itel' && typeof i.rate === 'number');
   if (itelInvs.length) {
     const minItel = Math.min(...itelInvs.map((i) => i.rate));

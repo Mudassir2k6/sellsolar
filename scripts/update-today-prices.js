@@ -55,7 +55,7 @@ async function fetchSupabaseAdminOverrideSheet() {
     }
 
     const repoPublishedMs =
-      Date.parse(RAW_BASE_DAILY_SHEET?.publishedIso || '2026-11-24T16:00:00+05:00') || 0;
+      Date.parse(RAW_BASE_DAILY_SHEET?.publishedIso || '2026-11-25T13:30:00+05:00') || 0;
     const remotePublishedMs =
       Date.parse(remoteWrapper.publishedAt || remoteSheet.publishedAt || row.updated_at || '') || 0;
 
@@ -604,6 +604,9 @@ async function runPriceUpdate() {
 
   const baseSheetLabel = (activeBaseSheet?.reportDate || activeBaseSheet?.label || shortDate).split(' ')[0];
   const isNewDaySheet = shortDate !== baseSheetLabel;
+  const repoSheetPublishedMs = Date.parse(activeBaseSheet?.publishedIso || '') || 0;
+  const prevAutoRunMs = Date.parse(PREV_AUTO_SNAPSHOT?.lastRunIso || '') || 0;
+  const isBaselineNewerThanPrevSnapshot = repoSheetPublishedMs > prevAutoRunMs;
 
   let totalChecked = 0;
   let liveMatchedCount = 0;
@@ -638,7 +641,10 @@ async function runPriceUpdate() {
         sourceHits[match.source] = (sourceHits[match.source] || 0) + 1;
 
         const baseRate = typeof item.rate === 'number' ? item.rate : match.rate;
-        const hasSameBaseline = prevAuto && prevAuto.baseRateAtFetch === item.rate;
+        const hasSameBaseline =
+          !isBaselineNewerThanPrevSnapshot &&
+          prevAuto &&
+          prevAuto.baseRateAtFetch === item.rate;
         const prevAnchor =
           hasSameBaseline && typeof prevAuto.externalMarketRate === 'number'
             ? prevAuto.externalMarketRate
@@ -704,7 +710,10 @@ async function runPriceUpdate() {
       } else {
         carriedForwardCount++;
         const carriedRate =
-          prevAuto && typeof prevAuto.rate === 'number' && prevAuto.baseRateAtFetch === item.rate
+          !isBaselineNewerThanPrevSnapshot &&
+          prevAuto &&
+          typeof prevAuto.rate === 'number' &&
+          prevAuto.baseRateAtFetch === item.rate
             ? prevAuto.rate
             : item.rate;
         snapshotItems[key] = {

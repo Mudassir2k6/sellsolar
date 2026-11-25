@@ -374,10 +374,27 @@ function Xy({
       window.removeEventListener('sellsolar_installation_updated', updateLeads);
   }, []);
 
+  // "More" menu: on screens narrower than 2xl some links are hidden from the bar; keep them reachable.
+  const [moreNavOpen, setMoreNavOpen] = useState(false);
+  const moreNavRef = useRef(null);
+  useEffect(() => {
+    if (!moreNavOpen) return undefined;
+    const closeOutside = (event) => {
+      if (moreNavRef.current && !moreNavRef.current.contains(event.target)) setMoreNavOpen(false);
+    };
+    document.addEventListener('mousedown', closeOutside);
+    document.addEventListener('touchstart', closeOutside);
+    return () => {
+      document.removeEventListener('mousedown', closeOutside);
+      document.removeEventListener('touchstart', closeOutside);
+    };
+  }, [moreNavOpen]);
+
   const h = (j) => {
     t(j);
     a(!1);
     o(!1);
+    setMoreNavOpen(false);
     setIsMobileSearchOpen(!1);
   };
   const p = async () => {
@@ -783,6 +800,49 @@ function Xy({
                       }),
                     ],
                   }),
+                }),
+                // Same menu for everyone (admin or visitor): links hidden at this width live here
+                jsxs('div', {
+                  ref: moreNavRef,
+                  className: 'relative shrink-0 flex 2xl:hidden',
+                  children: [
+                    jsxs('button', {
+                      type: 'button',
+                      id: 'header-more-btn',
+                      onClick: () => setMoreNavOpen((v) => !v),
+                      'aria-expanded': moreNavOpen,
+                      'aria-haspopup': 'menu',
+                      className:
+                        'flex items-center gap-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-2.5 py-1.5 text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer',
+                      children: ['More', jsx(ChevronDown, { className: `h-3.5 w-3.5 transition-transform ${moreNavOpen ? 'rotate-180' : ''}` })],
+                    }),
+                    moreNavOpen
+                      ? jsxs('div', {
+                          role: 'menu',
+                          className:
+                            'absolute right-0 top-full mt-2 w-56 animate-slide-down rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 py-2 shadow-xl z-50',
+                          children: [
+                            { label: 'Blog', page: 'blog', icon: BookOpen, cls: 'xl:hidden' },
+                            { label: 'Load Calculator', page: 'calculator', icon: Calculator, cls: 'lg:hidden' },
+                            { label: 'Dealers', page: 'dealers', icon: Store, cls: 'xl:hidden' },
+                            { label: 'Verify Plates', page: 'verification', icon: ShieldCheck, cls: '' },
+                            { label: 'Installation', page: 'install', icon: Wrench, cls: '' },
+                          ].map((item) =>
+                            jsxs(
+                              'button',
+                              {
+                                type: 'button',
+                                role: 'menuitem',
+                                onClick: () => h(item.page),
+                                className: `${item.cls} flex w-full items-center gap-2.5 px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer`,
+                                children: [jsx(item.icon, { className: 'h-4 w-4 text-amber-500 shrink-0' }), item.label],
+                              },
+                              item.page
+                            )
+                          ),
+                        })
+                      : null,
+                  ],
                 }),
               ],
             }),

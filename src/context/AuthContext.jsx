@@ -14,6 +14,14 @@ import {
 export const AuthContext = createContext(null);
 
 export const DEFAULT_ADMIN_EMAIL = 'admin@sellsolar.pk';
+
+// Accounts that can never sign in (the legacy local admin has no real Supabase user behind it).
+const LOCKED_ACCOUNTS = ['admin@sellsolar.pk'];
+export const LOCKED_ACCOUNT_MESSAGE =
+  'This account is locked. Please sign in with your registered admin email.';
+export function isLockedAccount(identifier) {
+  return LOCKED_ACCOUNTS.includes(String(identifier || '').trim().toLowerCase());
+}
 export const LEGACY_ADMIN_EMAIL = 'mudassir2k6@gmail.com';
 export const DEFAULT_ADMIN_ID = '00000000-0000-4000-8000-000000000001';
 
@@ -408,6 +416,12 @@ export function getStoredSession() {
     let modified = false;
     const userEmail = (session.user.email || '').toLowerCase();
     const isDefaultAdmin = userEmail === DEFAULT_ADMIN_EMAIL.toLowerCase();
+
+    // admin@sellsolar.pk is a locked account: any saved local session for it is discarded.
+    if (isLockedAccount(userEmail)) {
+      localStorage.removeItem(LOCAL_SESSION_KEY);
+      return null;
+    }
 
     // Migrate any legacy non-UUID user id (e.g. 'admin-user-mudassir') to valid UUID
     if (!session.user.id || !isValidUuid(session.user.id) || session.user.id === 'admin-user-mudassir') {
@@ -835,6 +849,11 @@ export function AuthProvider({ children }) {
         : `${rawIdentifier.toLowerCase().replace(/[^a-z0-9._-]/g, '')}@sellsolar.local`;
       const cleanPass = password.trim();
       const cleanPhone = normalizePhone(phone);
+
+      // Nobody may register the locked admin address
+      if (isLockedAccount(cleanEmail)) {
+        throw new Error(LOCKED_ACCOUNT_MESSAGE);
+      }
       const isAdm =
         cleanEmail === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
         rawIdentifier.toLowerCase() === 'mudassir2k6';
@@ -1083,6 +1102,11 @@ export function AuthProvider({ children }) {
       const cleanPass = password.trim();
       const digitsOnly = cleanIdentifier.replace(/\D/g, '');
 
+      // Locked accounts (legacy local admin) can never sign in
+      if (isLockedAccount(cleanIdentifier)) {
+        throw new Error(LOCKED_ACCOUNT_MESSAGE);
+      }
+
       // Security check: deleted account
       if (isAccountDeleted(cleanIdentifier)) {
         throw new Error('This account has been deleted. Please register for a new account.');
@@ -1306,6 +1330,10 @@ export function AuthProvider({ children }) {
       // 3. Admin credentials check (mudassir2k6@gmail.com / mudassir2k6 / 03001234567)
       if (isAdm) {
         if (record && record.password === cleanPass) {
+          // Aliases (username / phone) that resolve to the locked local admin are blocked too
+          if (isLockedAccount(record.user?.email) || isLockedAccount(record.profile?.email)) {
+            throw new Error(LOCKED_ACCOUNT_MESSAGE);
+          }
           clearRateLimit('login', cleanIdentifier || 'global');
           const activeUser = { ...record.user, id: DEFAULT_ADMIN_ID };
           const activeProfile = { ...record.profile, id: DEFAULT_ADMIN_ID };
@@ -1992,11 +2020,10 @@ export function AuthProvider({ children }) {
     let userExists = false;
 
     // 1. Check default admin accounts
-    if (
-      cleanMail === DEFAULT_ADMIN_EMAIL.toLowerCase() ||
-      cleanMail === 'mudassir2k6@gmail.com' ||
-      cleanMail === 'mudassir2k6'
-    ) {
+    if (isLockedAccount(cleanMail)) {
+      throw new Error(LOCKED_ACCOUNT_MESSAGE);
+    }
+    if (cleanMail === 'mudassir2k6@gmail.com' || cleanMail === 'mudassir2k6') {
       userExists = true;
     }
 

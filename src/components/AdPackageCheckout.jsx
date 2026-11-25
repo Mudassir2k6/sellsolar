@@ -8,6 +8,7 @@ import {
   Copy,
   ImagePlus,
   Loader2,
+  MessageCircle,
   Send,
   ShieldCheck,
   Smartphone,
@@ -15,6 +16,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { useSiteSettings } from '../context/SiteSettingsContext';
+import { buildWhatsAppUrl } from '../lib/whatsapp';
 import { compressImageFile } from '../lib/images';
 import { isValidPhone, normalizePhone } from '../lib/auth';
 import {
@@ -88,6 +91,7 @@ function CopyButton({ value, label }) {
 export default function AdPackageCheckout({ pkg, onBack, onNavigate }) {
   const toastCtx = useToast();
   const { user, profile } = useAuth();
+  const { settings } = useSiteSettings();
   const amount = parsePackageAmount(pkg);
   const isFree = amount === 0;
   const priceText = pkg.priceLabel || (isFree ? 'Rs. 0' : `Rs. ${amount.toLocaleString('en-PK')}`);
@@ -205,6 +209,37 @@ export default function AdPackageCheckout({ pkg, onBack, onNavigate }) {
             </div>
           ))}
         </dl>
+
+        {/* Instant alert: opens WhatsApp with the order already typed in; the customer attaches the screenshot there. */}
+        <div className="mx-auto max-w-sm rounded-2xl border-2 border-emerald-500/40 bg-emerald-50 p-4 text-left dark:bg-emerald-950/30">
+          <p className="text-sm font-black text-gray-900 dark:text-white">Get a faster reply on WhatsApp</p>
+          <p className="mt-1 text-xs text-gray-600 dark:text-gray-300">
+            Tap the button to send this order to our team{isFree ? '' : ' and attach your payment screenshot in the chat'}.
+          </p>
+          <a
+            href={buildWhatsAppUrl(
+              settings,
+              [
+                'Salam SellSolar Team! New ad package order:',
+                `• Ref: ${done.id}`,
+                `• Package: ${pkg.name} (${pkg.period})`,
+                `• Amount: ${priceText}${isFree ? ' (free launch)' : ' via Easypaisa'}`,
+                `• Name: ${done.contactName}`,
+                `• Phone: ${done.contactPhone}`,
+                done.businessName ? `• Business: ${done.businessName}` : '',
+                done.transactionId ? `• Transaction ID: ${done.transactionId}` : '',
+                isFree ? '' : 'Payment screenshot attached below.',
+              ]
+                .filter(Boolean)
+                .join('\n')
+            )}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-700"
+          >
+            <MessageCircle className="h-4 w-4" /> Send on WhatsApp
+          </a>
+        </div>
         <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
           <button type="button" onClick={() => onNavigate?.('home')} className="btn-primary px-5 py-2.5 text-sm font-bold cursor-pointer">
             Back to home

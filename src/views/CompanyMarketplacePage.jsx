@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
+import AdPackageCheckout from '../components/AdPackageCheckout';
 import {
   Building2,
   Briefcase,
@@ -1499,10 +1500,29 @@ function PricingContent({ onNavigate, onPostAd }) {
     else if (onNavigate) onNavigate(link);
   };
 
+  // Click a package card: it turns blue (selected). "Continue" opens the order page (summary + payment).
+  const [selectedPkgId, setSelectedPkgId] = useState(null);
+  const [checkoutPkgId, setCheckoutPkgId] = useState(null);
+  const selectedPkg = adPackages.find((p) => p.id === selectedPkgId) || null;
+  const checkoutPkg = adPackages.find((p) => p.id === checkoutPkgId) || null;
+
   const runCta = (pkg) => {
-    const link = pkg.ctaLink || 'contact';
-    if (onNavigate) onNavigate(link.replace(/^\//, ''));
+    setSelectedPkgId(pkg.id);
+    setCheckoutPkgId(pkg.id);
   };
+
+  if (checkoutPkg) {
+    return (
+      <AdPackageCheckout
+        pkg={checkoutPkg}
+        onNavigate={onNavigate}
+        onBack={() => {
+          setCheckoutPkgId(null);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
+    );
+  }
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -1528,15 +1548,34 @@ function PricingContent({ onNavigate, onPostAd }) {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-stretch">
-            {adPackages.map((pkg) => (
+            {adPackages.map((pkg) => {
+              const isSelected = selectedPkgId === pkg.id;
+              return (
               <div
                 key={pkg.id}
-                className={`rounded-3xl border p-6 flex flex-col justify-between shadow-sm ${
-                  pkg.highlighted
-                    ? 'border-2 border-violet-500 bg-white dark:bg-gray-900 shadow-lg relative'
-                    : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900'
+                role="button"
+                tabIndex={0}
+                aria-pressed={isSelected}
+                onClick={() => setSelectedPkgId(pkg.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedPkgId(pkg.id);
+                  }
+                }}
+                className={`rounded-3xl border p-6 flex flex-col justify-between shadow-sm relative cursor-pointer transition-all focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-500/30 ${
+                  isSelected
+                    ? 'border-2 border-blue-500 bg-blue-50 dark:bg-blue-950/40 shadow-lg ring-4 ring-blue-500/15'
+                    : pkg.highlighted
+                      ? 'border-2 border-violet-500 bg-white dark:bg-gray-900 shadow-lg hover:border-blue-400'
+                      : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-blue-300'
                 }`}
               >
+                {isSelected && (
+                  <span className="absolute -top-3 right-4 inline-flex items-center gap-1 rounded-full bg-blue-600 px-2.5 py-0.5 text-[10px] font-extrabold uppercase text-white shadow">
+                    <Check className="h-3 w-3" /> Selected
+                  </span>
+                )}
                 {pkg.highlighted && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-violet-600 text-white text-[10px] font-extrabold uppercase px-3 py-0.5">
                     Best value
@@ -1563,16 +1602,40 @@ function PricingContent({ onNavigate, onPostAd }) {
                 </div>
                 <button
                   type="button"
-                  onClick={() => runCta(pkg)}
-                  className={`mt-6 w-full text-xs py-2.5 rounded-xl font-bold ${
-                    pkg.highlighted ? 'btn-primary' : pkg.id === 'free' ? 'btn-secondary' : 'btn-secondary'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    runCta(pkg);
+                  }}
+                  className={`mt-6 w-full text-xs py-2.5 rounded-xl font-bold cursor-pointer ${
+                    isSelected
+                      ? 'bg-blue-600 text-white hover:bg-blue-700'
+                      : pkg.highlighted
+                        ? 'btn-primary'
+                        : 'btn-secondary'
                   }`}
                 >
                   {pkg.ctaText || 'Contact sales'}
                 </button>
               </div>
-            ))}
+              );
+            })}
           </div>
+
+          {selectedPkg && (
+            <div className="sticky bottom-3 z-10 mx-auto flex max-w-2xl flex-col items-center justify-between gap-2 rounded-2xl border border-blue-300 bg-white/95 px-4 py-3 shadow-xl backdrop-blur dark:border-blue-800 dark:bg-gray-900/95 sm:flex-row">
+              <p className="text-xs text-gray-600 dark:text-gray-300">
+                Selected: <span className="font-black text-blue-700 dark:text-blue-300">{selectedPkg.name}</span> ·{' '}
+                <span className="font-bold">{selectedPkg.priceLabel || `Rs. ${selectedPkg.price}`}</span> / {selectedPkg.period}
+              </p>
+              <button
+                type="button"
+                onClick={() => setCheckoutPkgId(selectedPkg.id)}
+                className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-extrabold text-white hover:bg-blue-700 cursor-pointer"
+              >
+                Continue <ArrowRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          )}
         </div>
       )}
 

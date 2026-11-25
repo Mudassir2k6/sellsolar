@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Megaphone, Plus, Trash2, GripVertical, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { DEFAULT_ADVERTISEMENT_SETTINGS } from '../lib/advertisementDefaults';
 import HomeAdvertisementBoard from './HomeAdvertisementBoard';
+import AdminAdPackageOrders from './AdminAdPackageOrders';
 import {
   deletePartnerAdSubmission,
   fetchAdminPartnerAds,
@@ -418,6 +419,8 @@ export default function AdminAdvertisementSettings({ value, onChange }) {
           </div>
         ))}
       </div>
+
+      <AdminAdPackageOrders />
 
       <div className="space-y-3 pt-2 border-t border-violet-200/60 dark:border-violet-900/40">
         <div className="flex items-center justify-between gap-2">

@@ -2,10 +2,10 @@
   "version": 2,
   "countryCode": "AU",
   "location": "Australia",
-  "lastUpdated": "2026-11-24T09:34:54+05:00",
-  "lastUpdatedLabel": "24 Nov 2026, 9:34 am PKT",
+  "lastUpdated": "2026-11-25T08:20:06+05:00",
+  "lastUpdatedLabel": "25 Nov 2026, 8:20 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solaraustralia, solarpanel, solarwaste, scalesolar",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solaraustralia, solarpanel, solarwaste, solarboon, solarelectricity, solarcheap",
   "trendingNews": [
     {
       "id": "tn-1",
@@ -33,18 +33,6 @@
     },
     {
       "id": "tn-3",
-      "title": "Silver costs spark push for cheaper solar panel alternatives",
-      "summary": "Trending solar coverage from Mining.com.au — use this Australia topic for your own posts and SEO content.",
-      "source": "Mining.com.au",
-      "url": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxPbnhjRkVEb2xZcFlHbDlKOENyR252RG1sb2VuQUh0UUx6U3EwY1NtU0dWeERiamI5d2V0WjVJc0ppOE9hTWhBQnpHT3UwVTZyYmtqbHF0aWhSdjdFQWFWN3lqRzVNeFJzeW1KOXZEWERSQXpkN1hQVl9rUzBIXzNpbEE0Y2o0SVp0Q3FZ?oc=5",
-      "tags": [
-        "#solarpanel",
-        "#solarAustralia",
-        "#solarenergy"
-      ]
-    },
-    {
-      "id": "tn-4",
       "title": "Rooftop solar waste is growing. Some experts say $10 fee per panel could help",
       "summary": "Trending solar coverage from ABC News & Headlines – Australian Broadcasting Corporation — use this Australia topic for your own posts and SEO content.",
       "source": "ABC News & Headlines – Australian Broadcasting Corporation",
@@ -56,24 +44,37 @@
       ]
     },
     {
-      "id": "tn-5",
-      "title": "How Is Australia's Cheaper Home Batteries Program Changing Solar Energy Storage in 2026?",
-      "summary": "Trending solar coverage from Kalkine — use this Australia topic for your own posts and SEO content.",
-      "source": "Kalkine",
-      "url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxQY0Nlbk8xS2RqMDZ0c3l2SzJjclFYMzNJb1d6SVVreWF1d1BfeGtwNlczVTUtZldzMF9nNnFlTnREaXZoZWk1aHE5ZUtlMUtCd2M1d0JIcmZXVTY2X1N1eTJDc1lTcElzbWJDYjR5X2Ytazd3VTBpTjVjOFBVTXlYTWpoUXF2ckVha2JtY3Q3UmQ5VFNaRzhXbDRYOW1RLTZYZHF6MGw2TnFQT1dFMlV3RGFoQW5pZmdObDU5TEY2QS1JTFoy?oc=5",
+      "id": "tn-4",
+      "title": "Global Warming and Solar Panel Performance in Australia",
+      "summary": "Trending solar coverage from Energy Matters — use this Australia topic for your own posts and SEO content.",
+      "source": "Energy Matters",
+      "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxQcjRReXM1VnlrWWZZTXgxUXBzdTJONTBVRVF3YTl6OEJ0NHI5dHRKTERYWG83ekpiS0lZWjRrbG1xRTU5bGRkY29PYUNpMjhoVjZOdGtrLUhhbUUwU3cxaXF5NGpJWDgwZHJsZ1JFX1FvNW1RTlVrS3RlS0FuNDM5MmpjbUxXRlp6ZExZbEhOam1KSG1BWl9xRTM0WlZMUQ?oc=5",
       "tags": [
-        "#solarenergy",
-        "#solarAustralia"
+        "#solarpanel",
+        "#solarAustralia",
+        "#solarenergy"
+      ]
+    },
+    {
+      "id": "tn-5",
+      "title": "Submission on Solar Panel Reuse and Recycling in Australia",
+      "summary": "Trending solar coverage from ALGA — use this Australia topic for your own posts and SEO content.",
+      "source": "ALGA",
+      "url": "https://news.google.com/rss/articles/CBMihgFBVV95cUxQVUJWbVVYWV9YV2RLWk55c0hmaW94M2hiMlY0LUhvVFk3bDBtV1V0NTE1VHdETy1MdU9xWFlRSlpzNFl1WEJQdmt5OGgwSnlqdFp2NTlNanFJWmFCR3Y2aURaMWE1TDNhY1Vld21KR3R6S0MtU2FtS1B4eWVTeGF6T1MwbS1xUQ?oc=5",
+      "tags": [
+        "#solarpanel",
+        "#solarAustralia",
+        "#solarenergy"
       ]
     },
     {
       "id": "tn-6",
-      "title": "Shaping Australia’s future energy landscape through smarter large-scale solar",
-      "summary": "Trending solar coverage from CSIRO — use this Australia topic for your own posts and SEO content.",
-      "source": "CSIRO",
-      "url": "https://news.google.com/rss/articles/CBMib0FVX3lxTFBkaVpYeXRUYWJpczFwdS01bXgtQUNrWWNCbUxaUjVJNzlyb1hVTDJTZ2hlbXg5b05kZzFURk5qSGtZOUMyNER4ZGUwaXZ3NGQ0a3NsNnp5VVkycEFZSmtHTWVpcUllOHJ3ZmFNUnZGbw?oc=5",
+      "title": "Australia wants to sell Singapore solar power. But does anyone want it?",
+      "summary": "Trending solar coverage from ABC News & Headlines – Australian Broadcasting Corporation — use this Australia topic for your own posts and SEO content.",
+      "source": "ABC News & Headlines – Australian Broadcasting Corporation",
+      "url": "https://news.google.com/rss/articles/CBMirgFBVV95cUxNZVMtem9CaVpMY0Y5d0J4bDhlTklaWjM2VUJlMTByUVdWb05zY1pnSzU3ZFJJbGZkYTkwZEFocTdkNUhlVzZJMWdBRkdUdU1kSGJacWpEa0ZGaWllczVURTNFQzNoMm1vcFQ1dHlITVlKc1REbGEtZExISVRFZWV4cWxrWDNuMklkTTV6YWgtbXpaeE5XU3Z4ekxKUlkybjFCV3h4a004RDhVR3NtUlE?oc=5",
       "tags": [
-        "#scalesolar",
+        "#solarpower",
         "#solarAustralia",
         "#solarenergy"
       ]
@@ -175,7 +176,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "179K+"
+          "posts": "183K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -185,7 +186,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "45K+"
+          "posts": "46K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -205,7 +206,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "499K+"
+          "posts": "514K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -215,7 +216,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "97K+"
+          "posts": "93K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solaraustralia/"
@@ -225,7 +226,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "37K+"
+          "posts": "35K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
@@ -235,20 +236,40 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "27K+"
+          "posts": "26K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarwaste/"
     },
     {
-      "tag": "#scalesolar",
+      "tag": "#solarboon",
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "29K+"
+          "posts": "45K+"
         }
       ],
-      "searchUrl": "https://www.instagram.com/explore/tags/scalesolar/"
+      "searchUrl": "https://www.instagram.com/explore/tags/solarboon/"
+    },
+    {
+      "tag": "#solarelectricity",
+      "platforms": [
+        {
+          "name": "Instagram",
+          "posts": "21K+"
+        }
+      ],
+      "searchUrl": "https://www.instagram.com/explore/tags/solarelectricity/"
+    },
+    {
+      "tag": "#solarcheap",
+      "platforms": [
+        {
+          "name": "Instagram",
+          "posts": "30K+"
+        }
+      ],
+      "searchUrl": "https://www.instagram.com/explore/tags/solarcheap/"
     }
   ],
   "contentIdeas": [

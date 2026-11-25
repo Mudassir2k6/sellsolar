@@ -2,10 +2,10 @@
   "version": 2,
   "countryCode": "EG",
   "location": "Egypt",
-  "lastUpdated": "2026-11-24T09:34:54+05:00",
-  "lastUpdatedLabel": "24 Nov 2026, 9:34 am PKT",
+  "lastUpdated": "2026-11-25T08:20:06+05:00",
+  "lastUpdatedLabel": "25 Nov 2026, 8:20 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solaregypt, solarpowered, solarpanel, solartriumph",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solaregypt, solarpowered, solarpanel, solaropens",
   "trendingNews": [
     {
       "id": "tn-1",
@@ -43,34 +43,32 @@
     },
     {
       "id": "tn-4",
-      "title": "Egypt considers electricity-saving incentives, expands solar power projects",
-      "summary": "Trending solar coverage from Daily News Egypt — use this Egypt topic for your own posts and SEO content.",
-      "source": "Daily News Egypt",
-      "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxQb1VzUzVkUXIxWnJ0ZGJCYXUxVGtjaGt0aVZlT0hzYzVxUnNBbXNYVThrMFhxVks5SS1uSFlxc3lkS2xYTDg0b0RVZ3RpQ0pfQktzek5iM2dGeVlNRVE5Z05RWVFaVUJUV2ZRYVdpdHBkcThESzFtNGFWTS1MQ1RqVURPdTZXOEdaNGt4ZmVvVUtFMTdCWm5mUFBlUTd5RlZLM2NCQmNOc1pRaERuQ2NsRzNCQQ?oc=5",
+      "title": "Africa’s Unseen Solar Energy Revolution",
+      "summary": "Trending solar coverage from CleanTechnica — use this Egypt topic for your own posts and SEO content.",
+      "source": "CleanTechnica",
+      "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxOa0FJcnNmcXBjdmpuck1aczVaMVVSTXNheWFPOGRSdjRTUzUzWVBMUkJDZHZrMHBKSHdFRldSWUZjZGRkODlvSktMdXBVNUd6cHlhTVhXVzBLR1A0VlhpNmJvUWw0WUNRNzl5cjZDdlp0d2pSNnlCS3F5SENjQ3dmd2RyZ1czM3FtQ2dGcm8zdVY0WlNyZ2VaTnJoMkViams?oc=5",
       "tags": [
-        "#solarpower",
-        "#solarEgypt",
-        "#solarenergy"
+        "#solarenergy",
+        "#solarEgypt"
       ]
     },
     {
       "id": "tn-5",
-      "title": "Egypt to construct new solar power plant in Aswan’s Benban Complex for US$127 million",
-      "summary": "Trending solar coverage from Egypt Independent — use this Egypt topic for your own posts and SEO content.",
-      "source": "Egypt Independent",
-      "url": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxNOEZaRkJQWFNvbTEtOExnME9NSktKM1BaejdRY0ZrbFpya3pDT2hFN2IzTWtMWVo3TGpRc1pSaWxRQ0dBNVNFY2lNRnlBMVhsOExpdFBpeDFlNDI4eGZtN2VnRFJ3cmZqMkRoWjByTDlESnNhZFBkQVR3WV9wT2tMVkE2WnBEcE5jcDczN1ZSa2luamk2ZlZGOS12OWtoV2JXLWttT2pGUHQ4QjNidEVPeTh5aDY1QUxU?oc=5",
+      "title": "IDSC's report: Egypt ranks among top 3 African markets for new solar energy additions",
+      "summary": "Trending solar coverage from Egypt Today — use this Egypt topic for your own posts and SEO content.",
+      "source": "Egypt Today",
+      "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxQek5QcS1RUEpNaFFUbFNESk1JbVB2TGZRSEg5WjNoNDhRVWxwOUpJNFVRWWl1REZYbHY2MmJaYXN6NnE4SHcyeERfZnoxdlVWTmJobS1NYWNRVzNkaG1aQldpMlJKemRldjdMck1xMXVtNWNiZkVmdGoyRDJ5dUNsNUQ4LWhhUlhfUk9hMWxkZ21tdGZ3MVFNaHhRUlRTdw?oc=5",
       "tags": [
-        "#solarpower",
-        "#solarEgypt",
-        "#solarenergy"
+        "#solarenergy",
+        "#solarEgypt"
       ]
     },
     {
       "id": "tn-6",
-      "title": "Prime Minister reviews efforts to rationalize electricity consumption, expand solar energy usage",
-      "summary": "Trending solar coverage from الهيئة العامة للاستعلامات — use this Egypt topic for your own posts and SEO content.",
-      "source": "الهيئة العامة للاستعلامات",
-      "url": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxOVUFlX0gzYld0Y3FPamxUdjd1THl4R1Y0anpQNHRZbk5nNUxmSTRTaVg3dTR6MVM5cmVIM3RFeDJaeFZwRmtNbVRZZk5VdHZ5MzBMUWl5M0EzRWJUYV9SNG9FVmZ5UHdhZVIyaUEtOEhqdzNlX1I3MGR5RmtBM2tXbnVITDFTN2xpQ2hLeDhDSXR3VTZyUE5qSnQtTnlwOURUZm54NzhfVWhVaDBpdm9hYlgzajRZMTZscGk2VGVWSHp4V3pOdGE2a1IyeHk1NlNjNHc?oc=5",
+      "title": "Rooftop Revolution: Solar Energy Is Reshaping Egypt’s Oil and Gas Future",
+      "summary": "Trending solar coverage from Egypt Oil & Gas — use this Egypt topic for your own posts and SEO content.",
+      "source": "Egypt Oil & Gas",
+      "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxPMTREN1dRM3l6NG5DUzNJa2VDeXE5eUFzX2M4bjd0RWhTcXdhZl94YmVsSEcyWVd6NVlTR2FnY1dSSEVoeUJWZHlYck5NOEhpYmJXZlVLOTltX0NJU2J4WjlMSmhWTmMzNEJxakl5bWRkNTZXQ1JUaUZsUUF0dEEtNFN1QWNnODNid3NCWG1hUkVBZ3dta2ZKUTdJMzEtQUtqOXNRNE9mXzI?oc=5",
       "tags": [
         "#solarenergy",
         "#solarEgypt"
@@ -173,7 +171,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "179K+"
+          "posts": "183K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -183,7 +181,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "45K+"
+          "posts": "46K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -203,7 +201,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "499K+"
+          "posts": "514K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -213,7 +211,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "97K+"
+          "posts": "93K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solaregypt/"
@@ -223,7 +221,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "34K+"
+          "posts": "32K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpowered/"
@@ -233,20 +231,20 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "37K+"
+          "posts": "36K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
     },
     {
-      "tag": "#solartriumph",
+      "tag": "#solaropens",
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "39K+"
+          "posts": "31K+"
         }
       ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solartriumph/"
+      "searchUrl": "https://www.instagram.com/explore/tags/solaropens/"
     }
   ],
   "contentIdeas": [

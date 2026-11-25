@@ -2,10 +2,10 @@
   "version": 2,
   "countryCode": "PH",
   "location": "Philippines",
-  "lastUpdated": "2026-11-24T09:34:54+05:00",
-  "lastUpdatedLabel": "24 Nov 2026, 9:34 am PKT",
+  "lastUpdated": "2026-11-25T08:20:06+05:00",
+  "lastUpdatedLabel": "25 Nov 2026, 8:20 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarphilippines, solarpanel, solarinstallation, solarsurge, solarboom",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarphilippines, solarpanel, solarinstallation, solarsurge, solarexport",
   "trendingNews": [
     {
       "id": "tn-1",
@@ -33,6 +33,30 @@
     },
     {
       "id": "tn-3",
+      "title": "How the Philippines’ rooftop solar surge can flip the energy emergency script",
+      "summary": "Trending solar coverage from Ember Energy — use this Philippines topic for your own posts and SEO content.",
+      "source": "Ember Energy",
+      "url": "https://news.google.com/rss/articles/CBMiugFBVV95cUxPd2RnUTBYLVU4cjBYM0Z6OUdhUElZUWxKZWdQNEpSRmRBcXNuUWZBTUdXTkxuOVZ3cGhWM1otT1VkWDhrZXJ4Sjl6cVNDVE5WUnliOXE2T2l0Nk1zSjFubnFYMnZpVlRERzh0QnhHUGw0UFU3ZmliSC03Tl83QVJIYXJEN2lLMUlTdmVZVDN0YWVHOWVzc1BVdnpXUjlhS0Zpb3JnWWRNWkRuR0NZUkVwWFc0SWlRaFRRc2c?oc=5",
+      "tags": [
+        "#solarsurge",
+        "#solarPhilippines",
+        "#solarenergy"
+      ]
+    },
+    {
+      "id": "tn-4",
+      "title": "Philippines leads the world in rush to solar as power prices soar",
+      "summary": "Trending solar coverage from Reuters — use this Philippines topic for your own posts and SEO content.",
+      "source": "Reuters",
+      "url": "https://news.google.com/rss/articles/CBMipwFBVV95cUxOaHpHeV9XOF8wZXVYRS1NSDJ5bTJzTTZwZ3NlRHR5aXZ5dUh5ZXJtWnFmVHRvTVFfMXl1eUVSeDQtZGkxby1DQVZrb3ZrNUJFdE1rNjVMd05lRjBNTHU4a21tdTJ4ZFNnbDFFTE14M1hwY0Flb0ZtYmxuemhEQW45U05tYlAtcFRSM1JsMDVKYkhKUU5RMUNBVUNIQlJySXBxQ1dKVmlxSQ?oc=5",
+      "tags": [
+        "#solarpower",
+        "#solarPhilippines",
+        "#solarenergy"
+      ]
+    },
+    {
+      "id": "tn-5",
       "title": "Philippines Approves $21.90 Billion in Investments, Led by Renewable Energy Projects",
       "summary": "Trending solar coverage from energynews.pro — use this Philippines topic for your own posts and SEO content.",
       "source": "energynews.pro",
@@ -44,18 +68,7 @@
       ]
     },
     {
-      "id": "tn-4",
-      "title": "Transportify sees increased deliveries of Solar Energy and Water Storage Equipment across the Philippines",
-      "summary": "Trending solar coverage from Voice of ASIA — use this Philippines topic for your own posts and SEO content.",
-      "source": "Voice of ASIA",
-      "url": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxOdGoxYXVET2FWbXZna0diZnAySnJ0Y3diSHEtMFZuSzgxZlR4Q0dMV3RxQ19vc0stalF6TjRHRXp2Z2JOX1FxYXZqUFNMOFoxLThtbjVRc2JyaERsTEN4cEw5MkZSc0J0STJKMXJBVC1Rb2VITUVpUWhwTjcwc0hKSDB5QTBCRmVYbWJFeEI3WWdEbWgxNGFjZUlTMDJBS2IzQVdOdkwteXowN2RxNjVaUk1vN29IY0o5aF9ZdHlPLWFIazRSVHZGd0RKSFN3VjR2VERVUTFuTQ?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarPhilippines"
-      ]
-    },
-    {
-      "id": "tn-5",
+      "id": "tn-6",
       "title": "Climate Investment Funds invests in solar energy in the Philippines",
       "summary": "Trending solar coverage from Energy Global — use this Philippines topic for your own posts and SEO content.",
       "source": "Energy Global",
@@ -63,18 +76,6 @@
       "tags": [
         "#solarenergy",
         "#solarPhilippines"
-      ]
-    },
-    {
-      "id": "tn-6",
-      "title": "Philippines leads the world in rush to solar as power prices soar",
-      "summary": "Trending solar coverage from Reuters — use this Philippines topic for your own posts and SEO content.",
-      "source": "Reuters",
-      "url": "https://news.google.com/rss/articles/CBMipwFBVV95cUxOaHpHeV9XOF8wZXVYRS1NSDJ5bTJzTTZwZ3NlRHR5aXZ5dUh5ZXJtWnFmVHRvTVFfMXl1eUVSeDQtZGkxby1DQVZrb3ZrNUJFdE1rNjVMd05lRjBNTHU4a21tdTJ4ZFNnbDFFTE14M1hwY0Flb0ZtYmxuemhEQW45U05tYlAtcFRSM1JsMDVKYkhKUU5RMUNBVUNIQlJySXBxQ1dKVmlxSQ?oc=5",
-      "tags": [
-        "#solarpower",
-        "#solarPhilippines",
-        "#solarenergy"
       ]
     }
   ],
@@ -174,7 +175,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "179K+"
+          "posts": "183K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -184,7 +185,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "45K+"
+          "posts": "46K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -204,7 +205,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "499K+"
+          "posts": "514K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -214,7 +215,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "97K+"
+          "posts": "93K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarphilippines/"
@@ -224,7 +225,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "37K+"
+          "posts": "35K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
@@ -250,14 +251,14 @@
       "searchUrl": "https://www.instagram.com/explore/tags/solarsurge/"
     },
     {
-      "tag": "#solarboom",
+      "tag": "#solarexport",
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "45K+"
+          "posts": "20K+"
         }
       ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarboom/"
+      "searchUrl": "https://www.instagram.com/explore/tags/solarexport/"
     }
   ],
   "contentIdeas": [

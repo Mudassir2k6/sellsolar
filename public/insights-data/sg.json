@@ -2,10 +2,10 @@
   "version": 2,
   "countryCode": "SG",
   "location": "Singapore",
-  "lastUpdated": "2026-11-24T09:34:54+05:00",
-  "lastUpdatedLabel": "24 Nov 2026, 9:34 am PKT",
+  "lastUpdated": "2026-11-25T08:20:06+05:00",
+  "lastUpdatedLabel": "25 Nov 2026, 8:20 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarsingapore, solarpanel, solarindependence, solarresearch, solarpush, solardeployment",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarsingapore, solarpanel, solarindependence, solarinvestments, solarresearch, solardeployment",
   "trendingNews": [
     {
       "id": "tn-1",
@@ -21,6 +21,18 @@
     },
     {
       "id": "tn-2",
+      "title": "Cheaper, better solar panels are here. But maximising adoption in Singapore will take creativity",
+      "summary": "Trending solar coverage from CNA — use this Singapore topic for your own posts and SEO content.",
+      "source": "CNA",
+      "url": "https://news.google.com/rss/articles/CBMixwFBVV95cUxNc043QWtOMVNVdms3STBRVXBYcGFLc3R2R1Z1MnY2bjFOUjl2aVNHMjVFZnFLVUFFNFR3UUxuenl4S210NndWVFA1SXJ2X1d3QlpPc2lMMlBKbkprcUhXUjZJNHZTRENtRkJkVmFTaWZaaTBZZFcxeHo2b2hRUXZlb3lzWFhRd2MzSXBJN3JoUkJYOXZ1aXM3ZnUzcWZSWkpTNEl6S2pVdDVGbnM4ajZfSGF4RU80RTQyZUFYRTktSzZRRnpweUtF?oc=5",
+      "tags": [
+        "#solarpanels",
+        "#solarSingapore",
+        "#solarenergy"
+      ]
+    },
+    {
+      "id": "tn-3",
       "title": "To boost energy security, is solar independence for Singapore possible?",
       "summary": "Trending solar coverage from The Straits Times — use this Singapore topic for your own posts and SEO content.",
       "source": "The Straits Times",
@@ -32,7 +44,7 @@
       ]
     },
     {
-      "id": "tn-3",
+      "id": "tn-4",
       "title": "Solar Panels for Singapore Homes (2026): Cost, Payback Period, and How to Finance Them",
       "summary": "Trending solar coverage from MoneySmart — use this Singapore topic for your own posts and SEO content.",
       "source": "MoneySmart",
@@ -44,7 +56,7 @@
       ]
     },
     {
-      "id": "tn-4",
+      "id": "tn-5",
       "title": "EMA Steps Up Partnerships to Advance Solar Energy Technologies",
       "summary": "Trending solar coverage from Energy Market Authority (EMA) — use this Singapore topic for your own posts and SEO content.",
       "source": "Energy Market Authority (EMA)",
@@ -55,7 +67,7 @@
       ]
     },
     {
-      "id": "tn-5",
+      "id": "tn-6",
       "title": "Singapore and Switzerland ink deal to advance solar energy tech",
       "summary": "Trending solar coverage from Asian Power — use this Singapore topic for your own posts and SEO content.",
       "source": "Asian Power",
@@ -63,18 +75,6 @@
       "tags": [
         "#solarenergy",
         "#solarSingapore"
-      ]
-    },
-    {
-      "id": "tn-6",
-      "title": "Singapore updates renewable energy certificate standard to tackle greenwashing; unveils new solar efforts",
-      "summary": "Trending solar coverage from The Business Times — use this Singapore topic for your own posts and SEO content.",
-      "source": "The Business Times",
-      "url": "https://news.google.com/rss/articles/CBMi3gFBVV95cUxNVGNRNTNyaFd0bEtwLUkzZjZwM3B0TzRUSjlUaDhxTENCVXR5S0ZIOHFHTVg5Q1lLRVBwY05VY2FZRTJvakxOSG9MS3VjSG8tUVRaSFhDVVA1UTZaZXN2ZlpXUldEalZrRGQ3QVZqcDdpVEVuLWdDTkMxbVZKakN2NFFYQVUwaDZTVl9NMEVDQzl3SUdsLWh6QWdOUzBNTS1vTHBYUG1BLTkxZlgyUEk1cXA0LVhwNHlWYWhJZFBkcWF3Wjh2eXhSeHM0STlWOWxUcVFQYmVJNWQ5eUpnSkE?oc=5",
-      "tags": [
-        "#renewableenergy",
-        "#solarSingapore",
-        "#solarenergy"
       ]
     }
   ],
@@ -174,7 +174,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "179K+"
+          "posts": "183K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -184,7 +184,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "45K+"
+          "posts": "46K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -204,7 +204,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "499K+"
+          "posts": "514K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -214,7 +214,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "97K+"
+          "posts": "93K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarsingapore/"
@@ -224,7 +224,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "37K+"
+          "posts": "35K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
@@ -234,30 +234,30 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "42K+"
+          "posts": "41K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarindependence/"
+    },
+    {
+      "tag": "#solarinvestments",
+      "platforms": [
+        {
+          "name": "Instagram",
+          "posts": "16K+"
+        }
+      ],
+      "searchUrl": "https://www.instagram.com/explore/tags/solarinvestments/"
     },
     {
       "tag": "#solarresearch",
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "12K+"
+          "posts": "11K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarresearch/"
-    },
-    {
-      "tag": "#solarpush",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "28K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarpush/"
     },
     {
       "tag": "#solardeployment",

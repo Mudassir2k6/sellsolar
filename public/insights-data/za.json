@@ -2,8 +2,8 @@
   "version": 2,
   "countryCode": "ZA",
   "location": "South Africa",
-  "lastUpdated": "2026-11-24T09:34:54+05:00",
-  "lastUpdatedLabel": "24 Nov 2026, 9:34 am PKT",
+  "lastUpdated": "2026-11-25T08:20:06+05:00",
+  "lastUpdatedLabel": "25 Nov 2026, 8:20 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
   "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarsouthafrica, solarpanel, solartechnology",
   "trendingNews": [
@@ -33,28 +33,6 @@
     },
     {
       "id": "tn-3",
-      "title": "Fresh global funding continues to accelerate the shift to solar energy",
-      "summary": "Trending solar coverage from Novus Press Bulletin — use this South Africa topic for your own posts and SEO content.",
-      "source": "Novus Press Bulletin",
-      "url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxQakRzWW9USE9ZekpJZkJDaldheWk1MElnd0hrV1JaVmhQbXlteW9HUjdoZ0k1eGNYM2tiUVllU1VZYmliSzVjUV9sQTRDUUVEOTZaQ0ZqN2NoQ1lVUnRCck5Cay04UzM3YnptckI2b0xCR3o1NW0xbzJZYXRuNGdQZGFSWWJFTUplSTYyRFktM3VJUFpabVRjOVF1LVo1d3dNUUs3S3pCa3FabHQy?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarSouthAfrica"
-      ]
-    },
-    {
-      "id": "tn-4",
-      "title": "South Africa- and India-focused solar energy firm receives new funding",
-      "summary": "Trending solar coverage from Engineering News — use this South Africa topic for your own posts and SEO content.",
-      "source": "Engineering News",
-      "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxQZmthZ19xR1Nid2VLeVJFUEtRbHlSTmFiYm40dl9TY1B1Q2FMRUo4ZUxndDZxczZYNmVRWHNFTVE4TjFEMFhnOTBIRUtfbV84SUJPRzM3dWtMZ1VzSlZJbHlQUmVyeHZVbFNrQThWRnZyMFlSMGl4enVsWlB1ZXhpTV9ERTExUURuQzVkcUctYTN1dVhjVklqclMtY2ljaDdkNGRGZmFSU2F2U3hDWHJ4OUtlMmpCVHlZbUc1Wmo5NA?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarSouthAfrica"
-      ]
-    },
-    {
-      "id": "tn-5",
       "title": "A visit to a solar panel graveyard reveals new uses rising from waste",
       "summary": "Trending solar coverage from Daily Maverick — use this South Africa topic for your own posts and SEO content.",
       "source": "Daily Maverick",
@@ -66,13 +44,35 @@
       ]
     },
     {
-      "id": "tn-6",
-      "title": "China solar panel prices slip as year-end shipping push brings concessions",
-      "summary": "Trending solar coverage from Green Building Africa — use this South Africa topic for your own posts and SEO content.",
-      "source": "Green Building Africa",
-      "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPc1AxdHE2dGNrWnV3dGh4SWttNXFXTjQtd2JQZkFKcEo2VDNicmphV2dzcmY1ZkoyTUpfWHUwb3A5YnlYSkZETlB1aHl0VjdKblhtU1djMW5PVm1oRDEwVkVWQUxoM2RZamdYaWljb3R5elgwX1R4V1lnMzFVU0RYNE4ycEI1NU5Ca2Mwd1h4ZzlwU2Q0MXFuY0hxXzBhU1hXQUxuUy1qOFE0NlFCcnUwRXJiMA?oc=5",
+      "id": "tn-4",
+      "title": "Fresh global funding continues to accelerate the shift to solar energy",
+      "summary": "Trending solar coverage from Novus Press Bulletin — use this South Africa topic for your own posts and SEO content.",
+      "source": "Novus Press Bulletin",
+      "url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxQakRzWW9USE9ZekpJZkJDaldheWk1MElnd0hrV1JaVmhQbXlteW9HUjdoZ0k1eGNYM2tiUVllU1VZYmliSzVjUV9sQTRDUUVEOTZaQ0ZqN2NoQ1lVUnRCck5Cay04UzM3YnptckI2b0xCR3o1NW0xbzJZYXRuNGdQZGFSWWJFTUplSTYyRFktM3VJUFpabVRjOVF1LVo1d3dNUUs3S3pCa3FabHQy?oc=5",
       "tags": [
-        "#solarpanel",
+        "#solarenergy",
+        "#solarSouthAfrica"
+      ]
+    },
+    {
+      "id": "tn-5",
+      "title": "South Africa- and India-focused solar energy firm receives new funding",
+      "summary": "Trending solar coverage from Engineering News — use this South Africa topic for your own posts and SEO content.",
+      "source": "Engineering News",
+      "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxQZmthZ19xR1Nid2VLeVJFUEtRbHlSTmFiYm40dl9TY1B1Q2FMRUo4ZUxndDZxczZYNmVRWHNFTVE4TjFEMFhnOTBIRUtfbV84SUJPRzM3dWtMZ1VzSlZJbHlQUmVyeHZVbFNrQThWRnZyMFlSMGl4enVsWlB1ZXhpTV9ERTExUURuQzVkcUctYTN1dVhjVklqclMtY2ljaDdkNGRGZmFSU2F2U3hDWHJ4OUtlMmpCVHlZbUc1Wmo5NA?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarSouthAfrica"
+      ]
+    },
+    {
+      "id": "tn-6",
+      "title": "South Africa is overlooking solar technology that can keep generating electricity after sunset",
+      "summary": "Trending solar coverage from The Conversation — use this South Africa topic for your own posts and SEO content.",
+      "source": "The Conversation",
+      "url": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxQTEVXM3hNcHYybDVPMmpLc0FJUnNvczVGZGxEa3lWbjFjaGhoZExKSDl2bm9DRExQT1pVdktLMDNMR0lxT0xMb3hoMGZHazIxRU01eklmMlk2VS0zaTlkUzVXcG0zd1RaMWJFN0xBTXEtdFh4SDN3LVBkLTRYcTdjNTg2SnM2MTVGQk9sLUhnWXRQWE9WcW5tdmJpSEgwSUh5RVdTdmpzZk5CQTdTSndaXzdlbDN1UXVCWG9yTGtKNWRSYlBaVEVRRw?oc=5",
+      "tags": [
+        "#solartechnology",
         "#solarSouthAfrica",
         "#solarenergy"
       ]
@@ -174,7 +174,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "179K+"
+          "posts": "183K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -184,7 +184,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "45K+"
+          "posts": "46K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -204,7 +204,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "499K+"
+          "posts": "514K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -214,7 +214,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "97K+"
+          "posts": "93K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarsouthafrica/"
@@ -224,7 +224,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "37K+"
+          "posts": "35K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"

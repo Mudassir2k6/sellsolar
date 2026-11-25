@@ -2,8 +2,8 @@
   "version": 2,
   "countryCode": "CA",
   "location": "Canada",
-  "lastUpdated": "2026-11-24T09:34:54+05:00",
-  "lastUpdatedLabel": "24 Nov 2026, 9:34 am PKT",
+  "lastUpdated": "2026-11-25T08:20:06+05:00",
+  "lastUpdatedLabel": "25 Nov 2026, 8:20 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
   "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarcanada, solarpanel",
   "trendingNews": [
@@ -31,6 +31,18 @@
     },
     {
       "id": "tn-3",
+      "title": "Alberta’s new sky-high solar panel recycling fee sparks industry backlash",
+      "summary": "Trending solar coverage from CBC — use this Canada topic for your own posts and SEO content.",
+      "source": "CBC",
+      "url": "https://news.google.com/rss/articles/CBMikgFBVV95cUxPYmV4eTBxREhPTkpOODBwa0FnSmt0ZmVabmN3eDFHZHhhcDBXck05a29pT3AyWjZJNXNqUk9Gc2NPV2hhOWNhRXhWRlZMNDItM0ZTdFgzMzRXdnVORnRNUE83SkFqRXhON1hycjdpM0hGOW4zSkpKTnZPZFdpRkQzZ2pCM3YxdzlaSTdWWDktNDFXZw?oc=5",
+      "tags": [
+        "#solarpanel",
+        "#solarCanada",
+        "#solarenergy"
+      ]
+    },
+    {
+      "id": "tn-4",
       "title": "Alberta to introduce Canada’s first provincial solar panel recycling program",
       "summary": "Trending solar coverage from Electrical Business Magazine — use this Canada topic for your own posts and SEO content.",
       "source": "Electrical Business Magazine",
@@ -42,23 +54,11 @@
       ]
     },
     {
-      "id": "tn-4",
+      "id": "tn-5",
       "title": "Alberta introduces the first solar panel recycling program in Canada",
       "summary": "Trending solar coverage from Global News — use this Canada topic for your own posts and SEO content.",
       "source": "Global News",
       "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxOMF92SUR5Z3duLUNVSmE2T1gycXR3aG5Jdk14b0hadlZZaElsOXZkcHlBYWJja0dOSldhcXc1dnlPdlpNN2tLTnlzRmh5SDhJM0poYmpaeEhUMFNQR1pNRXZkOERSLXhqbS1VYVU5dzhmOWJmQ01lOHpXOXFRUVVjQVBwUHdtTm9wVEtzZVlVaWZQdG05b2VQcUVBcjdSd1BsbHZicy1OWng?oc=5",
-      "tags": [
-        "#solarpanel",
-        "#solarCanada",
-        "#solarenergy"
-      ]
-    },
-    {
-      "id": "tn-5",
-      "title": "Alberta government touts Oct. 1 launch of $14 solar panel recycling fee, landfill ban",
-      "summary": "Trending solar coverage from CBC — use this Canada topic for your own posts and SEO content.",
-      "source": "CBC",
-      "url": "https://news.google.com/rss/articles/CBMidkFVX3lxTFA3cDh4TzZxNUtoOWlxWWxwUkJMTm16LW43RnR6Z1FfaTZ2MXhUSHpHMlNUUm9nYnU1SVExTmdFTmJIRVVZVVhTRHNLVmdsOVBQcVk4WGVDR3JQZGxFYUFRc1lRM0lteEZXbG04QnR1Z1dYY3Q0THc?oc=5",
       "tags": [
         "#solarpanel",
         "#solarCanada",
@@ -173,7 +173,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "179K+"
+          "posts": "183K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -183,7 +183,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "45K+"
+          "posts": "46K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -203,7 +203,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "499K+"
+          "posts": "514K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -213,7 +213,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "97K+"
+          "posts": "93K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarcanada/"
@@ -223,7 +223,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "37K+"
+          "posts": "35K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"

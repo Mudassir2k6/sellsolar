@@ -126,7 +126,7 @@ import { useToast } from './context/ToastContext';
 import { supabase, isSupabaseConfigured } from './lib/supabase';
 import { BRANDS, CATEGORIES, POSTABLE_CATEGORIES, CITIES, formatPrice } from './lib/constants';
 import { digitsOnlyPhone, isValidPhone, normalizePhone, isValidUuid } from './lib/auth';
-import { getLocalOrSeedListings, getLocalOrSeedListingById, matchesListingFilters, isFeaturedActive } from './data/seedListings';
+import { getLocalOrSeedListings, getLocalOrSeedListingById, matchesListingFilters, isFeaturedActive, isListingPublicVisible, isListingHiddenFromBuyers } from './data/seedListings';
 import { getEquipmentFallbackImage, SELL_SOLAR_PROMO_IMAGE, TURNKEY_INSTALL_PROMO_IMAGE } from './utils/solarImages';
 import ThemeRadioToggle from './components/ThemeRadioToggle';
 import WarrantySelector, { formatWarrantyShort, formatWarrantyLong } from './components/WarrantySelector';
@@ -6369,7 +6369,7 @@ function yx({
             );
             const queryPromise = supabase.from("solar_listings").select("*").eq("id", t).maybeSingle();
             const { data: m, error: v } = await Promise.race([queryPromise, timeoutPromise]);
-            if (!v && m && !isAdDeleted(m.id)) found = m;
+            if (!v && m && !isAdDeleted(m.id) && isListingPublicVisible(m)) found = m;
           } catch(err) {
             // ignore supabase error and try local
           }
@@ -6381,8 +6381,8 @@ function yx({
           u("Listing not found");
           return;
         }
-        if (found.is_deleted === true || found.status === 'deleted') {
-          u("This listing has been removed by the seller.");
+        if (isListingHiddenFromBuyers(found)) {
+          u("This listing has been removed or is no longer available.");
           return;
         }
         const k = found;
@@ -7235,7 +7235,7 @@ function _x({
       const startFilters = initialFilters ? { ...Vu, ...initialFilters } : Vu;
       const deletedMap = getDeletedAds();
       initialListingsRef.current = (getLocalOrSeedListings(startFilters) || []).filter(
-        (item) => !deletedMap[String(item.id)] && item?.is_deleted !== true && item?.status !== 'deleted'
+        (item) => !deletedMap[String(item.id)] && isListingPublicVisible(item)
       );
     } catch {
       initialListingsRef.current = [];
@@ -7262,6 +7262,13 @@ function _x({
     f&&f.scrollIntoView({
       behavior:"smooth",block:"start"
     })
+  },[]);
+  const[_,setListingsResync]=useState(0);
+  useEffect(()=>{
+    const resync=()=>{ if(typeof document!=="undefined"&&document.visibilityState==="visible") setListingsResync((n)=>n+1); };
+    window.addEventListener("focus",resync);
+    document.addEventListener("visibilitychange",resync);
+    return ()=>{ window.removeEventListener("focus",resync); document.removeEventListener("visibilitychange",resync); };
   },[]);
 
   useEffect(()=>{
@@ -7305,7 +7312,7 @@ function _x({
         }=queryResult;
         if(!active) return;
         if(!v && m && m.length > 0){
-          let combined = [...m];
+          let combined = m.filter(isListingPublicVisible);
           try {
             const raw = localStorage.getItem('sellsolar_custom_listings');
             if (raw) {
@@ -7315,6 +7322,7 @@ function _x({
                 // on another device. Ask the cloud which cached ads are gone so they never come back from
                 // this browser's cache (they are marked deleted, not erased, so owner "Deleted Ads" still works).
                 const goneIds = new Set();
+                const hiddenById = new Map();
                 const liveIds = new Set(combined.map((c) => String(c.id)));
                 const toCheck = parsed
                   .map((it) => it && it.id)
@@ -7324,10 +7332,13 @@ function _x({
                   try {
                     const { data: states } = await supabase
                       .from('solar_listings')
-                      .select('id,is_deleted,status')
+                      .select('id,is_deleted,status,is_ad_disabled')
                       .in('id', toCheck);
                     (states || []).forEach((r) => {
-                      if (r.is_deleted === true || r.status === 'deleted') goneIds.add(String(r.id));
+                      if (isListingHiddenFromBuyers(r)) {
+                        goneIds.add(String(r.id));
+                        hiddenById.set(String(r.id), r);
+                      }
                     });
                   } catch {}
                   if (goneIds.size > 0) {
@@ -7335,16 +7346,23 @@ function _x({
                       localStorage.setItem(
                         'sellsolar_custom_listings',
                         JSON.stringify(
-                          parsed.map((it) =>
-                            it && goneIds.has(String(it.id)) ? { ...it, is_deleted: true, status: 'deleted' } : it
-                          )
+                          parsed.map((it) => {
+                            if (!it || !goneIds.has(String(it.id))) return it;
+                            const row = hiddenById.get(String(it.id));
+                            return {
+                              ...it,
+                              is_deleted: row?.is_deleted === true || it.is_deleted === true,
+                              status: row?.status || (row?.is_deleted ? 'deleted' : 'disabled'),
+                              is_ad_disabled: row?.is_ad_disabled === true || it.is_ad_disabled === true,
+                            };
+                          })
                         )
                       );
                     } catch {}
                   }
                 }
                 parsed.forEach((item) => {
-                  if (item?.is_deleted || item?.status === 'deleted') return;
+                  if (isListingHiddenFromBuyers(item)) return;
                   if (item && goneIds.has(String(item.id))) return;
                   // Local ads must obey the active filters too (they used to leak into every filtered list).
                   if (!matchesListingFilters(item, e)) return;
@@ -7356,7 +7374,7 @@ function _x({
             }
           } catch {}
           const deletedMap = getDeletedAds();
-          const cleanM = combined.filter(item => !deletedMap[String(item.id)] && item?.is_deleted !== true && item?.status !== 'deleted');
+          const cleanM = combined.filter(item => !deletedMap[String(item.id)] && isListingPublicVisible(item));
           s(cleanM);
           d(cleanM.length);
         } else {
@@ -7374,7 +7392,7 @@ function _x({
       }
     })();
     return () => { active = false; };
-  },[h,e.category,e.brand,e.condition,e.city,e.minPrice,e.maxPrice,e.query]);
+  },[h,e.category,e.brand,e.condition,e.city,e.minPrice,e.maxPrice,e.query,_]);
 
   return jsxs(Fragment,{
     children:[jsx(nx,{

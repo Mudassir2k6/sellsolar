@@ -255,6 +255,18 @@ export const SEED_LISTINGS = [
   }
 ];
 
+/** Deleted, disabled, or inactive listings must not appear to buyers (admin panel may still show them to owner/admin). */
+export function isListingHiddenFromBuyers(item) {
+  if (!item) return true;
+  if (item.is_deleted === true || item.status === 'deleted') return true;
+  if (item.is_ad_disabled === true || item.status === 'disabled' || item.status === 'inactive') return true;
+  return false;
+}
+
+export function isListingPublicVisible(item) {
+  return !isListingHiddenFromBuyers(item);
+}
+
 export function getLocalOrSeedListings(filters = {}) {
   let userCustomListings = [];
   let deletedAdsMap = {};
@@ -280,9 +292,7 @@ export function getLocalOrSeedListings(filters = {}) {
   return all.filter((item) => {
     // Hide permanently deleted ads (admin-deleted blacklist)
     if (deletedAdsMap[String(item.id)]) return false;
-    if (item.is_deleted === true || item.status === 'deleted') return false;
-    // Hide disabled ads from marketplace display
-    if (item.is_ad_disabled || item.status === 'disabled') return false;
+    if (isListingHiddenFromBuyers(item)) return false;
     return matchesListingFilters(item, filters);
   });
 }
@@ -348,6 +358,6 @@ export function getLocalOrSeedListingById(id) {
   if (deletedAdsMap[String(id)]) return null;
   const all = [...userCustomListings, ...SEED_LISTINGS];
   const found = all.find((item) => String(item.id) === String(id)) || null;
-  if (found && (found.is_deleted === true || found.status === 'deleted')) return null;
+  if (found && isListingHiddenFromBuyers(found)) return null;
   return found;
 }

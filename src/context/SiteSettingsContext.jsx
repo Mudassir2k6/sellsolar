@@ -138,6 +138,64 @@ export const DEFAULT_SITE_SETTINGS = {
 
 export const SiteSettingsContext = createContext(null);
 
+function mergeRemoteSiteSettings(setSettings, remoteParsed, rawValue) {
+  setSettings((prev) => ({
+    ...prev,
+    ...remoteParsed,
+    socialLinks: {
+      ...prev.socialLinks,
+      ...(remoteParsed.socialLinks || {}),
+    },
+    homePageCms: {
+      ...prev.homePageCms,
+      ...(remoteParsed.homePageCms || {}),
+    },
+    pagesCmsMap: {
+      ...prev.pagesCmsMap,
+      ...(remoteParsed.pagesCmsMap || {}),
+    },
+    advertisementSettings: normalizeAdvertisementSettings(
+      remoteParsed.advertisementSettings || prev.advertisementSettings
+    ),
+  }));
+  if (typeof window !== 'undefined' && rawValue) {
+    try {
+      localStorage.setItem(SITE_SETTINGS_KEY, rawValue);
+    } catch {}
+  }
+}
+
+function revertVisitorsToDefaultSiteSettings(setSettings, settingsRef) {
+  settingsRef.current = DEFAULT_SITE_SETTINGS;
+  setSettings(DEFAULT_SITE_SETTINGS);
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.removeItem(SITE_SETTINGS_KEY);
+    localStorage.removeItem('sellsolar_settings');
+    window.dispatchEvent(new CustomEvent('sellsolar_settings_updated', { detail: DEFAULT_SITE_SETTINGS }));
+  } catch {}
+}
+
+async function fetchAndApplyRemoteSiteSettings(setSettings, settingsRef) {
+  if (!isSupabaseConfigured()) return;
+  try {
+    const { data, error } = await supabase
+      .from('site_settings')
+      .select('value, updated_at')
+      .eq('key', SITE_SETTINGS_KEY)
+      .maybeSingle();
+    if (error) return;
+    if (!data?.value) {
+      revertVisitorsToDefaultSiteSettings(setSettings, settingsRef);
+      return;
+    }
+    const remoteParsed = JSON.parse(data.value);
+    if (remoteParsed && typeof remoteParsed === 'object') {
+      mergeRemoteSiteSettings(setSettings, remoteParsed, data.value);
+    }
+  } catch {}
+}
+
 /**
  * Publishes site settings to Supabase so ALL visitors see them.
  * Writing is protected by RLS (is_admin()), so the admin must be signed in with a real
@@ -271,45 +329,26 @@ export function SiteSettingsProvider({ children }) {
         console.warn('Error reading site settings:', e);
       }
 
-      // Fetch live settings from Supabase database so all visitors see updated settings
-      if (isSupabaseConfigured()) {
-        supabase
-          .from('site_settings')
-          .select('value, updated_at')
-          .eq('key', SITE_SETTINGS_KEY)
-          .maybeSingle()
-          .then(({ data, error }) => {
-            if (!error && data?.value) {
-              try {
-                const remoteParsed = JSON.parse(data.value);
-                if (remoteParsed && typeof remoteParsed === 'object') {
-                  setSettings((prev) => ({
-                    ...prev,
-                    ...remoteParsed,
-                    socialLinks: {
-                      ...prev.socialLinks,
-                      ...(remoteParsed.socialLinks || {}),
-                    },
-                    homePageCms: {
-                      ...prev.homePageCms,
-                      ...(remoteParsed.homePageCms || {}),
-                    },
-                    pagesCmsMap: {
-                      ...prev.pagesCmsMap,
-                      ...(remoteParsed.pagesCmsMap || {}),
-                    },
-                    advertisementSettings: normalizeAdvertisementSettings(
-                      remoteParsed.advertisementSettings || prev.advertisementSettings
-                    ),
-                  }));
-                  localStorage.setItem(SITE_SETTINGS_KEY, data.value);
-                }
-              } catch {}
-            }
-          })
-          .catch(() => {});
-      }
+      fetchAndApplyRemoteSiteSettings(setSettings, settingsRef);
     }
+  }, []);
+
+  // Re-pull cloud settings when the tab wakes up or on a timer so admin reset/save reaches all visitors.
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const resync = () => {
+      if (document.visibilityState === 'visible') {
+        fetchAndApplyRemoteSiteSettings(setSettings, settingsRef);
+      }
+    };
+    window.addEventListener('focus', resync);
+    document.addEventListener('visibilitychange', resync);
+    const timer = setInterval(() => fetchAndApplyRemoteSiteSettings(setSettings, settingsRef), 4 * 60 * 1000);
+    return () => {
+      window.removeEventListener('focus', resync);
+      document.removeEventListener('visibilitychange', resync);
+      clearInterval(timer);
+    };
   }, []);
 
   const updateSiteSettings = useCallback((newPartialSettings) => {
@@ -405,9 +444,12 @@ export function SiteSettingsProvider({ children }) {
       if (isSupabaseConfigured()) {
         (async () => {
           const sess = await supabase.auth.getSession().catch(() => null);
-          // Requires a real signed-in admin session (RLS); no credentials are embedded in the client.
-          if (!sess?.data?.session?.user) return;
-          await supabase.from('site_settings').delete().eq('key', SITE_SETTINGS_KEY);
+          // Real admin session: publish defaults so every visitor drops admin overrides on next cloud sync.
+          if (sess?.data?.session?.user) {
+            await publishSiteSettings(DEFAULT_SITE_SETTINGS);
+          } else {
+            await supabase.from('site_settings').delete().eq('key', SITE_SETTINGS_KEY);
+          }
         })().catch(() => {});
       }
     }

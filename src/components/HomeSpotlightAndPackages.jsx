@@ -36,6 +36,8 @@ export function HomeStaticSpotlight({ onNavigate }) {
   if (adCfg.enabled === false || adCfg.staticEnabled === false || adCfg.spotlightEnabled === false) return null;
 
   const ads = collectSpotlightAds(adCfg, SPOTLIGHT_SLOTS);
+  // No live spotlight ad -> show nothing (no empty "Advertise here" placeholder block).
+  if (ads.length === 0) return null;
   const staticPkg = (adCfg.packages || []).find((p) => p.id === 'static' && p.isActive !== false);
   const slots = [
     ...ads.map((ad) => ({ type: 'ad', ad })),

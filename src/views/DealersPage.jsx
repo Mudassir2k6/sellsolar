@@ -25,8 +25,14 @@ import {
   getSourceDealerCounts
 } from '../data/dealersData';
 
+// Last merged (seed + cloud) directory: later visits start with the final list, so counts never "jump".
+let dealersCache = null;
+
 export default function DealersPage({ onNavigate, onBack, hasOuterNavbar = false }) {
-  const [dealersList, setDealersList] = useState(VERIFIED_DEALERS);
+  const [dealersList, setDealersList] = useState(dealersCache || VERIFIED_DEALERS);
+  // Counts stay as a placeholder until the merged directory is known (prevents 80 -> 81 jump).
+  const [ready, setReady] = useState(Boolean(dealersCache));
+  const showNum = (n) => (ready ? n : '…');
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedSource, setSelectedSource] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -41,9 +47,13 @@ export default function DealersPage({ onNavigate, onBack, hasOuterNavbar = false
         const { fetchAllDealersMerged } = await import('../data/seedDealers');
         const merged = await fetchAllDealersMerged(VERIFIED_DEALERS);
         if (!isMounted) return;
-        setDealersList(Array.isArray(merged) && merged.length > 0 ? merged : VERIFIED_DEALERS);
+        const next = Array.isArray(merged) && merged.length > 0 ? merged : VERIFIED_DEALERS;
+        dealersCache = next;
+        setDealersList(next);
+        setReady(true);
       } catch (err) {
         console.warn('[DealersPage] Supabase load note:', err?.message);
+        if (isMounted) setReady(true);
       }
     }
 
@@ -166,7 +176,7 @@ export default function DealersPage({ onNavigate, onBack, hasOuterNavbar = false
             {/* Quick KPI stats */}
             <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2.5">
               <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
-                <div className="text-lg font-black text-amber-500">{dealersList.length}+</div>
+                <div className="text-lg font-black text-amber-500">{ready ? `${dealersList.length}+` : '…'}</div>
                 <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Verified Dealers</div>
               </div>
               <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
@@ -226,10 +236,10 @@ export default function DealersPage({ onNavigate, onBack, hasOuterNavbar = false
                   onChange={(e) => setSelectedSource(e.target.value)}
                   className="w-full bg-transparent text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 py-1.5 focus:outline-hidden cursor-pointer"
                 >
-                  <option value="all">All Sources ({sourceCounts.all})</option>
-                  <option value="ai_curated">🤖 AI Curated & Verified ({sourceCounts.ai_curated})</option>
-                  <option value="self_registered">🌐 Self-Registered on Website ({sourceCounts.self_registered})</option>
-                  <option value="manual_admin">🛡 Admin Verified ({sourceCounts.manual_admin})</option>
+                  <option value="all">All Sources ({showNum(sourceCounts.all)})</option>
+                  <option value="ai_curated">🤖 AI Curated & Verified ({showNum(sourceCounts.ai_curated)})</option>
+                  <option value="self_registered">🌐 Self-Registered on Website ({showNum(sourceCounts.self_registered)})</option>
+                  <option value="manual_admin">🛡 Admin Verified ({showNum(sourceCounts.manual_admin)})</option>
                 </select>
               </div>
             </div>
@@ -285,7 +295,7 @@ export default function DealersPage({ onNavigate, onBack, hasOuterNavbar = false
               >
                 All Cities
                 <span className="ml-0.5 px-1.5 py-0.2 rounded-full text-[10px] bg-black/10 dark:bg-black/20">
-                  {dealersList.length}
+                  {showNum(dealersList.length)}
                 </span>
               </button>
 
@@ -307,7 +317,7 @@ export default function DealersPage({ onNavigate, onBack, hasOuterNavbar = false
                     <MapPin className="h-3 w-3 opacity-70" />
                     {city}
                     <span className="ml-0.5 px-1.5 py-0.2 rounded-full text-[10px] bg-black/10 dark:bg-black/20">
-                      {count}
+                      {showNum(count)}
                     </span>
                   </button>
                 );
@@ -319,7 +329,7 @@ export default function DealersPage({ onNavigate, onBack, hasOuterNavbar = false
         {/* Results Counter & Active Filter Pills */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
           <div className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-            Showing <span className="text-amber-600 dark:text-amber-400 font-bold">{filteredDealers.length}</span> verified{' '}
+            Showing <span className="text-amber-600 dark:text-amber-400 font-bold">{showNum(filteredDealers.length)}</span> verified{' '}
             {filteredDealers.length === 1 ? 'dealer' : 'dealers'}
             {selectedCity && <span> in <strong>{selectedCity}</strong></span>}
             {selectedSource !== 'all' && (

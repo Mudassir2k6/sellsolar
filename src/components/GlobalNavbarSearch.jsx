@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useDeferredValue } from 'react';
 import {
   Search,
   X,
@@ -14,9 +14,60 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { CATEGORIES, formatPrice } from '../lib/constants';
-import { getLocalOrSeedListings } from '../data/seedListings';
+import {
+  getLocalOrSeedListings,
+  isListingPublicVisible,
+  matchesSearchQuery,
+  scoreSearchMatch,
+  buildSupabaseSearchClauses,
+  tokenizeSearchQuery,
+} from '../data/seedListings';
 import { getEquipmentFallbackImage } from '../utils/solarImages';
-import { supabase } from '../lib/supabase';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { getDeletedAds } from '../context/AuthContext';
+
+const SEARCH_COLUMNS =
+  'id, title, brand, category, condition, price, city, capacity_kw, warranty_years, image_url, featured, featured_until, views, created_at, status, is_deleted';
+const CACHE_TTL_MS = 5 * 60 * 1000;
+const REMOTE_DEBOUNCE_MS = 220;
+const MAX_RESULTS = 8;
+
+// Shared by every search box instance (navbar + admin): one request, reused for 5 minutes.
+const rowsCache = { rows: null, at: 0, promise: null };
+
+function loadSearchRows() {
+  if (!isSupabaseConfigured()) return Promise.resolve(null);
+  const fresh = rowsCache.rows && Date.now() - rowsCache.at < CACHE_TTL_MS;
+  if (fresh) return Promise.resolve(rowsCache.rows);
+  if (rowsCache.promise) return rowsCache.promise;
+  rowsCache.promise = supabase
+    .from('solar_listings')
+    .select(SEARCH_COLUMNS)
+    .eq('is_deleted', false)
+    .order('featured', { ascending: false })
+    .order('created_at', { ascending: false })
+    .limit(150)
+    .then(({ data, error }) => {
+      if (!error && Array.isArray(data)) {
+        rowsCache.rows = data.filter(isListingPublicVisible);
+        rowsCache.at = Date.now();
+      }
+      return rowsCache.rows;
+    })
+    .catch(() => rowsCache.rows)
+    .finally(() => {
+      rowsCache.promise = null;
+    });
+  return rowsCache.promise;
+}
+
+function withoutDeleted(list) {
+  let deleted = {};
+  try {
+    deleted = getDeletedAds() || {};
+  } catch {}
+  return (list || []).filter((item) => item && !deleted[String(item.id)] && isListingPublicVisible(item));
+}
 
 const POPULAR_SEARCHES = [
   { label: 'Longi Hi-MO 6 585W', brand: 'Longi', category: 'panel' },
@@ -48,8 +99,15 @@ export default function GlobalNavbarSearch({
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
-  const [allListings, setAllListings] = useState(() => getLocalOrSeedListings({}));
+  const [allListings, setAllListings] = useState(() =>
+    withoutDeleted(rowsCache.rows || getLocalOrSeedListings({}))
+  );
+  const [remoteResults, setRemoteResults] = useState([]);
+  const [isSearchingRemote, setIsSearchingRemote] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  // Keep typing instant: heavy list work runs on a deferred copy of the text.
+  const deferredQuery = useDeferredValue(query);
+  const remoteSeq = useRef(0);
 
   const containerRef = useRef(null);
   const inputRef = useRef(null);
@@ -72,34 +130,67 @@ export default function GlobalNavbarSearch({
     }
   }, [mobileOpen]);
 
-  // Load listings cache for fast instant search
+  // Preload the search index only when it is needed (first open/focus) or when the browser is idle,
+  // so it never competes with the first paint. Cached for 5 minutes and shared across instances.
+  const wantsIndex = isOpen || mobileOpen;
   useEffect(() => {
-    let isMounted = true;
-    async function loadData() {
-      try {
-        const { data, error } = await supabase
-          .from('solar_listings')
-          .select('id, title, brand, category, condition, price, city, capacity_kw, warranty_years, image_url, image_urls, featured, views, created_at')
-          .limit(100);
-
-        if (isMounted) {
-          if (!error && data && data.length > 0) {
-            setAllListings(data);
-          } else {
-            setAllListings(getLocalOrSeedListings({}));
-          }
-        }
-      } catch {
-        if (isMounted) {
-          setAllListings(getLocalOrSeedListings({}));
-        }
-      }
-    }
-    loadData();
-    return () => {
-      isMounted = false;
+    let cancelled = false;
+    const run = () => {
+      loadSearchRows().then((rows) => {
+        if (!cancelled && rows && rows.length > 0) setAllListings(withoutDeleted(rows));
+      });
     };
-  }, []);
+    if (wantsIndex) {
+      run();
+      return () => {
+        cancelled = true;
+      };
+    }
+    const idle =
+      typeof window !== 'undefined' && 'requestIdleCallback' in window
+        ? window.requestIdleCallback(run, { timeout: 6000 })
+        : window.setTimeout(run, 4000);
+    return () => {
+      cancelled = true;
+      if (typeof window !== 'undefined' && 'cancelIdleCallback' in window) window.cancelIdleCallback(idle);
+      else window.clearTimeout(idle);
+    };
+  }, [wantsIndex]);
+
+  // Search the whole database (not just the cached newest 150) once the user stops typing.
+  useEffect(() => {
+    const tokens = tokenizeSearchQuery(deferredQuery);
+    if (!isSupabaseConfigured() || tokens.length === 0 || deferredQuery.trim().length < 2) {
+      setRemoteResults([]);
+      setIsSearchingRemote(false);
+      return undefined;
+    }
+    const seq = ++remoteSeq.current;
+    setIsSearchingRemote(true);
+    const timer = setTimeout(async () => {
+      try {
+        let q = supabase
+          .from('solar_listings')
+          .select(SEARCH_COLUMNS)
+          .eq('is_deleted', false)
+          .order('featured', { ascending: false })
+          .order('created_at', { ascending: false })
+          .limit(24);
+        if (activeCategory !== 'all') q = q.eq('category', activeCategory);
+        buildSupabaseSearchClauses(deferredQuery).forEach((clause) => {
+          q = q.or(clause);
+        });
+        const { data, error } = await q;
+        if (seq !== remoteSeq.current) return; // a newer keystroke superseded this request
+        setRemoteResults(!error && Array.isArray(data) ? withoutDeleted(data) : []);
+      } catch {
+        if (seq === remoteSeq.current) setRemoteResults([]);
+      } finally {
+        if (seq === remoteSeq.current) setIsSearchingRemote(false);
+      }
+    }, REMOTE_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [deferredQuery, activeCategory]);
 
   // Global keyboard shortcut ('/' or 'Ctrl+K' / 'Cmd+K' to focus search)
   useEffect(() => {
@@ -128,34 +219,34 @@ export default function GlobalNavbarSearch({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Filter listings based on query and active category
+  // Cached listings that match every typed word, best matches first; cloud results fill the gaps.
   const filteredResults = useMemo(() => {
-    const q = query.trim().toLowerCase();
     const cat = activeCategory === 'all' ? '' : activeCategory;
+    const hasQuery = tokenizeSearchQuery(deferredQuery).length > 0;
 
-    let pool = allListings;
-    if (pool.length === 0) {
-      pool = getLocalOrSeedListings({});
+    const seen = new Set();
+    const merged = [];
+    const consider = (item) => {
+      if (!item || seen.has(String(item.id))) return;
+      if (cat && item.category !== cat) return;
+      if (hasQuery && !matchesSearchQuery(item, deferredQuery)) return;
+      seen.add(String(item.id));
+      merged.push(item);
+    };
+    allListings.forEach(consider);
+    remoteResults.forEach(consider);
+
+    if (hasQuery) {
+      // Decorate-sort-undecorate: score each match once instead of inside the comparator.
+      return merged
+        .map((item) => ({ item, score: scoreSearchMatch(item, deferredQuery) }))
+        .sort((a, b) => b.score - a.score)
+        .map((entry) => entry.item);
     }
+    return merged;
+  }, [allListings, remoteResults, deferredQuery, activeCategory]);
 
-    return pool.filter((item) => {
-      if (cat && item.category !== cat) return false;
-      if (!q) return true;
-
-      const titleMatch = item.title?.toLowerCase().includes(q);
-      const brandMatch = item.brand?.toLowerCase().includes(q);
-      const cityMatch = item.city?.toLowerCase().includes(q);
-      const descMatch = item.description?.toLowerCase().includes(q);
-      const catMatch = item.category?.toLowerCase().includes(q) || (CATEGORIES[item.category] && CATEGORIES[item.category].toLowerCase().includes(q));
-      const capacityMatch = item.capacity_kw && String(item.capacity_kw).toLowerCase().includes(q);
-
-      return titleMatch || brandMatch || cityMatch || descMatch || catMatch || capacityMatch;
-    });
-  }, [allListings, query, activeCategory]);
-
-  const displayedResults = useMemo(() => {
-    return filteredResults.slice(0, 8);
-  }, [filteredResults]);
+  const displayedResults = useMemo(() => filteredResults.slice(0, MAX_RESULTS), [filteredResults]);
 
   const handleSelect = (listingId) => {
     setIsOpen(false);
@@ -198,28 +289,20 @@ export default function GlobalNavbarSearch({
 
   // Quick category badges with count
   const categoryCounts = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    const counts = { all: 0, panel: 0, inverter: 0, battery: 0, complete_system: 0 };
-    
-    allListings.forEach((item) => {
-      let matchesQuery = true;
-      if (q) {
-        matchesQuery =
-          item.title?.toLowerCase().includes(q) ||
-          item.brand?.toLowerCase().includes(q) ||
-          item.city?.toLowerCase().includes(q) ||
-          item.description?.toLowerCase().includes(q);
-      }
-      if (matchesQuery) {
-        counts.all += 1;
-        if (counts[item.category] !== undefined) {
-          counts[item.category] += 1;
-        }
-      }
-    });
-
+    const counts = { all: 0, panel: 0, inverter: 0, battery: 0, complete_system: 0, electric_equipment: 0, others: 0 };
+    const hasQuery = tokenizeSearchQuery(deferredQuery).length > 0;
+    const seen = new Set();
+    const tally = (item) => {
+      if (!item || seen.has(String(item.id))) return;
+      if (hasQuery && !matchesSearchQuery(item, deferredQuery)) return;
+      seen.add(String(item.id));
+      counts.all += 1;
+      if (counts[item.category] !== undefined) counts[item.category] += 1;
+    };
+    allListings.forEach(tally);
+    remoteResults.forEach(tally);
     return counts;
-  }, [allListings, query]);
+  }, [allListings, remoteResults, deferredQuery]);
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
@@ -415,6 +498,8 @@ export default function GlobalNavbarSearch({
                   );
                 })}
               </div>
+            ) : query.trim() && isSearchingRemote ? (
+              <div className="py-8 text-center text-xs font-semibold text-gray-400">Searching all listings…</div>
             ) : query.trim() ? (
               <div className="py-8 text-center">
                 <Search className="h-8 w-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
@@ -493,7 +578,9 @@ export default function GlobalNavbarSearch({
           {/* Bottom Footer Actions */}
           <div className="flex items-center justify-between p-2.5 sm:p-3 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 text-xs">
             <span className="text-gray-400 dark:text-gray-500 font-medium text-[11px] sm:text-xs">
-              Found {filteredResults.length} matching items
+              {isSearchingRemote && filteredResults.length === 0
+                ? 'Searching…'
+                : `Found ${filteredResults.length}${isSearchingRemote ? '+' : ''} matching items`}
             </span>
             <button
               type="button"
@@ -641,6 +728,8 @@ export default function GlobalNavbarSearch({
                   );
                 })}
               </div>
+            ) : query.trim() && isSearchingRemote ? (
+              <div className="py-12 text-center text-xs font-semibold text-gray-400">Searching all listings…</div>
             ) : query.trim() ? (
               <div className="py-12 text-center">
                 <Search className="h-10 w-10 text-gray-300 dark:text-gray-600 mx-auto mb-3" />

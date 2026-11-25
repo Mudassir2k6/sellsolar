@@ -126,7 +126,7 @@ import { useToast } from './context/ToastContext';
 import { supabase, isSupabaseConfigured } from './lib/supabase';
 import { BRANDS, CATEGORIES, POSTABLE_CATEGORIES, CITIES, formatPrice } from './lib/constants';
 import { digitsOnlyPhone, isValidPhone, normalizePhone, isValidUuid } from './lib/auth';
-import { getLocalOrSeedListings, getLocalOrSeedListingById, matchesListingFilters, isFeaturedActive, isListingPublicVisible, isListingHiddenFromBuyers, useDemoSeedListings } from './data/seedListings';
+import { getLocalOrSeedListings, getLocalOrSeedListingById, matchesListingFilters, isFeaturedActive, isListingPublicVisible, isListingHiddenFromBuyers, useDemoSeedListings, buildSupabaseSearchClauses } from './data/seedListings';
 import { getEquipmentFallbackImage, SELL_SOLAR_PROMO_IMAGE, TURNKEY_INSTALL_PROMO_IMAGE } from './utils/solarImages';
 import ThemeRadioToggle from './components/ThemeRadioToggle';
 import WarrantySelector, { formatWarrantyShort, formatWarrantyLong } from './components/WarrantySelector';
@@ -7372,7 +7372,7 @@ function _x({
         }).order("created_at",{
           ascending:!1
         });
-        e.category&&(f=f.eq("category",e.category)),e.brand&&(f=f.eq("brand",e.brand)),e.condition&&(f=f.eq("condition",e.condition)),e.city&&(f=f.eq("city",e.city)),e.minPrice&&(f=f.gte("price",parseFloat(e.minPrice))),e.maxPrice&&(f=f.lte("price",parseFloat(e.maxPrice))),e.query&&(f=f.or(`title.ilike.%${e.query}%,brand.ilike.%${e.query}%,description.ilike.%${e.query}%`));
+        e.category&&(f=f.eq("category",e.category)),e.brand&&(f=f.eq("brand",e.brand)),e.condition&&(f=f.eq("condition",e.condition)),e.city&&(f=f.eq("city",e.city)),e.minPrice&&(f=f.gte("price",parseFloat(e.minPrice))),e.maxPrice&&(f=f.lte("price",parseFloat(e.maxPrice))),e.query&&buildSupabaseSearchClauses(e.query).forEach((clause)=>{f=f.or(clause)});
         // Hard 5s cap so a slow network never leaves the page stuck on skeletons.
         const queryResult = await Promise.race([
           f.limit(60),

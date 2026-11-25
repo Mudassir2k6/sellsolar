@@ -1,5 +1,6 @@
 import { SOLAR_PANEL_IMAGE, INVERTER_IMAGE, BATTERY_IMAGE, COMPLETE_SYSTEM_IMAGE } from '../utils/solarImages';
 import { isSupabaseConfigured } from '../lib/supabase';
+import { CATEGORIES as CATEGORY_LABELS } from '../lib/constants';
 
 /** Demo/sample listings only when there is no live cloud database (local dev). */
 export function useDemoSeedListings() {
@@ -316,6 +317,112 @@ export function isFeaturedActive(item) {
   return !Number.isFinite(until) || until > Date.now();
 }
 
+/* ------------------------------------------------------------------ */
+/* Fast multi-word search (shared by navbar search + marketplace filter) */
+/* ------------------------------------------------------------------ */
+
+// Common spellings / local words -> words that appear in listings.
+const SEARCH_SYNONYMS = {
+  plate: ['plate', 'panel'],
+  plates: ['plate', 'panel'],
+  panels: ['panel'],
+  solar: ['solar'],
+  invertor: ['inverter'],
+  invertors: ['inverter'],
+  inverters: ['inverter'],
+  battries: ['battery'],
+  battry: ['battery'],
+  batteries: ['battery'],
+  bateri: ['battery'],
+  systems: ['system'],
+};
+
+/** Lowercase tokens (max 6), punctuation stripped. "Longi 585W" -> ["longi", "585w"]. */
+export function tokenizeSearchQuery(query) {
+  return String(query || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9.+\-\u0600-\u06FF\s]/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 6);
+}
+
+export function expandSearchToken(token) {
+  const alts = SEARCH_SYNONYMS[token];
+  return alts && alts.length ? [token, ...alts.filter((a) => a !== token)] : [token];
+}
+
+const haystackCache = new WeakMap();
+
+function capacityWords(capacityKw) {
+  const kw = Number(capacityKw);
+  if (!Number.isFinite(kw) || kw <= 0) return '';
+  const watts = Math.round(kw * 1000);
+  return kw >= 1 ? ` ${kw}kw ${watts}w` : ` ${watts}w`;
+}
+
+/** One lowercase string per listing, built once (WeakMap) so each keystroke is a plain includes(). */
+export function getSearchHaystack(item) {
+  if (!item || typeof item !== 'object') return '';
+  const cached = haystackCache.get(item);
+  if (cached !== undefined) return cached;
+  const categoryLabel = CATEGORY_LABELS[item.category] || item.category || '';
+  const text = [
+    item.title,
+    item.brand,
+    item.city,
+    item.description,
+    item.model,
+    categoryLabel,
+    item.condition,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase()
+    .concat(capacityWords(item.capacity_kw));
+  haystackCache.set(item, text);
+  return text;
+}
+
+/** Every typed word must appear somewhere (title, brand, city, category, capacity...). */
+export function matchesSearchQuery(item, query) {
+  const tokens = tokenizeSearchQuery(query);
+  if (tokens.length === 0) return true;
+  const hay = getSearchHaystack(item);
+  return tokens.every((t) => expandSearchToken(t).some((alt) => hay.includes(alt)));
+}
+
+/** Higher = better. Brand/title hits and featured ads first, then newest. */
+export function scoreSearchMatch(item, query) {
+  const tokens = tokenizeSearchQuery(query);
+  if (tokens.length === 0) return isFeaturedActive(item) ? 1 : 0;
+  const title = String(item.title || '').toLowerCase();
+  const brand = String(item.brand || '').toLowerCase();
+  const phrase = tokens.join(' ');
+  let score = 0;
+  if (title.startsWith(phrase)) score += 6;
+  else if (title.includes(phrase)) score += 4;
+  tokens.forEach((t) => {
+    if (brand === t) score += 4;
+    else if (brand.includes(t)) score += 2;
+    if (title.includes(t)) score += 2;
+  });
+  if (isFeaturedActive(item)) score += 2;
+  return score;
+}
+
+/**
+ * PostgREST `.or()` clauses (one per word, so the calls AND together) for server-side search.
+ * Tokens are already stripped of commas/parentheses/percent signs.
+ */
+export function buildSupabaseSearchClauses(query) {
+  return tokenizeSearchQuery(query).map((t) => {
+    const fields = ['title', 'brand', 'description', 'city'];
+    const alts = expandSearchToken(t);
+    return fields.flatMap((f) => alts.map((a) => `${f}.ilike.%${a}%`)).join(',');
+  });
+}
+
 /**
  * Single source of truth for the marketplace filters (category, brand, condition,
  * city, price range, search text). Used for seed/local listings and for any local
@@ -329,17 +436,7 @@ export function matchesListingFilters(item, filters = {}) {
   if (filters.city && item.city !== filters.city) return false;
   if (filters.minPrice && Number(item.price) < Number(filters.minPrice)) return false;
   if (filters.maxPrice && Number(item.price) > Number(filters.maxPrice)) return false;
-  if (filters.query) {
-    const q = String(filters.query).toLowerCase().trim();
-    if (q) {
-      const match =
-        (item.title && item.title.toLowerCase().includes(q)) ||
-        (item.brand && item.brand.toLowerCase().includes(q)) ||
-        (item.description && item.description.toLowerCase().includes(q)) ||
-        (item.city && item.city.toLowerCase().includes(q));
-      if (!match) return false;
-    }
-  }
+  if (filters.query && !matchesSearchQuery(item, filters.query)) return false;
   return true;
 }
 

@@ -15,7 +15,6 @@ import PasswordPage from './views/PasswordPage';
 // Heavy pages are code-split so the home page bundle stays small & fast.
 const TodayPricesPage = lazy(() => import('./views/TodayPricesPage'));
 const Tier1VerificationPage = lazy(() => import('./views/Tier1VerificationPage'));
-import DailyMarketRates from './components/DailyMarketRates';
 const LoadCalculatorPage = lazy(() => import('./views/LoadCalculatorPage'));
 import SolarLoadCalculator from './components/SolarLoadCalculator';
 import FloatingPostAdButton from './components/FloatingPostAdButton';
@@ -7384,10 +7383,6 @@ function _x({
       onPostAd:()=>nav?nav("post-ad"):void 0,
       onInstall:()=>nav?nav("install"):void 0,
       onNavigate:nav
-    }),jsx(DailyMarketRates,{
-      onNavigate:nav,
-      onSelectCategory:C,
-      compact:true
     }),jsx(ix,{
       filters:e,
       onSelectCategory:C,

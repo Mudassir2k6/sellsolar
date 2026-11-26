@@ -2,10 +2,10 @@
   "version": 2,
   "countryCode": "EG",
   "location": "Egypt",
-  "lastUpdated": "2026-11-25T08:20:06+05:00",
-  "lastUpdatedLabel": "25 Nov 2026, 8:20 am PKT",
+  "lastUpdated": "2026-11-26T07:36:59+05:00",
+  "lastUpdatedLabel": "26 Nov 2026, 7:36 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solaregypt, solarpowered, solarpanel, solaropens",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solaregypt, solarpowered, solarpanel",
   "trendingNews": [
     {
       "id": "tn-1",
@@ -65,13 +65,14 @@
     },
     {
       "id": "tn-6",
-      "title": "Rooftop Revolution: Solar Energy Is Reshaping Egypt’s Oil and Gas Future",
-      "summary": "Trending solar coverage from Egypt Oil & Gas — use this Egypt topic for your own posts and SEO content.",
-      "source": "Egypt Oil & Gas",
-      "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxPMTREN1dRM3l6NG5DUzNJa2VDeXE5eUFzX2M4bjd0RWhTcXdhZl94YmVsSEcyWVd6NVlTR2FnY1dSSEVoeUJWZHlYck5NOEhpYmJXZlVLOTltX0NJU2J4WjlMSmhWTmMzNEJxakl5bWRkNTZXQ1JUaUZsUUF0dEEtNFN1QWNnODNid3NCWG1hUkVBZ3dta2ZKUTdJMzEtQUtqOXNRNE9mXzI?oc=5",
+      "title": "Egypt pilots solar-panel shade for crops as heat, water shortages squeeze farmers",
+      "summary": "Trending solar coverage from Yahoo — use this Egypt topic for your own posts and SEO content.",
+      "source": "Yahoo",
+      "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxNRlBWdld3TmVlSndhcmp1cUM0eV9kRE9QTzZXYWx1VE4yR0d2LTRuSHRpMzdYdk9kekFmSG40eXA5LUJpZ2czNGlMVFAwUVlSMWt5aUlYbERqVFZ5dE1uTkx3amQ2RGZ5V0JCVDBpcTVzRXF1NFNSd2JMMGtRbmtSNU1aODdxX1lESlpUOVZ0YzFhZ2s?oc=5",
       "tags": [
-        "#solarenergy",
-        "#solarEgypt"
+        "#solarpanel",
+        "#solarEgypt",
+        "#solarenergy"
       ]
     }
   ],
@@ -171,7 +172,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "183K+"
+          "posts": "175K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -191,7 +192,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "119K+"
+          "posts": "121K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -201,7 +202,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "514K+"
+          "posts": "489K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -211,7 +212,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "93K+"
+          "posts": "97K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solaregypt/"
@@ -231,20 +232,10 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "36K+"
+          "posts": "35K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
-    },
-    {
-      "tag": "#solaropens",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "31K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solaropens/"
     }
   ],
   "contentIdeas": [

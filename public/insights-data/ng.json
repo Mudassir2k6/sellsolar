@@ -2,10 +2,10 @@
   "version": 2,
   "countryCode": "NG",
   "location": "Nigeria",
-  "lastUpdated": "2026-11-25T08:20:06+05:00",
-  "lastUpdatedLabel": "25 Nov 2026, 8:20 am PKT",
+  "lastUpdated": "2026-11-26T07:36:59+05:00",
+  "lastUpdatedLabel": "26 Nov 2026, 7:36 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarnigeria, solarboom, solarpanel, solaraccessibility, solarindustry",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarnigeria, solarboom, solarproduction, solarpanel, solarproduct",
   "trendingNews": [
     {
       "id": "tn-1",
@@ -32,29 +32,6 @@
     },
     {
       "id": "tn-3",
-      "title": "Solar panel overheating sparks fire in Oyo house",
-      "summary": "Trending solar coverage from The Guardian Nigeria News — use this Nigeria topic for your own posts and SEO content.",
-      "source": "The Guardian Nigeria News",
-      "url": "https://news.google.com/rss/articles/CBMikgFBVV95cUxOQS1KNm5aT1lXSTk4bWdVeDVybWRpLWZxSFh1TmxmVnZVLWYzWXV2RXVVd25JbFN1MDdIcmUyM1l0bjFZa2x6empYYlRBNkt5YkJVZ01WVmxfakdwb2VyMEZRakVaSFhLaTcxdl9TVFN3NUI0UDNLVjFhWmFzN3E5RDhYcm9pUUw0UHpfZnc2S0pWdw?oc=5",
-      "tags": [
-        "#solarpanel",
-        "#solarNigeria",
-        "#solarenergy"
-      ]
-    },
-    {
-      "id": "tn-4",
-      "title": "Nigerian Startup Sunrisal Secures $25,000 ECOWAS Grant to Expand Solar Energy Access",
-      "summary": "Trending solar coverage from MSME Africa — use this Nigeria topic for your own posts and SEO content.",
-      "source": "MSME Africa",
-      "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxOTTdCR0Z5c29RN0lBQUpLR1E1TzVKWGlLUGY3M1lHY1RjZHpMSE53M0N2UTdDa2d2VWpEV0FJVEtYWHZRYUtNeWIzUi1fc2tXSVkxeFdnOXBEaWtwa0pOdUV0Tjc1SUZxdm41d3ptUWczX1EwcFptS2JSTFdSQ1JqbkpCN21FdXVlMFJuQXNQaVRTdmVsX1BEMTVDeUVTSlNyc3Q2Zk91VEpqNkVXYVZSZFJR?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarNigeria"
-      ]
-    },
-    {
-      "id": "tn-5",
       "title": "FG Moves To Tighten Solar Energy Safety Standards As Udeh Inaugurates Inter-agency Committee",
       "summary": "Trending solar coverage from Federal Ministry of Information and National Orientation — use this Nigeria topic for your own posts and SEO content.",
       "source": "Federal Ministry of Information and National Orientation",
@@ -65,15 +42,37 @@
       ]
     },
     {
-      "id": "tn-6",
-      "title": "Our governments are not serious about solar power — Prof....",
-      "summary": "Trending solar coverage from Daily Trust — use this Nigeria topic for your own posts and SEO content.",
-      "source": "Daily Trust",
-      "url": "https://news.google.com/rss/articles/CBMi2gFBVV95cUxNOVpsWGpFNlowd0p6OC1aeTByTUEyR0ZlUURPUVpQNjQwWkFTQTR2MTR4VE5sdUVVRWhXNWZ6eFQ3TzdtREx6QXMyZ1YxWU5VeHRmb09XTkRxdVNWOVdQNWdFejRTelhTNUZxMV92cHBMNFQ5ckZKSnNJUDI2OU44d2NTYUczZE5fNjhOQmg4WjdIRk1RVzJWMzl0N3hVOXhyMU1rM3dwdklwUFJ4S2VSMnQzLVFMcDNNUFNxdy1wU2pmcV8wZXU5TjhYMFYtQjVENC1zNlNvRVJlQQ?oc=5",
+      "id": "tn-4",
+      "title": "FG moves to boost local solar production before restricting imports",
+      "summary": "Trending solar coverage from The Guardian Nigeria News — use this Nigeria topic for your own posts and SEO content.",
+      "source": "The Guardian Nigeria News",
+      "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxNSDd6UkJrbG1yeG9MNHppMDBTNW11TUFRckRfUUhjWEpzSUlLMllBbUlZRGRVbl9HdVlzSWswbVRuZ1VTZWFUa09hQzUtUHhPZ241WURaRFJaS1o2VXlqVW5aZWRDYUFubnFLSVVFbHNzakhiT3ZvTjJxdkRRdzdlaGQzTHpsQV9vTk8wX25tVmtubUQtSE1FeA?oc=5",
       "tags": [
-        "#solarpower",
+        "#solarproduction",
         "#solarNigeria",
         "#solarenergy"
+      ]
+    },
+    {
+      "id": "tn-5",
+      "title": "From rot to revenue: How solar energy is cutting post-harvest losses in Nigeria's fishing village",
+      "summary": "Trending solar coverage from TheCable — use this Nigeria topic for your own posts and SEO content.",
+      "source": "TheCable",
+      "url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxPbV9aUzVyZmQxZEt0aGY2UXA4QXBCZlF0YmtuZmJ3cmRkLWE2eU1xYTZHSEdzOGt4elVpaE5HN0VYWXlQYVpDUU56QXFuYllrZWZQNkFqZUwxTVpnVmkwaFB3UjliTm81cGlFZjJKdkxpVW8tRC1Na2ZZQTBuU1BSZHdZSzhhWWw1X3Y3aHA1cTZYRHJZblBxZTV3UVFJeXZqVy1CVWFhajAwdkNpb2dTWFVvUzVKNmVNbV9SYw?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarNigeria"
+      ]
+    },
+    {
+      "id": "tn-6",
+      "title": "Nigerian Startup Sunrisal Secures $25,000 ECOWAS Grant to Expand Solar Energy Access",
+      "summary": "Trending solar coverage from MSME Africa — use this Nigeria topic for your own posts and SEO content.",
+      "source": "MSME Africa",
+      "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxOTTdCR0Z5c29RN0lBQUpLR1E1TzVKWGlLUGY3M1lHY1RjZHpMSE53M0N2UTdDa2d2VWpEV0FJVEtYWHZRYUtNeWIzUi1fc2tXSVkxeFdnOXBEaWtwa0pOdUV0Tjc1SUZxdm41d3ptUWczX1EwcFptS2JSTFdSQ1JqbkpCN21FdXVlMFJuQXNQaVRTdmVsX1BEMTVDeUVTSlNyc3Q2Zk91VEpqNkVXYVZSZFJR?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarNigeria"
       ]
     }
   ],
@@ -173,7 +172,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "183K+"
+          "posts": "175K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -193,7 +192,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "119K+"
+          "posts": "121K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -203,7 +202,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "514K+"
+          "posts": "489K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -213,7 +212,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "93K+"
+          "posts": "97K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarnigeria/"
@@ -229,34 +228,34 @@
       "searchUrl": "https://www.instagram.com/explore/tags/solarboom/"
     },
     {
-      "tag": "#solarpanel",
+      "tag": "#solarproduction",
       "platforms": [
         {
           "name": "Instagram",
           "posts": "36K+"
         }
       ],
+      "searchUrl": "https://www.instagram.com/explore/tags/solarproduction/"
+    },
+    {
+      "tag": "#solarpanel",
+      "platforms": [
+        {
+          "name": "Instagram",
+          "posts": "37K+"
+        }
+      ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
     },
     {
-      "tag": "#solaraccessibility",
+      "tag": "#solarproduct",
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "15K+"
+          "posts": "25K+"
         }
       ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solaraccessibility/"
-    },
-    {
-      "tag": "#solarindustry",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "24K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarindustry/"
+      "searchUrl": "https://www.instagram.com/explore/tags/solarproduct/"
     }
   ],
   "contentIdeas": [

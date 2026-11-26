@@ -2,13 +2,25 @@
   "version": 2,
   "countryCode": "CA",
   "location": "Canada",
-  "lastUpdated": "2026-11-25T08:20:06+05:00",
-  "lastUpdatedLabel": "25 Nov 2026, 8:20 am PKT",
+  "lastUpdated": "2026-11-26T07:36:59+05:00",
+  "lastUpdatedLabel": "26 Nov 2026, 7:36 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarcanada, solarpanel",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarcanada, solarpanel, solarmovement",
   "trendingNews": [
     {
       "id": "tn-1",
+      "title": "Manitoba solar panel project could create 8,000 jobs, First Nations group says",
+      "summary": "Trending solar coverage from Global News — use this Canada topic for your own posts and SEO content.",
+      "source": "Global News",
+      "url": "https://news.google.com/rss/articles/CBMihgFBVV95cUxNcnVJNURXRWhvQ1hpb3VuWWdnZTJieVFrM0pHcHk0OERzOEVHendWNXpFUDVXSkdVbFdzUGxmLUZWWkF3eUQ5ZUhRM0JLT2NOWkQyZHJ1V3d2Q1E1cFBMaW9QYjhLdUVzVEJhZFdhaFBjLWFjVFVNbHN6RFhscnJ0TnhyNm51dw?oc=5",
+      "tags": [
+        "#solarpanel",
+        "#solarCanada",
+        "#solarenergy"
+      ]
+    },
+    {
+      "id": "tn-2",
       "title": "Solar energy just won't quit",
       "summary": "Trending solar coverage from Canada's National Observer — use this Canada topic for your own posts and SEO content.",
       "source": "Canada's National Observer",
@@ -19,7 +31,7 @@
       ]
     },
     {
-      "id": "tn-2",
+      "id": "tn-3",
       "title": "From idea to impact: How RBC is helping organizations unlock the value of solar energy",
       "summary": "Trending solar coverage from rbc.com — use this Canada topic for your own posts and SEO content.",
       "source": "rbc.com",
@@ -30,23 +42,11 @@
       ]
     },
     {
-      "id": "tn-3",
-      "title": "Alberta’s new sky-high solar panel recycling fee sparks industry backlash",
-      "summary": "Trending solar coverage from CBC — use this Canada topic for your own posts and SEO content.",
-      "source": "CBC",
-      "url": "https://news.google.com/rss/articles/CBMikgFBVV95cUxPYmV4eTBxREhPTkpOODBwa0FnSmt0ZmVabmN3eDFHZHhhcDBXck05a29pT3AyWjZJNXNqUk9Gc2NPV2hhOWNhRXhWRlZMNDItM0ZTdFgzMzRXdnVORnRNUE83SkFqRXhON1hycjdpM0hGOW4zSkpKTnZPZFdpRkQzZ2pCM3YxdzlaSTdWWDktNDFXZw?oc=5",
-      "tags": [
-        "#solarpanel",
-        "#solarCanada",
-        "#solarenergy"
-      ]
-    },
-    {
       "id": "tn-4",
-      "title": "Alberta to introduce Canada’s first provincial solar panel recycling program",
-      "summary": "Trending solar coverage from Electrical Business Magazine — use this Canada topic for your own posts and SEO content.",
-      "source": "Electrical Business Magazine",
-      "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxNcWR6N2RuRThLYXlDOU9YQmFGTDRTNVNscFREX2ZrZGExLW9PSEdMVnJqSEZJYTNScFRMZ0pYdWJ4MTBOSHZqVS16RktJRlpUdlcwV2xvWmN6cUZvOE9GVXlLQ2lRd0Vkbk4xRE1aY2lxd2F3Z182bEVYaW5QRjJScHhsRmVmME1ic0x5M0lLUGUzUEJQS28teEV0SXpUVFU?oc=5",
+      "title": "Alberta launches solar panel recycling program",
+      "summary": "Trending solar coverage from RealAgriculture — use this Canada topic for your own posts and SEO content.",
+      "source": "RealAgriculture",
+      "url": "https://news.google.com/rss/articles/CBMikAFBVV95cUxOZG5ZSnVmSlRwOWNvWHpQT3BTczdlTzVIWXE1VFd4ODdiME1JNUpISzFheTFzRzhDX2g3ZE9kSUZrc3J1a19HcUF4dEVyN1AyUURsb2tpbEp6R2VCblg3Q0lPUlltdXA4aTZ6SEZhV2dUZkVMREo1Mmg4emoyVWJ4dnJsMG1UWlNDQlM0bWN6dDY?oc=5",
       "tags": [
         "#solarpanel",
         "#solarCanada",
@@ -55,25 +55,25 @@
     },
     {
       "id": "tn-5",
-      "title": "Alberta introduces the first solar panel recycling program in Canada",
-      "summary": "Trending solar coverage from Global News — use this Canada topic for your own posts and SEO content.",
-      "source": "Global News",
-      "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxOMF92SUR5Z3duLUNVSmE2T1gycXR3aG5Jdk14b0hadlZZaElsOXZkcHlBYWJja0dOSldhcXc1dnlPdlpNN2tLTnlzRmh5SDhJM0poYmpaeEhUMFNQR1pNRXZkOERSLXhqbS1VYVU5dzhmOWJmQ01lOHpXOXFRUVVjQVBwUHdtTm9wVEtzZVlVaWZQdG05b2VQcUVBcjdSd1BsbHZicy1OWng?oc=5",
+      "title": "Mattamy Homes taps into sunny Alberta's solar energy",
+      "summary": "Trending solar coverage from Yahoo News Canada — use this Canada topic for your own posts and SEO content.",
+      "source": "Yahoo News Canada",
+      "url": "https://news.google.com/rss/articles/CBMif0FVX3lxTE1XWkdvT1BXanFranhQa2dib2dNNEJpZDlyWGo2SzZrd2dNRW9YMC1pd2UwbnZ0aUhIYXlNVFJBdUJqUEFJdWdGVjZSdTdjMzgyS0lFYkFwaVBwTWZpR242STFuTmp2QlR6eU1wc3pfS3dXeHFSeG1tR1BkU3RoaVk?oc=5",
       "tags": [
-        "#solarpanel",
-        "#solarCanada",
-        "#solarenergy"
+        "#solarenergy",
+        "#solarCanada"
       ]
     },
     {
       "id": "tn-6",
-      "title": "Canada’s new way for solar energy",
-      "summary": "Trending solar coverage from Your South Shore — use this Canada topic for your own posts and SEO content.",
-      "source": "Your South Shore",
-      "url": "https://news.google.com/rss/articles/CBMia0FVX3lxTE1XX0RnNGd0cm1oWHY2VVVFVEQ2Qk5meG1mOUljNXJRRHMxZ1hxektBUmhhVTdiTXhlSXQyUEUzNEIwQXpOVkJEQmxMbUIxZWY4TWZPVXo0VUlEczI4cUUyeVFlSmZMWFV0bGtv?oc=5",
+      "title": "Alberta government touts Oct. 1 launch of $14 solar panel recycling fee, landfill ban",
+      "summary": "Trending solar coverage from Toronto Star — use this Canada topic for your own posts and SEO content.",
+      "source": "Toronto Star",
+      "url": "https://news.google.com/rss/articles/CBMihwJBVV95cUxOZHM0TThVbGdYQnM3QkJlZzA1b1o0cG5lZGgyUTF6OWhtOEtlczRlX3c0SFNKUW5tcVdyU3VLaWphUHBZSk9uejBIX3VkbExKcVQ5eS1Zc3pVemdJRWlHN0Fzb3UwbU9NM3ZtX2t4N3lHeWVMRUNEdUEyeEQ4TXdSZDlxWG5tVVZXNzRrS0YzOWRJV3Q5ZWpWcEk1SENlUnhvQ1dWZ2tKcU1QbG0teXZVazFHUmJqQWlTNlNqMlNWNWhqSkxtTU9SUm9sWGVuYTZzYThVSnlNV3BHYTZuMUpIWGpBZ2J0X2VINjF4ZWtLRVhlblhVczRnU2E1S0hWNjhiWEUwQndaWQ?oc=5",
       "tags": [
-        "#solarenergy",
-        "#solarCanada"
+        "#solarpanel",
+        "#solarCanada",
+        "#solarenergy"
       ]
     }
   ],
@@ -173,7 +173,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "183K+"
+          "posts": "175K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -193,7 +193,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "119K+"
+          "posts": "121K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -203,7 +203,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "514K+"
+          "posts": "489K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -213,7 +213,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "93K+"
+          "posts": "97K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarcanada/"
@@ -227,6 +227,16 @@
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
+    },
+    {
+      "tag": "#solarmovement",
+      "platforms": [
+        {
+          "name": "Instagram",
+          "posts": "29K+"
+        }
+      ],
+      "searchUrl": "https://www.instagram.com/explore/tags/solarmovement/"
     }
   ],
   "contentIdeas": [

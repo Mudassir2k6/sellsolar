@@ -2,24 +2,13 @@
   "version": 2,
   "countryCode": "US",
   "location": "United States",
-  "lastUpdated": "2026-11-25T08:20:06+05:00",
-  "lastUpdatedLabel": "25 Nov 2026, 8:20 am PKT",
+  "lastUpdated": "2026-11-26T07:36:59+05:00",
+  "lastUpdatedLabel": "26 Nov 2026, 7:36 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarusa, solarpanel, solarrooftop, solargenerates, solardevelopment, solarstorage",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarusa, solarpanel, solarrooftop, solarinstallations, solargenerates, solardevelopment, solarstorage",
   "trendingNews": [
     {
       "id": "tn-1",
-      "title": "Iran’s Solar Energy Policy in the Shadow of War",
-      "summary": "Trending solar coverage from WANA News Agency — use this United States topic for your own posts and SEO content.",
-      "source": "WANA News Agency",
-      "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTE9VRVhhTHVsRXZ5T2R1V01YRUdEellIdTJRQU9MMVE2d0ZmVGN0dk04QXg4Zk81emJ4V0ZNM3JDbnU5R3ZiRE5TNHdmMzRIMXpiNGJiTzlmdm9rM2VUS0V6UmtqRUktRTVaZlBMdUVURkI3UHVL?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarUSA"
-      ]
-    },
-    {
-      "id": "tn-2",
       "title": "End-of-Life Solar Panels: Regulations and Management",
       "summary": "Trending solar coverage from U.S. Environmental Protection Agency (.gov) — use this United States topic for your own posts and SEO content.",
       "source": "U.S. Environmental Protection Agency (.gov)",
@@ -31,7 +20,7 @@
       ]
     },
     {
-      "id": "tn-3",
+      "id": "tn-2",
       "title": "A New Crop of Solar Panels Is the U.S.’s Best Hope of Catching China",
       "summary": "Trending solar coverage from The New York Times — use this United States topic for your own posts and SEO content.",
       "source": "The New York Times",
@@ -43,7 +32,7 @@
       ]
     },
     {
-      "id": "tn-4",
+      "id": "tn-3",
       "title": "Should Solar Panel Recycling Be Mandated?",
       "summary": "Trending solar coverage from RAND — use this United States topic for your own posts and SEO content.",
       "source": "RAND",
@@ -55,13 +44,25 @@
       ]
     },
     {
-      "id": "tn-5",
+      "id": "tn-4",
       "title": "Solar Rooftop Potential",
       "summary": "Trending solar coverage from Department of Energy (.gov) — use this United States topic for your own posts and SEO content.",
       "source": "Department of Energy (.gov)",
       "url": "https://news.google.com/rss/articles/CBMia0FVX3lxTFBuSk03WFQ0Yjd5U3AtM0hUdWxSNWNRS3FLTWlDZUU5WVRodU9QWHRLUWpCc2tEUkhaLWtQMC1CUnF5U3llSHcwWi1EZ0p6ZEFMRXdhclZ2ZldtZmVjOEE1dGg0Y3hiVDhUWVZr?oc=5",
       "tags": [
         "#solarrooftop",
+        "#solarUSA",
+        "#solarenergy"
+      ]
+    },
+    {
+      "id": "tn-5",
+      "title": "6 Million Solar Installations: Powering American Communities",
+      "summary": "Trending solar coverage from Solar Energy Industries Association — use this United States topic for your own posts and SEO content.",
+      "source": "Solar Energy Industries Association",
+      "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTE1xeHMxRVhIMHF0Q0JfVi1DRDFHNUdybE4wMlR2Z2JEeDYweFNzQVFLLWVXeU9sVE9jZlo1Z0xHR2xvZmFGSk9jaFlsaVotSmNRcFAtSzhTb3pIQzN2WGNLRTdHVEpfMHI0aWNvRVRnQWZ3NExS?oc=5",
+      "tags": [
+        "#solarinstallations",
         "#solarUSA",
         "#solarenergy"
       ]
@@ -175,7 +176,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "183K+"
+          "posts": "175K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -195,7 +196,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "119K+"
+          "posts": "121K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -205,7 +206,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "514K+"
+          "posts": "489K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -215,7 +216,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "93K+"
+          "posts": "97K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarusa/"
@@ -235,17 +236,27 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "45K+"
+          "posts": "44K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarrooftop/"
+    },
+    {
+      "tag": "#solarinstallations",
+      "platforms": [
+        {
+          "name": "Instagram",
+          "posts": "23K+"
+        }
+      ],
+      "searchUrl": "https://www.instagram.com/explore/tags/solarinstallations/"
     },
     {
       "tag": "#solargenerates",
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "34K+"
+          "posts": "33K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solargenerates/"
@@ -265,7 +276,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "33K+"
+          "posts": "32K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarstorage/"

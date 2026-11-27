@@ -2,10 +2,10 @@
   "version": 2,
   "countryCode": "US",
   "location": "United States",
-  "lastUpdated": "2026-11-26T07:36:59+05:00",
-  "lastUpdatedLabel": "26 Nov 2026, 7:36 am PKT",
+  "lastUpdated": "2026-11-27T07:37:41+05:00",
+  "lastUpdatedLabel": "27 Nov 2026, 7:37 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarusa, solarpanel, solarrooftop, solarinstallations, solargenerates, solardevelopment, solarstorage",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarusa, solarrooftop, solarpanel, solarinstallations, solargenerates, solardevelopment",
   "trendingNews": [
     {
       "id": "tn-1",
@@ -33,24 +33,24 @@
     },
     {
       "id": "tn-3",
-      "title": "Should Solar Panel Recycling Be Mandated?",
-      "summary": "Trending solar coverage from RAND — use this United States topic for your own posts and SEO content.",
-      "source": "RAND",
-      "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE04eU5vcTB2enRTZ2FxQkg5S3YzcmdGbDFZdXVoblpQX29ZQU81bktscjZPWGVCWkVvQTNfM2R5NE1aYWhiOFNQQWQ5Y1NZZlFIUWF4dGdjY1NWTXBPWjNVWDhBZVdGV0p5?oc=5",
-      "tags": [
-        "#solarpanel",
-        "#solarUSA",
-        "#solarenergy"
-      ]
-    },
-    {
-      "id": "tn-4",
       "title": "Solar Rooftop Potential",
       "summary": "Trending solar coverage from Department of Energy (.gov) — use this United States topic for your own posts and SEO content.",
       "source": "Department of Energy (.gov)",
       "url": "https://news.google.com/rss/articles/CBMia0FVX3lxTFBuSk03WFQ0Yjd5U3AtM0hUdWxSNWNRS3FLTWlDZUU5WVRodU9QWHRLUWpCc2tEUkhaLWtQMC1CUnF5U3llSHcwWi1EZ0p6ZEFMRXdhclZ2ZldtZmVjOEE1dGg0Y3hiVDhUWVZr?oc=5",
       "tags": [
         "#solarrooftop",
+        "#solarUSA",
+        "#solarenergy"
+      ]
+    },
+    {
+      "id": "tn-4",
+      "title": "Should Solar Panel Recycling Be Mandated?",
+      "summary": "Trending solar coverage from RAND — use this United States topic for your own posts and SEO content.",
+      "source": "RAND",
+      "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE04eU5vcTB2enRTZ2FxQkg5S3YzcmdGbDFZdXVoblpQX29ZQU81bktscjZPWGVCWkVvQTNfM2R5NE1aYWhiOFNQQWQ5Y1NZZlFIUWF4dGdjY1NWTXBPWjNVWDhBZVdGV0p5?oc=5",
+      "tags": [
+        "#solarpanel",
         "#solarUSA",
         "#solarenergy"
       ]
@@ -146,7 +146,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "1M+"
+          "posts": "984K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -176,7 +176,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "175K+"
+          "posts": "176K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -186,7 +186,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "46K+"
+          "posts": "45K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -196,7 +196,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "121K+"
+          "posts": "116K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -206,7 +206,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "489K+"
+          "posts": "510K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -216,37 +216,37 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "97K+"
+          "posts": "95K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarusa/"
-    },
-    {
-      "tag": "#solarpanel",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "35K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
     },
     {
       "tag": "#solarrooftop",
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "44K+"
+          "posts": "43K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarrooftop/"
+    },
+    {
+      "tag": "#solarpanel",
+      "platforms": [
+        {
+          "name": "Instagram",
+          "posts": "37K+"
+        }
+      ],
+      "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
     },
     {
       "tag": "#solarinstallations",
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "23K+"
+          "posts": "22K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarinstallations/"
@@ -256,7 +256,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "33K+"
+          "posts": "34K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solargenerates/"
@@ -266,20 +266,10 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "35K+"
+          "posts": "34K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solardevelopment/"
-    },
-    {
-      "tag": "#solarstorage",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "32K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarstorage/"
     }
   ],
   "contentIdeas": [

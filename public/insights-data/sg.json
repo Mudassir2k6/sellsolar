@@ -2,8 +2,8 @@
   "version": 2,
   "countryCode": "SG",
   "location": "Singapore",
-  "lastUpdated": "2026-11-26T07:36:59+05:00",
-  "lastUpdatedLabel": "26 Nov 2026, 7:36 am PKT",
+  "lastUpdated": "2026-11-27T07:37:41+05:00",
+  "lastUpdatedLabel": "27 Nov 2026, 7:37 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
   "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarsingapore, solarpanel, solardeployment, solarpush",
   "trendingNews": [
@@ -44,17 +44,6 @@
     },
     {
       "id": "tn-4",
-      "title": "Singapore steps up partnerships to advance solar energy technologies",
-      "summary": "Trending solar coverage from TNGlobal — use this Singapore topic for your own posts and SEO content.",
-      "source": "TNGlobal",
-      "url": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNZWk1SF9nejRzUXRJUkpNN19HVXdJRDlhNTFjZFY0Y2hKM3RVdXJOTmxkd21sUHVDX2FmalRqaG5lOGgtMFZFNUU3Wml3dUR3dG45UDl1SWx3WEZKNUJrQl84TkdLY3RYZDZMWVFaZk4yU05EbXZTRXRhTnVaVXgtYVR4M05Ja2hTWlNkbzVIdnFULUczVW5LRUZUbVBXVUlEcHM5MldzNA?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarSingapore"
-      ]
-    },
-    {
-      "id": "tn-5",
       "title": "Singapore to Accelerate Solar Deployment to Meet 3 GWp Solar Target by 2030",
       "summary": "Trending solar coverage from Energy Market Authority (EMA) — use this Singapore topic for your own posts and SEO content.",
       "source": "Energy Market Authority (EMA)",
@@ -66,13 +55,24 @@
       ]
     },
     {
-      "id": "tn-6",
-      "title": "Singapore updates renewable energy certificate standard to tackle greenwashing; unveils new solar efforts",
-      "summary": "Trending solar coverage from The Business Times — use this Singapore topic for your own posts and SEO content.",
-      "source": "The Business Times",
-      "url": "https://news.google.com/rss/articles/CBMi3gFBVV95cUxNVGNRNTNyaFd0bEtwLUkzZjZwM3B0TzRUSjlUaDhxTENCVXR5S0ZIOHFHTVg5Q1lLRVBwY05VY2FZRTJvakxOSG9MS3VjSG8tUVRaSFhDVVA1UTZaZXN2ZlpXUldEalZrRGQ3QVZqcDdpVEVuLWdDTkMxbVZKakN2NFFYQVUwaDZTVl9NMEVDQzl3SUdsLWh6QWdOUzBNTS1vTHBYUG1BLTkxZlgyUEk1cXA0LVhwNHlWYWhJZFBkcWF3Wjh2eXhSeHM0STlWOWxUcVFQYmVJNWQ5eUpnSkE?oc=5",
+      "id": "tn-5",
+      "title": "Singapore steps up partnerships to advance solar energy technologies",
+      "summary": "Trending solar coverage from TNGlobal — use this Singapore topic for your own posts and SEO content.",
+      "source": "TNGlobal",
+      "url": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNZWk1SF9nejRzUXRJUkpNN19HVXdJRDlhNTFjZFY0Y2hKM3RVdXJOTmxkd21sUHVDX2FmalRqaG5lOGgtMFZFNUU3Wml3dUR3dG45UDl1SWx3WEZKNUJrQl84TkdLY3RYZDZMWVFaZk4yU05EbXZTRXRhTnVaVXgtYVR4M05Ja2hTWlNkbzVIdnFULUczVW5LRUZUbVBXVUlEcHM5MldzNA?oc=5",
       "tags": [
-        "#renewableenergy",
+        "#solarenergy",
+        "#solarSingapore"
+      ]
+    },
+    {
+      "id": "tn-6",
+      "title": "Singapore’s renewed solar push: Hanging panels, clay-like tiles for heritage buildings among plans",
+      "summary": "Trending solar coverage from The Straits Times — use this Singapore topic for your own posts and SEO content.",
+      "source": "The Straits Times",
+      "url": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxQWXFHTFFsSTFmVWRUSGxKX05hbWxwRUdFelZmd3YycDBqT1hYWWpobkx1ME1yQlMzMUlhTnhfR3JKSlhvbFJMdkNiakNreWZRNThyODl0bV8xWjFWaDR2aEZ0UVNaN3NnU0hlRzNiZ1lqR3hGWUtPXzdydVl2VGtCZk4wcmxWUmFqS24zR0w1VGFvR2ZrMWxhUFZreVdKUG5Sa1FCNUhTenFkLW1MU0RlOWpIUzNnUXdsTlhKT1h2Y0JVR0xpV05qTFZiaXlvcFVmaF9Wb2dUbFZCeDZKNmJN?oc=5",
+      "tags": [
+        "#solarpush",
         "#solarSingapore",
         "#solarenergy"
       ]
@@ -144,7 +144,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "1M+"
+          "posts": "984K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -174,7 +174,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "175K+"
+          "posts": "176K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -184,7 +184,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "46K+"
+          "posts": "45K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -194,7 +194,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "121K+"
+          "posts": "116K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -204,7 +204,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "489K+"
+          "posts": "510K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -214,7 +214,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "97K+"
+          "posts": "95K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarsingapore/"
@@ -234,7 +234,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "18K+"
+          "posts": "19K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solardeployment/"
@@ -244,7 +244,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "28K+"
+          "posts": "27K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpush/"

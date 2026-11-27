@@ -2,10 +2,10 @@
   "version": 2,
   "countryCode": "AE",
   "location": "United Arab Emirates",
-  "lastUpdated": "2026-11-26T07:36:59+05:00",
-  "lastUpdatedLabel": "26 Nov 2026, 7:36 am PKT",
+  "lastUpdated": "2026-11-27T07:37:41+05:00",
+  "lastUpdatedLabel": "27 Nov 2026, 7:37 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solaruae, solarpanel, solarplans, solarfarm, solarfarms",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solaruae, solarpanel, solarplans, solarfarm",
   "trendingNews": [
     {
       "id": "tn-1",
@@ -143,7 +143,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "1M+"
+          "posts": "984K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -173,7 +173,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "175K+"
+          "posts": "176K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -183,7 +183,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "46K+"
+          "posts": "45K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -193,7 +193,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "121K+"
+          "posts": "116K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -203,7 +203,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "489K+"
+          "posts": "510K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -213,7 +213,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "97K+"
+          "posts": "95K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solaruae/"
@@ -233,7 +233,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "31K+"
+          "posts": "32K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplans/"
@@ -243,20 +243,10 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "31K+"
+          "posts": "29K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarfarm/"
-    },
-    {
-      "tag": "#solarfarms",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "45K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarfarms/"
     }
   ],
   "contentIdeas": [

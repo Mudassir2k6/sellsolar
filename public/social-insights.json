@@ -2,10 +2,10 @@
   "version": 2,
   "countryCode": "PK",
   "location": "Pakistan",
-  "lastUpdated": "2026-11-26T07:36:59+05:00",
-  "lastUpdatedLabel": "26 Nov 2026, 7:36 am PKT",
+  "lastUpdated": "2026-11-27T07:37:41+05:00",
+  "lastUpdatedLabel": "27 Nov 2026, 7:37 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarpakistan, solarboom, solarpanel, solarrevolution, solarusers",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarpakistan, solarboom, solarrevolution, solarpanel, solarusers",
   "trendingNews": [
     {
       "id": "tn-1",
@@ -56,12 +56,12 @@
     },
     {
       "id": "tn-5",
-      "title": "Rs60 Billion Money Laundering Uncovered Through Solar Panel Imports, Senate Panel Told",
-      "summary": "Trending solar coverage from Energy Update — use this Pakistan topic for your own posts and SEO content.",
-      "source": "Energy Update",
-      "url": "https://news.google.com/rss/articles/CBMiugFBVV95cUxOdFVtMkR5N1o2M2VPX2VsZGF5enM2VDBRSTVOZktzOWVleXViQmI4U2lEWkJDdV81Ql9XaDZrNlZIUGN6dmtEZGZRMTUxR1BBbG8zOWRnQk9mUnlZOXJkNFdmWEo5Q2lId3dNUzN1QVg3a1ZRNGF4WkdDbWRNa1dVZThYOFJWZk53RUJEX0tIUW4td0pXakFEMXAyODY2c1ZIMndFeHdMZHpib2thcWJ3amxhbFZpZDNDSWc?oc=5",
+      "title": "Pakistan's solar boom puts pressure on national power grid",
+      "summary": "Trending solar coverage from The Business Standard — use this Pakistan topic for your own posts and SEO content.",
+      "source": "The Business Standard",
+      "url": "https://news.google.com/rss/articles/CBMipgFBVV95cUxPTjNocmUtcU9LTU8tWEJsbzhlRGpSMTFJRjRRR2dWMC0zc2Z5Wnd6ZGlQTUJFWVBMVGhqakNjMDRXMUd4RFd1MlYwZjZ6eTBNRFFENEU2TGtsNE5DX1RTSnp3YVlMSnFJYm5zbWpHTHRZUFhpdkp4STN4N2c2SHBDMWhYSVZBWXBxTnFhcW9jLXBKLVhLTTF1LTN3UVlYVVB5VHBmejhB?oc=5",
       "tags": [
-        "#solarpanel",
+        "#solarboom",
         "#solarPakistan",
         "#solarenergy"
       ]
@@ -145,7 +145,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "1M+"
+          "posts": "984K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -175,7 +175,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "175K+"
+          "posts": "176K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/netmetering/"
@@ -185,7 +185,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "46K+"
+          "posts": "45K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -195,7 +195,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "121K+"
+          "posts": "116K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -205,7 +205,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "489K+"
+          "posts": "510K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -215,7 +215,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "97K+"
+          "posts": "95K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpakistan/"
@@ -231,16 +231,6 @@
       "searchUrl": "https://www.instagram.com/explore/tags/solarboom/"
     },
     {
-      "tag": "#solarpanel",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "35K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
-    },
-    {
       "tag": "#solarrevolution",
       "platforms": [
         {
@@ -251,11 +241,21 @@
       "searchUrl": "https://www.instagram.com/explore/tags/solarrevolution/"
     },
     {
+      "tag": "#solarpanel",
+      "platforms": [
+        {
+          "name": "Instagram",
+          "posts": "35K+"
+        }
+      ],
+      "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
+    },
+    {
       "tag": "#solarusers",
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "21K+"
+          "posts": "22K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarusers/"

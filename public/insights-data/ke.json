@@ -2,13 +2,35 @@
   "version": 2,
   "countryCode": "KE",
   "location": "Kenya",
-  "lastUpdated": "2026-11-27T07:37:41+05:00",
-  "lastUpdatedLabel": "27 Nov 2026, 7:37 am PKT",
+  "lastUpdated": "2026-11-28T07:27:45+05:00",
+  "lastUpdatedLabel": "28 Nov 2026, 7:27 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarkenya, solarmarket, solarpanel",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarkenya, solarpanel, solarmarket",
   "trendingNews": [
     {
       "id": "tn-1",
+      "title": "Inside Kenya’s Small-Scale Solar Energy Revolution",
+      "summary": "Trending solar coverage from Construction Kenya — use this Kenya topic for your own posts and SEO content.",
+      "source": "Construction Kenya",
+      "url": "https://news.google.com/rss/articles/CBMieEFVX3lxTFBtMWJnb1pyUGdVVUluQUtreFAtclc4WkoxOUhDNHJheFhFbG11czBUU19paG04SW44dWtyNmQ4SUpLQTh1SWNzS1l3dW9xS084SVNPUWUwUE5tbUNSYXNPMzNHLXNLVFhhaktBeGxDX1FjY0RaQWNIbQ?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarKenya"
+      ]
+    },
+    {
+      "id": "tn-2",
+      "title": "Kikuyu Dairy Cooperative cuts power bill by 93 percent through solar energy",
+      "summary": "Trending solar coverage from Kenya News Agency — use this Kenya topic for your own posts and SEO content.",
+      "source": "Kenya News Agency",
+      "url": "https://news.google.com/rss/articles/CBMipwFBVV95cUxPc2RYNU1HQU5yQnlqS1dsM3B1V0lwQXZaZG9fbFphc01OQjhwWUxYOWRVLXpTcWFuZ1FZdDZTTlNhVlM0Z0hQLXljeE8zRjdVZnpKeExwX0ZrenVoSlpzdTA2S29JSDVQaDJDLUFGOGhhYlI3a2F0S1NpcXdHUEZhZTVUbDFmaEItMDVsMUZYUDdvd05vSFlVQ1RvVkF5ZmtPNW1mU2cyUQ?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarKenya"
+      ]
+    },
+    {
+      "id": "tn-3",
       "title": "Kenyans protest soaring Kenya Power bills as faulty meters push some to solar energy",
       "summary": "Trending solar coverage from Daily Nation — use this Kenya topic for your own posts and SEO content.",
       "source": "Daily Nation",
@@ -19,7 +41,7 @@
       ]
     },
     {
-      "id": "tn-2",
+      "id": "tn-4",
       "title": "𝐍𝐚𝐧𝐝𝐢 𝐭𝐨 𝐩𝐨𝐰𝐞𝐫 𝐌𝐨𝐭𝐡𝐞𝐫 𝐚𝐧𝐝 𝐁𝐚𝐛𝐲 𝐇𝐞𝐚𝐥𝐭𝐡 𝐂𝐨𝐦𝐩𝐥𝐞𝐱 𝐰𝐢𝐭𝐡 𝐒𝐨𝐥𝐚𝐫 𝐄𝐧𝐞𝐫𝐠𝐲 The Nandi County Government plans to install a solar power system at Kapsabet County Referral Hospital’s Mother and Baby Health Complex to reduce electricity c",
       "summary": "Trending solar coverage from Facebook — use this Kenya topic for your own posts and SEO content.",
       "source": "Facebook",
@@ -31,33 +53,11 @@
       ]
     },
     {
-      "id": "tn-3",
-      "title": "EDITORIAL: Solar energy provides Kenya’s path to a cheaper future",
-      "summary": "Trending solar coverage from the-star.co.ke — use this Kenya topic for your own posts and SEO content.",
-      "source": "the-star.co.ke",
-      "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxOLV9LM2xHeDMwS1lUdHdoSGxUVTFTNVJVQUNsRzJVMzREczhOZ24xVVc4aTRDMHpDSGFlVlVGN0xtU3dzTE5NaDNxczFwRms2MWRNSjAzTktOdVFfOE80VVQyU1ZHSnpIeWxvcmdYOEZEeFFCZ0s4b3c4N0VWSWhMSkplZ0RhWm5RUE1qbzE3Z05OSmZsMUNsRWdhdjkxSXlGcVBTejBYMWUtaEhkREd3MHd3VnlNMDg?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarKenya"
-      ]
-    },
-    {
-      "id": "tn-4",
-      "title": "“Solar energy is the way forward”: Kenyan Archbishop Urges Africa to Embrace Green Energy Amid Power Crisis",
-      "summary": "Trending solar coverage from ACI Africa — use this Kenya topic for your own posts and SEO content.",
-      "source": "ACI Africa",
-      "url": "https://news.google.com/rss/articles/CBMi2AFBVV95cUxQeERDMjBXVDJONFRpZG9GNkdMUUZOTFZJSjdfV2hOeEMwbzl0WHQzcmtfSF9CaTlHT09VNjc0bGFlVXpIVkVMeWFMWmRTZWQ4U1Z2ODI0YzlaMVRMNUVaWjZOdFMzNWJqdm04bUFiODIzRGJxZlpIVEg2YjBtVk4tWmNTN2VsTXRKNnkwQWtReTY2QkNlVkdjZWpUQXRPYkpqSC1kS1BsZVVwbkxnTXNXWXFQd1U2bUEtekVEUWVqYXlMOU9weHh6Q3U1OEVTNmNhUEIzZVFnUEjSAd4BQVVfeXFMTkN6eENRVEpRZVRBOVJOMXFqX0xDdTdJTk5OYVMyNmZ6OFVOZWxSOVI3RGRuTmJidlM3TGc0WF9hNzZTMEdlME9SSjZ2R1lGM1BNdXpBcFgyLTIxM2JtdlpUb2wwUUhLOGRqVmRmUDNSUlZ6YVl3X0F6dU9fTDR1RF94YWNrUmNaWWEyV3VhVEpjQlhkWUl6aHhvZmM4U1JpdGI1N3JiNm5sQlV4SGl3OE9QaUxjUEpMVVp6S3hxSEVYcGRqbzN2bFBWbWg1bUhXbjNudXA5QTVnVnhIUmhR?oc=5",
-      "tags": [
-        "#solarenergy",
-        "#solarKenya"
-      ]
-    },
-    {
       "id": "tn-5",
-      "title": "From circuits to sunshine: how Benjamin Kipruto found his calling in solar energy in Kenya",
-      "summary": "Trending solar coverage from UNESCO — use this Kenya topic for your own posts and SEO content.",
-      "source": "UNESCO",
-      "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxPYVpBUHZ2OUJOSVJmNmpKdEZ5OHVQUnNCNV9iUktOd2hhRS1qNUdXS3p5Umx6ZngtdGRzcm9fX1F6SVpjSzB3Si1lMDFWODRsdnBfVmlLWWRRbDlGY0U0NVViQkZIdXBmX3RZTExwZXhSRGNEMEhxQ0ZLQjZWcldqRVNpN3h5cG9BbDFtT3ljZ0hfN0syaEI2Z05JeWZxNkdRcGN2bVQySXdndGd6QUow?oc=5",
+      "title": "Nairobi to host East Africa's largest solar, energy exhibition",
+      "summary": "Trending solar coverage from The Star, Kenya — use this Kenya topic for your own posts and SEO content.",
+      "source": "The Star, Kenya",
+      "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQVVBBVUlkS0gzODNCdzNuWThHdHhnN1MzcWwxOG1hQnllSEFUNEthVFVCaUw0T3h6aWJDYVVSWmdDNmoyRHY3NVNmTHdqWnVEZ3Q1SzlIVnFqSEtFM0toYXJhQmNMRFNiOFhrbUJicm1meDNEZDh4OGNpM3hJUWtsOUV4YWo1RzZrMlk1bVhfZkc5Nk9GTUgyY2xqS0tyVHlrZThqb1ZqX1ZFdEdWUFhwbmVhLVdsdw?oc=5",
       "tags": [
         "#solarenergy",
         "#solarKenya"
@@ -65,12 +65,12 @@
     },
     {
       "id": "tn-6",
-      "title": "Global clean energy firm targets Kenya’s untapped solar market",
-      "summary": "Trending solar coverage from Citizen Digital — use this Kenya topic for your own posts and SEO content.",
-      "source": "Citizen Digital",
-      "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxQc01jS213Vi03dzVjWGlkVGdVRUpoaHZzVzk3NFk2b2wtdWRjb2t5SHBvc25IRWtDRWFSOURvQTY0ZXlzU1N6MndZWjc2LUlIemdZajlZVjV6US1WejRZRHBCTURmTVFnRDZQblhpSDNFUUVJekFVbG10cVBpakppM3lkVEhwcVI1TWNYbHBUd29SSWhZaG1qaWk5M2ZBa3VqMUgw?oc=5",
+      "title": "MOL, Sharp, IOM Implement Solar Panel Donation Project - Move Will Enhance Living Conditions in Power-short Areas of Kenya - | Information | Mitsui O.S.K. Lines",
+      "summary": "Trending solar coverage from 商船三井 — use this Kenya topic for your own posts and SEO content.",
+      "source": "商船三井",
+      "url": "https://news.google.com/rss/articles/CBMiYkFVX3lxTE1wZXJsWlBrb2hqckJ3U1owdlZydzJaeFQxY1QtMUppVTdTTjZSVDF5cEZMT0p2cDJJdjZYWjFtblRjSDFWcnE4X1l3LTR5bEpDT2xjSGE4OFhSb0x0TDdQQ29R?oc=5",
       "tags": [
-        "#solarmarket",
+        "#solarpanel",
         "#solarKenya",
         "#solarenergy"
       ]
@@ -142,7 +142,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "984K+"
+          "posts": "1M+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -182,7 +182,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "45K+"
+          "posts": "46K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -192,7 +192,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "116K+"
+          "posts": "118K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -202,7 +202,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "510K+"
+          "posts": "485K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -218,24 +218,24 @@
       "searchUrl": "https://www.instagram.com/explore/tags/solarkenya/"
     },
     {
-      "tag": "#solarmarket",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "27K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarmarket/"
-    },
-    {
       "tag": "#solarpanel",
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "37K+"
+          "posts": "36K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
+    },
+    {
+      "tag": "#solarmarket",
+      "platforms": [
+        {
+          "name": "Instagram",
+          "posts": "28K+"
+        }
+      ],
+      "searchUrl": "https://www.instagram.com/explore/tags/solarmarket/"
     }
   ],
   "contentIdeas": [

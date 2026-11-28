@@ -2,13 +2,25 @@
   "version": 2,
   "countryCode": "PK",
   "location": "Pakistan",
-  "lastUpdated": "2026-11-27T07:37:41+05:00",
-  "lastUpdatedLabel": "27 Nov 2026, 7:37 am PKT",
+  "lastUpdated": "2026-11-28T07:27:45+05:00",
+  "lastUpdatedLabel": "28 Nov 2026, 7:27 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarpakistan, solarboom, solarrevolution, solarpanel, solarusers",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarpakistan, solarrevolution, solarboom, solarsurge, solarpanel, solarsuccess",
   "trendingNews": [
     {
       "id": "tn-1",
+      "title": "Pakistan's solar revolution is so successful the national grid is lagging behind",
+      "summary": "Trending solar coverage from BBC — use this Pakistan topic for your own posts and SEO content.",
+      "source": "BBC",
+      "url": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE54N1FiSGpwT3FOZk90Q0ExaXlFeTd1cGRMUXBTc29oSWU3N1JHRmRmcTRhS0xFYVVJbzk0ZnUzUlB1ZW9EY0x5MUs3TzZKNEJxaW9SUDJIUlc2blk?oc=5",
+      "tags": [
+        "#solarrevolution",
+        "#solarPakistan",
+        "#solarenergy"
+      ]
+    },
+    {
+      "id": "tn-2",
       "title": "KP offers vast opportunities for solar energy investment: Kundi",
       "summary": "Trending solar coverage from Investify — use this Pakistan topic for your own posts and SEO content.",
       "source": "Investify",
@@ -19,7 +31,7 @@
       ]
     },
     {
-      "id": "tn-2",
+      "id": "tn-3",
       "title": "Solar power in Pakistan: Assisting Low-Income Families",
       "summary": "Trending solar coverage from The Borgen Project — use this Pakistan topic for your own posts and SEO content.",
       "source": "The Borgen Project",
@@ -31,35 +43,23 @@
       ]
     },
     {
-      "id": "tn-3",
-      "title": "How Pakistan’s solar boom is shielding it from worst of Iran war crisis",
-      "summary": "Trending solar coverage from Al Jazeera — use this Pakistan topic for your own posts and SEO content.",
-      "source": "Al Jazeera",
-      "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxQbGJ0eE1ueU9tZXpKZUUyUDFOV3dGTzFZQlMxbmFvTUNuSFAzN0ZLRUJJdXBBVnZMTFNBOVhHbk9iWXBsWEc1VDluMGcwbW1NVURmS3ZzLXFiMXQ3aXZIcG8ybVYxd3hTVnBuaUYzamFLQzgyMENpeGZaMTZSUkFCUTQ5S0NfbDhvLVNQOXVVd0tJd0djTWtqQW12d3FvUVRONFZLM01QcmZCQklabnFoOEtPaE7SAboBQVVfeXFMTUd3S2VrTWs5QzdBWUZnR0Nnak5FODVNWF9rczdwQmVJV3dYcjhxN0E4cXBJSV9CVkxTTEVfMEdZYS1lenhnbGFPaHBXZkZFOGRNZmlleDBxWE5NeWRPNlVndHZyNmUyLXFaanNJWFM5QWlTTGYzSmlpZVUwd2lRR2xaNlctTThOZW5qNXBpVXpaNy1MaUFMX3RmOE9pcXJvTENidkkzbl9GbFUyX2xDUVF6V19CaEt0REdn?oc=5",
-      "tags": [
-        "#solarboom",
-        "#solarPakistan",
-        "#solarenergy"
-      ]
-    },
-    {
       "id": "tn-4",
-      "title": "Powering Pakistan’s Future – Is There A Path To Renewable Energy Security By 2031",
-      "summary": "Trending solar coverage from The Friday Times — use this Pakistan topic for your own posts and SEO content.",
-      "source": "The Friday Times",
-      "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxOelcyMGJVRUV0NmZjNkYxcWJDT2dBNTdHa0JxTGxpWl95R01pTnRYX2F6MDV5N1BlTGk1anRrbHVOMU4wd3JkLXVHNS15aXdVZVJqaVZLYnhfNUcycFoxRjFjbVczT3RuYTVXc3RDQW5iNzVHSkdENU9MeElTWHRTREJVOWxqQS1KTG5XQ3laeVJud3hKQ01rb3EzVXRhMVZ3Y245SFZjSUs?oc=5",
+      "title": "War turned Pakistan into a solar power. Will other Asian nations follow?",
+      "summary": "Trending solar coverage from E&E News by POLITICO — use this Pakistan topic for your own posts and SEO content.",
+      "source": "E&E News by POLITICO",
+      "url": "https://news.google.com/rss/articles/CBMipgFBVV95cUxPLUk5MmZfRU5Ya3JEZWltdWpsQmhwWS1CQnJjVU5uVllKYlJlWGJxXzdnaENtRVl6cVlWNlVPNXR0OFNxemNXcVJ3dFhianhaUy11Q3NzN2pHZ3FkLTFwQnphUnRHU3dRc044MFpyNjhUdG1KZ2dLZkhKU19iNlV6ZG5mR0luaFB5dUlMcnRNY1hRM0dCTEZZdmlGWE1IbE1BY3VpUEhR?oc=5",
       "tags": [
-        "#renewableenergy",
+        "#solarpower",
         "#solarPakistan",
         "#solarenergy"
       ]
     },
     {
       "id": "tn-5",
-      "title": "Pakistan's solar boom puts pressure on national power grid",
-      "summary": "Trending solar coverage from The Business Standard — use this Pakistan topic for your own posts and SEO content.",
-      "source": "The Business Standard",
-      "url": "https://news.google.com/rss/articles/CBMipgFBVV95cUxPTjNocmUtcU9LTU8tWEJsbzhlRGpSMTFJRjRRR2dWMC0zc2Z5Wnd6ZGlQTUJFWVBMVGhqakNjMDRXMUd4RFd1MlYwZjZ6eTBNRFFENEU2TGtsNE5DX1RTSnp3YVlMSnFJYm5zbWpHTHRZUFhpdkp4STN4N2c2SHBDMWhYSVZBWXBxTnFhcW9jLXBKLVhLTTF1LTN3UVlYVVB5VHBmejhB?oc=5",
+      "title": "How Pakistan’s solar boom is shielding it from worst of Iran war crisis",
+      "summary": "Trending solar coverage from Al Jazeera — use this Pakistan topic for your own posts and SEO content.",
+      "source": "Al Jazeera",
+      "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxQbGJ0eE1ueU9tZXpKZUUyUDFOV3dGTzFZQlMxbmFvTUNuSFAzN0ZLRUJJdXBBVnZMTFNBOVhHbk9iWXBsWEc1VDluMGcwbW1NVURmS3ZzLXFiMXQ3aXZIcG8ybVYxd3hTVnBuaUYzamFLQzgyMENpeGZaMTZSUkFCUTQ5S0NfbDhvLVNQOXVVd0tJd0djTWtqQW12d3FvUVRONFZLM01QcmZCQklabnFoOEtPaE7SAboBQVVfeXFMTUd3S2VrTWs5QzdBWUZnR0Nnak5FODVNWF9rczdwQmVJV3dYcjhxN0E4cXBJSV9CVkxTTEVfMEdZYS1lenhnbGFPaHBXZkZFOGRNZmlleDBxWE5NeWRPNlVndHZyNmUyLXFaanNJWFM5QWlTTGYzSmlpZVUwd2lRR2xaNlctTThOZW5qNXBpVXpaNy1MaUFMX3RmOE9pcXJvTENidkkzbl9GbFUyX2xDUVF6V19CaEt0REdn?oc=5",
       "tags": [
         "#solarboom",
         "#solarPakistan",
@@ -145,7 +145,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "984K+"
+          "posts": "1M+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -185,7 +185,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "45K+"
+          "posts": "46K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -195,7 +195,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "116K+"
+          "posts": "118K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -205,7 +205,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "510K+"
+          "posts": "485K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -221,16 +221,6 @@
       "searchUrl": "https://www.instagram.com/explore/tags/solarpakistan/"
     },
     {
-      "tag": "#solarboom",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "43K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarboom/"
-    },
-    {
       "tag": "#solarrevolution",
       "platforms": [
         {
@@ -239,6 +229,26 @@
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarrevolution/"
+    },
+    {
+      "tag": "#solarboom",
+      "platforms": [
+        {
+          "name": "Instagram",
+          "posts": "45K+"
+        }
+      ],
+      "searchUrl": "https://www.instagram.com/explore/tags/solarboom/"
+    },
+    {
+      "tag": "#solarsurge",
+      "platforms": [
+        {
+          "name": "Instagram",
+          "posts": "45K+"
+        }
+      ],
+      "searchUrl": "https://www.instagram.com/explore/tags/solarsurge/"
     },
     {
       "tag": "#solarpanel",
@@ -251,14 +261,14 @@
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
     },
     {
-      "tag": "#solarusers",
+      "tag": "#solarsuccess",
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "22K+"
+          "posts": "17K+"
         }
       ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarusers/"
+      "searchUrl": "https://www.instagram.com/explore/tags/solarsuccess/"
     }
   ],
   "contentIdeas": [

@@ -2,25 +2,48 @@
   "version": 2,
   "countryCode": "US",
   "location": "United States",
-  "lastUpdated": "2026-11-27T07:37:41+05:00",
-  "lastUpdatedLabel": "27 Nov 2026, 7:37 am PKT",
+  "lastUpdated": "2026-11-28T07:27:45+05:00",
+  "lastUpdatedLabel": "28 Nov 2026, 7:27 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarusa, solarrooftop, solarpanel, solarinstallations, solargenerates, solardevelopment",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarusa, solarpanel, solarcapacity",
   "trendingNews": [
     {
       "id": "tn-1",
-      "title": "End-of-Life Solar Panels: Regulations and Management",
-      "summary": "Trending solar coverage from U.S. Environmental Protection Agency (.gov) — use this United States topic for your own posts and SEO content.",
-      "source": "U.S. Environmental Protection Agency (.gov)",
-      "url": "https://news.google.com/rss/articles/CBMie0FVX3lxTE9VLWxPWUZjU0syN0hBQ1VBRnVsX19JSFAtNnlTVUdpUkUzMHkwZk5hM3hSUm1iNk1oTkFZNlJ5UGs3cUMwUVdHZ3EwODhfeW9vX2Z5N0lHN2JYbkFaNE82Z0xEdXJjSFlXR2xnRlhZdUFpWjdKdmlvNDRfZw?oc=5",
+      "title": "Steel solar panel frames hit the mainstream",
+      "summary": "Trending solar coverage from Solar Power World — use this United States topic for your own posts and SEO content.",
+      "source": "Solar Power World",
+      "url": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNSnVCYTVhRUI3ZzVDMVlBX2JqRy1YVjZmOFhHaXlqSWxKUUlOcEktVFFPMkxHbHdZVzVlTlBxemF3V1lhQ1ViQm13T3Q3MnRncHBMVVIxZUhPZmNLbFBsdW1waFRScUdhWXVPZmJTWFhfcGpCOEdlYXNtc0xiQTUtTnRpS1E4NzFhYWRRWGRhVVpqbFVq?oc=5",
       "tags": [
-        "#solarpanels",
+        "#solarpanel",
         "#solarUSA",
         "#solarenergy"
       ]
     },
     {
       "id": "tn-2",
+      "title": "Solar Panel Recycling expands U.S. operations with new California facility",
+      "summary": "Trending solar coverage from Recycling Product News — use this United States topic for your own posts and SEO content.",
+      "source": "Recycling Product News",
+      "url": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxQeExXR3pqM1JRRXJhVEt5VVFYQkNwODZhb2RJckRtdHBCeFJzNG1jbnA0UDA2Uzk5M0ZBMXlRYXM5dmNacWl1c3E3cmxPb2dNcjN5V3FlaGRwMk5rYndMS2xQYjBfelhwanA0X1QyTUROaTh4QzZrVkp4dmo3UThOaWtLX25VTnRNdUVEeE84SEVKdVgybEM1a1hRd09CWUFSNVFiRXJIXzNaUlJLSHVKZllhR2J4TkVHUjl6RFhSZWU?oc=5",
+      "tags": [
+        "#solarpanel",
+        "#solarUSA",
+        "#solarenergy"
+      ]
+    },
+    {
+      "id": "tn-3",
+      "title": "Learning a Better Way To Forecast Wind and Solar Energy Costs",
+      "summary": "Trending solar coverage from Department of Energy (.gov) — use this United States topic for your own posts and SEO content.",
+      "source": "Department of Energy (.gov)",
+      "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxOTHdkTVREYm1yWjFFS3psZTVzQVg5REN1ZWNWZFNXWjdqLVRjOWZpcVF1cTlhLUd3bERWS2kteHBRMXEwdHdpUUl0UUlJcXd3ZTdNS0dUZnI0b0tjMDB0RC1pUERDVUFWYThibk8zcll0V0YtNUNESmxtVHF0WFF2VTZWXzJobWtoQmc2THlWWjdDN3JBbUl1UzhXVVBzbE5f?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarUSA"
+      ]
+    },
+    {
+      "id": "tn-4",
       "title": "A New Crop of Solar Panels Is the U.S.’s Best Hope of Catching China",
       "summary": "Trending solar coverage from The New York Times — use this United States topic for your own posts and SEO content.",
       "source": "The New York Times",
@@ -32,51 +55,26 @@
       ]
     },
     {
-      "id": "tn-3",
-      "title": "Solar Rooftop Potential",
-      "summary": "Trending solar coverage from Department of Energy (.gov) — use this United States topic for your own posts and SEO content.",
-      "source": "Department of Energy (.gov)",
-      "url": "https://news.google.com/rss/articles/CBMia0FVX3lxTFBuSk03WFQ0Yjd5U3AtM0hUdWxSNWNRS3FLTWlDZUU5WVRodU9QWHRLUWpCc2tEUkhaLWtQMC1CUnF5U3llSHcwWi1EZ0p6ZEFMRXdhclZ2ZldtZmVjOEE1dGg0Y3hiVDhUWVZr?oc=5",
-      "tags": [
-        "#solarrooftop",
-        "#solarUSA",
-        "#solarenergy"
-      ]
-    },
-    {
-      "id": "tn-4",
-      "title": "Should Solar Panel Recycling Be Mandated?",
-      "summary": "Trending solar coverage from RAND — use this United States topic for your own posts and SEO content.",
-      "source": "RAND",
-      "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE04eU5vcTB2enRTZ2FxQkg5S3YzcmdGbDFZdXVoblpQX29ZQU81bktscjZPWGVCWkVvQTNfM2R5NE1aYWhiOFNQQWQ5Y1NZZlFIUWF4dGdjY1NWTXBPWjNVWDhBZVdGV0p5?oc=5",
-      "tags": [
-        "#solarpanel",
-        "#solarUSA",
-        "#solarenergy"
-      ]
-    },
-    {
       "id": "tn-5",
-      "title": "6 Million Solar Installations: Powering American Communities",
+      "title": "REPORT: U.S. Solar Capacity Can Now Power Over 50 Million American Homes – SEIA",
       "summary": "Trending solar coverage from Solar Energy Industries Association — use this United States topic for your own posts and SEO content.",
       "source": "Solar Energy Industries Association",
-      "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTE1xeHMxRVhIMHF0Q0JfVi1DRDFHNUdybE4wMlR2Z2JEeDYweFNzQVFLLWVXeU9sVE9jZlo1Z0xHR2xvZmFGSk9jaFlsaVotSmNRcFAtSzhTb3pIQzN2WGNLRTdHVEpfMHI0aWNvRVRnQWZ3NExS?oc=5",
+      "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxNemVaVUNlWUJJN3dQOGctTlVTNU51RTNBX2dBaHJHWnBUUDVkN2JSWF9zT3NTbWZBRXJmaWJLYzV2Q05rc1FkNElvbnJmankwNnhQRmZfLTNsVW8wZWF1S0tTaWdSdEp4XzVTX1dTT29jNDVnNmRoNjJoUHd3c0Rqb2UxT1VPbmtqRFFkSWdn?oc=5",
       "tags": [
-        "#solarinstallations",
+        "#solarcapacity",
         "#solarUSA",
         "#solarenergy"
       ]
     },
     {
       "id": "tn-6",
-      "title": "Solar generates more energy in US than coal for first time",
-      "summary": "Trending solar coverage from The Guardian — use this United States topic for your own posts and SEO content.",
-      "source": "The Guardian",
-      "url": "https://news.google.com/rss/articles/CBMid0FVX3lxTE5ZeFB6c1pNeWdwRUFtM0VtZUJDZGVMWjFNTFh1MTNINkdBaFRXdF9VMlpVdUFOREduaWFhdmJGM3dWQkNzdHlNS1dqUHZqSWE0NDJEZmw0SWxmaUNCZkhoMHNSZzY0WW1XNVp3a0wwWVZnOFgyb3ZB?oc=5",
+      "title": "Building More Solar Energy Sources Means Rethinking Land Use For Agriculture And Conservation",
+      "summary": "Trending solar coverage from FlaglerLive — use this United States topic for your own posts and SEO content.",
+      "source": "FlaglerLive",
+      "url": "https://news.google.com/rss/articles/CBMiS0FVX3lxTE5mVWhnZUo5SlN4LW1GTk0xV0lKQ2pQZks2eEJrVmYyY3ByTVhnRlp2RHNlclN0NHFuelpQMk5Nb0F0WHdFc0pER2Fxcw?oc=5",
       "tags": [
-        "#solargenerates",
-        "#solarUSA",
-        "#solarenergy"
+        "#solarenergy",
+        "#solarUSA"
       ]
     }
   ],
@@ -146,7 +144,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "984K+"
+          "posts": "1M+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -186,7 +184,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "45K+"
+          "posts": "46K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -196,7 +194,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "116K+"
+          "posts": "118K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -206,7 +204,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "510K+"
+          "posts": "485K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -222,54 +220,24 @@
       "searchUrl": "https://www.instagram.com/explore/tags/solarusa/"
     },
     {
-      "tag": "#solarrooftop",
+      "tag": "#solarpanel",
+      "platforms": [
+        {
+          "name": "Instagram",
+          "posts": "36K+"
+        }
+      ],
+      "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
+    },
+    {
+      "tag": "#solarcapacity",
       "platforms": [
         {
           "name": "Instagram",
           "posts": "43K+"
         }
       ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarrooftop/"
-    },
-    {
-      "tag": "#solarpanel",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "37K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
-    },
-    {
-      "tag": "#solarinstallations",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "22K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarinstallations/"
-    },
-    {
-      "tag": "#solargenerates",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "34K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solargenerates/"
-    },
-    {
-      "tag": "#solardevelopment",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "34K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solardevelopment/"
+      "searchUrl": "https://www.instagram.com/explore/tags/solarcapacity/"
     }
   ],
   "contentIdeas": [

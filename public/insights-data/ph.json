@@ -2,13 +2,24 @@
   "version": 2,
   "countryCode": "PH",
   "location": "Philippines",
-  "lastUpdated": "2026-11-27T07:37:41+05:00",
-  "lastUpdatedLabel": "27 Nov 2026, 7:37 am PKT",
+  "lastUpdated": "2026-11-28T07:27:45+05:00",
+  "lastUpdatedLabel": "28 Nov 2026, 7:27 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarphilippines, solarpanel, solarinstallation, solarsurge, solarexport, solarboom",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarphilippines, solarpanel, solarinstallation, solarsurge, solarboom",
   "trendingNews": [
     {
       "id": "tn-1",
+      "title": "Vietnam's VinEnergo breaks ground on 126 MWp solar energy project in Philippines",
+      "summary": "Trending solar coverage from TNGlobal — use this Philippines topic for your own posts and SEO content.",
+      "source": "TNGlobal",
+      "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPTWU4SXlHdmpodVB2Ny1HY19CWDBlMlBwOWJiYlJVWnp4bUpkNmRZS0hPaVU3NEtLeXc5MDd2cmFHWjB0Qld4WXBmX1YyVnh6THpLdWhXbkZWWldzUTVSTUxjRXM3X2luUUo3WE41Z0NCcjhjMDd4WWtja2taYzhmZmFJSGQtQXA5QTlqa1h0SFlBem14ZklzY3dGejlTb1BUa0QtN3lXOVJGVXBIeXNFSWtMaUc1QQ?oc=5",
+      "tags": [
+        "#solarenergy",
+        "#solarPhilippines"
+      ]
+    },
+    {
+      "id": "tn-2",
       "title": "DOE drafts ordinance to streamline solar panel installation requirements",
       "summary": "Trending solar coverage from Philippine News Agency — use this Philippines topic for your own posts and SEO content.",
       "source": "Philippine News Agency",
@@ -20,7 +31,7 @@
       ]
     },
     {
-      "id": "tn-2",
+      "id": "tn-3",
       "title": "Lawmaker bats for nationwide household solar installation subsidy MANILA – Abra lone district Rep. JB Bernos on Thursday called on the government to consider replicating a neighboring country’s initiative that would help residents finance a shift to solar ene",
       "summary": "Trending solar coverage from Facebook — use this Philippines topic for your own posts and SEO content.",
       "source": "Facebook",
@@ -32,35 +43,22 @@
       ]
     },
     {
-      "id": "tn-3",
-      "title": "How the Philippines’ rooftop solar surge can flip the energy emergency script",
-      "summary": "Trending solar coverage from Ember Energy — use this Philippines topic for your own posts and SEO content.",
-      "source": "Ember Energy",
-      "url": "https://news.google.com/rss/articles/CBMiugFBVV95cUxPd2RnUTBYLVU4cjBYM0Z6OUdhUElZUWxKZWdQNEpSRmRBcXNuUWZBTUdXTkxuOVZ3cGhWM1otT1VkWDhrZXJ4Sjl6cVNDVE5WUnliOXE2T2l0Nk1zSjFubnFYMnZpVlRERzh0QnhHUGw0UFU3ZmliSC03Tl83QVJIYXJEN2lLMUlTdmVZVDN0YWVHOWVzc1BVdnpXUjlhS0Zpb3JnWWRNWkRuR0NZUkVwWFc0SWlRaFRRc2c?oc=5",
-      "tags": [
-        "#solarsurge",
-        "#solarPhilippines",
-        "#solarenergy"
-      ]
-    },
-    {
       "id": "tn-4",
-      "title": "Philippines leads the world in rush to solar as power prices soar",
-      "summary": "Trending solar coverage from Reuters — use this Philippines topic for your own posts and SEO content.",
-      "source": "Reuters",
-      "url": "https://news.google.com/rss/articles/CBMipwFBVV95cUxOaHpHeV9XOF8wZXVYRS1NSDJ5bTJzTTZwZ3NlRHR5aXZ5dUh5ZXJtWnFmVHRvTVFfMXl1eUVSeDQtZGkxby1DQVZrb3ZrNUJFdE1rNjVMd05lRjBNTHU4a21tdTJ4ZFNnbDFFTE14M1hwY0Flb0ZtYmxuemhEQW45U05tYlAtcFRSM1JsMDVKYkhKUU5RMUNBVUNIQlJySXBxQ1dKVmlxSQ?oc=5",
+      "title": "Is solar energy only for the rich?",
+      "summary": "Trending solar coverage from Rappler — use this Philippines topic for your own posts and SEO content.",
+      "source": "Rappler",
+      "url": "https://news.google.com/rss/articles/CBMif0FVX3lxTE5iaGFCWmI5bUJwMzBPM1k0cmxhdHZLdFZ0VDlwNGFNVS1ubC05Y2Jzek9TbExtR2FYU2t3WXdDYkwxbXo3eFRhN3VXUy1GNm8xVVpXVURKRGY2N3hMeDBFZDVsU05lWEt5MW5aN01aTUpzdkpYLUVCWU85LTVHOEU?oc=5",
       "tags": [
-        "#solarpower",
-        "#solarPhilippines",
-        "#solarenergy"
+        "#solarenergy",
+        "#solarPhilippines"
       ]
     },
     {
       "id": "tn-5",
-      "title": "Climate Investment Funds invests in solar energy in the Philippines",
-      "summary": "Trending solar coverage from Energy Global — use this Philippines topic for your own posts and SEO content.",
-      "source": "Energy Global",
-      "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxNbXNZZzlGVnc2NGRhZ2x2MnhER19yc09sTFpvZTR0QmRodU5TTFVMd3Z0VFhGOXdWVnUyQ0RFbm5ianFKWmFOa3ZsQnlJTVBkUG5zRGF6NUpSbVBjWHk4dDlNa3NXTi1iTUJQOWd6M0tkTHozM18yM2p0aDYzV3hNNGVSeHd6V2RLcjFONF8wQy1sTXdrZU1mR01fdG56UkJwYmc4NXlyaE9NLXdrWTRiNnJtNA?oc=5",
+      "title": "Transportify sees increased deliveries of Solar Energy and Water Storage Equipment across the Philippines",
+      "summary": "Trending solar coverage from Voice of ASIA — use this Philippines topic for your own posts and SEO content.",
+      "source": "Voice of ASIA",
+      "url": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxOdGoxYXVET2FWbXZna0diZnAySnJ0Y3diSHEtMFZuSzgxZlR4Q0dMV3RxQ19vc0stalF6TjRHRXp2Z2JOX1FxYXZqUFNMOFoxLThtbjVRc2JyaERsTEN4cEw5MkZSc0J0STJKMXJBVC1Rb2VITUVpUWhwTjcwc0hKSDB5QTBCRmVYbWJFeEI3WWdEbWgxNGFjZUlTMDJBS2IzQVdOdkwteXowN2RxNjVaUk1vN29IY0o5aF9ZdHlPLWFIazRSVHZGd0RKSFN3VjR2VERVUTFuTQ?oc=5",
       "tags": [
         "#solarenergy",
         "#solarPhilippines"
@@ -68,10 +66,10 @@
     },
     {
       "id": "tn-6",
-      "title": "Anker SOLIX brings solar energy storage products to Philippines",
-      "summary": "Trending solar coverage from BusinessWorld Online — use this Philippines topic for your own posts and SEO content.",
-      "source": "BusinessWorld Online",
-      "url": "https://news.google.com/rss/articles/CBMiugFBVV95cUxNejd3bktFYlZYM2pBVTh3UklhMm85YjRsdWxrNmJ6RVNUTlR6NTYwcnBqR01QWENQTXp0N0NTWnJrcWdhb1oySENpb2pRa2ZjOHg2QkpoRHVQWTB1dEFYSXAxR3dMVXBMWUFld29fQ0ZJdEUwQjZqaGFBRVhCWWxXMURZa2RabmZFdVlXajhlS3RVWE9wSkY3ZU96SmdJZGVlRkR3WWZRM2ZFSFB6MFZienl4QjJ1aTRScnc?oc=5",
+      "title": "Climate Investment Funds invests in solar energy in the Philippines",
+      "summary": "Trending solar coverage from Energy Global — use this Philippines topic for your own posts and SEO content.",
+      "source": "Energy Global",
+      "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxNbXNZZzlGVnc2NGRhZ2x2MnhER19yc09sTFpvZTR0QmRodU5TTFVMd3Z0VFhGOXdWVnUyQ0RFbm5ianFKWmFOa3ZsQnlJTVBkUG5zRGF6NUpSbVBjWHk4dDlNa3NXTi1iTUJQOWd6M0tkTHozM18yM2p0aDYzV3hNNGVSeHd6V2RLcjFONF8wQy1sTXdrZU1mR01fdG56UkJwYmc4NXlyaE9NLXdrWTRiNnJtNA?oc=5",
       "tags": [
         "#solarenergy",
         "#solarPhilippines"
@@ -144,7 +142,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "984K+"
+          "posts": "1M+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -184,7 +182,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "45K+"
+          "posts": "46K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -194,7 +192,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "116K+"
+          "posts": "118K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -204,7 +202,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "510K+"
+          "posts": "485K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -224,7 +222,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "35K+"
+          "posts": "36K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
@@ -248,16 +246,6 @@
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarsurge/"
-    },
-    {
-      "tag": "#solarexport",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "20K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarexport/"
     },
     {
       "tag": "#solarboom",

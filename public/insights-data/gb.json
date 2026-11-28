@@ -2,17 +2,17 @@
   "version": 2,
   "countryCode": "GB",
   "location": "United Kingdom",
-  "lastUpdated": "2026-11-27T07:37:41+05:00",
-  "lastUpdatedLabel": "27 Nov 2026, 7:37 am PKT",
+  "lastUpdated": "2026-11-28T07:27:45+05:00",
+  "lastUpdatedLabel": "28 Nov 2026, 7:27 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solaruk, solarpanel, solarefficiency, plugsolar, solarfarms",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solaruk, solarpanel, solarfires, solarefficiency, solarproject",
   "trendingNews": [
     {
       "id": "tn-1",
-      "title": "Solar panel grants and funding in the UK 2026 | FMB",
-      "summary": "Trending solar coverage from FMB, Federation of Master Builders — use this United Kingdom topic for your own posts and SEO content.",
-      "source": "FMB, Federation of Master Builders",
-      "url": "https://news.google.com/rss/articles/CBMic0FVX3lxTE13dExMbU1xbTZQcjRFbkhpb3VEREwwYzBTUGtjNWFVQjhtSEpEbC0zcUhnY2xmMmktRWVkSXBRMUlFTmR5WWcwWWduTG9wN2V4VHhCVThRaUpWa25xWDViaWhuTWdZMVc5REg1SGJOSXJaMGs?oc=5",
+      "title": "Microchannel heat pipe cuts solar panel temperature by 15.5 C",
+      "summary": "Trending solar coverage from pv magazine Global — use this United Kingdom topic for your own posts and SEO content.",
+      "source": "pv magazine Global",
+      "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxNQXNISjZsSGJFNW5HQ1ZTWE40TUN2NmNodUpYWWdPLU1FMUt1WHlTTnFzSGwxcW0zWUJJLXFRdnhUeVRReGdHTVpwSFh2LW0xNmp2Z3lMWXJXcDI3T3FuaG9Ic2JEbE10aHM0eUdoeTNxb3ZnMEJHWk5aVHVmcEhKVkh0NktfRzU0SGxUMVBuZFlmSFhzamMwTDM1YnNqSnZ3MGNN?oc=5",
       "tags": [
         "#solarpanel",
         "#solarUK",
@@ -69,12 +69,12 @@
     },
     {
       "id": "tn-6",
-      "title": "Microchannel Heat Pipe PV-T Module Boosts Solar Efficiency to 11.15% - News and Statistics",
-      "summary": "Trending solar coverage from IndexBox — use this United Kingdom topic for your own posts and SEO content.",
-      "source": "IndexBox",
-      "url": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxNYURNamdKS0ZOWmNWTjlZOS1fcVNYdFZuRkR6NUtDZVJwOER0TmFpcVZJdXl3TGxpSUhDcmxISF9HQTZPeTA1cU9KOXU5VmRoTmZYRVQzOUZBZ0RGSHNaa3JVTVNzVmR2SU5weXl6SWJydGZlZUMxdVRIWUJMMHY4WVFNNXd2cGk1aHo2QUEtVnNqeWk5d1RrdWNvamJLMEdGcUpQWDc5aHhhbDMyaFNNZUZOeHBkLVlD?oc=5",
+      "title": "Plug-in solar panels are coming to a shop near you - here's what to know",
+      "summary": "Trending solar coverage from BBC — use this United Kingdom topic for your own posts and SEO content.",
+      "source": "BBC",
+      "url": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE1DWlo2Q2pUcm9ianVpT1dKMWxaY0tmaXdOQU1Ra2hQR3dscUJ6LTlxcHY1T0NsYXk4c0pJbWNucUsycHd0alhZNFk3VkRQT2phMkNTdEc0WnNadw?oc=5",
       "tags": [
-        "#solarefficiency",
+        "#solarpanels",
         "#solarUK",
         "#solarenergy"
       ]
@@ -146,7 +146,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "984K+"
+          "posts": "1M+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -186,7 +186,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "45K+"
+          "posts": "46K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -196,7 +196,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "116K+"
+          "posts": "118K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -206,7 +206,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "510K+"
+          "posts": "485K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -226,40 +226,40 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "35K+"
+          "posts": "36K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
+    },
+    {
+      "tag": "#solarfires",
+      "platforms": [
+        {
+          "name": "Instagram",
+          "posts": "44K+"
+        }
+      ],
+      "searchUrl": "https://www.instagram.com/explore/tags/solarfires/"
     },
     {
       "tag": "#solarefficiency",
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "37K+"
+          "posts": "35K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarefficiency/"
     },
     {
-      "tag": "#plugsolar",
+      "tag": "#solarproject",
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "24K+"
+          "posts": "28K+"
         }
       ],
-      "searchUrl": "https://www.instagram.com/explore/tags/plugsolar/"
-    },
-    {
-      "tag": "#solarfarms",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "46K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarfarms/"
+      "searchUrl": "https://www.instagram.com/explore/tags/solarproject/"
     }
   ],
   "contentIdeas": [

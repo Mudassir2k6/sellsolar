@@ -2,10 +2,10 @@
   "version": 2,
   "countryCode": "SA",
   "location": "Saudi Arabia",
-  "lastUpdated": "2026-11-27T07:37:41+05:00",
-  "lastUpdatedLabel": "27 Nov 2026, 7:37 am PKT",
+  "lastUpdated": "2026-11-28T07:27:45+05:00",
+  "lastUpdatedLabel": "28 Nov 2026, 7:27 am PKT",
   "notice": "Real-time trending solar content from across the web and social media — not your own data.",
-  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarsaudiarabia, solarprojects, solarpanel, goingsolar",
+  "seoKeywords": "solarenergy, solarpower, solarpanels, gogreen, renewableenergy, cleanenergy, solartok, solar, sustainability, netmetering, solarplates, hybridinverter, lifepo4, solarsaudiarabia, solarprojects, goingsolar",
   "trendingNews": [
     {
       "id": "tn-1",
@@ -67,12 +67,12 @@
     },
     {
       "id": "tn-6",
-      "title": "KAUST tests innovative solar panel coating",
-      "summary": "Trending solar coverage from Arab News — use this Saudi Arabia topic for your own posts and SEO content.",
-      "source": "Arab News",
-      "url": "https://news.google.com/rss/articles/CBMikgFBVV95cUxNdWk0TFh4SW1YTmN3MHdRVmJ6X3Z0QXdfdzhiWS1fT2NNVlJ2dXJkMFVkb2VhSmc3aEs0SEUwcHBRMlBQQVFPd2oxVmJGWHhuTm9PVkF1WXdVM0NVN002R0cyaUtsZmpMaHZyaFJfVC10ZTd6R1locnp5V0lJMDFjMHBiQ0lRT0dhOWtzeUJISjVfQQ?oc=5",
+      "title": "Oil Giant Saudi Arabia Is Emerging as a Solar Power",
+      "summary": "Trending solar coverage from WSJ — use this Saudi Arabia topic for your own posts and SEO content.",
+      "source": "WSJ",
+      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNXy0xakx5RlVXYWV3MDFuTU9fdkdEeW43QXJGei00WHdZZ1hNY3FfNnVOMXcyY0hkU05COFktM2k4Njd2X04wOFV4MUxNa0NIR3lhNmtCdjZpR0J5WHVpOFYweHZRUFlITUVFVnlFUkNDM2IxWDQ1aE5fdDhJZ0RrdG5TazJZcWt1M3F4bGNiWlg2MkR3LWhheUZ6LUNjQWUzQWc?oc=5",
       "tags": [
-        "#solarpanel",
+        "#solarpower",
         "#solarSaudiArabia",
         "#solarenergy"
       ]
@@ -144,7 +144,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "984K+"
+          "posts": "1M+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/solartok"
@@ -184,7 +184,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "45K+"
+          "posts": "46K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/solarplates/"
@@ -194,7 +194,7 @@
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "116K+"
+          "posts": "118K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/hybridinverter/"
@@ -204,7 +204,7 @@
       "platforms": [
         {
           "name": "TikTok",
-          "posts": "510K+"
+          "posts": "485K+"
         }
       ],
       "searchUrl": "https://www.tiktok.com/tag/lifepo4"
@@ -230,21 +230,11 @@
       "searchUrl": "https://www.instagram.com/explore/tags/solarprojects/"
     },
     {
-      "tag": "#solarpanel",
-      "platforms": [
-        {
-          "name": "Instagram",
-          "posts": "37K+"
-        }
-      ],
-      "searchUrl": "https://www.instagram.com/explore/tags/solarpanel/"
-    },
-    {
       "tag": "#goingsolar",
       "platforms": [
         {
           "name": "Instagram",
-          "posts": "12K+"
+          "posts": "13K+"
         }
       ],
       "searchUrl": "https://www.instagram.com/explore/tags/goingsolar/"
